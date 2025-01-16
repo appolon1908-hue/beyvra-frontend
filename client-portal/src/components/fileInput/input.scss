@@ -1,0 +1,82 @@
+.fileInput{
+    max-width: 28rem;
+    .progress-wrapper{
+        border: 2px solid #2dd674;
+        height: 120px;
+        padding:18px 24px;
+        border-radius: 8px ;
+        .ant-progress {
+            .ant-progress-inner{
+                background-color: white;
+            }
+            .ant-progress-text{
+                color: #A3A8B0;
+            }
+        }
+    }
+   
+    .ant-upload-wrapper{
+        .ant-upload-drag{
+            border: none; 
+            border: 2px dashed #2dd674;
+            width: 100%; 
+            margin: 20px 0; 
+            overflow: hidden;
+            height: 120px ;
+       
+            &.fail{
+                border: 2px solid  #E03137
+
+
+            }
+            &.success{
+                border: 2px dashed #2dd674;
+            }
+            
+            .ant-upload{
+                .upload-btn{
+                    // padding: 16px;
+                }
+                padding: 0;
+
+            }
+        }
+        .ant-upload-drag-container{
+            background: #17273E;
+            margin: 0 !important;
+            padding: 16px !important;
+            
+            p.ant-upload-drag-icon{
+                margin-bottom: 0;
+            }
+            > div{
+                display: flex !important;
+                justify-content: center;
+                align-items: center;
+                padding: 1rem;
+                gap: 10px;
+    
+                .text-wrap{
+                    .ant-upload-text{
+                        color: white;
+                    }
+                    .ant-upload-hint{
+                        color: white;
+                    }
+    
+                }
+    
+                .ant-upload .ant-upload-btn{
+                    background-color: red;
+                    align-items: center;
+                    padding: 0 !important;
+            
+                }
+            }
+           
+          
+        }
+    }
+
+ 
+}

@@ -1,0 +1,453 @@
+.navbarContainer{
+    display: flex;
+    justify-content: space-between;
+    padding: 1.3rem 7.3rem;
+    align-items: center;
+    width: 100%;
+    margin: auto;
+    color: white;
+    background-color: #0E0F12;
+    position: fixed;
+    z-index: 100;
+    @media (max-width: 730px) {
+        padding: 1rem 1rem;
+      }
+
+    .leftSideNav{
+        display: flex;
+        flex: 50%;
+        justify-content: space-between;
+        align-items: center;
+        @media (max-width: 730px) {
+            flex: none;
+          }
+        img{
+            height: 1.6rem;
+        }
+        .navContent{
+            margin-right: 1rem;
+            display: flex;
+            @media (max-width: 932px) {
+                margin-right: 0.5rem;
+              }
+            @media (max-width: 730px) {
+                background-color: yellow;
+                display: none;
+              }
+              .navDropDownContainer {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0rem 1rem;
+                cursor: pointer;
+                position: relative;
+
+                background-color: #0E0F12;
+            
+                svg {
+                    // margin-top: 4px;
+                    transition: all 0.3s ease;
+                    margin-bottom: 0.4rem;
+                    transition: all 0.3s ease;
+                    @media (max-width: 878px) {
+                        // padding: 0rem 0.3rem;
+                      margin-bottom: -0.1rem;
+                       
+                    }
+                }
+            
+                span {
+                    padding: 0rem 1rem 0.5rem 0.5rem;
+                    font-family: "Poppins", sans-serif;
+                    font-size: 13px;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                    @media (max-width: 878px) {
+                        padding: 0rem 0.3rem;
+                    }
+                }
+            
+                &:hover {
+                    svg, span {
+                        color: #42ff00;
+                    }
+                }
+            
+                .navDropDownNav {
+                    background-color: #1d263c;
+                    border: 1.3px solid white;
+                    display: flex;
+                    position: absolute;
+                    top: 2rem;
+                    left: 1rem;
+                    padding: 1rem 1rem;
+                    border-radius: 15px;
+                    opacity: 0;
+                    visibility: hidden;
+                    // transform: translateY(-10px);
+                    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+
+                    
+                    .firstNavDropDown{
+                        // background-color: blue;
+                        min-width: 145px;
+                    }
+                    .secondNavDropDown{
+                        // background-color: red;
+                        margin-left: 1rem;
+                        min-width: 185px;
+                        
+                    }
+                    .thirdNavDropDown{
+                        // background-color: red;
+                        margin-left: 1rem;
+                        min-width: 185px;
+                    }
+                   
+                    a{
+                        text-decoration: none;
+                        transition: transform 0.3s ease-in-out;
+                    }
+                    p {
+                        font-family: "Poppins", sans-serif;
+                        font-size: 13px;
+                        transition: transform 0.3s ease-in-out;
+                        padding: 0.5rem 1rem;
+                        width: 100%;
+                        text-decoration: none !important;
+                        color: white;
+                        
+                        &:hover {
+                            color: #42ff00;
+                            text-decoration: none;
+                            transform: scale(1.08)
+                        }
+                    }
+                }
+            
+                &:hover .navDropDownNav,
+                .navDropDownNav:hover {
+                    opacity: 1;
+                    visibility: visible;
+                    transform: translateY(0);
+                }
+            }
+            
+          
+        }
+    }
+    .rightSideNav{
+        display: flex;
+        flex: 50%;
+        justify-content: end;
+        align-items: center;
+        @media (max-width: 730px) {
+            display: none;
+          }
+    }
+    .navSearchContainer{
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        @media (max-width: 730px) {
+            margin-top: 2rem;
+            background-color: #212124;
+            padding: 0.2rem 0.7rem;
+            border-radius: 5px;
+          }
+
+          svg{
+            cursor: pointer;
+          }
+        input{
+            background-color: transparent;
+            outline: none;
+            margin-left: 0.3rem;
+            margin-right: 0.8rem;
+            max-width: 3.8rem;
+            font-family: "Poppins", sans-serif;
+            font-size: 13px;
+            color: white;
+            letter-spacing: 1px;
+           
+
+            @media (max-width: 878px) {
+                margin-left: 0.4rem;
+                width: 100%;
+                
+              }
+          
+
+        }
+    }
+    .languageSelectorContainer{
+        @media (max-width: 730px) {
+            margin-top: 1rem;
+          }
+    
+    .languageButton{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 0.5rem;
+        cursor: pointer;
+        position: relative;
+        h2{
+            font-size: 14px;
+            margin-left: 0.4rem;
+            margin-right: 0.35rem;
+        }
+        img{
+            width: 15px;
+            height: 15px;
+            margin-bottom: 1px;
+        }
+    }
+    .languageDropDownMenu{
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        background-color: #0E0F12;
+        
+        margin-top: 12px;
+        color: white;
+        border: 1px solid white;
+        border-radius: 8px;
+
+    }
+    .closeLanguageDropDown{
+        display: none;
+    }
+    .showLanguageDropDown{
+        display: flex;
+    }
+    .languageValue{
+        display: flex;
+        padding: 0.5rem 0.8rem;
+        cursor: pointer;
+        overflow-y: hidden;
+        &:hover{
+            background-color: rgba(255, 255, 255, 0.179);
+        }
+        h2{
+            font-size: 12px;
+            margin-left: 0.4rem;
+            margin-right: 0.35rem;
+            font-family: 100;
+            font-family: 'poppins','sans-serif';
+            color: white;
+
+        }
+        img{
+            width: 15px;
+            height: 15px;
+        }
+    }
+
+}
+.menuBarButton{
+    display: none;
+    @media (max-width: 730px) {
+        display: flex;
+      }
+}
+.mobileNavClose {
+    transform: translateX(100vw);  
+    opacity: 0;                    
+    visibility: hidden;            
+    transition: transform 0.3s ease-in-out, opacity 0.8s ease-in-out, visibility 0.3s ease-in-out;
+    position: fixed;               
+    top: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0E0F12;
+    padding: 1.2rem 1.2rem;
+}
+
+.mobileNavOpen {
+    transform: translateX(0);     
+    opacity: 1;                    
+    visibility: visible;           
+    transition: transform 0.3s ease-in-out,  opacity 0.1s ease-in-out,visibility 0.2s ease-in-out;
+    position: fixed;              
+    top: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+    background-color: #0E0F12;
+    padding: 1.2rem 1.2rem;
+}
+
+.mobileNavOpen {
+   display: none;
+}
+
+
+@media (max-width: 730px) {
+    .mobileNavOpen {
+        background-color: #0e1422;
+        display: flex;
+       flex-direction: column;
+    }
+
+
+      }
+    .mobileNavLogo{
+        img{
+            height: 20px;
+        }
+    }
+    .menuCloseIcon{
+        position: absolute;
+        top: 4;
+        right: 0;
+        margin-right: 14px;
+    }
+    .mobileNavContent{
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        margin-top: 3rem;
+        flex: 80%;
+
+        .navSearchMoblieContainer{
+            display: flex;
+            border: 1px solid white;
+            width: 150px;
+            padding: 0.4rem 0.4rem;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+
+            svg{
+                flex-shrink: 0;
+            }
+            input{
+                background-color: transparent;
+                font-size: 16px;
+                width: 100%;
+                color: white;
+                margin-left: 4px;
+                outline: none;
+            }
+        }
+        .mobileLearn{
+            margin-top: 1.3rem;
+            margin-right: 0.8rem;
+        }
+        span{
+            margin-top: 1.3rem;
+        }
+        .mobileNavDropDownContainer{
+            margin-top: 1.4rem;
+            svg{
+                margin-left: 0.4rem;
+                margin-bottom: -0.2rem;
+            }
+          
+        }
+
+        .mobileMarketsSubLinksContainer , .mobiletradingSubLinksContainer{
+            max-height: 0;
+            opacity: 0;
+            gap: 2rem;
+            overflow: hidden;
+            flex-direction: row;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.629);
+            border-radius: 15px;
+            padding: 0rem 0.8rem;
+        }
+        
+        .mobileMarketsSubLinksContainer.open{
+            max-height: 200px; 
+            opacity: 1;
+            transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
+            display: flex;
+            margin-top: 0.5rem;
+
+        }
+        .mobiletradingSubLinksContainer.open{
+            max-height: 300px; 
+            opacity: 1;
+            transition: max-height 0.3s ease-in, opacity 0.3s ease-in;
+            display: flex;
+            margin-top: 0.5rem;
+
+           
+        }
+        
+        .mobileSubLinksLeftItems, .mobileSubLinksRightItems {
+            flex: 1;
+          
+        }
+        
+        .mobileSubLinksLeftItems a, .mobileSubLinksRightItems a {
+            text-decoration: none;
+            color: white;
+            opacity: 0;
+            padding: 0.5rem ;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        }
+        
+        .mobileMarketsSubLinksContainer.open .mobileSubLinksLeftItems a,
+        .mobileMarketsSubLinksContainer.open .mobileSubLinksRightItems a,
+        .mobiletradingSubLinksContainer.open .mobileSubLinksLeftItems a,
+        .mobiletradingSubLinksContainer.open .mobileSubLinksRightItems a {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.2s;
+        }
+        
+       
+    }
+    .mobileBottomNav{
+        display: flex;
+        flex-direction: column;
+
+       
+    }
+}
+.primaryButton{
+    border: none;
+    border-radius: 12px;
+    margin: 0 1px 0 17px;
+    font-family: "Nacelle", sans-serif;
+    font-size: 14px;
+
+    background: linear-gradient(90deg, #00ffc2 0%, #42ff00 100%);
+    color: rgba(0, 0, 0, 1);
+    padding: 8px 16px;
+    font-weight: 600;
+    text-align: center;
+    font-style: normal;
+    line-height: 24px;
+
+    @media (max-width: 730px) {
+      margin-top: 2rem;
+    }
+  
+  }
+  .secondaryButton{
+    background-color: red;
+    border-radius: 5px;
+    padding: 0.4rem 0.6rem;
+    margin-left: 0.8rem;
+    font-weight: 500;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    color: white;
+    @media (max-width: 730px) {
+      margin-top: 1.2rem;
+      padding: 0.4rem 1rem;
+    }
+  
+  }
+  
+
+
+

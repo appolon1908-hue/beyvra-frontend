@@ -1,0 +1,462 @@
+.tradesMenuWrapper {
+  p.tradeHeading {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .tradeIconWrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 4rem;
+    margin-bottom: 1.38rem;
+    svg {
+      width: 5.5rem;
+      height: 5.5rem;
+    }
+  }
+  p.noTrade {
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.1719rem;
+    font-style: normal;
+  }
+}
+
+.day.tradesMenuWrapper {
+  p.tradeHeading {
+    color: #000000ab;
+  }
+  .tradeIconWrapper {
+
+    svg {
+      circle{
+        fill:#969798
+      }
+      path{
+        fill:#000
+      }
+
+    }
+  }
+  p.noTrade {
+    color: rgba(0, 0, 0, 0.6);
+
+  }
+}
+
+
+.tradesMenu {
+  .slider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    .fixedTime {
+      width: 6rem !important;
+    }
+    button {
+      background: transparent;
+      border: 0.0625rem solid rgba(93, 134, 166, 1);
+      padding: 0.525rem 0.9375rem;
+      color: white;
+      border-radius: 1.1875rem;
+      font-size: 0.65rem;
+      font-weight: 400;
+    }
+    button:first-child {
+      width: 5.5rem;
+    }
+    .active {
+      background-color: rgba(22, 23, 26, 1);
+    }
+    button:hover {
+      background-color: rgba(22, 23, 26, 1);
+    }
+  }
+}
+
+.tradesMenu.day {
+  .slider {
+    button {
+      border: 0.0625rem solid rgb(162, 121, 89);
+      color: #000;
+  
+    }
+
+    .active {
+      background-color: rgb(233, 232, 229);
+      color: #000000;
+    }
+    button:hover {
+      background-color: rgb(233, 232, 229);
+      color: #000000;
+
+    }
+  }
+}
+
+
+.tradesAssetMenu {
+  p.tradeHeading {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .assetsSearchbar {
+    margin-bottom: 0.9375rem;
+    padding: 0.3rem 0.575rem 0.3rem 0.3125rem !important;
+    .searchIcon {
+      svg {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+  }
+  .assetsFilters {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.9375rem;
+    width: 100%;
+    margin-left: 0.2rem;
+    .filterButton {
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.69rem;
+      font-weight: 600;
+      transition: all 0.25s;
+      gap: 0.3rem;
+      margin-right: 0.8rem;
+      &:hover {
+        color: #fff;
+      }
+    }
+
+    .filterSelectlist {
+      width: auto !important;
+
+      .ant-select-arrow {
+        svg {
+          width: 0.8rem;
+        }
+      }
+
+      .ant-select-selector {
+        border: 0rem solid white;
+        outline: 0rem;
+        background: transparent;
+        border-radius: 1.25rem;
+        .ant-select-selection-item {
+          font-size: 0.69rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.6);
+        }
+        .ant-select-selection-item:hover {
+          color: #fff;
+        }
+
+        .ant-select-selection-search {
+          input {
+            height: 100%;
+          }
+        }
+      }
+    }
+  }
+  .assetsList {
+    .assetsListCol {
+      display: flex;
+      align-items: center;
+
+      &.alignEnd {
+        justify-content: flex-end;
+      }
+
+      .assetsColIcon {
+        display: flex;
+        align-items: center;
+      }
+
+      .assetsListColTitle {
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: #969798;
+      }
+
+      .barsIcon {
+        width: 2rem;
+      }
+
+      .questionIcon {
+        width: 1.25rem;
+      }
+    }
+
+    .assetsListItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 0.3125rem;
+      padding: 0.625rem 0.9375rem;
+      cursor: pointer;
+      background-color: transparent;
+      margin-top: 0.5rem;
+      &:hover {
+        background-color: #1a1d21;
+      }
+
+      &.active {
+        background-color: transparent;
+        box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05),
+          0 0.0943rem 0 0.063rem inset rgba(39, 162, 255, 0.5);
+      }
+
+      &.disabled {
+        cursor: default;
+
+        .contentLeft {
+          .itemTitle {
+            color: #969798;
+          }
+        }
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+
+      .contentLeft {
+        display: flex;
+        align-items: center;
+        img {
+          width: 1.2rem;
+          margin-right: 0.625rem;
+        }
+
+        .itemTitle {
+          font-size: 0.8rem;
+          font-weight: 500;
+          color: #fff;
+        }
+
+        .itemSubtext {
+          font-size: 0.65rem;
+          font-weight: 400;
+          color: #969798;
+          margin-top: 0.3125rem;
+        }
+      }
+
+      .contentRight {
+        display: flex;
+        align-items: center;
+
+        .itemText {
+          font-size: 0.7rem;
+          font-weight: 400;
+          color: #969798;
+          margin-right: 0.625rem;
+
+          &.success {
+            color: #5dac49;
+          }
+
+          &.danger {
+            color: #e53939;
+          }
+
+          &.primary {
+            color: #5d86a6;
+          }
+        }
+
+        svg {
+          width: 1rem;
+        }
+        // color: #e6e6e6;
+      }
+    }
+  }
+}
+
+.day.tradesAssetMenu {
+  p.tradeHeading {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  .assetsFilters {
+    .filterButton {
+      cursor: pointer;
+      color: rgba(41, 40, 40, 0.6);
+      &:hover {
+        color: #030303;
+      }
+    }
+   
+    .filterSelectlist {
+
+
+      .ant-select-arrow {
+        svg {
+          path{
+            stroke: #727272;
+          }
+        }
+      }
+
+      .ant-select-selector {
+        border: 0rem solid rgb(238, 238, 238);
+        .ant-select-selection-item {
+          color: rgba(41, 40, 40, 0.6);
+        }
+        .ant-select-selection-item:hover {
+          color: #000;
+        }
+      }
+    }
+    
+  }
+  
+  .assetsList {
+    .assetsListCol {
+      display: flex;
+      align-items: center;
+
+      &.alignEnd {
+        justify-content: flex-end;
+      }
+
+      .assetsColIcon {
+        display: flex;
+        align-items: center;
+      }
+
+      .assetsListColTitle {
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: #969798;
+      }
+
+      .barsIcon {
+        width: 2rem;
+      }
+
+      .questionIcon {
+        width: 1.25rem;
+      }
+    }
+
+    .assetsListItem {
+      &:hover {
+        background-color: #1a1d21;
+      }
+
+      &.active {
+        box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05),
+          0 0.0943rem 0 0.063rem inset rgba(39, 162, 255, 0.5);
+      }
+
+      &.disabled {
+        cursor: default;
+
+      
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+
+      .contentLeft {
+      
+        .itemTitle {        
+          color: #000;
+        }
+   
+
+        .itemSubtext {
+          color: #3d3d3d;
+        }
+      }
+
+      .contentRight {
+
+
+        .itemText {
+          color: #3b3b3b;
+
+          &.success {
+            color: #5dac49;
+          }
+
+          &.danger {
+            color: #e53939;
+          }
+
+          &.primary {
+            color: #5d86a6;
+          }
+        }
+
+        svg {
+          width: 1rem;
+          path{
+            fill: #000
+          }
+        }
+      }
+    }
+    .assetsListItem {
+  
+      &:hover {
+        background-color: #dde9f8;
+      }
+
+      &.active {
+        background-color: transparent;
+        box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05),
+          0 0.0943rem 0 0.063rem inset rgba(39, 162, 255, 0.5);
+      }
+
+      &.disabled {
+
+        .contentLeft {
+          .itemTitle {
+            color: #505050;
+          }
+        }
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+
+       .contentRight {
+
+        .itemText {
+
+          color: #969798;
+
+          &.success {
+            color: #5dac49;
+          }
+
+          &.danger {
+            color: #e53939;
+          }
+
+          &.primary {
+            color: #5d86a6;
+          }
+        }
+
+        svg {
+          width: 1rem;
+        }
+      }
+    }
+  }
+}

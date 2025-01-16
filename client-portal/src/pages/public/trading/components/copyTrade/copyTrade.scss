@@ -1,0 +1,197 @@
+.copyTrade-wrapper{
+    min-height: 300px;
+    margin-top: 10px ;
+    color: white;
+    padding-left: 20px;
+    position: relative;
+    justify-content: space-between;
+    display: flex;
+    width: 90%;
+    margin: auto;
+    @media (max-width: 920px) {
+        flex-direction: column;
+    }
+
+    
+  
+    .copyTrade-info{
+
+        flex-basis: 60%;
+        padding: 20px 0;
+        div{
+            max-width: 600px;
+            margin: auto  100px ;
+
+        h3{
+            font-size: 34px;
+            margin: 18px 0;
+        }
+        p{
+            color: #999999;
+            font-size: 16px;
+            line-height: 24px;
+            margin: 22px 0;
+        }
+
+        button{
+            padding:12px 54px;
+            border-radius: 8px;
+            background: #FF1802;
+            color: white;
+            margin-top: 12px;
+            @media (max-width: 480px) {
+                width: 100%;                
+            }
+        }
+    }
+    @media (max-width: 920px) {
+        order: 1;
+        div{
+            margin: auto 0;
+        }
+    }
+
+
+    }
+   .copy-graph{
+    @media (max-width: 920px) {
+        order: 2;
+
+        }
+
+    .group-icon{
+        top: 60%;
+        z-index: 0;
+        right: 0;
+        position: absolute;
+        border-radius: 36px;
+        background: linear-gradient(deg(180), #2871FE, #2871FE)
+        ;
+        font-size: 10px;
+        padding: 20px;
+        height: 96px;
+        width: 96px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        @media (max-width:1020px) {
+            right: 0;
+           
+        }
+        @media (max-width:420px) {
+            right: -10px;
+            top: 70%;
+            width: 80px;
+            height: 80px;
+           
+        }
+
+       
+
+
+
+
+
+    }
+
+    .flag-icon{
+        top: 5%;
+        left: 200px;
+        position: absolute;
+        background: linear-gradient(deg(180), #2871FE, #2871FE);
+        font-size: 10px;
+ 
+        width: 36px;
+        height: 36px;
+        @media (max-width: 720px) {
+        
+            left: 145px;
+    }
+    @media (max-width:420px) {
+        left: 40px;       
+    }
+        
+
+
+
+
+    }
+    flex-basis: 40%;
+    position: relative;
+    padding: 80px 0 ;
+    text-align: left;
+
+    > div{
+        position: relative;
+        // background-color: red;
+        max-width: 500px;
+
+         img.user{
+        border-radius: 20px;
+        width: 80%;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        height: 100%;
+        max-height: 400px;
+      
+    }
+}
+    }
+}
+
+.pic-card{
+    display: inline-block;
+    background-color: #3C475B;
+    padding: 15px 20px;
+    position: absolute;
+    top: 0px;
+    right: 20px;
+    border-radius: 14px;
+    width: 100px;
+    overflow: hidden;
+    transform: translateY(-20%);
+    @media (max-width: 720px) {
+        padding: 5px 10px;
+
+        right: 20px;
+}
+@media (max-width: 520px) {        
+    right: 20px;
+}
+    .pic-wrapper{
+        margin: auto;
+        width: 70px;
+        border-radius: 100%;
+        height: 70px;
+        overflow: hidden;
+        img{
+            width: 100%;
+        }
+    }
+    .pic-info{
+        text-align: center;
+        margin: 10px auto;
+        .name{
+            font-size: 13px;
+            
+        }
+        .fig{
+            color: #00B67A;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .ROI{
+            span{color: #00B67A;}
+            font-size: 10px;
+        }
+        button{
+            background-color: #13121B ;
+            border-radius: 14px;
+            color: white;
+            font-size: 10px;
+            padding: 3px 4px;
+            display: block;
+            width: 100%;
+            margin: 19px auto ;
+        }
+    }
+}

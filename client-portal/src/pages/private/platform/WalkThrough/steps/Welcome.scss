@@ -1,0 +1,23 @@
+.appearanceMenu {
+  .interfaceScale {
+    margin-bottom: 1rem;
+  }
+}
+
+.dropDownMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0rem;
+  font-size: 1rem;
+  .dropDownMenuItemIcon {
+    img,
+    svg {
+      width: 1.5rem;
+    }
+  }
+  .dropDownMenuItemText {
+    display: flex;
+    margin-left: 0rem;
+  }
+}

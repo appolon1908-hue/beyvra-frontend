@@ -1,0 +1,17 @@
+.ant-modal {
+  background-color: #26272b;
+  margin: -2rem;
+  border-radius: 1rem;
+  .ant-modal-content {
+    position: relative;
+    background-color: #26272b;
+    border-radius: 0.625rem;
+    color: #fff;
+
+    .ant-modal-close-x {
+      svg {
+        width: 1.0625rem;
+      }
+    }
+  }
+}

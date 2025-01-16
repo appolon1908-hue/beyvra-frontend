@@ -1,0 +1,81 @@
+// .stepThreeInfo{
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   z-index: 100;
+//   color: white;
+//   position: absolute;
+//   animation: slideInFromTop 0.8s forwards !important;
+//   bottom: 5%;
+//   margin-left: 15%;
+//   // margin-top: 4rem;
+//   max-width: 70%;
+//   text-align: center;
+//   @media screen and (max-width: 730px) {
+//     max-width: 95%;
+//     margin-left: 3%;
+//  }
+//   h2{
+//     font-weight: 500;
+//     font-family: "Poppins", sans-serif;
+//     font-size: 17px;
+//     max-width: 90%;
+//     @media screen and (max-width: 730px) {
+//       font-size: 15px;
+//    }
+//   }
+//   .stepThreeButton{
+//     margin-top: 1rem;
+//     @media screen and (max-width: 730px) {
+//       margin-bottom: 2rem;
+//    }
+//   }
+// }
+.welcomeStepThree{
+  animation: slideInFromTop 0.8s forwards !important;
+  .step-three-content{
+    left: 50%;
+    transform: translate(-50%, 0%);
+    bottom: 0%;
+   
+  }
+  .line-width::before{
+    content: url('../../../../assets/icons/welcomeIcons/green-line.svg');
+    position: absolute;
+    bottom:-14px;
+    left: -10px;
+    width: 100%;
+    overflow-x: hidden;
+    animation: blink ease-in-out 1.5s infinite;
+  }
+  .line-width::after{
+    content: url('../../../../assets/icons/welcomeIcons/red-dotted-line.svg');
+    position: absolute;
+    top: -2px;
+    left: -10px;
+    width: 100%;
+    overflow-x: hidden;
+    animation: alternate-blink  ease-in-out 1.5s infinite;
+  }
+
+}
+
+// @keyframes blink {
+//   100%,
+//   0% {
+//    opacity: 1;
+//   }
+//   60% {
+//    opacity: 0.5;
+//   }
+// }
+
+// @keyframes alternate-blink {
+//   100%,
+//   0% {
+//    opacity: 0.5;
+//   }
+//   60% {
+//    opacity: 1;
+//   }
+// }

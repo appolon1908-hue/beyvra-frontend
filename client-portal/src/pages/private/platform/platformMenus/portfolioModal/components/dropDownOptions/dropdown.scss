@@ -1,0 +1,18 @@
+.settings-dropdown {
+  max-width: 732px;
+  width: 100%;
+  .dropdown-options {
+    transition: all 0.1s ease-in-out;
+    border-radius: 15px ;
+    background-color: #56635f67;
+    padding: 0 12px;
+    overflow: hidden;
+    &.let-down {
+      height: max-content;
+      padding: 12px 15px;
+    }
+    &.let-up {
+      height: 0;
+    }
+  }
+}

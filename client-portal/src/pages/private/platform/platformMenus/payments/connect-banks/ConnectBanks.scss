@@ -1,0 +1,195 @@
+.connect-banks-modal-root {
+    overflow: hidden;
+
+    .ant-modal-wrap {
+
+        .ant-modal,
+        .css-dev-only-do-not-override-2rgkd4 {
+            width: auto !important;
+            top: 0;
+
+            .ant-modal-close {
+                color: white
+            }
+
+            .ant-modal-content {
+                height: 100%;
+                background-color: transparent;
+                border-radius: 0;
+                padding: 0;
+
+                .ant-modal-close {
+                    top: 4.1875rem;
+                    right: 3.0313rem
+                }
+            }
+        }
+    }
+}
+
+.connect-banks-container {
+    background: none;
+
+}
+
+.connect-banks-content {
+    display: flex;
+    justify-content: space-between;
+
+    .bank-details {
+        width: 40%;
+        height: 100%;
+        .bank-details-container{
+            display: flex;
+            flex-direction: column;
+            padding-top: 6rem;
+            padding-left: 3.875rem;
+    
+            svg {
+                cursor: pointer;
+                margin-bottom: 1.7731rem;
+            }
+    
+            span {
+                color: #FFF
+            }
+    
+            .bank-details-title {
+                font-size: 1.25rem;
+                margin-bottom: 0.9375rem;
+            }
+    
+            .bank-details-description {
+                font-size: 1.125rem;
+                line-height: 1.3181rem;
+            }
+    
+            @media (max-width: 843px) {
+                display: none;
+            }
+        }
+        @media (max-width: 670px) {
+            display: none;
+        }
+    }
+
+    .connect-banks-list {
+        width: 47%;
+        background: #303033;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 7.875rem 4rem;
+
+        .banks-title {
+            font-size: 1.875rem;
+            color: #fff;
+        }
+
+        .show-more-text {
+            color: #fff;
+            font-size: 1.25rem;
+            margin-bottom: 0.4375rem;
+        }
+
+        .find-bank-input-container {
+            padding: 3.6875rem 1rem;
+            width: 100%;
+
+            .find-bank-input {
+                border-radius: 15px;
+                background: #FFF;
+                flex-direction: row-reverse;
+
+                .inputContainer {
+                    input {
+                        color: #303033;
+
+                        &::placeholder {
+                            color: #303033;
+                        }
+                    }
+                }
+
+
+            }
+        }
+
+        .banks-cards-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+
+            .banks-card-item {
+                width: 14.1875rem;
+                height: 7.375rem;
+                margin: 1rem;
+                box-shadow: 0px 4px 10px 0px #00000040;
+                background: #D9D9D91F;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 0.9375rem;
+                img {
+                    object-fit: cover;
+                    width: 80%;
+                }
+            }
+        }
+
+        @media (max-width: 1280px) {
+            width: 70%;
+            .banks-cards-list {
+                .banks-card-item {
+                    width: 8.2169rem;
+                    height: 4.2713rem;
+                }
+            }
+        }
+        @media (max-width: 426px) {
+            width: 100%;
+            padding: 7.875rem 2rem;
+        }
+        @media (max-width: 768px) {
+            width: 100%;
+            padding: 7.875rem 2rem;
+        }
+
+    }
+}
+
+.sub-modal-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5rem 0;
+
+    .sub-modal-title {
+        font-size: 1.875rem;
+        color: #fff;
+        margin-bottom: 3.4375rem;
+    }
+
+    .sub-modal-sub-title {
+        font-size: 1.5625rem;
+        color: #fff;
+        margin-bottom: 3.25rem;
+    }
+
+    .sub-modal-numbers-list {
+        color: #fff;
+
+        p {
+            font-size: 1.25rem;
+            margin-bottom: 3rem;
+        }
+    }
+
+    .should-login-message {
+        width: 17.3125rem;
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        color: #fff;
+    }
+}

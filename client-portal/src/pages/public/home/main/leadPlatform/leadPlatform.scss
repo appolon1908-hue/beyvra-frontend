@@ -1,0 +1,56 @@
+.leadPlatformContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 4rem;
+
+    h2{
+        font-family: 'poppins','sans-serif';
+        font-size: 36px;
+        color: white;
+        font-weight: 500;
+        margin-bottom: 3rem;
+        text-align: center;
+
+        @media (max-width: 730px){
+            padding: 0rem 1rem;
+            font-size: 32px;
+            margin-bottom: 1rem;
+        }
+    }
+    .leadPlatformCardContainer{
+        display: flex ;
+        flex-wrap: wrap;
+        gap: 2rem;
+        justify-content: center;
+        align-items: center;
+        max-width: 85%;
+       .leadPlatformCard{
+        margin-top: 0rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: start;
+        border: 1px solid #3a455f;
+        border-radius: 12px;
+        min-width: 340px;
+        padding: 2rem 3rem;
+        background: linear-gradient(180deg, rgba(47,57,83,1) 0%, rgba(255,255,255,0) 100%);
+
+        @media (max-width:365px){
+         min-width: 100%;
+        }
+        img{
+            width: 90px;
+        }
+        p{
+            color: #999999;
+            font-family: 'poppins','sans-serif';
+            margin-top: 1rem;
+        }
+       }
+}
+}
+
+

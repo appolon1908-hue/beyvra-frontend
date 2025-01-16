@@ -1,0 +1,108 @@
+.customModalWrapperContainer{
+    background-color: rgba(76, 83, 96, 0.497);
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999 !important ;
+
+    .customModalFlexContainer{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        
+        .customModalContainer{
+            background-color: #26272b;
+            border-radius: 15px;
+            min-width: 600px;
+            padding: 2rem 3rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-weight: 500;
+            gap: 1rem;
+            h2{
+                color: #ffffffbb;
+                font-size: 18px;
+            }
+            .customModalDescriptionContainer{
+                // background-color: yellow;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                gap: 1srem;
+
+                .customModalTopHeaderTittle{
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 0.5rem;
+                    span{
+                        color: white;
+                        font-size: 14px;
+                    }
+                }
+                .customModalMiddleHeaderTitle{
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-direction: column;
+                    margin: 0.8rem 0rem;
+                    gap: 1rem;
+                    .customModalDepositContainer{
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        gap: 3rem;
+
+                        
+                    }
+                    
+                }
+            }
+            .customModalFooterButtons{
+                display: flex;
+                gap: 3rem;
+                justify-content: center;
+                align-items: center;
+                button:nth-child(1){
+                    background-color:#26272b;
+                    ;
+                }
+                button:nth-child(2){
+                    background-color: #0094FF;
+                }
+                button{
+                    background-color: purple;
+                    padding: 0.4rem 0rem;
+                    border-radius: 5px;
+                    width: 150px;
+                    color: white;
+                    font-size: 14px;
+
+                }
+            }
+        }
+    }
+}
+
+.customModalPrice{
+    color: white;
+    font-weight: 500;
+}
+.customModalSpanTitle{
+    color: white;
+    font-size: 15px;
+    span{
+        margin-left: 2px;
+    }
+
+}
+
+span.customModalGreyButton{
+    color: #ffffffbb;
+}

@@ -1,0 +1,51 @@
+.bankCardWrapperCont,
+.bankCardWrapperContSmall {
+  position: relative;
+  .yellow,
+  .blue {
+    position: absolute;
+  }
+  .yellow {
+    right: 0;
+    bottom: 0;
+  }
+ 
+  .bankCard,
+  .bankCardSmall {
+    border-radius: 0.9375rem;
+    background: rgba(217, 217, 217, 0.12);
+    box-shadow: 0 0.25rem 0.625rem 0 rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(26px);
+    width: 22.8125rem;
+    height: 12.3125rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    color: #fff;
+    cursor: pointer;
+    @media (max-width: 767px) {
+      width: 18.8125rem;
+      height: 8.3125rem;
+    }
+  }
+
+  .bankCardSmall {
+    width: 14.1875rem;
+    height: 7.375rem;
+  }
+}
+
+.bankImage{
+  width: 12rem;
+  max-height: 80%;
+}
+.bankImageSmall{
+  width: 10rem;
+  max-height: 80%;
+}
+.bankCardWrapperContSmall {
+  .yellow {
+    display: none;
+  }
+}

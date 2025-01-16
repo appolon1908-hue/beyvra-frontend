@@ -1,0 +1,289 @@
+.kycWrapper{
+    
+    min-height: 100vh;
+    height: 100%;
+    background: #26272b;
+    overflow-y: auto;
+    
+    *{
+        font-family: "Inter", sans-serif;
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+}
+
+
+.formContainer{
+    button{            
+        position: relative;
+        border-radius: 10px;
+        background: rgba(241, 243, 243, 0.12); 
+        border: solid 0.1rem #3f3f3f;
+        color: #fff;
+    }
+    button:hover{
+        background: #2dd674;
+        border: solid 0.1rem #1c8037;
+    }
+    
+
+    input{
+        border: 1px solid #90ACC1;
+        border-radius: 6px;
+        background: none;
+        padding: 6px 16px;
+        width: 100%;
+        color: #fff;
+    }
+
+    .custom-checkbox .ant-form-item .agrree-terms{
+
+        margin-bottom: 0 !important;
+    }
+    .custom-checkbox .ant-checkbox-inner {
+        background-color: #f0f0f000; /* Custom background color */
+        border-radius: 4px; /* Custom border radius */
+        border: 1px solid #706E82;
+        height: 24px !important;
+        width: 24px !important;
+    }
+    
+    .custom-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+        background: #3a3a3a; /* Background color when checked */
+        border: 1px solid #706E82;
+        height: 18px ;
+        width: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .custom-checkbox .ant-checkbox-checked::after {
+        height: 18px !important;
+        width: 18px !important;
+        background: #3a3a3a; /* Background color when checked */
+
+        border-color: #fff; /* Color for the checkmark */
+    }
+
+
+
+    label {
+        cursor: pointer;
+        font-size: 14px;
+        color: #d0d0d0;
+
+        a {
+        color: #2dd674;
+        text-decoration: none;
+        }
+    }
+    .login{
+        background: linear-gradient(269.17deg, rgba(0, 148, 255, 0.36) 2.39%, rgba(0, 148, 255, 0) 107.19%);
+        width: 100%;
+        height: 49px;
+    }
+    &.otpForm{
+        input{
+
+            background: #152338;
+
+
+            border: 1px solid #D6DDEB;
+
+        }
+
+    }
+
+    &.otpForm input{
+        padding: 15px 8px;
+        // background-color: red ;
+    }
+
+    &.successWrapper{
+        button{
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+
+        }
+    }
+
+
+    &.bioDetails{
+        button{
+            width: max-content;
+            width: max-content;
+            border-radius: 12px;
+            padding: 0 80px;
+            height: 49px;
+          
+        }
+        .ant-form-item-control-input{
+            .ant-form-item-control-input-content{
+                .ant-picker{
+                    padding: 12px;
+                    background: none;
+                }
+            }
+         
+        }
+
+        .ant-select-selector{
+            padding: 22px  24px;
+            height: 24px;
+            background: none;
+            color: white;
+            .ant-select-selection-placeholder{
+                color: white;
+            }
+        }
+    
+
+    }
+
+
+
+    &.doc-review{
+        h5{
+            color: white;
+        }
+
+        button{            
+            position: relative;
+            width: 100%;
+            padding: 0.8rem 1.1rem 0.8rem 0.8rem;
+            border-radius: 10px;
+            background: linear-gradient(269deg, rgba(0, 148, 255, 0.36) 2.39%, rgba(0, 148, 255, 0) 107.19%);
+            box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.2);
+            color: #fff;
+        }
+
+        span{
+            &.rejected{
+                padding: 8px 16px;
+                border-radius: 8px;
+                color: #F97066;
+                background: #F044381F;
+
+        
+            }
+            &.approved{
+                padding: 8px 16px;
+                border-radius: 8px;
+                color: #B2FFA7;
+                ;
+                background: #B2FFA71F;
+                ;
+
+        
+            }
+            &.pending{
+                padding: 8px 16px;
+                border-radius: 8px;
+                color:  #FDB022;
+                background: #B2FFA71F;
+
+        
+            }
+        }
+      
+    }
+
+    &.kyc-document{
+        max-width: 700px;
+        font-family: "Inter", sans-serif;
+
+        button{            
+            position: relative;
+
+            border-radius: 10px;
+            background: rgba(241, 243, 243, 0.12); 
+            border: solid 0.1rem #3f3f3f;
+            color: #fff;
+
+            &.back{
+                background: rgba(241, 243, 243, 0.12); ;
+                border: 1px solid rgba(255, 255, 255, 0.555);
+            }
+        }
+
+    
+    
+    }
+
+
+}
+
+
+.kyc-button{
+    position: relative;
+    width: 100%;
+    padding: 0.8rem 1.1rem 0.8rem 0.8rem;
+    border-radius: 10px;
+    background: rgba(241, 243, 243, 0.12); 
+    border: solid 0.1rem #3f3f3f;
+    color: #fff;
+
+    &.back{
+        background: rgba(241, 243, 243, 0.12); 
+        border: solid 0.1rem #3f3f3f;
+    }
+  }
+.kyc-button::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    padding: 1.5px;
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+
+ .img-container{
+
+    border-radius: 50%;
+    background:#FFF;
+    box-shadow: 0px 20px 40px 0px rgba(0, 0, 0, 0.30);
+    width: 60px;
+    height: 60px;
+   
+  }
+  .success-illustration{
+    background-color: #2dd674;
+    padding: 20px;
+    border-radius: 50%;
+    width: 80px;
+    animation: pulse-animation 2s infinite;
+  }
+
+  @keyframes pulse-animation {
+    0% {
+      box-shadow: 0 0 0 0px rgba(19, 132, 218, 0.2);
+    }
+    100% {
+      box-shadow: 0 0 0 20px rgba(19, 132, 218, 0.2);
+    }
+  }
+  
+
+  .ant-picker .ant-picker-input >input {
+    color: #ffffff;
+  }
+
+
+  .bioDetails .date-input input::placeholder{
+    color: white;
+  }

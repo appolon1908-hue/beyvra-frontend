@@ -1,0 +1,138 @@
+.landingHeaderTitle{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    
+    @media (max-width: 730px) {
+        padding: 0rem 1rem;
+
+      }
+    h2{
+        width:100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 2rem;
+        font-size: 44px;
+        font-family: "Poppins", sans-serif;
+        text-align: center;
+        font-weight: 600;
+        color: white;
+        @media (max-width: 730px) {
+            font-size: 35px;
+    
+          }
+    }
+    span{
+        width:100%;
+        width:100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 0.6rem;
+        color: #999999;
+        text-align: center;
+    }
+    button{
+        align-self: center;
+        margin-top: 1rem;
+        background-color: red;
+        border-radius: 5px;
+        padding: 0.6rem 2rem;
+        margin-left: 0.8rem;
+        font-weight: 500;
+        font-family: "Poppins", sans-serif;
+        font-size: 16px;
+        color: white;
+
+    }
+ 
+}
+.bottomGraphImageContainer{
+    display: flex;
+    justify-content: space-between;
+
+    .homeGraphContainer {
+        width: 60%;
+        position: relative;  
+        @media (max-width: 730px) {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+    
+        img {
+            width: 100%;
+            height: 80vh;
+            margin-top: -80px;
+            position: relative;
+            @media (max-width: 730px) {
+                overflow-y: visible !important;
+                margin-top: 0px;
+                height: 40vh;
+                width: 60vw;
+                margin-left: -5vw;
+            }
+            @media (max-width: 400px) {
+                width: 55vw;
+            }
+        }
+    
+        .valueGraphIndicator {
+            position: absolute;
+            top: 44%;
+            right: 26%;
+            color: #1FBF75;
+            font-family: "Poppins", sans-serif;
+            font-size: 14px;
+            @media (max-width: 730px) {
+                top: 47%;
+            }
+        }
+    
+        .customMarker1Container {
+            position: absolute;
+            top: 53%;
+            right: 34.5%;
+            max-width: 100%;
+            @media (max-width: 730px) {
+                top: 60%;
+            }
+        }
+    
+        .customMarker2Container {
+            position: absolute;
+            top: 30%;
+            right: -15.8rem;  // This will position it at the right edge of the image
+            max-width: 100%;
+            @media (max-width: 730px) {
+                top: 34%;
+                left: 54vw;
+                z-index: 100;
+            }
+            @media (max-width: 495px) {
+                top: 40%;
+                left: 55vw;
+            }
+            @media (max-width: 400px) {
+                left: 50vw;
+            }
+        }
+    }
+    .homeTradeFunctionality{
+        margin-right: 4%;
+        margin-top: -50px;
+        img{
+            width: 200px;
+            @media (max-width: 730px) {
+                width: 100px;
+                margin-top: 22vw;
+              }
+            @media (max-width: 496px) {
+                width: 70px;
+                margin-top: 28vw;
+              }
+        }
+    }
+}
+ 

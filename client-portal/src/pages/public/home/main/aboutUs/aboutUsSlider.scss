@@ -1,0 +1,136 @@
+.aboutUsSliderContainer{
+    max-width: 85%;
+    // margin-left: auto;
+    margin: auto;
+    margin-top: 4rem;
+    @media (max-width:730px){
+        max-width: 95%;
+        margin: auto;
+    }
+    h2{
+        font-family: 'poppins','sans-serif';
+        color: white;
+        font-weight: 600;
+        margin-left: 1rem;
+        font-size: 28px;
+
+    }
+    .aboutUsSliders{
+        margin-top: 0.8rem;
+        width: 100%;
+        .aboutUsliderItem{
+            margin-left: 12%;
+
+            @media (max-width:730px){
+                margin-left: 0%;
+            }
+            .aboutUsSliderInnerItem{
+                margin: 1rem 3rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                color: white;
+                align-items: start;
+                border: 1px solid #3a455f;
+                padding: 2rem 3rem;
+                min-width: 500px;
+                border-radius: 12px;
+                
+                background: linear-gradient(180deg, rgba(47,57,83,1) 0%, rgba(255,255,255,0) 100%);
+                @media (max-width:1430px){
+                    min-width: 95%;
+                   
+                }
+                @media (max-width:730px){
+                    min-width: 95%;
+                    margin-bottom: 25px !important;
+                    max-width: 95%;
+                    margin: 1rem auto;
+                    padding: 1rem 1rem;
+                }
+                .aboutUsSliderQuoteContainer{
+                    position: relative;
+                    p{
+                        font-size: 12px;
+                        font-weight: 300;
+                        font-family: 'poppins','sans-serif';
+
+                        
+                    }
+                    .aboutUsLowerQuoteImage{
+                        margin-top: 15px;
+                        img{
+                            width: 25px;
+                        }
+                    }
+                    .aboutUsUpperQuoteImage{
+                        margin-bottom: 15px;
+                        img{
+                            width: 25px;
+                        }
+                    }
+                }
+                .aboutUsSliderCardInfo{
+                    margin-top: 2rem;
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    
+                    span{
+                        color: white;
+                        font-family: 'poppins','sans-serif';
+
+                    }
+                    .aboutUsRatingStarCard{
+                        display: flex;
+                        gap: 0.3rem;
+                        img{
+                            width: 20px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.aboutUsPreviousSliderButton{
+    background-color: transparent;
+    position: absolute;
+    top: -15%;
+    right: 10%;
+    z-index: 100;
+    border-radius: 100px;
+    border: 1px solid white;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    padding: 0.4rem 0.7rem 0.2rem 0.5rem;
+    .aboutUsPreviousSliderIconContainer{
+        
+        // width: 10px;
+        // height: 10px;
+    }
+}
+.aboutUsNextSliderButton{
+    background-color: transparent;
+    position: absolute;
+    top: -15%;
+    right: 6.5%;
+    z-index: 100;
+    border-radius: 100px;
+    border: 1px solid white;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    padding: 0.3rem 0.3rem 0.2rem 0.4rem;
+    .aboutUsNextSliderIconContainer{
+        // width: 10px;
+        // height: 10px;
+    }
+}
+
+
+

@@ -1,0 +1,75 @@
+.deposit {
+  .deposit-subtext {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+  }
+  .hr {
+    width: 100%;
+    height: 0.5px;
+    background-color: white;
+    margin-top: 1rem;
+    margin-bottom: 3.4rem;
+  }
+}
+
+
+
+.payment-card-next-button {
+  margin-bottom: 1.5rem;
+  margin-top: 3rem;
+}
+
+.verify-payment-amount-title{
+  font-size: 1.5263rem;
+  color: #969798;
+}
+
+.verify-payment-amount-subtext{
+  font-size: 2.0625rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.verify-payment{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  
+
+}
+.options-list{
+  width: 100%;
+  
+  .option-row {
+  padding: 1.5625rem 0;
+  border-bottom: 1px solid #3D4046;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  .ant-btn-default {
+    background-color: #3D4046;
+    color: #fff;
+    border: none;
+    font-size: 0.875rem;
+  }
+  .option-subtext{
+    color: #969798
+  }
+}
+}
+.verify-payment-redirect-msg{
+  width: 23.5625rem;
+  text-align: center;
+  color: #969798;
+  margin-top: 5.125rem;
+  .verify-payment-redirect-text{
+    color: #969798;
+  }
+  .settingsButton{
+    margin-top: 1.5rem;
+  width: 100%;
+}
+}

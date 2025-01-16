@@ -1,0 +1,69 @@
+.verification-platforms {
+    .mainItemCard .trading-platforms-about {
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem 1rem 1rem;
+    }
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    .btn {
+      width: 10.625rem;
+      height: 2.875rem;
+      border-radius: 0.5rem;
+      background-color: #393a3d;
+      border: none;
+      color: white;
+    }
+  }
+  .trading-platforms-about {
+    padding: 1rem 2rem 1rem 2rem;
+    margin-bottom: 1.5rem;
+    .about-info {
+      .h3 {
+        font-weight: 500;
+        font-size: 1.056rem;
+      }
+      .topics {
+        color: rgba(149, 149, 149, 1);
+        font-weight: 400;
+        font-size: 0.75rem;
+        padding: 0.5rem 0rem 1rem 0rem;
+      }
+      .about-info-content {
+        .content {
+          display: flex;
+          align-items: center;
+          gap: 0.288rem;
+          padding: 0.1rem 0rem 0rem 0rem;
+          .content-icon {
+            color: rgba(162, 162, 162, 1);
+            padding: 0.2rem 0.5rem 0rem 0rem;
+          }
+          .text {
+            color: #a2a2a2;
+            font-weight: 400;
+            font-size: 0.759rem;
+            padding: 0rem;
+          }
+        }
+      }
+    }
+  }
+  .olymp-trade {
+    cursor: pointer;
+    margin-top: 1.575rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1d21;
+    padding: 2rem;
+    border-radius: 0.438rem;
+    gap: 2.563rem;
+    div {
+      font-weight: 700;
+      font-size: 1rem;
+      color: white;
+    }
+  }
+}

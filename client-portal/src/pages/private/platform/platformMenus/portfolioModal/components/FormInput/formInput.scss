@@ -1,0 +1,17 @@
+.portfolioWrapper{
+    .form-input{
+        box-sizing: border-box;
+        outline: none !important;
+        color: #90ACC1 !important;
+        border: 0.1px solid #FFF !important;
+        border-radius: 18px;
+        background: none;
+    }
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active{
+        -webkit-box-shadow: 0 0 0 30px #152338 inset;
+        -webkit-text-fill-color: #90ACC1;
+    }
+}

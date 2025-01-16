@@ -1,0 +1,293 @@
+.loanIdentification {
+  background-color: rgba(1, 0, 6, 1);
+  padding: 4.5rem 1rem 2rem 4.6875rem;
+  @media (max-width: 992px) {
+    padding: 4.5rem 0rem 5rem 0rem;
+  }
+  .getLoanRow {
+    @media (max-width: 992px) {
+      width: 100%;
+      overflow: hidden;
+      justify-content: center;
+    }
+    .PersonalDatainputWrapper {
+      display: flex;
+      flex-direction: column;
+      @media (max-width: 992px) {
+        align-items: center;
+      }
+      .LoanInput {
+        input {
+          width: 32.875rem;
+          @media (max-width: 1112px) {
+            width: 28rem;
+          }
+          @media (max-width: 992px) {
+            width: 32rem;
+          }
+          @media (max-width: 768px) {
+            width: 28rem;
+          }
+          @media (max-width: 576px) {
+            width: 20rem;
+          }
+          @media (max-width: 350px) {
+            width: 15rem;
+          }
+        }
+      }
+      h2 {
+        font-size: 1.875rem;
+        font-weight: 500;
+        color: white;
+        @media (max-width: 992px) {
+          text-align: center;
+          padding: 0rem 6rem;
+        }
+        @media (max-width: 768px) {
+          padding: 0rem 3rem;
+          font-size: 1.7rem;
+        }
+        @media (max-width: 576px) {
+          padding: 0rem 2rem;
+          font-size: 1.5rem;
+        }
+        @media (max-width: 320px) {
+          padding: 0rem 1rem;
+          font-size: 1.25rem;
+        }
+      }
+      .rectangle-download-links {
+        width: 22.813rem;
+        height: 0.813rem;
+        background: linear-gradient(
+          to right,
+          rgba(39, 162, 255, 1),
+          rgba(249, 252, 255, 0)
+        );
+        border-radius: 0.625rem;
+        margin-top: 2.125rem;
+        margin-bottom: 1rem;
+        @media (max-width: 768px) {
+          width: 18rem;
+          height: 0.7rem;
+        }
+        @media (max-width: 576px) {
+          width: 15rem;
+          height: 0.6rem;
+        }
+        @media (max-width: 320px) {
+          width: 10rem;
+          height: 0.4rem;
+        }
+      }
+      .paragraph {
+        font-size: 1.125rem;
+        line-height: 1.3181rem;
+        color: white;
+        margin-bottom: 4rem;
+        @media (max-width: 992px) {
+          text-align: center;
+          padding: 0 6rem;
+        }
+        @media (max-width: 768px) {
+          padding: 0 3rem;
+          font-size: 1rem;
+        }
+        @media (max-width: 576px) {
+          padding: 0 2rem;
+          font-size: 0.875rem;
+        }
+        @media (max-width: 320px) {
+          padding: 0 1rem;
+          font-size: 0.75rem;
+        }
+      }
+    }
+    .col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      p {
+        font-size: 1.125rem;
+        line-height: 1.3181rem;
+        color: white;
+        padding-bottom: 1rem;
+        margin-left: -13rem;
+        @media (max-width: 992px) {
+          text-align: center;
+          padding-bottom: 1rem;
+          margin-left: 0;
+        }
+        @media (max-width: 768px) {
+          padding-bottom: 1rem;
+          font-size: 1rem;
+        }
+        @media (max-width: 576px) {
+          padding-bottom: 1rem;
+          font-size: 0.875rem;
+        }
+        @media (max-width: 320px) {
+          padding-bottom: 1rem;
+          font-size: 0.75rem;
+        }
+      }
+      .VerificationCodeInputContainer {
+        margin-top: 3rem;
+        width: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        p {
+          font-size: 1.125rem;
+          line-height: 1.3181rem;
+          color: white;
+          margin-left: 0;
+          padding-bottom: 1rem;
+          @media (max-width: 992px) {
+            text-align: center;
+            padding-bottom: 1rem;
+            margin-left: none;
+          }
+          @media (max-width: 768px) {
+            padding-bottom: 1rem;
+            font-size: 1rem;
+          }
+          @media (max-width: 576px) {
+            padding-bottom: 1rem;
+            font-size: 0.875rem;
+          }
+          @media (max-width: 320px) {
+            padding-bottom: 1rem;
+            font-size: 0.75rem;
+          }
+        }
+        .fourDigitVerificationCode {
+          display: flex;
+          width: auto;
+          .vi__container {
+            width: 100% !important;
+          }
+          .vi__character {
+            background-color: rgba(48, 48, 51, 1);
+            color: white;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.9375rem;
+            display: flex;
+            gap: 1rem;
+            width: 5.5rem;
+            height: 4.75rem;
+            @media (max-width: 768px) {
+              width: 5rem;
+              height: 4.225rem;
+              gap: 0.8rem !important;
+            }
+            @media (max-width: 576px) {
+              width: 4rem;
+              height: 3.6rem;
+              gap: 0.6rem !important;
+            }
+            @media (max-width: 320px) {
+              width: 3rem;
+              height: 3rem;
+              gap: 0.4rem !important;
+            }
+            :focus {
+              outline: none;
+            }
+          }
+        }
+      }
+      .confirmButton {
+        margin-top: 5rem;
+        margin-bottom: 8rem;
+        button {
+          padding: 1rem 6rem;
+          background-color: rgba(0, 148, 255, 1);
+          font-size: 1rem;
+          color: white;
+          border-radius: 0.625rem;
+        }
+      }
+    }
+  }
+}
+
+.ModalLoanIdentification {
+  
+  .ant-modal-content {
+    background-color: #26272b;
+  }
+  .ant-modal-mask {
+    background-color: #26272b !important;
+  }
+  .ModalContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    .ModalImage {
+      img {
+        width: 12.5rem;
+        height: 10.8331rem;
+      }
+    }
+    h2 {
+      font-size: 2rem;
+      margin-top: 2.5rem;
+      font-weight: 500;
+      @media (max-width: 992px) {
+        font-size: 1.5rem;
+      }
+      @media (max-width: 768px) {
+        font-size: 1.375rem;
+      }
+      @media (max-width: 576px) {
+        font-size: 1rem;
+      }
+      @media (max-width: 320px) {
+        font-size: 1rem;
+      }
+    }
+    p {
+      font-size: 1rem;
+      text-align: center;
+      margin-top: 1rem;
+       @media (max-width: 992px) {
+        font-size: 0.9rem;
+      }
+      @media (max-width: 768px) {
+        font-size: 0.8rem;
+      }
+      @media (max-width: 576px) {
+        font-size: 0.7rem;
+      }
+    }
+    .ButtonModal {
+      margin-top: 4rem;
+      button {
+        padding: 1rem 6rem;
+        background-color: #28bd66;
+        font-size: 1rem;
+        color: white;
+        border-radius: 0.625rem;
+        @media (max-width: 992px) {
+          padding: 1rem 4rem;
+        }
+        @media (max-width: 768px) {
+          padding: 1rem 3rem;
+        }
+        @media (max-width: 576px) {
+          padding: 1rem 2rem;
+        }
+        @media (max-width: 320px) {
+          padding: 1rem 1rem;
+        }
+      }
+    }
+  }
+}

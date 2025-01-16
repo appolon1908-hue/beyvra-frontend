@@ -1,0 +1,183 @@
+{
+  "assets": [
+    {
+      "name": "Stripe",
+      "image": "/welcome-icons/step_two/stripe.svg"
+    },
+    {
+      "name": "Stubhub",
+      "image": "/welcome-icons/step_two/stubhub.svg"
+    },
+    {
+      "name": "Seat geek",
+      "image": "/welcome-icons/step_two/seat_geek.svg"
+    },
+    {
+      "name": "Discord",
+      "image": "/welcome-icons/step_two/discord.svg"
+    },
+    {
+      "name": "Turo",
+      "image": "/welcome-icons/step_two/turo-logo.svg"
+    },
+    {
+      "name": "Navan",
+      "image": "/welcome-icons/step_two/navan-logo.svg"
+    },
+    {
+      "name": "Hungry Root",
+      "image": "/welcome-icons/step_two/hungry-root.svg"
+    },
+    {
+      "name": "YXT Group",
+      "image": "/welcome-icons/step_two/yxt.svg"
+    },
+    {
+      "name": "Reitar",
+      "image": "/welcome-icons/step_two/reitar-logo.png"
+    },
+    {
+      "name": "Zspace",
+      "image": "/welcome-icons/step_two/zspace-seeklogo.svg"
+    },
+    {
+      "name": "Caterpillar",
+      "image": "/welcome-icons/step_two/caterpillar.svg"
+    },
+   
+    {
+      "name": "GBP/CAD",
+      "image": "/welcome-icons/step_two/gbp_cad.svg"
+    },
+    {
+      "name": "Toncoin",
+      "image": "/welcome-icons/step_two/toncoin.svg"
+    },
+    {
+      "name": "Tether USDt",
+      "image": "/welcome-icons/step_two/usdt.svg"
+    },
+    {
+      "name": "Nike",
+      "image": "/welcome-icons/step_two/nike.svg"
+    },
+
+    {
+      
+      "name": "Walmart",
+      "image": "/welcome-icons/step_two/walmart.svg"
+    },
+    {
+      "name": "Amazon",
+      "image": "/welcome-icons/step_two/amazon.svg"
+    },
+    {
+      "name": "Apple",
+      "image": "/welcome-icons/step_two/apple.svg"
+    },
+    {
+      "name": "CVS Health",
+      "image": "/welcome-icons/step_two/csv_health_logo.svg"
+    }, 
+    {
+      "name": "United Health Group",
+      "image": "/welcome-icons/step_two/unitedhealth-group.svg"
+    },
+    {
+      "name": "Exxon Mobil",
+      "image": "/welcome-icons/step_two/exxon_mobil_logo.svg"
+    },
+    {
+      "name": "Berkshire Hathaway",
+      "image": "/welcome-icons/step_two/berkshire_hathaway.svg"
+    },
+    {
+      "name": "Alphabet",
+      "image": "/welcome-icons/step_two/alphabet.svg"
+    }, 
+    {
+      "name": "McKesson Corporation",
+      "image": "/welcome-icons/step_two/mcKesson_corporation.svg"
+    },
+    {
+      "name": "Amerisource Bergen",
+      "image": "/welcome-icons/step_two/amerisourceBergen.svg"
+    },
+    {
+      "name": "Cigna",
+      "image": "/welcome-icons/step_two/cigna.svg"
+    },
+    {
+      "name": "Costco Wholesale",
+      "image": "/welcome-icons/step_two/costco.svg"
+    }, 
+    {
+      "name": "Chevron Corporation",
+      "image": "/welcome-icons/step_two/chevron_corporation.svg"
+    },
+    {
+      "name": "AT&T",
+      "image": "/welcome-icons/step_two/AT&T.svg"
+    },
+    {
+      "name": "Microsoft",
+      "image": "/welcome-icons/step_two/microsoft.svg"
+    },
+    {
+      "name": "Bitcoin",
+      "image": "/welcome-icons/step_two/bitcoin.svg"
+    },
+    {
+      "name": "Ethereum",
+      "image": "/welcome-icons/step_two/ethereum.svg"
+    },
+    {
+      "name": "Binance Coin",
+      "image": "/welcome-icons/step_two/binance-coin.svg"
+    },
+    {
+      "name": "USD Coin",
+      "image": "/welcome-icons/step_two/usd-coin.svg"
+    },
+    {
+      "name": "XRP",
+      "image": "/welcome-icons/step_two/ripple.svg"
+    },
+    {
+      "name": "Cardano (ADA)",
+      "image": "/welcome-icons/step_two/carnado.svg"
+    },
+    {
+      "name": "Solana (SOL)",
+      "image": "/welcome-icons/step_two/solana.svg"
+    },
+    {
+      "name": "Dogecoin",
+      "image": "/welcome-icons/step_two/dogecoin.svg"
+    },
+    {
+      "name": "Polygon (Matic)",
+      "image": "/welcome-icons/step_two/polygon.svg"
+    },
+    {
+      "name": "Polkadot (DOT)",
+      "image": "/welcome-icons/step_two/polkadot.svg"
+    },
+    {
+      "name": "Litecoin",
+      "image": "/welcome-icons/step_two/litecoin.svg"
+    },
+    {
+      "name": "Avalanche (AVAX)",
+      "image": "/welcome-icons/step_two/avalanche.svg"
+    },
+    {
+      "name": "Chainlink",
+      "image": "/welcome-icons/step_two/chainlink.svg"
+    },
+    {
+      "name": "Shiba Inu",
+      "image": "/welcome-icons/step_two/shiba-inu.svg"
+    }
+  ]
+}

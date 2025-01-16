@@ -1,0 +1,63 @@
+.deposit-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4rem;
+  .deposit-success-sub {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    svg {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+    .success-message {
+      color: rgba(255, 255, 255, 1);
+      font-weight: 500;
+      font-size: 1rem;
+    }
+    .deposited-payment {
+      color: rgba(29, 151, 71, 1);
+      font-weight: 500;
+      font-size: 2rem;
+    }
+  }
+  .button {
+    padding: 0.7rem !important;
+  }
+  .deposited-trust {
+    padding-top: 7rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    .deposited-trust-text {
+      font-weight: 400;
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .deposited-trust-icons {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-evenly;
+      svg {
+        height: 1rem;
+      }
+      img {
+        height: 1.5rem;
+      }
+    }
+    .deposited-trust-subtext {
+      font-weight: 400;
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.5);
+      text-align: center;
+      padding: 0 2.5rem;
+    }
+  }
+}

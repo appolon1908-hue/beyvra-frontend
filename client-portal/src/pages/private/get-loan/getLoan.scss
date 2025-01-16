@@ -1,0 +1,90 @@
+.loanTabsContainer {
+  background: #000;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  padding: 4.6875rem 4.6875rem 0 4.6875rem;
+
+  @media (max-width: 992px) {
+    padding: 4.5rem 1rem 2rem 1rem;
+  }
+
+  .breadcrumb {
+    width: 100%;
+    list-style: none;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    background: #000;
+  }
+
+  .breadcrumb li {
+    float: left;
+    width: 33.3%;
+    cursor: pointer;
+  }
+
+  .breadcrumb li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 15px 0px 15px 50px;
+    background: #303033;
+    position: relative;
+    display: block;
+    float: left;
+    width: 100%;
+    transition: all 0.5s;
+    text-align: center;
+
+    &.active {
+      background: linear-gradient(
+        to right,
+        rgba(46, 161, 249, 1),
+        rgba(48, 48, 51, 0)
+      ) !important;
+
+      &::after {
+        border-left-color: #000 !important;
+      }
+    }
+  }
+
+  .breadcrumb li a:after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 0;
+    border-top: 50px solid transparent;
+    border-bottom: 50px solid transparent;
+    border-left: 70px solid #303033;
+    position: absolute;
+    top: 50%;
+    margin-top: -50px;
+    left: 100%;
+    z-index: 2;
+    transition: all 0.5s;
+    border-width: 50px;
+  }
+
+  .breadcrumb li a:before {
+    content: "";
+    display: block;
+    width: 0;
+    height: 0;
+    border-top: 50px solid transparent;
+    border-bottom: 50px solid transparent;
+    border-left: 70px solid #000;
+    position: absolute;
+    top: 50%;
+    margin-top: -50px;
+    margin-left: 2px;
+    left: 100%;
+    z-index: 1;
+    transition: all 0.5s;
+  }
+
+  .breadcrumb li:first-child a {
+    padding-left: 20px;
+  }
+}

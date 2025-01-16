@@ -1,0 +1,63 @@
+.helpCenter {
+  margin-bottom: 2rem;
+  .helpCenterSearch {
+    .searchIcon {
+      svg {
+        width: 1.55rem;
+        height: 1.55rem;
+      }
+    }
+  }
+  .helpSectionTitle {
+    font-size: 1rem;
+    font-weight: 500;
+    color: rgba(0, 148, 255, 1);
+    margin-top: 1rem;
+    margin-bottom: 0.5375rem;
+  }
+  .helpCenterItems {
+    cursor: pointer;
+    margin-top: 1rem;
+    h3 {
+      margin-top: 0.8rem;
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .HelpCenterItem {
+      display: flex;
+      align-items: center;
+      padding: 0.7rem 0.5rem;
+      gap: 1rem;
+      svg {
+        width: 2rem;
+        height: 2rem;
+      }
+      h2 {
+        color: white;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.day.helpCenter {
+  .helpSectionTitle {
+    color: rgba(0, 148, 255, 1);
+
+  }
+  .helpCenterItems {
+    h3 {
+      color: rgb(0, 0, 0);
+    }
+    .HelpCenterItem {
+
+      h2 {
+        color: rgb(0, 0, 0);
+    
+      }
+    }
+  }
+}

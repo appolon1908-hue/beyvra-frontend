@@ -1,0 +1,88 @@
+.cfdTradingContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  color: white;
+  width: 90%;
+  margin: 0 auto;
+  gap: 50px;
+  padding: 40px 0;
+
+  @media (max-width: 878px) {
+    gap: 20px;
+  }
+
+  @media (max-width: 678px) {
+    flex-direction: column;
+  }
+
+  h2,
+  span,
+  div,
+  button {
+    font-weight: 400;
+    font-family: "Poppins";
+    font-style: normal;
+    color: #ffffff;
+  }
+
+  div {
+    height: auto;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 40px;
+    align-items: flex-start;
+
+    @media (max-width: 678px) {
+      width: 100%;
+    }
+
+    h2 {
+      text-align: left;
+      font-weight: 600;
+      font-size: 60px;
+      line-height: 45px;
+      @media (max-width: 878px) {
+        width: 100%;
+        font-size: 40px;
+      }
+      @media (max-width: 478px) {
+        font-size: 32px;
+      }
+    }
+
+    span {
+      text-align: left;
+      color: #999999;
+      font-size: 18px;
+      line-height: 27px;
+    }
+
+    button {
+      width: 154.81px;
+      height: 49px;
+      background: #ff1802;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 17.4375px;
+      @media (max-width: 678px) {
+        width: 100%;
+      }
+    }
+  }
+
+  img {
+    width: 50%;
+    height: auto;
+    padding: 20px 0;
+    max-width: 655px;
+    max-height: 407px;
+
+    @media (max-width: 678px) {
+      width: 90%;
+    }
+  }
+}

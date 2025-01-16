@@ -1,0 +1,37 @@
+.customTabs {
+  .tabButton {
+    background-color: #1a1d21;
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    height: 2.563rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all ease 0.2s;
+
+    &:hover {
+      background-color: #19252f;
+    }
+
+    &.active {
+      background-color: #5d86a6;
+    }
+  }
+
+  .tabsRow {
+    &:first-child {
+      .tabsCol:first-child .tabButton {
+        border-radius: 0.313rem 0 0 0.313rem;
+      }
+    }
+
+    &:last-child {
+      .tabsCol:last-child .tabButton {
+        border-radius: 0 0.313rem 0.313rem 0;
+      }
+    }
+  }
+}

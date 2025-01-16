@@ -1,0 +1,99 @@
+.executiveBonusesContainer{
+    max-width: 95%;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4rem;
+
+    @media (max-width:730px){
+        flex-direction: column;
+        margin: auto;
+    }
+
+    .leftExecutiveContainer{
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        height: 100%;
+        width: 40%;
+        @media (max-width:730px){
+            width: 100% !important;
+        }
+    }
+
+    .rightSliderExecutiveContainer{
+            width: 60% !important;
+            @media (max-width:730px){
+                width: 100% !important;
+                margin-top: 2rem;
+            }
+            .executiveSliderItem{
+                margin-left: 25%;
+                display: flex;
+                width: 100%;
+              
+                @media (max-width:730px){
+                    margin-left: 0% ;
+                    margin-bottom: 30px ;
+                }
+                .executiveSliderInnerItem{
+                    display: flex;
+                    align-items: start;
+                    justify-content: space-between;
+                    width: 95%;
+                    border: 1px solid white;
+                    border-radius: 15px;
+                    padding: 2rem 4rem;
+                    
+                    @media (max-width:1430px){
+                        width: 95%;
+                    }
+                    @media (max-width:730px){
+                        // width: 100%;
+                        margin-top: 2rem;
+                        margin: 0rem 3rem;
+                        padding: 2rem 2rem;
+                    }
+                    .leftSideExecutiveSliderContainer{
+                        justify-content: center;
+                        align-items: start;
+                        display: flex;
+                        gap: 0.5rem;
+                        flex-direction: column;
+                        img{
+                            width: 70px;
+                        }
+                        p{
+                            color: #999999;
+                            font-family: 'poppins','sans-serif';
+                            height: 38px;
+                        }
+                        span{
+                            color: #FF1802;
+                            font-family: 'poppins','sans-serif';
+                        }
+                        button{
+                            border: 1px solid white;
+                            border-radius: 12px;
+                            background-color: transparent;
+                            padding: 0.5rem 1rem;
+                            color: white;
+                            font-family: 'poppins','sans-serif';
+                        }
+                    }
+                    .rightSideExecutiveSliderContainer{
+                        button{
+                            border: 1px solid #FF1802;
+                            border-radius: 12px;
+                            background-color: transparent;
+                            padding: 0.5rem 1rem;
+                            color: white;
+                            font-family: 'poppins','sans-serif';
+                        }
+                    }
+                }
+                
+            }
+    }
+}

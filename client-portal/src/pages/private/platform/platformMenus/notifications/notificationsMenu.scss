@@ -1,0 +1,20 @@
+.notificationsMenu {
+  .notificationsMenuSection {
+    .notificationsSectionTitle {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #fff;
+      margin-bottom: 0.9375rem;
+    }
+    .customToggle {
+      margin-bottom: 1rem;
+    }
+  }
+}
+.ant-switch {
+  min-width: 33px;
+}
+
+.ant-switch.ant-switch-checked .ant-switch-handle {
+  inset-inline-start: calc(100% - 16px);
+}

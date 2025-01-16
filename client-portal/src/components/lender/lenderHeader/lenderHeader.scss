@@ -1,0 +1,42 @@
+.lndHeadWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4rem 5rem;
+  @media (max-width: 767px) {
+    padding: 4rem 0.2rem;
+    
+  }
+  .leftHead {
+    color: #fff;
+    display: flex;
+    gap: 5.31rem;
+    @media (max-width: 767px) {
+      gap: 1rem;
+    }
+  }
+  .rightHead {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    gap: 2rem;
+    @media (max-width: 767px) {
+      gap: 0.8rem;
+      width: fit-content;
+      flex-wrap: wrap;
+    }
+    .icon {
+      cursor: pointer;
+    }
+    .userIcon {
+      background-color: #1184c5;
+      border-radius: 100%;
+      width: 27px;
+      height: 27px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

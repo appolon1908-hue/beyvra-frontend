@@ -1,0 +1,17 @@
+
+.notify-selector{
+    background: green;
+    height:44px;
+    width: 80px;
+    border-radius: 19px;
+    .ant-selecter{
+        height: 100%;
+
+        &.ant-select-single{
+            height: 100%;
+        }
+    }
+}
+.selecter{
+    background-color: green;
+}

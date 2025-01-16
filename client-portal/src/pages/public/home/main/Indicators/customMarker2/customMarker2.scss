@@ -1,0 +1,86 @@
+.customMarkr2-container {
+  display: flex;
+}
+
+.customMarkr2-outer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.customMarkr2-rotated-box-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  @media (max-width: 730px) {
+    margin-right: 10px;
+  }
+}
+
+.customMarkr2-rotated-box {
+  width: 14px;
+  height: 14px;
+  background-color: rgba(255, 255, 255, 0.3); 
+  transform: rotate(45deg);
+  display: flex;
+  @media (max-width: 730px) {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+.customMarkr2-centered-box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.customMarkr2-inner-box {
+  background-color: #ffffff; 
+  width: 8px;
+  height: 8px;
+  @media (max-width: 730px) {
+    width: 5px;
+    height: 5px;
+  }
+}
+
+.customMarkr2-line-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: -12px;
+  z-index: 0;
+}
+
+.customMarkr2-horizontal-line {
+  background-color: #ffffff; 
+  height: 0.5px;
+  width: 12rem; 
+  z-index: 0;
+  @media (max-width: 730px) {
+    overflow-y: visible !important;
+    width: 10vw; 
+  }
+}
+
+.customMarkr2-label-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.customMarkr2-label {
+  background-color: #ffffff; 
+  border-radius: 1.5rem; 
+  padding: 0.18rem 0.55rem; 
+  font-weight: 600; 
+  font-family: "Poppins", sans-serif;
+  letter-spacing: 1px;
+  font-size: 12px;
+  @media (max-width: 730px) {
+    font-size: 10px;
+    padding: 0rem 0.25rem; 
+  }
+}

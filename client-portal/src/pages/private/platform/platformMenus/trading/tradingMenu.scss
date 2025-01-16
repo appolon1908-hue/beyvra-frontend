@@ -1,0 +1,24 @@
+.tradingMenu {
+  .firstOrder {
+    margin-top: 0rem !important;
+  }
+  .tradingMenuSection {
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+
+    .tradingSectionTitle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #fff;
+      margin-bottom: 0.5375rem;
+      margin-bottom: 1rem;
+    }
+
+    .customToggle {
+      margin-bottom: 1rem;
+    }
+  }
+}

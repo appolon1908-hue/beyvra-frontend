@@ -1,0 +1,17 @@
+.trading-experience{
+    display: flex;
+    .exp-info{
+        // flex: 1;
+        flex-basis: 50%;
+
+    }
+   .exp-graph{
+    // flex: 1;
+    flex-basis: 50%;
+    text-align: right;
+
+    img{
+        width: 200px;
+    }
+    }
+}

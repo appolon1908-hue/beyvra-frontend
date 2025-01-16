@@ -1,0 +1,46 @@
+.ant-modal {
+    .ant-modal-content{
+        background-color: #26272b;
+    }
+    
+    h2{
+        color: #ffffff9d;
+
+    }
+    h3{
+        color: white;
+    }
+    p{
+        svg{
+            circle{
+                stroke: #2dd674 ;
+            }
+            path{
+
+                stroke: #2dd674;
+            }
+        }
+    }
+
+}
+.day.ant-modal{
+    .ant-modal-content{
+        background-color: white;
+    }
+
+    h2{
+        color: #0000009d;
+
+    }
+    p{
+        color: black
+    }
+    h3{
+        color: black;
+    }
+
+}
+
+.ant-modal-close-x {
+    color: white; /* Change this to your desired color */
+  }

@@ -1,0 +1,59 @@
+
+/* Define light mode colors (default) */
+:root {
+  --stage-background: #0e0f12;
+  // --background-theme: #0e0f12;
+
+    --background-color-light: #ffffff;
+    --text-color-light: #000000;
+    --button-background-light: #0094ff;
+    --button-text-color-light: #ffffff;
+    --hover-background-light: #5e697852;
+  }
+  
+  /* Define dark mode colors */
+  [data-theme='night'] {
+    --stage-background: #0e0f12;
+    --surface-canvas: #0e0f12;
+    --base: #f1f1f1;
+    --base-variant :#383839;
+    --background-theme: #08090a;
+    --bg-variant:  #000000;
+    --base-gamma: #14161a;
+    --plain: #fff;
+    --theme-plain: #000;
+    --theme-variant: rgba(255, 255, 255, 0.6);
+    --text-theme: #9cb0c2;
+    --faint-light: rgba(255, 255, 255, 0.201);  //handles hover effects
+    --button-background-dark: #0094ff;
+    --button-text-color-dark: #ffffff;
+    --hover-background-dark: #5e697852;
+    --padding-lg: 40px
+    --active-light: rgba(22, 23, 26, 1); //active
+
+  }
+
+  [data-theme='day'] {
+    --stage-background: #fafafa;
+    --surface-canvas: rgba(243, 246, 249, 1);
+    --background-theme: rgba(231, 237, 243, 1);
+
+    --base: #0e0f12;
+    --base-variant :#cacaca;
+    --padding-lg: 40px
+
+    --background-theme: #fdfdfd;
+    --plain: #000;
+    --theme-variant: rgba(0, 0, 0, 0.6);
+    --faint-light: rgba(0, 0, 0, 0.201); //handles hover effects 
+
+    --text-theme: #282e31;
+    --base-gamma: rgba(231, 237, 243, 1);
+    --active-light: rgba(203, 202, 199, 1); //active
+
+
+    --button-background-dark: #0094ff;
+    --button-text-color-dark: #ffffff;
+    --hover-background-dark: #5e697852;
+  }
+

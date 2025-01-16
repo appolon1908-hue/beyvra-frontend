@@ -1,0 +1,63 @@
+.archiveMenu {
+  padding: 0rem 0rem 0rem 0rem;
+  .archiveMenuText {
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 0rem 3rem 1rem 0rem;
+  }
+  .archiveMenuList {
+    padding-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    svg {
+      width: 1.5rem;
+    }
+    .archiveMenuContent {
+      margin-left: -0.5rem;
+      .archiveMenuItem {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        gap: 0.5rem;
+        svg {
+          width: 1.5rem;
+        }
+        p {
+          font-size: 0.675rem;
+          font-weight: 400;
+          line-height: 1.25rem;
+          color: rgba(255, 255, 255, 0.6);
+          padding: 0rem 3rem 0rem 0rem;
+        }
+      }
+      p {
+        font-size: 1rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 1);
+        padding-top: 0.5rem;
+        padding: 0rem 2rem 0rem 0rem;
+      }
+    }
+  }
+  .archiveMenuHelpCenter {
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    span {
+      color: rgba(0, 148, 255, 1);
+    }
+  }
+  .menuListCard {
+    padding: 1rem 0rem;
+    background-color: rgba(61, 64, 70, 1);
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.3),
+      0 0.063rem 0 0.063rem inset rgba(39, 162, 255, 0.26);
+    border-radius: 1rem;
+  }
+  .mainItemCardv2 {
+    box-shadow: none;
+  }
+}

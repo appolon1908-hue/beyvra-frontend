@@ -1,0 +1,71 @@
+.forexCalculator{
+    display: flex;
+    margin: 16px auto;
+    max-width: 90%;
+    gap: 50px;
+    padding: 8px 12px;
+    @media(max-width:729px){
+        flex-direction: column;
+        gap: 10px;
+    }
+    .background-graphic{
+        flex: 1;
+        width: 50%;
+        @media(max-width:729px){
+            width: 90%;
+        }
+        .calculatorGraphic{
+            width: 100%;
+            max-width: 560px;
+            
+            // background-color: red;
+   
+        position: relative;
+        img.main-image{
+            max-height: 450px;
+            border-radius: 12px;
+            max-width: 450px;
+            width: 80%;
+            height: auto;
+            box-shadow:   0 0 35px 0 rgba(0, 0, 0, 0.948);
+            @media(max-width:729px){
+                width: 80%;
+            }
+        }
+         
+        img.droplet{
+            position: absolute;
+            right: 0%;
+            top: 25%;
+            width: 10%;
+
+        }
+        img.cornBg{
+            position: absolute;
+            right: -4%;
+            top: 52%;
+            width: 20%;
+
+        }
+
+    }
+    
+}
+
+    .forexProfitText{
+        width: 100%;
+        color: white;
+        flex: 1;
+        h3{
+            font-size: 34px;
+            line-height: 45px;
+        }
+        p{
+            margin-bottom: 11px;
+
+            font-size: 17px;
+            line-height: 27px;
+            color: #999999;
+        }
+    }
+}

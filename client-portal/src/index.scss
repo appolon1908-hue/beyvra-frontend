@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+@import './variables';
+
+* {
+  border: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Nacelle", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* Width of the entire scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Track (background of the scrollbar) */
+::-webkit-scrollbar-track {
+  background: #ffffff80;
+  border-radius: 10px;
+}
+
+/* Handle (the draggable part of the scrollbar) */
+::-webkit-scrollbar-thumb {
+  background: #4e4d4d;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+@-moz-document url-prefix() {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #4e4d4d #ffffff80;
+  }
+}
+
+button {
+  cursor: pointer;
+}
+button{
+  &.disabled{
+    background-color: #26272b;
+    cursor: not-allowed;
+  }
+}
+.chart-toolbar,
+.chart-controls-bar,
+html.theme-dark .chart-controls-bar {
+  display: none;
+}
+.trade-graph #widget-container {
+  border-color: red !important;
+}
+
+.ant-drawer-mask.rightSubDrawerMask {
+  background: transparent;
+}
+
+// #dark{
+//   color: white
+// }
+
+// #light{
+//   color: #000;
+// }
+
+
+.walkthroughTooltip .ant-tooltip-inner{
+  font-size: 16px;
+}
+
+
+.fullLoadingBackground{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: #0E1422;
+  overflow: hidden;
+}
+
+.ant-drawer-content.night.rightDrawer, .ant-drawer .ant-drawer-content.night {
+  background-color: #0e0f12;
+}
+.rightDrawer .ant-drawer-wrapper-body{
+  background: none;
+}

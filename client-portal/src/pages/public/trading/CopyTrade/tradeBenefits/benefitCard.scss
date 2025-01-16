@@ -1,0 +1,28 @@
+.benefitList{
+
+
+    padding: 5px;
+    max-width: 300px;
+
+
+            color: white;
+            div{
+                color: black;
+                height: 40px;
+                width: 40px;
+                border-radius: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: linear-gradient(180deg, #FF1802 -21.25%, rgba(255, 24, 2, 0) 130%);
+            }
+            h3{
+                margin: 12px 0;
+                font-size: 17px;
+            }
+            p{
+                margin: 12px 0;
+                font-size: 13px;
+            }
+        }
+

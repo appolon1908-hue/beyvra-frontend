@@ -1,0 +1,71 @@
+.Promo-input {
+  display: flex;
+  align-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.625rem;
+  padding: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 0rem !important;
+  border: none;
+
+  .inputIcon {
+    display: flex;
+    align-items: center;
+    width: 2rem;
+    margin-right: 0.625rem;
+
+    img,
+    svg {
+      width: 2rem;
+    }
+  }
+
+  .suffixIcon {
+    display: flex;
+    align-items: center;
+    width: 1.5rem;
+    margin-left: 0.625rem;
+
+    img,
+    svg {
+      width: 1.5rem;
+    }
+  }
+
+  .inputContainer {
+    width: 100%;
+  }
+
+  label {
+    color: rgb(223, 224, 227);
+    font-size: 0.675rem;
+    font-weight: 400;
+  }
+
+  input {
+    background-color: transparent;
+    border: none;
+    padding: 2rem;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #201e1e;
+    padding: 0;
+    background-color: #ffffff;
+    margin-top: 0.313rem;
+    width: 100%;
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    &::placeholder {
+      color: #45454599;
+      font-weight: 400;
+    }
+
+    &.ant-input-disabled {
+      background-color: transparent;
+      color: #ffffff;
+    }
+  }
+}

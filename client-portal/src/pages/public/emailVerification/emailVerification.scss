@@ -1,0 +1,31 @@
+.emailVerificationContainer {
+  background: #08090a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100vw;
+  height: 100vh;
+
+  .verificationTitle {
+    padding-top: 6.25rem;
+    color: #fff;
+    font-size: 1.5625rem;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+  }
+
+  .status {
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 400;
+
+    &.success {
+      color: #1fbf75;
+    }
+
+    &.error {
+      color: #f15131;
+    }
+  }
+}

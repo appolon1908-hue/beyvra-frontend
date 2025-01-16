@@ -1,0 +1,37 @@
+.publishedStrategies {
+  margin-top: 7rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  .elipse {
+    background-color: rgba(112, 128, 140, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 7.9375rem;
+    height: 7.9375rem;
+    border-radius: 50%;
+  }
+  h2 {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.75rem;
+    color: #fff;
+    text-align: center;
+    margin-top: 1rem;
+  }
+}
+
+.day.publishedStrategies {
+
+  .elipse {
+    background-color: rgb(66, 75, 82);
+    path{
+      fill: antiquewhite;
+    }
+  }
+  h2 {
+    color: #000000;
+  }
+}

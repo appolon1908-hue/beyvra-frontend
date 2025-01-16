@@ -1,0 +1,169 @@
+.marketSubMenuSlider {
+  margin-bottom: 2.5rem;
+  padding: 1rem 0.5rem;
+  overflow: hidden;
+  display: flex !important;
+  border-radius: 0.625rem;
+  cursor: pointer;
+  .menuSecondCard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    .menuSecondCardText1 {
+      margin-top: 0.7rem;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #ffffff;
+    }
+    .menuSecondCardText2 {
+      font-size: 0.7rem;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+  .menuSecondCardImage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    .imgDiv {
+      margin-left: -0.5rem;
+      .img {
+        width: 7.5rem;
+        height: 7.5rem;
+      }
+    }
+    .backgroundImage {
+      position: absolute;
+      right: -13px;
+      top: -16px;
+      height: 128%;
+      bottom: 0;
+      z-index: -1;
+    }
+  }
+}
+
+// day mode 
+.day.marketSubMenuSlider {
+
+  cursor: pointer;
+  .menuSecondCard {
+
+    .menuSecondCardText1 {
+
+      color: #000000;
+    }
+    .menuSecondCardText2 {
+
+      color: rgba(0, 0, 0, 0.8);
+    }
+  }
+  .menuSecondCardImage {
+    .imgDiv {
+      .img {
+
+      }
+    }
+    .backgroundImage {
+
+    }
+  }
+}
+.red {
+  background: linear-gradient(
+    to left,
+    rgba(189, 0, 52, 0.25),
+    rgba(0, 0, 0, 0.4)
+  );
+}
+
+.purple {
+  background: linear-gradient(
+    to left,
+    rgba(140, 12, 240, 0.25),
+    rgba(0, 0, 0, 0.4)
+  );
+}
+
+.green {
+  background: linear-gradient(
+    to left,
+    rgba(107, 255, 91, 0.25),
+    rgba(0, 0, 0, 0.4)
+  );
+  .menuSecondCardImage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    .imgDiv {
+      margin-left: -0.5rem;
+      .img {
+        width: 8.5rem !important;
+        height: 7.5rem !important;
+      }
+    }
+  }
+}
+
+.green2 {
+  background: linear-gradient(
+    to left,
+    rgba(24, 193, 115, 0.35),
+    rgba(0, 0, 0, 0)
+  );
+}
+
+.sky {
+  background: linear-gradient(
+    to left,
+    rgba(0, 148, 255, 0.35),
+    rgba(0, 0, 0, 0)
+  );
+}
+
+.purple2 {
+  background: linear-gradient(
+    to left,
+    rgba(140, 12, 240, 0.25),
+    rgba(0, 0, 0, 0)
+  );
+  .menuSecondCardImage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    .imgDiv {
+      margin-left: -0.5rem;
+      .img {
+        width: 6.5rem !important;
+        height: 6.5rem !important;
+      }
+    }
+  }
+}
+.purple3 {
+  background: linear-gradient(
+    to left,
+    rgba(140, 12, 240, 0.25),
+    rgba(0, 0, 0, 0)
+  );
+  .menuSecondCardImage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    .imgDiv {
+      margin-left: 1rem;
+      .img {
+        width: 5.5rem !important;
+        height: 5.5rem !important;
+      }
+    }
+  }
+}

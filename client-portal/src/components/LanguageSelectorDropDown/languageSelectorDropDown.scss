@@ -1,0 +1,65 @@
+.languageSelectorContainer{
+        @media (max-width: 730px) {
+            margin-top: 1rem;
+          }
+    
+    .languageButton{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 0.5rem;
+        cursor: pointer;
+        position: relative;
+        h2{
+            font-size: 14px;
+            margin-left: 0.4rem;
+            margin-right: 0.35rem;
+        }
+        img{
+            width: 15px;
+            height: 15px;
+            margin-bottom: 1px;
+        }
+    }
+    .languageDropDownMenu{
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        background-color: #0E0F12;
+        
+        margin-top: 12px;
+        color: white;
+        border: 1px solid white;
+        border-radius: 8px;
+
+    }
+    .closeLanguageDropDown{
+        display: none;
+    }
+    .showLanguageDropDown{
+        display: flex;
+    }
+    .languageValue{
+        display: flex;
+        padding: 0.5rem 0.8rem;
+        cursor: pointer;
+        overflow-y: hidden;
+        &:hover{
+            background-color: rgba(255, 255, 255, 0.179);
+        }
+        h2{
+            font-size: 12px;
+            margin-left: 0.4rem;
+            margin-right: 0.35rem;
+            font-family: 100;
+            font-family: 'poppins','sans-serif';
+            color: white;
+
+        }
+        img{
+            width: 15px;
+            height: 15px;
+        }
+    }
+
+}

@@ -1,0 +1,70 @@
+// .welcomeStepFour {
+//   animation: slideInFromLeft 0.8s forwards;
+//   .info {
+//     margin-top: -250px;
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     justify-content: center;
+//     gap: 20px;
+
+//     .text {
+//       font-family: "Roboto";
+//       font-style: normal;
+//       font-weight: 400;
+//       font-size: 18px;
+//       color: #ffffff;
+//       max-width: 70%;
+//       text-align: center;
+//       z-index: 101;
+//       max-width: 50%;
+//     }
+//   }
+// }
+
+
+// @media (max-width: 834px) {
+//   .welcomeStepFour {
+//     .info {
+//         margin-top: 70px;
+//     }
+//   }
+// }
+
+// @media screen and (max-width: 428px) {
+//   .welcomeStepFour {
+//     .info {
+//       .text {
+//         font-size: 13.19px;
+//       }
+//     }
+//   }
+// }
+.welcomeStepFour{
+  animation: slideInFromLeft 0.8s forwards;
+  .step-three-content{
+    left: 50%;
+    transform: translate(-50%, 0%);
+    bottom: 0%;
+ 
+  }
+  .line-width::before{
+    content: url('../../../../assets/icons/welcomeIcons/green_blurred_square.svg');
+    position: absolute;
+    bottom: -8px;
+    left: 0px;
+    width: 100%;
+    overflow-x: hidden;
+    animation: blink ease-in-out 2.5s infinite;
+  }
+  .line-width::after{
+    content: url('../../../../assets/icons/welcomeIcons/red_burred_square.svg');
+    position: absolute;
+    top: -2px;
+    left: 0px;
+    width: 100%;
+    overflow-x: hidden;
+    animation: alternate-blink  ease-in-out 2.5s infinite;
+  }
+
+}

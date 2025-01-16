@@ -1,0 +1,147 @@
+.inputContainer {
+  border: none;
+  .mainItemCardv2 {
+    box-shadow: none !important;
+    border: none;
+  }
+  .input_main {
+    padding: 0.525rem 0.638rem !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 0.025rem solid rgb(125, 125, 125);
+    border-radius: 0.625rem;
+
+    .inputIcon {
+      display: flex;
+      align-items: center;
+      width: 1rem;
+      margin-right: 0.625rem;
+
+      img,
+      svg {
+        width: 1rem;
+      }
+    }
+    input {
+      outline: none;
+    }
+
+    .suffixIcon {
+      display: flex;
+      align-items: center;
+      width: 1.5rem;
+      margin-left: 0.625rem;
+
+      img,
+      svg {
+        width: 1.5rem;
+      }
+    }
+
+    .inputContainer {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      border: none;
+    }
+
+    label {
+      color: rgb(186, 186, 186);
+      font-size: 0.575rem;
+      font-weight: 400;
+      // margin-bottom: 1.313rem;
+      span {
+        font-weight: 700;
+      }
+    }
+
+    input {
+      background-color: transparent;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #fff;
+      margin-top: 0.013rem;
+      width: 100%;
+
+      &:focus {
+        box-shadow: none;
+      }
+      &:disabled {
+        opacity: 0.5;
+      }
+
+      &::placeholder {
+        color: #ffffff99;
+        font-weight: 400;
+      }
+
+      &.ant-input-disabled {
+        background-color: transparent;
+        color: #fff;
+      }
+    }
+  }
+}
+
+.day.inputContainer {
+  .mainItemCardv2 {
+  }
+  .input_main {
+
+    border: 0.125rem solid rgba(0, 0, 0, 0.3);
+
+    .inputIcon {
+      img,
+      svg {
+        width: 1rem;
+     path{
+         fill: black
+     }
+      }
+    }
+    input {
+    }
+
+    .suffixIcon {
+
+
+      img,
+      svg {
+        width: 1.5rem;
+        path{
+          // fill: black
+      }
+      }
+    }
+
+    .inputContainer {
+    }
+
+    label {
+      color: rgba(0, 0, 0, 0.6);
+      span {
+      }
+    }
+
+    input {
+
+      color: #000000;
+
+
+      &:focus {
+      }
+
+      &::placeholder {
+        color: #00000099;
+      }
+
+      &.ant-input-disabled {
+        background-color: transparent;
+        color: #000000;
+      }
+    }
+  }
+}

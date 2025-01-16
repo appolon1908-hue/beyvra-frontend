@@ -1,0 +1,232 @@
+body{
+  background-color: rgb(0, 0, 0);
+}
+.loginContainer {
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 60px;
+  @media (max-width: 768px) {
+    padding-top: 20px;
+  }
+
+  .centerWrapper {
+    overflow-y: auto;
+    width: 23rem;
+    max-height: 52.375rem;
+    margin: 1.25rem;
+    border: linear-gradient(179.91deg, #404040 0.08%, rgba(14, 14, 14, 0) 112.74%);
+    background: radial-gradient(100.15% 191.04% at 15.32% 0%, #171717 0%, #101010 66.17%);
+    padding: 0rem 1.5rem 2em 1.5rem;
+    border-radius: 1rem;
+    @media (max-width: 768px) {
+      width: 23rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 0rem 1rem;
+    }
+
+    .emailSentContainer {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+
+      p {
+        font-size: 1.25rem;
+        color: #fff;
+        margin-top: 1.875rem;
+      }
+
+      svg {
+        width: 3.125rem;
+      }
+    }
+
+    .forgotPassContainer {
+      padding-top: 1.875rem;
+
+      .info-text {
+        color: #70808c;
+        margin-bottom: 1.25rem;
+      }
+    }
+
+    .ant-tabs {
+      height: 100%;
+
+      .ant-tabs-content {
+        height: 100%;
+
+        .ant-tabs-tabpane {
+          height: 100%;
+
+          .contentContainer {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+          }
+        }
+      }
+    }
+
+    .ant-tabs-top > .ant-tabs-nav::before,
+    .ant-tabs-bottom > .ant-tabs-nav::before,
+    .ant-tabs-top > div > .ant-tabs-nav::before,
+    .ant-tabs-bottom > div > .ant-tabs-nav::before {
+      border-bottom: 0.0625rem solid #2d3138;
+    }
+    .ant-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+      font-size: 1rem;
+      color: #6aff41;
+      font-weight: 500;
+    }
+    .ant-tabs .ant-tabs-tab {
+      color: #70808c;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    .ant-tabs .ant-tabs-tab:hover {
+      color: #6aff41;
+    }
+    .ant-tabs .ant-tabs-ink-bar {
+      background: #6aff41;
+    }
+
+    .ant-form {
+      width: 100% !important;
+    }
+    .ant-form-item {
+      margin-bottom: 0;
+
+      .ant-form-item-control {
+        margin-bottom: 0.6rem;
+      }
+    }
+    input.loginInput,
+    .ant-input-affix-wrapper {
+      border-radius: 0.53894rem;
+      border: 0.0539rem solid #272930;
+      background: #14161a;
+      padding: 0.5rem 0.9375rem;
+      width: 100%;
+      outline: 0;
+      color: #fff;
+      &::placeholder {
+        color: #9cb0c2;
+        font-size: 0.9rem;
+      }
+    }
+    .ant-input-affix-wrapper {
+      background: #14161a;
+      padding: 0.85rem 0.9375rem;
+      margin: 0 0 0.94rem 0;
+      svg {
+        fill: #70808c;
+        width: 1.5rem;
+      }
+    }
+    .ant-input {
+      background: #14161a;
+      color: #fff;
+      &::placeholder {
+        color: #9cb0c2;
+        font-size: 1rem;
+      }
+    }
+    .ant-checkbox-inner {
+      width: 1.2rem;
+      height: 1.2rem;
+      background-color: #1a1d21;
+      border: 0.125rem solid #70808c;
+      border-radius: 0.375rem;
+    }
+    .ant-checkbox-wrapper:not(.ant-checkbox-wrapper-disabled):hover
+      .ant-checkbox-checked:not(.ant-checkbox-disabled)
+      .ant-checkbox-inner {
+      background-color: #6aff41;
+    }
+    .ant-checkbox-wrapper {
+      color: #fff;
+      font-weight: 400;
+    }
+    p.forgotPass {
+      cursor: pointer;
+      color: #6aff41;
+      font-weight: 400;
+      font-size: 1rem;
+      margin: 1rem 0rem 1.8rem 0rem;
+    }
+    button.login,
+    button.register {
+      width: 100%;
+      border-radius: 1rem;
+      background: linear-gradient(90deg, rgba(1, 254, 239, 1) 0%, rgba(45, 254, 77, 1) 100%);
+      color: rgba(0, 0, 0, 1);
+      padding: 0.8125rem 4.0625rem;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      font-style: normal;
+      height: 2.5rem;
+    }
+
+    button.login:hover,
+    button.register:hover {
+      background: linear-gradient(90deg, rgba(102, 254, 245, 1) 0%, rgba(109, 254, 132, 1) 100%);
+      color: rgba(0, 0, 0, 1);
+    }
+
+    .continueWithText {
+      display: flex;
+      align-items: center;
+      margin-top: 1.25rem;
+
+      .liner {
+        width: 100%;
+        background-color: #272930;
+        height: 0.0625rem;
+      }
+
+      p {
+        font-size: 1rem;
+        font-weight: 400;
+        color: #9cb0c2;
+        min-width: 7.7rem;
+        margin: 0 0.625rem;
+      }
+    }
+
+    .socialIcons {
+      padding: 1.25rem 0;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      height: 100%;
+      max-height: 26.875rem;
+
+      .topIcons {
+        img {
+          margin: 0 0.625rem;
+        }
+      }
+
+      img {
+        width: 100%;
+        max-width: 3.4375rem;
+        height: auto;
+      }
+    }
+  }
+
+  .centerWrapper::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+  }
+}
+
+.tabinactive{
+  background-color: #242424;
+}

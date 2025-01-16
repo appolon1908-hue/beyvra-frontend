@@ -1,0 +1,20 @@
+.deposit-dark-input {
+    background-color: #3D4046;
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    border-radius: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.4);
+    border: none;
+    outline: none;
+    font-weight: 400;
+    font-size: 1rem;
+    color: white;
+}
+
+.deposit-dark-input::placeholder{
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 400;
+    font-size: 1rem;
+    margin: 0 auto;
+}

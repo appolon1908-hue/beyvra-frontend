@@ -1,0 +1,114 @@
+.customToggle {
+  margin-top: 16px;
+  border-bottom: #ffffff;
+  border-bottom-style: dashed;
+  border-bottom-width: 1px;
+  padding-bottom: 8px;
+
+  .toggleContainer {
+    display: flex;
+
+    .toggleTextContainer {
+      width: 100%;
+
+      .toggleLabel {
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.85);
+        margin-bottom: 0.325rem;
+      }
+
+      .toggleSubtext {
+        font-size: 0.575rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    .ant-switch {
+      background: transparent;
+      border: 0.125rem solid #969798;
+      height: 1.2625rem;
+      &:hover {
+        background: transparent;
+      }
+
+      .ant-switch-handle {
+        border: 0.125rem solid #969798;
+        border-radius: 0.5rem;
+        width: 0.8rem;
+        height: 0.8rem;
+
+        &::before {
+          background: transparent;
+        }
+      }
+
+      .ant-switch-inner {
+        padding: 0;
+      }
+
+      &.ant-switch-checked {
+        border: 0.125rem solid #2dd674;
+        &:hover {
+          background: transparent;
+        }
+
+        .ant-switch-handle {
+          border: 0.125rem solid #2dd674;
+        }
+      }
+    }
+  }
+
+  .infoText {
+    color: #0094ff;
+    font-size: 0.75rem;
+    font-weight: 400;
+    margin-top: 0.5rem;
+  }
+}
+
+.day.customToggle {
+  .toggleContainer {
+    .toggleTextContainer {
+      .toggleLabel {
+        color: rgba(0, 0, 0, 0.85);
+      }
+
+      .toggleSubtext {
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 10px;
+        font-weight: 500;
+      }
+    }
+
+    .ant-switch {
+      border: 0.125rem solid #3f3f3f;
+      &:hover {
+      }
+
+      .ant-switch-handle {
+        border: 0.125rem solid #414141;
+      }
+
+      .ant-switch-inner {
+      }
+
+      &.ant-switch-checked {
+        border: 0.125rem solid #0094ff;
+        &:hover {
+          background: transparent;
+        }
+
+        .ant-switch-handle {
+          border: 0.125rem solid #0094ff;
+        }
+      }
+    }
+  }
+
+  .infoText {
+    color: #0094ff;
+  }
+}

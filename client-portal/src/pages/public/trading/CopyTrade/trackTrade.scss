@@ -1,0 +1,74 @@
+   .copyTradingWrapper{
+
+    .activityContainer{
+        .btnWrapper{
+
+  
+        max-width: 400px;
+        margin: auto;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        button{
+            padding: 12px 42px;
+            border-radius: 29px;
+            background-color: transparent;
+            color: red;
+
+            &.active{
+                border: 1px solid #E6E6EF;
+
+            }
+            @media (max-width:420px) {
+                padding: 6px 10px;
+                font-size: 12px;
+                
+            }
+        }
+    }
+}
+    h2{
+        color: white;
+        text-align: center;
+        font-size: 34px;
+        margin: 34px auto;
+        @media (max-width: 724px) {
+            font-size: 30px;
+            
+        }
+    }
+
+    .benefitCardWrapper{
+        h2{
+            font-size: 34px;
+            margin: 12px;
+            color: #fff;
+            text-align: center;
+        }
+    }
+    .benefitWrapper{
+        display: flex;
+        width: 90%;
+        margin: auto;
+        margin-top: 20px;
+        @media (max-width:720Px){
+            flex-direction: column;
+        }
+        gap: 38px;
+
+        .benefitListWrapper{
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+
+            @media (max-width:902Px) {
+                grid-template-columns: 2fr 2fr;
+                padding: 12px 8px;
+                
+            }
+         
+        }
+   
+   }
+   }

@@ -1,0 +1,44 @@
+.notFoundPageContainer{
+    background-color: #0e1422;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+
+    h2{
+        font-family: 'poppins','sans-serif';
+        font-size: 96px;
+        color: white;
+        font-weight: 1000;
+        letter-spacing: 1.5px;
+
+        text-align: center;
+
+        @media (max-width: 730px){
+            padding: 0rem 1rem;
+            font-size: 48px;
+        }
+    }
+    p{
+        color: #999999;
+        font-family: 'poppins','sans-serif';
+    }
+
+    button{
+        margin-top: 1.5rem;
+        padding: 0.8rem 2.5rem;
+        border-radius: 0.6rem;
+        font-weight: 500;
+        font-size: 18px;
+        background-color: #28bd66;
+        color: black;
+        font-weight: 600;
+        font-family: "Poppins", sans-serif;
+        @media screen and (max-width: 730px) {
+            margin-left: 1rem;
+            font-size: 16px;
+            padding: 0.6rem 2rem;
+         }
+    }
+}

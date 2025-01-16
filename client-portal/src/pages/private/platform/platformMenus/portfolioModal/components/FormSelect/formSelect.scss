@@ -1,0 +1,28 @@
+.kycWrapper{
+    .select-selector{
+        box-sizing: border-box;
+        outline: none !important;
+        color: #90ACC1 !important;
+        border: 1px solid #90ACC1;
+        border-radius: 6px;
+        background: none;
+        padding: 12px 16px;
+        width: 100%;
+    }
+    select:-webkit-autofill,
+    select:-webkit-autofill:hover, 
+    select:-webkit-autofill:focus, 
+    select:-webkit-autofill:active{
+        -webkit-box-shadow: 0 0 0 30px #152338 inset;
+        -webkit-text-fill-color: #90ACC1;
+    }
+
+
+   .dropdown.right{
+
+    .dropdown-menu{
+        right: 0
+
+    }
+    }
+}

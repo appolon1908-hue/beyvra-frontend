@@ -1,0 +1,161 @@
+.topbarContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+
+  @media (max-width: 767px) {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .conversionDiv {
+    width: 88%;
+    @media (max-width: 767px) {
+      width: 100%;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      // width: auto;
+    }
+    // @media (max-width: 1600px) {
+    //   width: 74%;
+    // }
+
+    // @media (max-width: 1292px) {
+    //   width: 70%;
+    // }
+    // @media (max-width: 11115px) {
+    //   width: 65%;
+    // }
+    // @media (max-width: 9005px) {
+    //   width: 65%;
+    // }
+  }
+  .payProfileTab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &.payProfileTabMobile {
+      display: none;
+    }
+
+    @media (max-width: 767px) {
+      width: 100%;
+      justify-content: space-between;
+      display: none;
+
+      &.payProfileTabMobile {
+        display: flex;
+      }
+
+      button.profile {
+        border-radius: 0.438rem !important;
+      }
+    }
+
+    .demo {
+      // height: 2.813rem;
+      // padding: 0 0.625rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0.2rem 0.6rem;
+      margin-right: 10px;
+      width: max-content;
+
+      p.value {
+        color: #fff;
+        font-size: 14px;
+        margin-right: 0.225rem;
+      }
+      .amount {
+        // margin-top: 0.313rem;
+        display: flex;
+        align-items: center;
+      }
+      .dem {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+        span {
+          color: rgba(45, 254, 77, 1);
+          font-size: 16px;
+        }
+      }
+    }
+    .demo:hover {
+      background: #5e697852;
+      border-radius: 0.313rem;
+    }
+    .profileButtons {
+      position: relative;
+      
+    }
+    button.payments {
+      
+
+
+    align-items: center;
+    appearance: none;
+    background: linear-gradient(90deg, rgba(1, 254, 239, 1) 0%, rgba(45, 254, 77, 1) 100%);
+    border: none;
+    border-radius: 8px;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.25rem;
+    min-height: 1.5rem;
+    outline: none;
+    padding: 10px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    width: max-content;
+
+
+
+
+    }
+    button.dropup-icon {
+    
+      align-items: center;
+      height: 18px;
+      width: 18px;
+      box-sizing: border-box;
+      display: inline-flex;
+      position: absolute;
+      left: -.05rem;
+      bottom: -.05rem;
+      background: rgba(41, 41, 41, 1);
+      border: .125rem solid rgba(13, 13, 13, 1);
+      border-radius: 50%;
+      z-index: 100;
+
+    }
+    button.profile {
+      position: relative;
+      background: var(--base-gamma);
+      width: 3rem;
+      height: 3rem;
+      border-radius: 3rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+
+      .profile-img {
+        width: 5rem;
+        height: 5rem;
+      }
+    }
+  }
+}

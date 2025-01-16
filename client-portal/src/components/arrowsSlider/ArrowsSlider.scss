@@ -1,0 +1,50 @@
+.arrows-slider-container{
+    width: 100%;
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+    .arrows-slider-left-icon {
+        width: 1.5rem;
+        cursor: pointer;
+    }
+    .arrows-slider-right-icon {
+        width: 1.5rem;
+        cursor: pointer;
+        svg{
+            path{
+               stroke: white
+            }
+        }
+    }
+    .arrows-slider-children {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        overflow-x: scroll;
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+        &::-webkit-scrollbar {
+        display: none;
+        }
+    }
+}
+
+.day.arrows-slider-container{
+
+    .arrows-slider-left-icon {
+        svg{
+            path{
+               fill: black
+            }
+        }
+
+    }
+    .arrows-slider-right-icon {
+ 
+        svg{
+            path{
+               stroke: black
+            }
+        }
+    }
+}

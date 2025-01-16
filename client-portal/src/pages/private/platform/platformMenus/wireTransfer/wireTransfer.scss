@@ -1,0 +1,44 @@
+.wireTransfer {
+  min-width: 650px;
+  padding: 0 30px;
+  background-color: #26272b;
+  margin: -2rem;
+  border-radius: 1rem;
+  border: none;
+
+  @media (max-width: 768px) {
+    width: 100% !important;
+  }
+  .inputsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    border: none;
+    padding: 0.5rem;
+    p {
+      color: rgba(241, 61, 68, 1);
+      font-size: 0.65rem;
+    }
+  }
+  .inputError.input_main {
+    border: 1px solid rgba(241, 61, 68, 1);
+  }
+  .deliveryTime {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.6906rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  h2 {
+    color: rgba(255, 255, 255);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 10px;
+    text-align: center;
+    padding: 10px 0px;
+  }
+}

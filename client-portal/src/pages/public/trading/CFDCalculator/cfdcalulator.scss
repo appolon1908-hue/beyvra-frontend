@@ -1,0 +1,15 @@
+.tradingContainer{
+    background-color: #0E0F12;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  
+        
+    
+        @media(max-width: 767px) {
+            gap: 0.8rem;
+            width: fit-content;
+            flex-wrap: wrap;
+          }
+    
+    }

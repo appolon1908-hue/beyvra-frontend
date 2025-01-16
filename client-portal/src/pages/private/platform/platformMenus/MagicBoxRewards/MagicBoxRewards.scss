@@ -1,0 +1,105 @@
+  .magicBoxContainer {
+  background: linear-gradient(180deg, rgba(39, 162, 255, -1.5) 0%, rgba(39, 162, 255, 0) 100%),
+linear-gradient(0deg, #3D4046, #3D4046);
+  width: 20.25rem ;
+  height: 19.0625rem ;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+.magic-box-image-box {
+  width: 100%;
+  height: 19.1038rem;
+  background: linear-gradient(
+    126.82deg,
+    rgba(23, 49, 113, 0.6),
+    rgba(20, 95, 239, 0.6),
+    rgba(88, 132, 241, 0.6)
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  img {
+    width: 10rem;
+    height: 9rem;
+    margin-right: 1rem;
+  }
+
+  span {
+    color: #fff;
+    font-size: 1.5356rem;
+    font-weight: 500;
+    margin-top: 1.375rem;
+  }
+  
+}
+  }
+.magic-box-text-box {
+  display: flex;
+  margin-top: 14rem;
+  position: relative;
+  p {
+    color: #969798;
+    width: 100%;
+    line-height: 1.1719rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    text-align: center;
+    padding: 1rem 2.5rem;
+    margin-top: 1rem;
+  }
+}
+
+.magic-box-possible-rewards {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  .rewards-title {
+    color: #fff;
+    text-align: start;
+  }
+  span {
+    font-size: 1.3rem;
+    font-weight: 500;
+  }
+  .reward-btn {
+    width: 100%;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0.5rem;
+    background: none !important;
+  box-shadow: 0rem 0.125rem 0rem 0.125rem rgba(0, 0, 0, 0.05), 0rem 0.0625rem 0rem 0.0225rem inset rgba(39, 162, 255, 0.5);
+    .settings {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      background: none;
+      img {
+        margin-right: 0.5rem;
+        width: 2.625rem;
+        height: 1.9375rem;
+        object-fit: contain;
+      }
+      p {
+        text-align: left;
+      }
+      .reward-key {
+        color: #969798;
+        margin-bottom: 0.25rem;
+        font-size: 0.675rem;
+      }
+      .reward-value {
+        color: #fff;
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+

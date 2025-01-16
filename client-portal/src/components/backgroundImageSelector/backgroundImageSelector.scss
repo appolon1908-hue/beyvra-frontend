@@ -1,0 +1,101 @@
+$gradientBorderColorPrimary: linear-gradient(
+  to bottom,
+  rgba(39, 162, 255, 0.5),
+  rgba(0, 0, 0, 0)
+);
+$background: linear-gradient(to bottom, #3c3d40, #2d2e32);
+
+.backgroundImageSelector {
+  .selectorTitle {
+    color: #ababad;
+    font-size: 0.875rem;
+    font-weight: 400;
+    margin-bottom: 1.25rem;
+  }
+
+  .imageList {
+    .imageContainer {
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      border-radius: 0.3125rem;
+      overflow: hidden;
+
+      &.active {
+        background: $gradientBorderColorPrimary;
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        border-radius: 0.313rem;
+        border: 0.125rem solid transparent;
+        border-bottom-width: 0;
+        background-image: $background;
+        background-clip: padding-box;
+        z-index: 1;
+      }
+
+      .cardInner {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.125rem;
+        border-radius: 0.3125rem;
+        overflow: hidden;
+
+        img {
+          border-radius: 0.3125rem;
+          z-index: 2;
+        }
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}
+
+.day.backgroundImageSelector {
+  .selectorTitle {
+    color: #5f5f5f;
+
+  }
+
+  .imageList {
+    .imageContainer {
+   
+
+      &.active {
+        background: $gradientBorderColorPrimary;
+      }
+
+      &::before {
+
+        background-image: $background;
+
+      }
+
+      .cardInner {
+             img {
+ 
+        }
+      }
+
+      img {
+
+      }
+    }
+  }
+}

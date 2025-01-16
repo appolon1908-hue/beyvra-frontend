@@ -1,0 +1,41 @@
+.tradCalcItemQuantity {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  gap: 5px;
+  position: relative;
+}
+
+.tradCalcItemQuantity {
+  span {
+    text-align: center;
+    box-sizing: border-box;
+    background: #2f3541;
+    border: 1px solid #79859a;
+    border-radius: 6px;
+    padding: 15px;
+    font-weight: 700;
+    font-size: 19.6px;
+    color: #79859a;
+    @media (max-width: 878px) {
+      font-size: 13.29px;
+    }
+    @media (max-width: 478px) {
+      font-size: 18.5px;
+    }
+  }
+
+  .tradCalcMinus {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    cursor: pointer;
+  }
+
+  .tradCalcPlus {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    cursor: pointer;
+  }
+}

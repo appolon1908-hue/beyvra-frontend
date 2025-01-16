@@ -1,0 +1,148 @@
+.settingProfile {
+  width: 100%;
+  overflow-x: hidden;
+
+  .form-input {
+    box-sizing: border-box;
+    outline: none !important;
+    color: #90acc1 !important;
+    border: 0.1px solid #fff !important;
+    border-radius: 18px;
+    background: none;
+  }
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #0c141f inset;
+    -webkit-text-fill-color: #90acc1;
+  }
+
+  .form-container {
+    .form-tool {
+      border-radius: 12px;
+      .ant-form-item {
+        margin-bottom: 0;
+      }
+    }
+  }
+  &Modal {
+    .ant-modal-content {
+      border: 0.5px solid;
+      overflow: auto;
+      width: 100%;
+      .ant-modal-title {
+        text-align: center;
+      }
+      .ant-modal-header {
+        color: white;
+        background-color: transparent;
+        .ant-modal-title {
+          color: white;
+        }
+      }
+      @media (max-width: 768px) {
+        width: 95vw !important;
+      }
+    }
+    .ant-modal-content::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
+    }
+    .ant-modal-close {
+      color: white;
+    }
+  }
+}
+
+.verifyEmailButton {
+  background: #28bd66;
+  padding: 6px 12px;
+  font-weight: 500;
+  border-radius: 8px;
+}
+.confirmEmailContainer {
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  width: 100%;
+  margin: auto;
+}
+.confirmEmailTitle {
+  font-size: 22px;
+  font-weight: 600;
+  text-align: left;
+}
+.confirmEmailSubTitle {
+  font-size: 13px;
+  font-weight: 400;
+  text-align: center;
+  margin-top: 20px;
+  width: 400px;
+  align-self: center;
+}
+.confirmEmailNote {
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 24px;
+  text-align: center;
+  margin-top: 16px;
+  color: #e1e1e1;
+  width: 390px;
+  align-self: center;
+}
+.confirmEmailInputCotainer {
+  max-width: 436px;
+  width: 100%;
+  padding: 3px 16px 3px 16px;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  margin-top: 20px;
+}
+.confirmEmailInputlabel {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: left;
+  padding: 0px 10px 3px 10px;
+}
+.confirmEmailInput {
+  background: rgba(241, 243, 243, 0.12);
+  padding: 3px 10px;
+  color: #fff;
+  border-radius: 5px;
+  border: solid 0.1rem #686767;
+}
+.confirmEmailInput:focus-visible {
+  outline: none;
+}
+.confirmEmailContinueButton {
+  background: #28bd66;
+  max-width: 160px;
+  width: 100%;
+  height: 40px;
+  padding: auto;
+  gap: 8px;
+  border-radius: 16px;
+  align-self: center;
+  margin-top: 20px;
+}
+.confirmEmailCancelButton {
+  background: rgba(241, 243, 243, 0.12); 
+  max-width: 160px;
+  border: solid 0.1rem #3f3f3f;
+  width: 100%;
+  height: 40px;
+  padding: auto;
+  gap: 8px;
+  border-radius: 16px;
+  align-self: center;
+  margin-top: 10px;
+}
+.confirmEmailCancelButton:hover{
+  background: #259654;
+}
+.confirmEmailContinueButton:hover{
+  background: #2be377;
+}

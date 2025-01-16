@@ -1,0 +1,121 @@
+.loan {
+  background-color: rgba(1, 0, 6, 1);
+  width: 100%;
+  height: 100vh;
+  padding: 5rem 7rem;
+  @media (max-width: 804px) {
+    height: 100%;
+  }
+  .loanHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: center;
+      justify-content: center;
+    }
+      .rectangle-loan-links {
+    width: 22.8125rem;
+    height: 0.8125rem;
+    background: linear-gradient(
+      to right,
+      rgba(39, 162, 255, 1),
+      rgba(249, 252, 255, 0)
+    );
+    border-radius: 0.625rem;
+    margin: 1.4375rem 0rem 1.4375rem 3.875rem;
+    @media (max-width: 768px) {
+      width: 18rem;
+      height: 0.7rem;
+      margin: 1rem 0rem 0rem 0rem;
+    }
+    @media (max-width: 576px) {
+      width: 15rem;
+      height: 0.6rem;
+    }
+    @media (max-width: 320px) {
+      width: 10rem;
+      height: 0.4rem;
+    }
+  }
+
+  .loanTitle {
+    color: white;
+    font-size: 1.875rem;
+    margin: 1rem 0rem 0rem 3.875rem;
+    @media (max-width: 768px) {
+      text-align: center;
+      margin: 0;
+    }
+  }
+  .btnBox {
+    cursor: pointer;
+    padding: 0.8rem 2rem;
+    background: rgba(0, 148, 255, 1);
+    color: white;
+    border-radius: 0.4375rem;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 18.75px;
+    letter-spacing: 1%;
+    margin-right: 5rem;
+    @media (max-width: 768px) {
+      margin-right: 0rem;
+      margin-top: 0rem;
+    }
+  }
+  }
+
+
+  .BoxesDiv {
+    display: flex;
+    gap: 2.6875rem;
+    justify-content: center;
+    align-items: center;
+    height: 100;
+    margin-top: 7rem;
+    @media (max-width: 768px) {
+      padding-bottom: 10rem;
+    }
+    .rectangleBox {
+      width: 15.8125rem;
+      height: 10.3125rem;
+      background-color: rgba(217, 217, 217, 0.12);
+      border-radius: 0.9375rem;
+      box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+
+      .Elipse {
+        position: absolute;
+        height: 2.8125rem;
+        width: 3rem;
+        background-color: rgba(0, 102, 179, 1);
+        top: 1rem;
+        right: 0.5rem;
+        border-radius: 50%;
+        filter: blur(1.5rem);
+      }
+      .Elipse2 {
+        position: absolute;
+        height: 2.8125rem;
+        width: 3rem;
+        background-color: rgba(167, 205, 69, 1);
+        bottom: 0rem;
+        right: 0rem;
+        border-radius: 50%;
+        filter: blur(1.5rem);
+      }
+      p {
+        font-size: 1.475rem;
+        color: white;
+        font-weight: 600;
+      }
+    }
+  }
+}

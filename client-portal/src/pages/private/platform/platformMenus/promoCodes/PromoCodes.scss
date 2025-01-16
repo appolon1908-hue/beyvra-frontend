@@ -1,0 +1,68 @@
+.promocodes {
+  padding: 40px 70px;
+  background-color: #26272b;
+  margin: -2rem;
+  border-radius: 1rem;
+  border: none;
+  .promocodes-title {
+    color: rgba(255, 255, 255);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: auto;
+    text-align: center;
+    padding: 32px 0px 0px 0px;
+  }
+  .promocodes-subTitle {
+    color: rgb(184, 172, 172);
+    font-size: 0.8rem;
+    font-weight: 400;
+    margin: auto;
+    text-align: center;
+    padding: 0px 0px 32px 0px;
+  }
+  .mainItemCardv2 {
+    box-shadow: none !important;
+  }
+  .promocode-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: white;
+  }
+  .promocode-paragraph {
+    font-size: 1rem;
+    font-weight: 400;
+    color: rgba(172, 173, 174, 1);
+    text-align: left;
+    .promocode-paragraph-span {
+      margin-left: 6rem;
+    }
+  }
+  .promocode-input {
+    margin-bottom: 1.5rem;
+    padding: 0;
+    border: none;
+  }
+  .promocodes-button {
+    background: #2dd674;
+    color: black;
+  }
+  &Modal {
+    .ant-modal-content {
+      width: 450px !important;
+      border: 0.5px solid;
+      max-height: 820px !important;
+      overflow: auto;
+      border: #26272b;
+      @media (max-width: 768px) {
+        width: 95vw !important;
+      }
+    }
+    .ant-modal-content::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
+    }
+    .ant-modal-close {
+      color: white;
+    }
+  }
+}

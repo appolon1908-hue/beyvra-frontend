@@ -1,0 +1,111 @@
+.considerationContainer{
+    .considerationHeadingContainer{
+        max-width: 90%;
+        margin: auto;
+        display: flex;
+        justify-content: start;
+        align-items: start;
+        flex-direction: column;
+        margin-top: 4rem;
+    
+        @media(max-width:730px){
+            max-width: 95%;
+        }
+       
+        h2{
+            font-size: 32px;
+            font-family: 'poppins','sans-serif';
+            color: white;
+            font-weight: 600;
+    
+            @media(max-width:730px){
+                font-size: 24px;
+            }
+        }
+    
+        p{
+            margin-top: 2rem;
+            font-family: 'poppins','sans-serif';
+            color: #999999;
+            font-size: 20px;
+            @media(max-width:730px){
+                font-size: 18px;
+            }
+        }
+    
+    }
+    .considerationHeadingTwoContainer{
+        max-width: 90%;
+        margin: auto;
+        display: flex;
+        justify-content: start;
+        align-items: start;
+        flex-direction: column;
+        margin-top: 4rem;
+    
+        @media(max-width:730px){
+            max-width: 95%;
+        }
+       
+        h2{
+            font-size: 32px;
+            font-family: 'poppins','sans-serif';
+            color: white;
+            font-weight: 600;
+    
+            @media(max-width:730px){
+                font-size: 24px;
+            }
+        }
+    
+        p{
+            margin-top: 2rem;
+            font-family: 'poppins','sans-serif';
+            color: #999999;
+            font-size: 20px;
+            @media(max-width:730px){
+                font-size: 18px;
+            }
+        }
+    
+    
+    }
+    .considerationInformationContainer{
+        max-width: 90%;
+        margin: auto;
+        display: flex;
+        justify-content: start;
+        align-items: start;
+        flex-direction: column;
+        margin-top: 2rem;
+        .considerationInformationItemContainer{
+            margin-top: 3rem;
+            .considrationItemHeadingContainer{
+                display: flex;
+                align-items: center;
+                h2{
+                    font-size: 32px;
+                    font-family: 'poppins','sans-serif';
+                    color: white;
+                    font-weight: 600;
+                    margin-left: 0.5rem;
+                    
+                    @media(max-width:730px){
+                        font-size: 24px;
+                    }
+                }
+            }
+        
+            p{
+                margin-top: 2rem;
+                font-family: 'poppins','sans-serif';
+                color: #999999;
+                font-size: 20px;
+                @media(max-width:730px){
+                    font-size: 18px;
+                }
+            }
+
+        }
+    }
+}

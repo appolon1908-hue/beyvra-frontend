@@ -1,0 +1,118 @@
+.market-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  .mainItemCardv2 {
+    box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05),
+      0 0.063rem 0 0.063rem inset rgba(255, 255, 255, 0.3);
+  }
+  .menufirstCard {
+    display: flex;
+    align-items: center;
+    .menufirstCardText {
+      font-size: 0.9rem;
+      font-weight: 500;
+      flex: 1;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    svg {
+      width: 1.3rem;
+      height: 1.3rem;
+    }
+  }
+  .menuthirdCardCon {
+    margin-top: -1rem;
+    margin-bottom: 0.5rem;
+    .mainItemCard {
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.3),
+        rgba(0, 0, 0, 0)
+      );
+    }
+    .mainItemCard::before {
+      background-image: linear-gradient(to right, rgb(60, 61, 64), rgb(45, 46, 50));
+    }
+    .menuthirdCard {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+      .menuThirdCardRow {
+        display: flex;
+        align-items: center;
+        .menuthirdCardText1 {
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #fff;
+          line-height: 2rem;
+        }
+        .menuthirdCardText2 {
+          font-size: 0.7rem;
+          font-weight: 400;
+          color: rgba(150, 151, 152, 1);
+        }
+        .svgs {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          img {
+            width: 4rem;
+            height: 4rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+.day.market-menu {
+
+  .mainItemCardv2 {
+    box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05),
+      0 0.063rem 0 0.063rem inset rgba(0, 0, 0, 0.3);
+  }
+  .menufirstCard {
+
+    .menufirstCardText {
+      color: #000000;
+
+    }
+      path{
+        stroke: #000
+    }
+  }
+  .menuthirdCardCon {
+
+    .mainItemCard {
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.3),
+        rgba(255, 255, 255, 0)
+      );
+    }
+    .mainItemCard::before {
+      background-image: linear-gradient(to right, rgb(195, 194, 191), #2d2e32);
+    }
+    .menuthirdCard {
+
+      .menuThirdCardRow {
+
+        .menuthirdCardText1 {
+
+          color: #000000;
+          line-height: 2rem;
+        }
+        .menuthirdCardText2 {
+
+          color: rgb(18, 20, 22);
+        }
+
+      }
+    }
+  }
+}
