@@ -1,0 +1,99 @@
+.profile-card{
+    max-width: 400px;
+    width: 100%;
+    border-radius: 12px;
+    padding: 10px;
+    color: white;
+    background: #3c475bc7;
+    border: none;
+    text-align: left;
+
+    .profile-top{
+        .info{
+            h3{
+                font-size: 21px;
+                color: #ffffffab;
+            }
+          
+
+        .info-value{
+            gap: 3px;
+            display: flex;
+             align-items: center;
+            >p{
+                font-size: 12px;
+                margin: 0;
+                line-height: 4px;
+            }
+            span{
+                color: green;
+            }
+        }
+        .followers{
+            text-align: left;
+            margin-top: 12px;
+            font-size: 11px;
+            line-height: 20px;
+            color: #ffffff8f;
+        }
+
+        }
+    .image-wrapper{
+        width: 121px;
+        height: 121px;
+        border-radius: 100%;
+        overflow: hidden;
+        display: flex;
+        // align-items: center; /* Center the image vertically */
+        justify-content: center; 
+        background: #000;
+  
+
+    img{
+      
+        border-radius: 100%;
+        object-fit: cover;
+        width: 100%;
+        object-position: top ;
+
+    }
+}
+    }
+
+    .profile-buttons{
+        display: flex;
+        justify-content: space-between;
+        margin: 30px auto;
+        button{
+            border-radius: 8px;
+            padding: 10px 43px;
+            width: 47%;
+            background: none;
+            border: 1px solid white;
+            color: white;
+            font-size: 12px;
+      
+            &.copy{
+                background-color:  #13121b;
+                border: none;
+              }
+        }
+      
+    }
+    .profile-bottom{
+        margin: 30px auto;
+
+
+    .stat{
+        span{        
+        font-size: 11px;
+        }
+        p{
+            font-weight: 500;
+            line-height: 31px;
+            text-align: left;
+
+        }
+    }
+}
+}

@@ -1,0 +1,59 @@
+.enhanceSecurityContainer {
+  .securityTitle {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 0.425rem;
+  }
+  .securitySubtitle {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #ffffff;
+    margin-bottom: 0.738rem;
+    line-height: 1rem;
+  }
+  .securityItem {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .securityItemIcon {
+      min-height: 1.7rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    p {
+      margin-top: 0.625rem;
+      font-size: 0.75rem;
+      color: #ffffff99;
+      font-weight: 400;
+      text-align: center;
+    }
+  }
+}
+
+.day.enhanceSecurityContainer {
+  .securityTitle {
+
+    color: #000000;
+    margin-bottom: 0.425rem;
+  }
+  .securitySubtitle {
+
+    color: #535353;
+  }
+  .securityItem {
+
+
+    .securityItemIcon {
+    }
+
+    p {
+      color: #00000099;
+      
+    }
+  }
+}

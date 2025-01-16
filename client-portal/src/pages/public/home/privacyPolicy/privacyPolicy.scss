@@ -1,0 +1,40 @@
+.privacyPolciyPageContainer{
+    background-color: #0E1422;
+
+    .privacyPolicyHeadingContainer{
+        max-width: 90%;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin-top: 4rem;
+
+        @media(max-width:730px){
+            max-width: 95%;
+        }
+       
+        h2{
+            font-size: 32px;
+            font-family: 'poppins','sans-serif';
+            color: white;
+            font-weight: 600;
+
+            @media(max-width:730px){
+                font-size: 24px;
+            }
+        }
+
+        p{
+            margin-top: 2rem;
+            font-family: 'poppins','sans-serif';
+            color: #999999;
+            font-size: 20px;
+            text-align: center;
+            @media(max-width:730px){
+                font-size: 18px;
+            }
+        }
+    
+    }
+}

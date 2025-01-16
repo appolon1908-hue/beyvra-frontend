@@ -1,0 +1,185 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(10%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(10%);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOutToTop {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(10%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOutToBottom {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(50%);
+  }
+}
+
+
+// button animation
+
+@keyframes buttonPulse {
+  0% {
+    // transform: scale(1);
+    opacity: 100%;
+  }
+  
+  50% {
+    opacity: 80%;
+    // transform: scale(1.1);
+  }
+  
+  100% {
+    opacity: 100%;
+    // transform: scale(1);
+  }
+}
+
+
+
+
+
+
+.stepOneContainer{
+  // width: 100%;
+  // height: 100%;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
+  // flex-direction: column;
+  
+    animation: fadeIn 0.5s forwards;
+  
+  
+  .fade-exit {
+    animation: fadeOut 0.5s forwards;
+  }
+  // img{
+  //   width: 210px;
+  //   margin-top: 2%;
+  //   @media screen and (max-width: 730px) {
+  //     width: 170px;
+  //     margin-top: 20%;
+  //  }
+  // }
+  // .stepOneHeader{
+  //   display: flex;
+  //   justify-content: center;
+  //   align-items: center;
+  //   flex-direction: column;
+  //   margin-top: 1rem;
+  //   color: white;
+
+  //   h2{
+  //     font-size: 24px;
+  //     font-family: "Poppins", sans-serif;
+
+  //   }
+  //   span{
+  //     margin-top: 1rem;
+  //     text-align: center;
+  //     font-family: "Poppins", sans-serif;
+  //     @media screen and (max-width: 730px) {
+  //       max-width: 80%;
+  //    }
+
+  //   }
+  //   .stepOneButton{
+  //     margin-top: 1rem;
+  //     animation: buttonPulse 1s infinite;
+  //     transition: all 0.5s ease-in-out;
+  //   }
+  // }
+}

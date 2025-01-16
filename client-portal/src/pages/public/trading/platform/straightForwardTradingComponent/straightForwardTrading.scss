@@ -1,0 +1,48 @@
+
+.tradingWrapper.straightForwardWrap{
+    display: flex;
+    width: 90%;
+    margin: auto;
+    align-items: center;
+    gap: 50px;
+    
+    margin-top: -90px;
+    @media (max-width: 720px) {
+        flex-direction: column;
+        
+    }
+        .textWrapper{
+        padding: 42px 0;
+        flex: 1;
+
+        h3{
+            font-size: 34px;
+            color: #fff;
+            line-height: 45px;
+            margin: 12px 0;
+            @media (max-width: 480px) {
+                text-align: center;
+                
+            }
+        }
+        p{
+            line-height: 24px;
+            color: #999999;
+            font-size: 16px;
+            @media (max-width: 480px) {
+                text-align: justify;
+                
+            }
+        }
+    }
+    .backdropImage{
+        position: relative;
+        text-align: right;
+        flex: 1;
+        
+        img{
+          max-width: 100%;
+        }
+
+    }
+}

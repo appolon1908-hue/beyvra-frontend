@@ -1,0 +1,227 @@
+.assetsMenu {
+  .slider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    .fixedTime {
+      width: 6rem !important;
+    }
+    button {
+      background: transparent;
+      border: 0.0625rem solid rgba(93, 134, 166, 1);
+      padding: 0.525rem 0.9375rem;
+      color: white;
+      border-radius: 1.1875rem;
+      font-size: 0.65rem;
+      font-weight: 400;
+    }
+    .active {
+      background-color: rgba(22, 23, 26, 1);
+    }
+    button:hover {
+      background-color: rgba(22, 23, 26, 1);
+    }
+  }
+  .customTabs {
+    margin-bottom: 0.9375rem;
+  }
+
+  .assetsSearchbar {
+    margin-top: 1rem;
+    margin-bottom: 0.9375rem;
+    padding: 0.3rem 0.575rem 0.3rem 0.3125rem !important;
+    .searchIcon {
+      svg {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+  }
+
+  .assetsFilters {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 0.9375rem;
+
+    .filterButton {
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: all 0.25s;
+
+      &:hover {
+        color: #fff;
+      }
+    }
+
+    .filterSelectlist {
+      width: auto !important;
+
+      .ant-select-arrow {
+        svg {
+          width: 1.25rem;
+        }
+      }
+
+      .ant-select-selector {
+        border: 0rem solid white;
+        outline: 0rem;
+        background: transparent;
+        border-radius: 1.25rem;
+        .ant-select-selection-item {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.6);
+          margin-right: 0.6rem;
+        }
+        .ant-select-selection-item:hover {
+          color: #fff;
+        }
+
+        .ant-select-selection-search {
+          input {
+            height: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  .assetsList {
+    .assetsListCol {
+      display: flex;
+      align-items: center;
+
+      &.alignEnd {
+        justify-content: flex-end;
+      }
+
+      .assetsColIcon {
+        display: flex;
+        align-items: center;
+      }
+
+      .assetsListColTitle {
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: #969798;
+      }
+
+      .barsIcon {
+        width: 2rem;
+      }
+
+      .questionIcon {
+        width: 1.25rem;
+      }
+    }
+
+    .assetsListItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 0.3125rem;
+      padding: 0.625rem 0.9375rem;
+      cursor: pointer;
+      background-color: transparent;
+      margin-top: 0.5rem;
+      &:hover {
+        background-color: #1a1d21;
+      }
+
+      &.active {
+        background-color: transparent;
+        box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05),
+          0 0.0943rem 0 0.063rem inset rgba(39, 162, 255, 0.5);
+      }
+
+      &.disabled {
+        cursor: default;
+
+        .contentLeft {
+          .itemTitle {
+            color: #969798;
+          }
+        }
+
+        &:hover {
+          background-color: transparent;
+        }
+      }
+
+      .contentLeft {
+        display: flex;
+        align-items: center;
+        img {
+          width: 1.5rem;
+          margin-right: 0.625rem;
+        }
+
+        .itemTitle {
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #fff;
+        }
+
+        .itemSubtext {
+          font-size: 0.65rem;
+          font-weight: 400;
+          color: #969798;
+          margin-top: 0.3125rem;
+        }
+      }
+
+      .contentRight {
+        display: flex;
+        align-items: center;
+
+        .itemText {
+          font-size: 0.8rem;
+          font-weight: 400;
+          color: #969798;
+          margin-right: 0.625rem;
+
+          &.success {
+            color: #5dac49;
+          }
+
+          &.danger {
+            color: #e53939;
+          }
+
+          &.primary {
+            color: #5d86a6;
+          }
+        }
+
+        svg {
+          width: 1rem;
+        }
+      }
+    }
+  }
+}
+
+.assetsDropdown {
+  &.ant-select-dropdown {
+    background-color: #1a1d21;
+    border-radius: 1.25rem;
+
+    .ant-select-item {
+      background-color: #1a1d21 !important;
+      color: #fff;
+      border-radius: 1.25rem;
+    }
+
+    .ant-select-item-option-selected {
+      background-color: #5d86a6 !important;
+      color: #fff !important;
+    }
+  }
+}

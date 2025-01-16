@@ -1,0 +1,17 @@
+.welcomeStepTen {
+  // animation: fadeIn 0.8s forwards;
+}
+.zoom-in {
+  animation: zoom-in-zoom-out 0.9s ease-out ;
+}
+.zoom-in-2 {
+  animation: zoom-in-zoom-out 0.4s ease-out ;
+}
+@keyframes zoom-in-zoom-out {
+  from{
+    transform: scale(0.5, 0.5);
+  }
+  to{
+    transform: scale(1, 1);
+  }
+}

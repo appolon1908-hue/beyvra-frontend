@@ -1,0 +1,59 @@
+.personalSettingsMenu {
+  .menuSectionTitle {
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 500;
+    margin-top: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .settingsMenuItem {
+    position: relative;
+
+    .settingsMenuItemOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: pointer;
+
+      &.disabled {
+        cursor: default;
+      }
+    }
+  }
+
+  .input_main {
+    margin-bottom: 0.75rem;
+  }
+
+  .infoIcon {
+
+  }
+}
+.day.personalSettingsMenu {
+  .menuSectionTitle {
+    color: #000000;
+   
+  }
+
+  .settingsMenuItem {
+
+    .settingsMenuItemOverlay {
+
+
+      &.disabled {
+      }
+    }
+  }
+
+  .input_main {
+  }
+
+  .infoIcon {
+   
+  }
+}
+

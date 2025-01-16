@@ -1,0 +1,128 @@
+.checkCurrencyContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    flex-direction: column;
+    .checkCurrencyHeader{
+        h2{
+        font-family: 'poppins','sans-serif';
+        font-size: 36px;
+
+        @media (max-width:730px){
+            font-size: 24px;
+        }
+        }
+    }
+    .checkCurrencyCardContainer{
+        margin-top: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-self: flex-start;
+        .checkCurrencyCardContainer{
+            display: flex;
+            justify-content: space-between;
+            min-width: 300px;
+            align-items: center;
+            border: 2px solid rgba(255, 255, 255, 0.184);
+            border-radius: 6px;
+            padding: 0.9rem 1rem;
+            margin: 1rem 1rem;
+
+            @media (max-width:730px){
+                min-width: 95%;
+            }
+            
+            
+            .checkCurrencyCardLeftItmes{
+                display: flex;
+                align-items: center;
+                .checkCardImageWrapper{
+                    background-color: rgba(255, 255, 255, 0.184);
+                    border-radius: 10rem;
+                    width: 51px;
+                    height: 50px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    img{
+                        margin-right: 2px;
+                        width: 30px;
+                        height: 35px;
+                        object-fit: contain;
+                    }
+                }
+                span{
+                    margin-left: 0.7rem;
+                    font-size: 15px;
+                    font-family: 'poppins','sans-serif';
+
+                }
+            }
+            .checkCurrencyCardRightItmes{
+                font-family: 'poppins','sans-serif';
+
+                h2{
+                    font-size: 17px;
+                }
+                p{
+                    font-size: 13px;
+                    margin-top: 3px;
+                    
+                }
+            }
+        }
+    }
+    .tradersNumber{
+        margin-top: 5rem;
+        width: 100%;
+
+        h2{
+            font-size: 36px;
+            font-family: 'poppins','sans-serif';
+            font-weight: 400;
+            @media (max-width: 730px){
+                padding: 0rem 1rem;
+                font-size: 32px;
+            }
+        }
+        .traderCards{
+            display: flex;
+            justify-content: space-evenly;
+            flex-wrap: wrap;
+            max-width: 80%;
+            margin: auto;
+            .tradeNumberCard{
+                display: flex;
+                flex-direction: column;
+                margin-top: 3rem;
+                
+                .tradeCardNumberHeader{
+                    display: flex;
+                    justify-content: center;
+                    align-items: flex-end;
+                    
+                    img{
+                        width: 23px;
+                        margin-bottom: 5px;
+                    }
+                    
+                    span{
+                        margin-left: 0.6rem;
+                        color: #999999;
+                        font-family: 'poppins','sans-serif';
+                        
+                    }
+                }
+                
+                h2{
+                    font-size: 18px;
+                    margin-top: 0.5rem;
+                
+                }
+        }
+    }
+    }
+}

@@ -1,0 +1,167 @@
+.deposit {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  padding: 40px 90px;
+  background-color: #26272b;
+  margin: -2rem;
+  border-radius: 1rem;
+  .deposit-title {
+    color: rgba(255, 255, 255);
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 0px;
+  }
+  .deposit-subTitle {
+    color: rgb(167, 171, 176);
+    font-size: 0.8rem;
+    font-weight: 400;
+    margin: auto;
+    text-align: center;
+    padding: 0px;
+  }
+  .hr {
+    width: 100%;
+    height: 0.0043rem;
+    background-color: rgba(255, 255, 255, 0.3);
+    
+  }
+  .CurrentBalance {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    p {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: rgb(187, 194, 202);
+    }
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+    }
+  }
+  .buttonsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .PromoCode {
+      padding: 0.7rem !important;
+      background: #54596c;
+      border: none !important;
+      svg {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+    .payment-card-next-button {
+      margin-bottom: 1.5rem;
+      margin-top: 1.5rem;
+      &.active {
+        background-color: #2dd674;
+      }
+    }
+  }
+  .pending-spinner {
+    margin-top: 2rem;
+    width: 100%;
+    color: white;
+    .ant-spin-dot-spin {
+      .ant-spin-dot-item {
+        background-color: white;
+      }
+    }
+  }
+
+  &Modal {
+    .ant-modal-content {
+      width: 520px !important;
+      max-height: 820px !important;
+      overflow: auto;
+
+      @media (max-width: 768px) {
+        width: 95vw !important;
+      }
+    }
+    .ant-modal-content::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
+    }
+    .ant-modal-close {
+      color: white;
+    }
+  }
+}
+
+.footerSpan{
+  display: flex;
+  align-content: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+  width: 100%;
+  padding-top: 20px;
+  align-self: flex-end;
+  p{
+    padding: 0.5rem 0rem;
+    text-align: center;
+    color: #dcdcdc;
+    font-size: 0.7rem;
+    max-width: 20rem;
+  }
+  .imagecontainer{
+    align-self: center;
+    border: 1.3px solid #1b1d21;
+    border-radius: 10px;
+    padding: 0.1rem;
+    background-color: #34353b;
+    img{
+      color: #2dd674;
+    }
+  }
+  svg{
+    color: #2dd674;
+  }
+
+}
+
+
+.ant-checkbox-inner {
+  width: 1.2rem;
+  height: 1.2rem;
+  background-color: #1a1d21;
+  border: 0.125rem solid #70808c;
+  border-radius: 0.375rem;
+}
+.ant-checkbox-wrapper:not(.ant-checkbox-wrapper-disabled):hover
+  .ant-checkbox-checked:not(.ant-checkbox-disabled)
+  .ant-checkbox-inner {
+  background-color: #6aff41;
+}
+.ant-checkbox-wrapper {
+  color: #fff;
+  font-weight: 400;
+}
+
+
+.checkboxSpan{
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.agreementSpan{
+  padding-top: 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  a{
+    color: #6aff41;
+  }
+
+}
+
+
+
+
+
+

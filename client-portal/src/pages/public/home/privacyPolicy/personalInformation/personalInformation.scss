@@ -1,0 +1,95 @@
+
+.personalInformationContaner{
+    max-width: 90%;
+    margin: auto;
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    flex-direction: column;
+    margin-top: 3rem;
+    @media(max-width:730px){
+        max-width: 95%;
+    }
+    .personalInformatiionHeadingContainer{
+        h2{
+            font-size: 32px;
+            font-family: 'poppins','sans-serif';
+            color: white;
+            font-weight: 600;
+    
+            @media(max-width:730px){
+                font-size: 24px;
+            }
+        }
+    
+        p{
+            margin-top: 2rem;
+            font-family: 'poppins','sans-serif';
+            color: #999999;
+            font-size: 20px;
+            @media(max-width:730px){
+                font-size: 18px;
+            }
+        }
+        
+    }
+    .personalInformationDiscloseListContainer{
+        margin-top: 3rem;
+        span{
+            margin-top: 2rem;
+            font-family: 'poppins','sans-serif';
+            color: #999999;
+            font-size: 18px;
+            @media(max-width:730px){
+                font-size: 16px;
+            }
+        }
+        .personalInformationDiscloseItemContainer{
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            margin-top: 1rem;
+
+            svg {
+                flex-shrink: 0; 
+            }
+            p{
+                font-family: 'poppins','sans-serif';
+                margin-left: 0.5rem;
+                color: #999999;
+                font-size: 18px;
+                @media(max-width:730px){
+                    font-size: 16px;
+                }
+            }
+        }
+    }
+    .personalInforamtionTitleItemContainer{
+        margin-top: 4rem;
+        .personalInforamtionItemContainer{
+            display: flex;
+            align-items: center;
+            h2{
+                font-size: 32px;
+                font-family: 'poppins','sans-serif';
+                color: white;
+                font-weight: 600;
+                margin-left: 0.5rem;
+                
+                @media(max-width:730px){
+                    font-size: 24px;
+                }
+            }
+
+        }
+        p{
+            margin-top: 2rem;
+            font-family: 'poppins','sans-serif';
+            color: #999999;
+            font-size: 20px;
+            @media(max-width:730px){
+                font-size: 18px;
+            }
+        }
+    }
+}

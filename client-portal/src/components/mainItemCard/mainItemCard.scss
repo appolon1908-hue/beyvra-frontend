@@ -1,0 +1,84 @@
+$gradientBorderColor: linear-gradient(
+  to bottom,
+  rgba(130, 130, 130, 0.26),
+  rgba(0, 0, 0, 0)
+);
+$gradientBorderColorPrimary: linear-gradient(
+  to bottom,
+  rgba(71, 71, 71, 0.5),
+  rgba(0, 0, 0, 0)
+);
+$background: linear-gradient(to bottom, #3c3d40, #2d2e32);
+
+.mainItemCard {
+  cursor: pointer;
+  width: 100%;
+  position: relative;
+  background: $gradientBorderColor;
+  border-radius: 0.313rem;
+  box-shadow: 0 0.188rem 0.125rem rgba(0, 0, 0, 0.15);
+
+  &.primary {
+    background: $gradientBorderColorPrimary;
+  }
+
+  &.none-pointer {
+    cursor: default;
+  }
+
+  &.fullHeight {
+    height: 100%;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: 0.313rem;
+    border: solid 0.1rem #3f3f3f;
+    border-bottom-width: 0;
+    background-image: $background;
+    background-clip: padding-box;
+    z-index: 1;
+  }
+
+  .mainItemCardContent {
+    position: relative;
+    z-index: 2;
+    padding: 0.325rem;
+  }
+}
+
+.mainItemCardv2 {
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 0.313rem;
+  box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05),
+    0 0.063rem 0 0.063rem inset rgba(85, 105, 121, 0.26);
+
+  &.cardv3 {
+    background: linear-gradient(#cacfd726, #3031336b);
+  }
+
+  &.primary {
+    box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05),
+      0 0.063rem 0 0.063rem inset rgba(39, 162, 255, 0.5);
+  }
+
+  &.none-pointer {
+    cursor: default;
+  }
+
+  &.fullHeight {
+    height: 100%;
+  }
+
+  .mainItemCardv2Content {
+    padding: 0.638rem;
+  }
+}

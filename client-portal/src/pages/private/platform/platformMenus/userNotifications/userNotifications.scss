@@ -1,0 +1,24 @@
+.userNotificationsMenu {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .menuText {
+    color: #ababad;
+    font-size: 1rem;
+    font-weight: 400;
+  }
+}
+.notification-container{
+  margin-top: 8px;
+  .userNotificationsMessageContainer{
+    // color: #ababad;
+    color: white;
+    padding: 6px;
+    .notification-text{
+      margin-top: 8px;
+    }
+  }
+}

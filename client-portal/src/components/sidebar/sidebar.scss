@@ -1,0 +1,170 @@
+.sidebar {
+  width: 13%;
+  position: fixed;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--background-theme);
+  align-items: center;
+  z-index: 1100;
+  transition: all 0.25s;
+
+  @media (max-width: 991px) {
+    width: 8%;
+  }
+ 
+  @media (max-width: 767px) {
+    z-index: 100;
+    position: absolute;
+    bottom: 0;
+    height: auto;
+    min-width: 2rem;
+    width: 98%;
+    max-width: 98%;
+    padding: 0.5rem;
+  }
+  .top {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30%;
+
+    @media (max-width: 767px) {
+      width: 100%;
+      flex-direction: row;
+      justify-content: space-evenly;
+      gap: 0.3rem;
+      margin-top: 0;
+    }
+
+    button {
+      color: white;
+      background-color: rgba(241, 243, 243, 0.12);
+      border: solid 0.1rem #3f3f3f;
+      border-radius: 0.5rem;
+      padding: 0.5rem ;
+      min-height: 3rem;
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+      svg {
+        width: 1.425rem;
+      }
+      p {
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      @media (max-width: 991px) {
+        p {
+          display: none;
+        }
+
+        svg {
+          width: 1.55rem;
+        }
+      }
+
+      @media (max-width: 767px) {
+        svg {
+          width: 1.3rem;
+        }
+      }
+    }
+    button:hover {
+      background-color:  rgba(103, 103, 103, 0.416);;
+      color: var(--plain);
+      transition: 0.3s ease-in;
+      svg.trades {
+        path {
+          stroke: var(--plain);
+          transition: 0.3s ease-in;
+        }
+        rect {
+          stroke: var(--plain);
+          transition: 0.3s ease-in;
+        }
+      }
+      svg {
+        path {
+          fill: var(--plain);
+          transition: 0.3s ease-in;
+        }
+      }
+    }
+    button.active {
+      color: #2dd674;
+      svg {
+        path {
+          fill: #2dd674;
+        }
+      }
+      svg.trades {
+        path {
+          stroke: #2dd674;
+        }
+        rect {
+          stroke: #2dd674;
+        }
+      }
+    }
+  }
+  .bottom {
+    margin-top: auto;
+
+    @media (max-width: 767px) {
+      display: none;
+    }
+    .online {
+      text-align: center;
+
+      p.numberOnline {
+        color: var(--plain);
+        font-size: 0.875rem;
+
+        @media (max-width: 991px) {
+          font-size: 0.775rem;
+        }
+
+        @media (max-width: 767px) {
+          font-size: 0.675rem;
+        }
+      }
+      p.onl {
+        color: var(--text-theme);
+
+        font-size: 0.75rem;
+
+        @media (max-width: 991px) {
+          font-size: 0.7rem;
+        }
+
+        @media (max-width: 767px) {
+          font-size: 0.65rem;
+        }
+      }
+    }
+  }
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 1rem 0rem 1rem;
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  @media (max-width: 767px) {
+    display: none;
+  }
+  svg {
+    @media (max-width: 991px) {
+      width: 1.5rem;
+    }
+  }
+}
+
+.whiteIcons {
+  filter: brightness(0) invert(1);
+}

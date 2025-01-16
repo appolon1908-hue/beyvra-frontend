@@ -1,0 +1,49 @@
+.withdraw-payments {
+  padding: 40px 90px;
+  background-color: #26272b;
+  margin: -2rem;
+  border-radius: 1rem;
+  .withdrawTitle {
+    font-weight: 600;
+    font-size: 2rem;
+    line-height: 2.25rem;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.1rem;
+  }
+}
+
+.hr {
+  width: 100%;
+  height: 0.2px;
+  background-color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.withdraw-details {
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+
+  padding: 40px 90px;
+  background-color: #26272b;
+  border-radius: 1rem;
+
+  .withdraw-transfer {
+    display: flex;
+    justify-content: space-between;
+    p {
+      color: rgba(255, 255, 255);
+      font-size: 1rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+.button-withdraw {
+  background: #2dd674 !important;
+  &.active {
+    background: #2dd674;
+  }
+}

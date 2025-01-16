@@ -1,0 +1,118 @@
+.trackTradeWrapper{
+    color: white;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    @media(max-width: 900px){
+        flex-direction: column;
+    }
+.textWrapper{
+        flex: 1;
+        h3{
+            font-size: 60px;
+            line-height: 72px;
+            margin: 12px 0;
+        }
+        .subText{
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            font-size: 15px;
+            color: #999999;
+        }
+        button{
+            padding: 12px 52px;
+            border-radius: 8px;
+            background-color: #FF1802;
+            font-size: 16px;
+            color: #fff;
+            margin-top: 12px;
+        }
+
+    }
+    .graphBackdrop{
+        flex: 1;
+        width: 100%;
+        @media (max-width:720px) {
+            display: none;
+            
+        }
+        
+       
+        div{
+        margin-left: auto;
+        
+        position: relative;
+        height: 450px;
+        max-width: 450px;
+        background: url('../../../../assets/trading/graph-vector.png');
+        background-repeat: no-repeat;
+        background-position: center 280px ;
+
+        width: 100%;
+        img{
+            position: absolute;
+            height: 160px;
+        }
+        img.card-1{
+            right: 180px;
+            top: 40px
+        } 
+        img.card-2{
+            right: 50px;
+            top: 130px
+        }
+        img.card-3{
+            right: 280px;
+            top: 130px;
+            height: 250px;
+        }
+        img.t-globe{
+            height: 65px;
+            right: 350px;
+            top: 50px;
+
+        }
+        .googleWrapper{
+            position: absolute;
+            top: 200px;
+            right: 450px;
+            background: linear-gradient(180deg, #117EFF 0%, rgba(10, 76, 153, 0) 100%);
+            padding: 10px;
+            height: 40px;
+            width: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 100%;
+
+        }
+        .text-box{
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #717886;
+            border-radius: 8px;
+            width: max-content;
+            position: absolute;
+            height: max-content;
+            padding: 8px;
+            right: 460px;
+            top: 300px;
+
+
+            span{
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+                background-color: red;
+                border-radius: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    }
+
+    }
+}

@@ -1,0 +1,65 @@
+.transactions-container {
+  padding: 3.375rem 4.25rem 3.375rem 3.25rem;
+  background-color: #26272b;
+  min-height: 100vh;
+  color: rgb(82, 82, 82);
+
+  @media (max-width: 991px) {
+    padding: 2.5rem;
+  }
+
+  @media (max-width: 767px) {
+    padding: 1.5625rem;
+  }
+
+  @media (max-width: 575px) {
+    padding: 0.625rem;
+  }
+
+  .tabs-headers {
+    display: flex;
+    margin-bottom: 2.5rem;
+    li {
+      list-style: none;
+      cursor: pointer;
+      margin-right: 1.5rem;
+      padding: 0.5625rem 0;
+      color: #aaaaaa;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+  }
+
+  .user-options-bar {
+    width: 100%;
+    border-radius: 1.25rem;
+    background-color: #4d4d50;
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    
+  }
+
+  .ant-tabs-top > .ant-tabs-nav::before {
+    content: none;
+  }
+  .ant-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #26292f;
+  }
+
+  .ant-tabs .ant-tabs-tab-btn {
+    color: #6d6867;
+  }
+  .ant-table-wrapper .ant-table-thead > tr > th {
+    color: #b9bec9;
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+  ant-table-wrapper .ant-table-tbody > tr > td {
+    color: #26292f;
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+}

@@ -1,0 +1,54 @@
+.navigationRouteContainer{
+    max-width: 90%;
+    margin: auto;
+    @media(max-width:730px){
+        max-width: 95%;
+    }
+    .navigationRoutes{
+        margin-top: 1rem;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        @media(max-width:730px){
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        a{
+            text-decoration: none;
+        }
+        .navigationHomeIcon{
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+
+           
+            svg{
+                margin-bottom: 0px;
+                flex-shrink: 0;
+            }
+            h2{
+                font-size: 14px;
+                margin-left: 10px;
+                color: #969696;
+                font-family: "Poppins", sans-serif;
+                font-weight: 400;
+                
+            }
+        }
+
+        h2{
+            font-size: 14px;
+            color: #969696;
+            font-weight: 400;
+            font-family: "Poppins", sans-serif;
+
+            @media (max-width:730px){
+                min-width: 60px;
+                text-wrap: wrap;
+            }
+
+        }
+    }
+}

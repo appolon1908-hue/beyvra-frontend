@@ -1,0 +1,88 @@
+.transferInputContainer {
+  .mainItemCardv2 {
+    box-shadow: none;
+  }
+  .transfer-input {
+    display: flex;
+    align-items: center;
+    border: 2px solid rgba(255, 255, 255);
+    border-radius: 0.625rem;
+    padding: 0.5rem !important;
+
+    .inputIcon {
+      display: flex;
+      align-items: center;
+      width: 2rem;
+      margin-right: 0.625rem;
+
+      img,
+      svg {
+        width: 2rem;
+      }
+    }
+
+    .suffixIcon {
+      display: flex;
+      align-items: center;
+      width: 1.5rem;
+      margin-left: 0.625rem;
+
+      img,
+      svg {
+        width: 1.5rem;
+      }
+    }
+
+    .inputContainer {
+      width: 100%;
+      .title {
+        font-size: 0.7rem;
+        font-weight: 500;
+        line-height: 0.9rem;
+        color: white;
+        .subtitle {
+          margin-right: 0.25rem;
+          font-size: 0.575rem;
+          color: rgba(255, 255, 255, 0.6);
+          line-height: 0.9rem;
+        }
+      }
+      .inputField {
+        margin-top: -0.5rem;
+      }
+    }
+
+    label {
+      color: #ffffff;
+      font-size: 0.875rem;
+      font-weight: 400;
+    }
+
+    input {
+      background-color: transparent;
+      border: none;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #fff;
+      padding: 0;
+      margin-top: 0.313rem;
+      width: 100%;
+
+      &:focus {
+        box-shadow: none;
+      }
+
+      &::placeholder {
+        color: #ffffff99;
+        font-weight: 600;
+        font-size: 1rem;
+        line-height: 1.575rem;
+      }
+
+      &.ant-input-disabled {
+        background-color: transparent;
+        color: #fff;
+      }
+    }
+  }
+}

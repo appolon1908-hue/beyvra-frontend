@@ -1,0 +1,36 @@
+.SecondaryButtonContainer {
+  background: transparent;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: white;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.4);
+  width: 100%;
+  padding: 0.7rem 0rem;
+  text-align: center;
+  // margin: 1rem 0;
+  border-radius: 0.625rem;
+  box-shadow: 0 0.25rem 0.325rem 0 rgba(32, 32, 32, 0.4);
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.SecondaryButtonContainer.disable {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.day.SecondaryButtonContainer {
+
+  color: rgb(0, 0, 0);
+  border: 0.0625rem solid rgba(0, 0, 0, 0.4);
+
+  box-shadow: 0 0.25rem 0.625rem 0 rgba(255, 255, 255, 0.4);
+}
+
+.SecondaryButtonContainer.disable {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

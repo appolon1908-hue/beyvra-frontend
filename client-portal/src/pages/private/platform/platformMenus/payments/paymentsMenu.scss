@@ -1,0 +1,34 @@
+.paymentsMenu {
+  margin-top: 1rem;
+  .paymentItem {
+    cursor: pointer;
+    display: flex;
+    border-radius: 0.7rem;
+    gap: 0.7rem;
+    align-items: center;
+    margin-bottom: 0.6rem;
+    margin-left: 0rem;
+    padding: 0.8rem 1.1rem 0.8rem 1rem;
+    border: 1px solid #484848 ;
+    background: #252525;
+      
+    svg {
+      width: 1.5rem;
+      color: rgb(255, 255, 255);
+    }
+    h2 {
+      font-weight: 600;
+      font-size: 1rem;
+      color: rgb(255, 255, 255);
+    }
+  }
+  .paymentItem:hover {
+      background: #33a161;
+      transition: all 0.1s ease-in-out;
+      margin-left: 0rem;
+  }
+}
+
+.active{
+  background: #30ec7e;
+}

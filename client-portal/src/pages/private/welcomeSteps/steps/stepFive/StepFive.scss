@@ -1,0 +1,45 @@
+
+.welcomeStepFive{
+  // animation: zoom-in-zoom-out 0.2s ease-out ;
+
+  .step-three-content{
+    left: 50%;
+    transform: translate(-50%, 0%);
+    bottom: 0%;
+ 
+  }
+  .line-width::before{
+    content: url('../../../../assets/icons/welcomeIcons/step-5-green-blured-img.svg');
+    position: absolute;
+    bottom: -8px;
+    left: 0px;
+    width: 100%;
+    overflow-x: hidden;
+    animation: blink ease-in-out 2.5s infinite;
+  }
+  .line-width::after{
+    content: url('../../../../assets/icons/welcomeIcons/step-5-red-blurred-img.svg');
+    position: absolute;
+    top: -2px;
+    left: 0px;
+    width: 100%;
+    overflow-x: hidden;
+    animation: alternate-blink  ease-in-out 2.5s infinite;
+  }
+
+}
+
+// .zoom-in {
+//   animation: zoom-in-zoom-out 0.2s ease-out ;
+// }
+// .zoom-in-2 {
+//   animation: zoom-in-zoom-out 0.4s ease-out ;
+// }
+@keyframes zoom-in-zoom-out {
+  from{
+    transform: scale(1, 1);
+  }
+  to{
+    transform: scale(1, 1);
+  }
+}

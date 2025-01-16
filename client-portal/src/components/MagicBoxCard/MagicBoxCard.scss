@@ -1,0 +1,47 @@
+.card-container {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(
+    143.41deg,
+    rgba(23, 49, 113, 0.6) 6.26%,
+    rgba(20, 95, 239, 0.6) 45.35%,
+    rgba(88, 132, 241, 0.6) 78.69%
+  );
+  height: 13.75rem;
+  width: 100%;
+  border-radius: 0.625rem;
+  .magic-card-text {
+    width: 50%;
+    padding-left: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    .referalRewardsText {
+      color: #ffffff;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+    .megabox-text {
+      color: #61c1e8;
+      font-size: 1.3rem;
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+    }
+    .ant-btn-default {
+      background-color: #0e0f12;
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 500;
+      border: none;
+      width: 6rem;
+      height: 2rem;
+    }
+  }
+  .magicBoxImage {
+    img {
+      width: 9rem;
+      height: 8rem;
+      margin-right: 0.5rem;
+    }
+  }
+}

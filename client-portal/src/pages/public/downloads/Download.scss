@@ -1,0 +1,279 @@
+.downloads {
+  background-color: #010006;
+  padding: 7rem 8rem 0rem 8rem;
+  @media (max-width: 1400px) {
+    padding: 7rem 7rem 0rem 7rem;
+  }
+  @media (max-width: 1200px) {
+    padding: 7rem 6rem 0rem 6rem;
+  }
+  @media (max-width: 992px) {
+    padding: 7rem 5rem 0rem 5rem;
+  }
+  @media (max-width: 768px) {
+    padding: 7rem 4rem 0rem 4rem;
+  }
+  @media (max-width: 576px) {
+    padding: 7rem 3rem 0rem 3rem;
+  }
+  @media (max-width: 320px) {
+    padding: 7rem 1rem 0rem 1rem;
+  }
+  .go-back {
+    display: none;
+    width: 100%;
+    align-items: start;
+    justify-content: start;
+    margin-bottom: 2rem;
+    cursor: pointer;
+    @media (max-width: 992px) {
+      display: flex;
+    }
+  }
+  .downloads-header {
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 2rem;
+    @media (max-width: 992px) {
+      justify-content: center;
+      align-items: center;
+    }
+    .downloads-header-title {
+      font-weight: 500;
+      font-size: 2.125rem;
+      color: white;
+      @media (max-width: 992px) {
+        font-size: 2rem;
+        text-align: center;
+      }
+      @media (max-width: 768px) {
+        font-size: 1.8rem;
+      }
+      @media (max-width: 576px) {
+        font-size: 1.5rem;
+      }
+      @media (max-width: 320px) {
+        font-size: 1rem;
+      }
+    }
+    .buttonContent {
+      display: block;
+      @media (max-width: 992px) {
+        display: none;
+      }
+      button {
+        padding: 1rem 2.5rem;
+        border-radius: 0.4375rem;
+        background-color: rgba(0, 148, 255, 1);
+        font-size: 1rem;
+        color: white;
+      }
+    }
+  }
+  .line-bar {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    @media (max-width: 992px) {
+      align-items: center;
+      justify-content: center;
+    }
+    .rectangle-download-links {
+      width: 22.8125rem;
+      height: 0.8125rem;
+      background: linear-gradient(
+        to right,
+        rgba(39, 162, 255, 1),
+        rgba(249, 252, 255, 0)
+      );
+      border-radius: 0.625rem;
+      margin: 1rem 0rem 2rem 0rem;
+      @media (max-width: 992px) {
+        align-items: center;
+        justify-content: center;
+      }
+      @media (max-width: 768px) {
+        width: 18rem;
+        height: 0.7rem;
+        margin: 1rem 0rem 1rem 1rem;
+      }
+      @media (max-width: 576px) {
+        width: 15rem;
+        height: 0.6rem;
+      }
+      @media (max-width: 320px) {
+        width: 10rem;
+        height: 0.4rem;
+      }
+    }
+  }
+  .subTitle {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    @media (max-width: 992px) {
+      align-items: center;
+      justify-content: center;
+    }
+    .downloads-platforms {
+      color: white;
+      font-size: 1.375rem;
+      @media (max-width: 768px) {
+        font-size: 1rem;
+      }
+      @media (max-width: 576px) {
+        font-size: 0.8rem;
+      }
+    }
+  }
+  .downloads-platforms-links {
+    display: flex;
+    gap: 4rem;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5rem;
+    cursor: pointer;
+    img {
+      width: 100%;
+      @media (max-width: 320px) {
+        width: 110%;
+      }
+    }
+  }
+  .downloads-active-bar {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .active-bar-line {
+      width: 16.1244rem;
+      height: 0.325rem;
+      background-color: rgba(0, 148, 255, 0.5);
+      border-radius: 0.125rem;
+    }
+    .anydesk-line {
+      &.active-bar {
+        background-color: rgba(0, 148, 255, 1);
+      }
+    }
+    .teamviewer-line {
+      &.active-bar {
+        background-color: rgba(0, 148, 255, 1);
+      }
+    }
+  }
+  .download-devices {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2.5rem;
+    margin-top: 8rem;
+    padding-bottom: 10rem;
+    .device-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2.5rem;
+      cursor: pointer;
+      @media (max-width: 1200px) {
+        gap: 2rem;
+      }
+      @media (max-width: 992px) {
+        gap: 1.5rem;
+      }
+      @media (max-width: 768px) {
+        gap: 1.3rem;
+      }
+      @media (max-width: 576px) {
+        gap: 1rem;
+      }
+      @media (max-width: 320px) {
+        gap: 0.5rem;
+      }
+      .device-box {
+        width: 13.7169rem;
+        height: 8.8837rem;
+        background-color: rgba(217, 217, 217, 0.12);
+        box-shadow: 0rem 0.1804rem 0.451rem 0rem rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-radius: 0.6763rem;
+        overflow: hidden;
+        position: relative;
+        flex-wrap: wrap;
+        .elipse-windows {
+          position: absolute;
+          width: 4.0587rem;
+          height: 4.0587rem;
+          bottom: 0;
+          left: 0;
+          background-color: rgba(0, 102, 179, 1);
+          filter: blur(1rem);
+        }
+        .elipse-macos-1 {
+          position: absolute;
+          width: 0.9019rem;
+          height: 0.9019rem;
+          top: 2rem;
+          right: 1rem;
+          background-color: rgba(212, 255, 121, 1);
+          filter: blur(1rem);
+        }
+        .elipse-macos-2 {
+          position: absolute;
+          width: 1.4363rem;
+          height: 1.4363rem;
+          top: 0rem;
+          left: 3rem;
+          background-color: rgba(0, 102, 179, 1);
+          filter: blur(0.8rem);
+        }
+        .elipse-chrome {
+          position: absolute;
+          width: 2.48rem;
+          height: 2.48rem;
+          bottom: 1rem;
+          right: 0rem;
+          background-color: rgba(199, 219, 84, 1);
+          filter: blur(1rem);
+        }
+        .elipse-ios {
+          position: absolute;
+          width: 1.4937rem;
+          height: 1.4937rem;
+          top: 0rem;
+          left: 4rem;
+          background-color: rgba(0, 102, 179, 1);
+          filter: blur(1rem);
+        }
+        .elipse-android-1 {
+          position: absolute;
+          width: 2.0294rem;
+          height: 2.0294rem;
+          top: 2rem;
+          right: 3rem;
+          background-color: rgba(0, 102, 179, 1);
+          filter: blur(1rem);
+        }
+        .elipse-android-2 {
+          position: absolute;
+          width: 2.505rem;
+          height: 2.505rem;
+          top: 0rem;
+          left: 2rem;
+          background-color: rgba(199, 219, 84, 1);
+          filter: blur(1rem);
+        }
+      }
+      p {
+        font-size: 1rem;
+        color: white;
+      }
+    }
+  }
+}

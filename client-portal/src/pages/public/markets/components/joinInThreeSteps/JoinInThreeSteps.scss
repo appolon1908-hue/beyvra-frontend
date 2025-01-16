@@ -1,0 +1,124 @@
+.threeStepsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 40px 0;
+
+  h2 {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 600;
+    font-size: 34px;
+    line-height: 54px;
+    color: #ffffff;
+    padding-bottom: 25px;
+    text-align: center;
+    @media (max-width: 878px) {
+      font-size: 30px;
+    }
+  }
+
+  .threeStepsItems {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 20px;
+    @media (max-width: 478px) {
+      display: none;
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+
+      img {
+        width: 100%;
+        height: auto;
+        max-height: 129px;
+        max-width: 129px;
+        @media (max-width: 878px) {
+          max-height: 83.37px;
+          max-width: 83.37px;
+        }
+      }
+
+      span {
+        font-family: "Poppins";
+        font-style: normal;
+        font-weight: 600;
+        font-size: 21.1406px;
+        line-height: 30px;
+        color: #ffffff;
+        text-align: center;
+        @media (max-width: 878px) {
+          font-size: 20.15px;
+        }
+      }
+    }
+  }
+
+  .threeStepsItemsMobile {
+    display: none;
+  }
+
+  @media (max-width: 478px) {
+    .threeStepsItemsMobile {
+      display: block;
+      width: 100%;
+      margin-bottom: 40px;
+
+      div {
+        text-align: center;
+        margin: 0 auto;
+
+        img {
+          margin: 0 auto;
+          width: 100%;
+          height: auto;
+          max-height: 129px;
+          max-width: 129px;
+          margin-bottom: 20px;
+        }
+
+        span {
+          font-family: "Poppins";
+          font-style: normal;
+          font-weight: 600;
+          font-size: 20.15px;
+          line-height: 30px;
+          color: #ffffff;
+          text-align: center;
+        }
+      }
+
+      .slick-slider {
+        .slick-dots {
+          bottom: -40px;
+
+          li button {
+            width: 10px;
+            height: 10px;
+            background: #3c475b;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+          }
+
+          li button::before {
+            content: "";
+          }
+
+          .slick-active button {
+            background-color: #0094ff;
+          }
+        }
+      }
+    }
+  }
+}

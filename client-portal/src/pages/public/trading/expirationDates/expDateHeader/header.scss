@@ -1,0 +1,52 @@
+.expDateHeader{
+    width: 90%;
+    padding: 70px 0 5px;
+    text-align: center;
+    margin: auto;
+
+    h1{
+        font-size: 60px;
+        color: white;
+    }
+    p{
+        max-width: 600px;
+        margin: 24px auto;
+        font-size: 18px;
+        line-height: 27px;
+        color: #999999;
+    }
+
+    span{
+        color: #999999;
+        display: block;
+        margin: 20px auto;
+        background: #15171C;
+        width: max-content;
+        padding: 12px 20px ;
+        border-radius: 20px;
+        font-size: 16px;
+
+
+    }
+    .searchCon{
+        max-width: 400px;
+        margin: auto;
+    }
+
+    .dropdown{
+        margin: 30px auto;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        width: 100%;
+    }
+    .conditionSelection .ant-select-selector{
+        background-color: transparent;
+        color: white;
+
+    }
+       
+    .conditionSelection .ant-select-selector   .ant-select-selection-search .ant-select-selection-search-input{
+        color: white;
+    }
+}

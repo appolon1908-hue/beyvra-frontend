@@ -1,0 +1,14 @@
+.kycWrapper{
+    .form-input{
+        box-sizing: border-box;
+        outline: none !important;
+        color: #f3f3f3 !important;
+    }
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active{
+        -webkit-box-shadow: 0 0 0 30px #152338 inset;
+        -webkit-text-fill-color: #f3f3f3;
+    }
+}

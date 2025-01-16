@@ -1,0 +1,18 @@
+.storiesModal {
+  .ant-modal-mask {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .ant-modal-wrap {
+    .ant-modal {
+      width: auto !important;
+
+      .ant-modal-content {
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
+        border-radius: 0;
+      }
+    }
+  }
+}

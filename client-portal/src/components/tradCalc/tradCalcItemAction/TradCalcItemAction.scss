@@ -1,0 +1,50 @@
+.tradCalcItemAction {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  gap: 5px;
+  position: relative;
+}
+
+.tradCalcItemAction {
+  div {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    height: 56px;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 21px;
+    color: #171a20;
+    background: #79859a;
+    border: 1px solid #79859a;
+    border-radius: 6px;
+    @media (max-width: 878px) {
+      font-size: 8.14px;
+    }
+    @media (max-width: 478px) {
+      font-size: 11.33px;
+    }
+
+    .tradCalcNotActive {
+      width: 50%;
+      cursor: pointer;
+      text-align: center;
+      color: #171a20;
+      font-weight: 500;
+    }
+
+    .tradCalcActionActive {
+      background: #171a20;
+      border-radius: 6px;
+      height: 99%;
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+    }
+  }
+}

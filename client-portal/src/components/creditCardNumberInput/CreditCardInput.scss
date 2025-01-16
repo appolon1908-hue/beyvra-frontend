@@ -1,0 +1,60 @@
+.deposit-Input-Wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.7rem;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.6);
+  border-radius: 0.313rem;
+
+  &.marginTop {
+    margin-top: 0rem;
+  }
+
+  &.marginTop2 {
+    margin-top: 1rem;
+  }
+
+  .deposit-input {
+    background-color: transparent;
+    color: white;
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 0.3rem;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .credit-cards {
+    width: 19px;
+   
+  }
+  .credit-cards-container{
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+  }
+}
+.deposit-input:active,
+.deposit-input:focus {
+  border: none;
+  outline: none;
+}
+.deposit-input {
+  &::placeholder {
+    font-weight: 500;
+    font-size: 1rem;
+    padding-top: 0.5rem;
+    color: rgba(255, 255, 255, 1); // default color
+  }
+
+  &.placeholderColor2::placeholder {
+    color: white;
+  }
+
+  &.placeholderColor::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 400;
+  }
+}
+

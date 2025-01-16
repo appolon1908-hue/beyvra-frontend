@@ -1,0 +1,156 @@
+.profileModal {
+  padding: 0px 90px;
+  background-color: #26272b;
+  border-radius: 1rem;
+  @media (max-width: 768px) {
+    padding: 10px 0px;
+  }
+  .ant-modal {
+    .ant-modal-content {
+      background: #152338;
+      .ant-modal-close-x {
+        color: white;
+      }
+    }
+    .ant-modal-body {
+      background-color: #152338;
+    }
+  }
+
+  .profileContent {
+  background-color: #26272b;
+  border-radius: 1rem;
+    grid-template-columns: 1fr;
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+    .profilePicture {
+      .chat-box {
+        border: 1px solid rgba(255, 255, 255, 0.226);
+        padding: 4px 8px;
+        border-radius: 8px;
+        max-width: 200px;
+        margin: auto;
+        @media (max-width: 768px) {
+          max-width: 140px;
+        }
+      }
+    }
+    .biodata {
+      margin-top: 0px;
+
+      .ant-form-item {
+        margin-bottom: 10px;
+        .ant-form-item-label {
+          .ant-form-item-control-input-content input.ant-input {
+            background: transparent;
+          }
+          label {
+            color: white;
+          }
+        }
+        input.ant-input {
+          background: transparent;
+          border: 1px solid #ffffff33;
+          color: white;
+
+          padding: 12px;
+          @media (max-width: 480px) {
+          }
+        }
+      }
+
+      .summary {
+        .account {
+          padding: 12px 7px 12px 12px;
+          border: 1px solid rgba(255, 255, 255, 0.507);
+
+          .dropdown {
+            .select-selector {
+              display: flex;
+              flex-direction: column;
+              width: 70px;
+              span {
+                font-size: 16px;
+              }
+            }
+            .dropdown-menu {
+              background-color: #26272b;
+            }
+          }
+        }
+
+        .portfolio {
+          padding: 12px 7px 12px 12px;
+          border: 1px solid rgba(255, 255, 255, 0.507);
+
+          .dropdown {
+            .select-selector {
+              // background-color: blue;
+              display: flex;
+              flex-direction: column;
+              width: 70px;
+              span {
+                font-size: 16px;
+              }
+            }
+            .dropdown-menu {
+              background-color: #26272b;
+              width: 200px;
+              right: 0 !important;
+              position: absolute;
+            }
+          }
+        }
+        .hide-scrollbar {
+          overflow: hidden; /* Hide scrollbar */
+          scrollbar-width: none; /* For Firefox */
+        }
+      }
+    }
+  }
+  .currencySelect {
+    &.ant-select-dropdown {
+      background-color: #152338;
+    }
+
+    &.ant-select {
+      height: 100%;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+
+      .ant-select-selector {
+        background-color: transparent;
+        border: none;
+        color: white;
+        box-shadow: none;
+        display: flex;
+        // padding: 0;
+        flex-direction: column;
+        justify-content: flex-start;
+        .ant-select-selection-item {
+          color: white;
+        }
+      }
+
+      .ant-select-arrow {
+        margin: 10px auto;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+  }
+
+  .currencySelect.custom-dropdown.ant-select-dropdown.ant-select-dropdown-placement-bottomLeft {
+    background-color: #152338;
+  }
+}
+.ant-select-dropdown.currency-dropdown.currencySelect.ant-select-dropdown-placement-bottomLeft {
+  background-color: #152338;
+  width: 50px;
+  color: white;
+  .ant-select-item {
+    color: white;
+  }
+}

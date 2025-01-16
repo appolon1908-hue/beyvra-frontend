@@ -1,0 +1,81 @@
+.strength-meter {
+  width: 100%;
+  text-align: left;
+  margin: 1rem 0;
+
+  .pwd-checker-bar {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 0.5rem;
+    transition: width 0.5s ease;
+
+    &::-webkit-progress-bar {
+      background-color: #2e3033;
+      border-radius: 0.625rem;
+    }
+
+    &::-webkit-progress-value {
+      border-radius: 0.625rem;
+      background-size: 30px 18px, 100% 100%, 100% 100%;
+      transition: width 0.5s ease, background-color 0.5s ease;
+      background-color: #e94646;
+    }
+
+    &.strength-1::-webkit-progress-value {
+      background-color: #e94646;
+    }
+
+    &.strength-2::-webkit-progress-value {
+      background-color: #ddbc37;
+    }
+
+    &.strength-3::-webkit-progress-value {
+      background-color: #3cb78e;
+    }
+
+    &.strength-4::-webkit-progress-value {
+      background-color: #3cd450;
+    }
+  }
+
+  .strength-label {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0.5rem 0;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .strength {
+      color: #e94646;
+
+      &.strength-1 {
+        color: #e94646;
+      }
+
+      &.strength-2 {
+        color: #ddbc37;
+      }
+
+      &.strength-3 {
+        color: #3784dd;
+      }
+
+      &.strength-4 {
+        color: #3cd450;
+      }
+    }
+  }
+}
+
+
+.day.strength-meter {
+  .strength-label {
+    color: #000000;
+
+
+  
+  }
+}

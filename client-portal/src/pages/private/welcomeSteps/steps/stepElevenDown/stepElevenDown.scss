@@ -1,0 +1,188 @@
+.stepElevenDownContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    animation: fadeIn 0.8s forwards;
+    @media screen and (max-width: 830px) {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 100%;
+        
+     }
+    .stepElevenDownGraphContainer{
+        width: 80%;
+        @media screen and (max-width: 830px) {
+            width: 100%;
+           
+         }
+        .stepElevenRightFlexContainer{
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            position: relative;
+            @media screen and (max-width: 830px) {
+                height: 40vh;
+                
+             }
+
+             .customMarkerOneWalkThroughDown{
+                position: absolute;
+                right: 55%;
+                bottom: 50%;
+            }
+            
+             .customMarkerTwoWalkThroughDown{
+                position: absolute;
+                right: 50%;
+                bottom: 58%;
+                span{
+                   color: #FF0000;
+                }
+            }
+            
+             .customMarkerThreeWalkThroughDown{
+                position: absolute;
+                right: 0%;
+                bottom: -1%;
+            }
+
+            .customMarkerOneWalkThroughUp{
+                position: absolute;
+                right: 45%;
+                top: 20%;
+            }
+            
+            .customMarkerTwoWalkThroughUp{
+                position: absolute;
+                right: 38%;
+                top: 13%;
+                span{
+                   color: #1FBF75;
+                }
+            }
+            .customMarkerThreeWalkThroughUp{
+                position: absolute;
+                right: -2%;
+                top: 34%;
+            }
+             
+            img{
+                width: 80%;
+                height: 100%;
+                position: relative;
+                @media screen and (max-width: 830px) {
+                    width: 85%;
+                    
+                 }
+                @media screen and (max-width: 430px) {
+                    width: 80%;
+                    
+                 }
+
+           
+            }
+            .graphAmountContainer{
+                display: flex;
+                justify-content: space-between;
+                color: white;
+                @media screen and (max-width: 830px) {
+                    width: 25%;
+                  }
+
+                .graphAmount{
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    overflow: hidden;
+                    span{
+                      font-family: "Poppins", sans-serif;
+                      font-weight: 500;
+                    } 
+                    
+                    @media screen and (max-width: 830px) {
+                       gap: 1rem;
+                       height: 100%;
+
+                     }
+                     @media screen and (max-width: 430px) {
+                       padding-right: 0px;
+
+                     }
+                }
+            }
+        }
+        .stepElvenLeftFlexContainer{
+            .graphDurationContainer{
+                margin-top: 10px;
+                .graphDuration{
+                    overflow: hidden;
+                    color: white;
+                    display: flex;
+                    justify-content: space-between;
+                    align-content: space-between;
+                    @media screen and (max-width: 830px) {
+                        gap: 4rem;
+                        padding: 0rem 1rem;
+                     }
+                }
+            }
+        }
+    }
+    .sideModalWrapper{
+        display: flex;
+        justify-content: center;
+        width: 30%;
+        flex-direction: column;
+        margin: auto;
+        align-items: center;
+        // margin-left: 80px;
+        @media screen and (max-width: 830px) {
+           
+            margin-top: 4%;
+            margin-left: 0%;
+            width: 100%;
+            align-items: center
+        }
+      .stepElevenmain_infoDown{
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin: auto;
+        max-width: 90%;
+        color: white;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+
+        .stepElevenButtonDown{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: buttonPulse 1s infinite;
+            transition: all 0.5s ease-in-out;
+        }
+        @media screen and (max-width: 830px) {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        h2{
+            margin-top: 10px;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: 500;
+            font-family: "Poppins", sans-serif;
+            text-align: center;
+            @media screen and (max-width: 830px) {
+                margin-top: 25px;
+                font-size: 16px;
+            }
+        }
+      }
+    }
+}

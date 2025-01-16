@@ -1,0 +1,73 @@
+.callToAction{ 
+    display: flex;
+    background: linear-gradient(to right, #3342D1 40.02%, rgba(51, 66, 209, 0.78) 70.01%, rgba(3, 104, 255, 0.027) 109.46%),url('../../assets/trading/majocamelo_line_chart_3d_cinema_4d_ee9d9dac-36c2-43eb-be5a-c390318c34d7.png') ;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: right;
+    
+  position: relative;      
+    border-radius: 24px;
+    width: 90%;
+    margin: auto;
+    font-size: 16px;
+    color: white;
+    position: relative;  
+    .left{
+        flex: 1;
+        width: 40%;
+        padding: 80px 3px 80px 40px;
+
+        h3{
+            font-size: 32px;
+        }
+        .cta-icon-info{
+            display: flex;
+            gap: 10%;
+            color: gray;
+            margin: 30px auto;
+            span{
+                margin-left: 10px;
+                color: #99999999;
+            }
+    
+    
+    
+        }
+    
+    
+    
+    button{
+        color: white;
+        background-color: #ff1802;
+        border-radius: 8px;
+        padding: 10px 46px;
+    }
+}
+
+    .bg-sect{
+        width: 60%;
+            padding: 80px 33px;
+        position: relative;
+        // background: linear-gradient(to right, #3342D1 40.02%, rgba(51, 66, 209, 0.78) 70.01%, rgba(3, 104, 255, 0.027) 109.46%),url('/trading-images/majocamelo_line_chart_3d_cinema_4d_ee9d9dac-36c2-43eb-be5a-c390318c34d7.png') ;
+        background-repeat: no-repeat;
+        background-size: cover;
+        .icon-1{
+            position: absolute;
+            right: 50%;
+            top: 50%;
+            width: 240px;
+            transform: translate(90%, -50%);        }
+        .icon-2{
+            position: absolute;
+            width: 240px;
+            right: 50%;
+            top: 50%;
+            transform: translate(30%, -50%);
+        }
+        @media(max-width: 700px){
+            display: none;
+        }
+    }
+
+
+}

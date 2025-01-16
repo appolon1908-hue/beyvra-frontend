@@ -1,0 +1,86 @@
+.payment-methods-filter-btns {
+  height: 1rem;
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  .payment-methods-filter-btn {
+    height: 2rem;
+    margin-right: 0.4125rem;
+    border: 1px solid #28bd66;
+    padding: 0 1.5rem;
+    border-radius: 1.25rem;
+    background-color: transparent;
+    color: #fff;
+    font-size: 0.775rem;
+  }
+}
+
+// day mode
+.day {
+  .payment-methods-filter-btns {
+    .payment-methods-filter-btn {
+      border: 1px solid #5d86a6;
+
+      color: #000000;
+    }
+  }
+}
+
+.payment-method-list-title {
+  color: #fff;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+// day mode
+.day {
+  .payment-method-list-title {
+    color: #000000;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+}
+
+.payment-method-list-item {
+  display: flex;
+  align-items: center;
+  margin: 0.8125rem 0;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 4px;
+  cursor: pointer;
+  span {
+    margin-left: 0.5rem;
+    color: #969798;
+  }
+}
+
+.payment-method-list-item:hover {
+  background: #28bd66;
+}
+
+// day mode
+.day {
+  .payment-method-list-item {
+    span {
+      margin-left: 0.5rem;
+      color: #444444;
+    }
+  }
+}
+.active-payment-method-list-item {
+  background-color: #1b1d21;
+}
+.day {
+  .active-payment-method-list-item {
+    background-color: #454647;
+  }
+}
+.payment-methods-title {
+  color: rgba(255, 255, 255);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: auto;
+  text-align: center;
+  padding: 32px 0px;
+}

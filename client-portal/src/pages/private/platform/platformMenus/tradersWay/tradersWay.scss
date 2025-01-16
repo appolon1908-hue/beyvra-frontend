@@ -1,0 +1,284 @@
+.tradersWay {
+  .menuText {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.775rem;
+    font-weight: 300;
+    margin-bottom: 1.25rem;
+    line-height: 1.15rem;
+  }
+  .mainItemCardv2.cardv3 {
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+    box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05), 0 0.063rem 0 0.063rem inset rgba(255, 255, 255, 0.26);
+    border-radius: 0.625rem;
+  }
+  .tradersWayCard {
+    margin-bottom: 0rem;
+    .cardLeftIcon {
+      margin-right: 0.5rem;
+      svg {
+        width: 1.7rem;
+        height: 1.7rem;
+      }
+    }
+  }
+  .timeContainer {
+    margin: 1.25rem 0;
+
+    .timeCountdown {
+      font-size: 1rem;
+      font-weight: 400;
+      color: rgba(0, 148, 255, 1);
+      margin-bottom: 0.6375rem;
+    }
+
+    .timeLeftContainer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      span {
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: #fff;
+        margin-left: -0.7rem;
+      }
+      .timeLeftText {
+        font-size: 0.7rem;
+        font-weight: 400;
+        color: #969798;
+      }
+
+      svg {
+        width: 2rem;
+        margin-bottom: 0.3125rem;
+      }
+    }
+  }
+
+    .levelBar {
+    width: 100%;
+    background: linear-gradient(
+      to right,
+      rgba(39, 162, 255, 1),
+      rgba(0, 148, 255, 0)
+    );
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #fff;
+    border-radius: 0.625rem;
+    padding: 0.125rem 0.5rem;
+    height: 1.3rem;
+    font-size: 0.7rem;
+    margin-bottom: 1.5625rem;
+    .levelText {
+      margin-right: 5rem;
+    }
+    }
+  .traderOptions {
+    .menuListCard {
+      padding: 1rem;
+      justify-content: space-between;
+
+      @media (max-width: 767px) {
+        padding: 1rem;
+      }
+
+      @media (max-width: 575px) {
+        padding: 0.75rem;
+      }
+
+      .cardLeftIcon.textCenter {
+        top: 47%;
+      }
+
+      .cardRightContent {
+        width: auto;
+        margin-left: 2rem;
+
+        @media (max-width: 767px) {
+          margin-left: 2.5rem;
+        }
+
+        @media (max-width: 575px) {
+          margin-left: 2.1875rem;
+          width: 100%;
+        }
+
+        .menuListCardTitle {
+          text-align: start;
+
+          @media (max-width: 767px) {
+            font-size: 1rem;
+          }
+
+          @media (max-width: 575px) {
+            font-size: 0.75rem;
+          }
+        }
+      }
+
+      .tradesWayOption {
+        width: 1.5625rem;
+        height: 1.5625rem;
+        background-color: #586162;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 1.0625rem;
+
+        @media (max-width: 767px) {
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+
+        @media (max-width: 575px) {
+          width: 1.25rem;
+          height: 1.25rem;
+        }
+
+        .optionText {
+          font-size: 1rem;
+          font-weight: 500;
+
+          @media (max-width: 767px) {
+            font-size: 1rem;
+            font-weight: 400;
+          }
+
+          @media (max-width: 575px) {
+            font-size: 0.75rem;
+            font-weight: 400;
+          }
+        }
+      }
+
+      .cardRightSuffix {
+        .optionSuffix {
+          min-width: 7.375rem;
+          background-color: #272930;
+          height: 1.5rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 0 0.125rem;
+          border-radius: 1.125rem;
+
+          @media (max-width: 767px) {
+            min-width: 9.5rem;
+            height: 2.15rem;
+          }
+
+          @media (max-width: 575px) {
+            min-width: 8.75rem;
+            height: 1.875rem;
+          }
+
+          svg {
+            width: 1rem;
+            margin-right: 0.425rem;
+
+            @media (max-width: 767px) {
+              width: 0.95rem;
+              margin-right: 0.5rem;
+            }
+
+            @media (max-width: 575px) {
+              width: 0.8rem;
+              margin-right: 0.5rem;
+            }
+          }
+
+          p {
+            font-size: 0.6862rem;
+            font-weight: 400;
+            color: #fff;
+
+            @media (max-width: 767px) {
+              font-size: 0.8rem;
+            }
+
+            @media (max-width: 575px) {
+              font-size: 0.75rem;
+            }
+          }
+        }
+
+        &.disabled {
+          .optionSuffix {
+            p {
+              color: #969798;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.tradersWayModal {
+  .ant-modal-mask {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+  .ant-modal {
+    .ant-modal-content {
+      padding: 2rem;
+      padding-top: 5rem;
+
+      .ant-modal-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .modalBadge {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 2.25rem;
+          min-width: 8.625rem;
+          color: #d9d9d9;
+          font-size: 0.8862rem;
+          background-color: #424749;
+          border-radius: 1.125rem;
+          position: absolute;
+          left: 1.5625rem;
+          top: 1.5625rem;
+        }
+
+        .modalIcon {
+          margin-top: 1rem;
+          margin-bottom: 1.25rem;
+          svg {
+            width: 5.25rem;
+          }
+        }
+
+        .modalHeading {
+          font-size: 1.2094rem;
+          font-weight: 600;
+          margin-bottom: 1.25rem;
+        }
+
+        .modalText {
+          color: #70808c;
+          max-width: 15.3125rem;
+          text-align: center;
+          margin-bottom: 1.25rem;
+          font-size: 0.875rem;
+        }
+
+        .modalButton {
+          width: 6.625rem;
+          height: 4.25rem;
+          font-size: 1.125rem;
+          font-weight: 400;
+          background: #2e3439;
+          border-radius: 0.3125rem;
+          border: 0.125rem solid #27a2ff;
+          color: #fff;
+        }
+      }
+    }
+  }
+}

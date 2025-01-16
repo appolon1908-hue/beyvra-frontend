@@ -1,0 +1,159 @@
+.mainTableContainer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+.transactionTableHeaderContainer {
+  display: flex;
+  width: 100%;
+}
+.transactionTableHeader {
+  background-color: rgba(241, 243, 243, 0.12); ;
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 16px 52px;
+  display: flex;
+  width: 100%;
+  margin-bottom: 8px;
+
+  th {
+    font-size: 16px;
+    font-weight: 600;
+    justify-content: center;
+  }
+  th:nth-child(1) {
+    display: flex;
+    flex: 1;
+  }
+  th:nth-child(2) {
+    display: flex;
+    flex: 2;
+  }
+  th:nth-child(3) {
+    display: flex;
+    flex: 1;
+  }
+  th:nth-child(4) {
+    display: flex;
+    flex: 1;
+  }
+  th:nth-child(5) {
+    display: flex;
+    flex: 1;
+  }
+  th:nth-child(6) {
+    display: flex;
+    flex: 1;
+  }
+  th:nth-child(7) {
+    display: flex;
+    flex: 1;
+  }
+  th:nth-child(8) {
+    display: flex;
+    flex: 1;
+  }
+  th:nth-child(9) {
+    display: flex;
+    flex: 1;
+  }
+  th:nth-child(10) {
+    display: flex;
+    flex: 1;
+  }
+}
+.transactionTableRowsContainer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+.transactionTableRows {
+  background-color: rgb(68, 68, 68); ;
+  border-radius: 6px;
+  color: #ffffff;
+  padding: 16px 52px;
+  display: flex;
+  width: 100%;
+  margin-top: 3px;
+
+  td {
+    font-size: 16px;
+    font-weight: 600;
+    justify-content: center;
+  }
+
+  td:nth-child(1) {
+    display: flex;
+    flex: 1;
+  }
+  td:nth-child(2) {
+    display: flex;
+    flex: 2;
+    font-weight: 400;
+    color: #2dd674;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  td:nth-child(3) {
+    display: flex;
+    flex: 1;
+  }
+  td:nth-child(4) {
+    display: flex;
+    flex: 1;
+  }
+  td:nth-child(5) {
+    display: flex;
+    flex: 1;
+  }
+  td:nth-child(6) {
+    display: flex;
+    flex: 1;
+  }
+  td:nth-child(7) {
+    display: flex;
+    flex: 1;
+  }
+  td:nth-child(8) {
+    display: flex;
+    flex: 1;
+  }
+  td:nth-child(9) {
+    display: flex;
+    flex: 1;
+  }
+  td:last-child {
+    display: flex;
+    flex: 1;
+    color: #ffe100;
+  }
+}
+.transactionTablePaginatore {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  color: #ffffff;
+  justify-content: end;
+  margin-top: 16px;
+
+  svg {
+    cursor: pointer;
+  }
+  svg:nth-child(1) {
+    transform: rotate(180deg);
+    margin-left: 8px;
+  }
+}
+.exportButton {
+  background: #2dd674;
+  width: 159px;
+  height: 42px;
+  border-radius: 10px;
+  color: #000000;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  font-weight: 600;
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
+}

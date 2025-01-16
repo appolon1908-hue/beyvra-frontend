@@ -1,0 +1,89 @@
+.transferMenu {
+  padding: 40px 90px;
+  background-color: #26272b;
+  margin: -2rem;
+  border-radius: 1rem;
+
+  .transferMenu-title {
+    color: rgba(255, 255, 255);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: auto;
+    text-align: center;
+    padding: 32px 0px 32px 0px;
+  }
+  .transfer-MenuListCard {
+    .mainItemCardv2 {
+      box-shadow: none;
+      background: #3d4046;
+      border-radius: 8px;
+      .cardLeftIcon {
+        margin-left: 0.5rem;
+        svg {
+          width: 1.5rem;
+        }
+      }
+      .cardRightContent {
+        text-align: center;
+        p {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+  .withdrawTitle {
+    font-weight: 600;
+    font-size: 2rem;
+    line-height: 2.25rem;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.1rem;
+  }
+  .promoCodeInput {
+    cursor: pointer;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .currencyInput {
+    margin-bottom: 0.9375rem;
+  }
+
+  .amountInputs {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+
+    .warningText {
+      font-size: 0.875rem;
+      color: #fff;
+      font-weight: 400;
+    }
+  }
+
+  .infoText {
+    font-size: 0.8125rem;
+    color: #969798;
+    font-weight: 400;
+    margin-top: 1.25rem;
+  }
+
+  &Modal {
+    .ant-modal-content {
+      width: 520px !important;
+      max-height: 820px !important;
+      overflow: auto;
+      @media (max-width: 768px) {
+        width: 95vw !important;
+      }
+    }
+    .ant-modal-content::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
+    }
+    .ant-modal-close {
+      color: white;
+    }
+  }
+}
+.TransferButton {
+  background-color: #28bd66;
+}

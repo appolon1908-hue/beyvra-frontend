@@ -1,0 +1,10 @@
+.sharesContainer {
+  background-color: #0e1422;
+  
+  @media (max-width: 878px) {
+    .revertCompanents {
+      display: flex;
+      flex-direction: column-reverse;
+    }
+  }
+}

@@ -1,0 +1,24 @@
+.cardStat{
+    // background: linear-gradient(265.24deg, rgba(205, 207, 253, 0.2) 3.04%, rgba(0, 148, 255, 0) 100.62%);
+    // border: 2px solid;
+
+    border-image-source: linear-gradient(180deg, rgba(177, 200, 221, 0.18) 0%, rgba(229, 238, 246, 0) 100%);
+    
+    .loss{
+        color: #f15131;
+
+    }
+    .gain{
+        color: #1FBF75;
+        align-items: center;
+        // font-size: 19px;
+        svg{
+            path{
+            fill: green;
+            stroke: green;
+
+        }
+    }
+
+    }
+}

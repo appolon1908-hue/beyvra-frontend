@@ -1,0 +1,114 @@
+.tradCalcContainer {
+  width: 90%;
+  margin: 0 auto;
+  padding: 40px 0;
+
+  .mt-80 {
+    margin: 80px auto;
+  }
+
+  .mt-0 {
+    margin: 0px auto;
+  }
+
+  h3,
+  span,
+  p,
+  label,
+  button,
+  div {
+    font-family: "Poppins";
+    font-style: normal;
+    color: #ffffff;
+    font-weight: 400;
+  }
+
+  h3 {
+    font-weight: 600;
+    font-size: 18.9062px;
+    line-height: 27px;
+    @media (max-width: 878px) {
+      font-size: 12.82px;
+    }
+    @media (max-width: 478px) {
+      font-size: 18.91px;
+    }
+  }
+
+  label {
+    font-size: 12px;
+    line-height: 21px;
+    font-weight: 400;
+    color: #999999;
+    @media (max-width: 878px) {
+      font-size: 9px;
+    }
+    @media (max-width: 478px) {
+      font-size: 11.33px;
+    }
+  }
+
+  span {
+    font-size: 14px;
+    line-height: 24px;
+    color: rgba(255, 255, 255, 0.6);
+    @media (max-width: 878px) {
+      font-size: 9.49px;
+    }
+    @media (max-width: 478px) {
+      font-size: 14px;
+    }
+  }
+
+  .tradCalcMainBlock {
+    width: 80%;
+    background: linear-gradient(
+      180deg,
+      rgba(82, 93, 114, 0.7) 0%,
+      rgba(82, 93, 114, 0) 129.72%
+    );
+    border-radius: 16px;
+    display: flex;
+    gap: 40px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px;
+    @media (max-width: 1278px) {
+      width: 100%;
+    }
+    @media (max-width: 728px) {
+      flex-direction: column;
+    }
+  }
+
+  .tradCalcWrapperBlock {
+    margin: 80px auto;
+    width: 80%;
+    background: linear-gradient(
+      180deg,
+      rgba(82, 93, 114, 0.7) 0%,
+      rgba(82, 93, 114, 0) 129.72%
+    );
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 40px;
+    @media (max-width: 1278px) {
+      width: 100%;
+    }
+    @media (max-width: 728px) {
+      flex-direction: column;
+    }
+
+    .tradCalcMainTwoBlock {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      gap: 60px;
+      @media (max-width: 728px) {
+        flex-direction: column;
+      }
+    }
+  }
+}

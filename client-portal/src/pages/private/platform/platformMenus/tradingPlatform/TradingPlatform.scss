@@ -1,0 +1,88 @@
+.trading-platforms {
+  @media (max-width: 768px) {
+    padding: 0 5rem;
+  }
+  @media (max-width: 576px) {
+    padding: 0 2rem;
+  }
+  .buttonsContain {
+    display: flex;
+    flex-direction: column;
+    .btn {
+      height: 2.5rem;
+      width: fit-content;
+      border-radius: 0.5rem;
+      background-color: #393a3d;
+      border: none;
+      color: white;
+      font-size: 0.8rem;
+    }
+    .link-button {
+      cursor: default;
+      text-align: left;
+      margin: 1rem 0rem;
+      padding: 0;
+    }
+  }
+  .trading-platforms-about {
+    padding: 1rem 1rem 1rem 1rem;
+    margin-bottom: 1rem;
+    .about-info {
+      h3 {
+        color: white;
+        font-weight: 500;
+        font-size: 0.9rem;
+        line-height: 2.036rem;
+      }
+      .topics {
+        color: rgba(149, 149, 149, 1);
+        font-weight: 400;
+        font-size: 0.65rem;
+        line-height: 1.6rem;
+      }
+      .about-info-content {
+        .content {
+          display: flex;
+          align-items: center;
+          gap: 0.488rem;
+          padding: 0.8rem 0rem 0rem 0rem;
+          .content-icon {
+            color: rgba(162, 162, 162, 1);
+            padding: 0.2rem 0.5rem 0rem 0rem;
+            svg {
+              path {
+                fill: #0094ff;
+              }
+            }
+          }
+          .text {
+            color: #a2a2a2;
+            font-weight: 400;
+            font-size: 0.759rem;
+            padding: 0rem;
+          }
+        }
+      }
+    }
+  }
+  .olymp-trade {
+    cursor: pointer;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1d21;
+    padding: 1rem;
+    border-radius: 0.438rem;
+    gap: 1.5rem;
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+    div {
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: white;
+    }
+  }
+}

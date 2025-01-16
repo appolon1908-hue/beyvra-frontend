@@ -1,0 +1,104 @@
+.LoanInput {
+  width: fit-content;
+  input {
+    background: rgba(48, 48, 51, 1);
+    padding: 1rem 1.5rem;
+    border-radius: 0.9375rem;
+    outline: none;
+    color: white;
+    font-size: 1.25rem;
+    width: 29.1875rem;
+    
+    @media (max-width: 992px) {
+      width: 24rem;
+    }
+    @media (max-width: 768px) {
+      width: 20rem;
+      padding: 0.8rem 1.3rem;
+      font-size: 1rem;
+    }
+    @media (max-width: 576px) {
+      width: 15rem;
+      padding: 0.6rem 1.1rem;
+      font-size: 0.875rem;
+    }
+    @media (max-width: 320px) {
+      width: 10rem;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.75rem;
+    }
+  }
+  ::placeholder {
+    color: white;
+    font-size: 1.25rem;
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+    @media (max-width: 576px) {
+      font-size: 0.875rem;
+    }
+    @media (max-width: 320px) {
+      font-size: 0.75rem;
+    }
+  }
+  .ant-input-password {
+    background: rgba(48, 48, 51, 1);
+    padding: 0.8rem 1.5rem;
+    border-color: none !important;
+    border-radius: 0.9375rem;
+    outline: none;
+    color: white;
+    font-size: 1.25rem;
+    width: 29.1875rem;
+    border-color: rgba(48, 48, 51, 1);
+    @media (max-width: 992px) {
+      width: 24rem;
+    }
+    @media (max-width: 768px) {
+      width: 20rem;
+      padding: 0.6rem 1.1rem;
+      font-size: 1rem;
+    }
+    @media (max-width: 576px) {
+      width: 15rem;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.875rem;
+    }
+    @media (max-width: 320px) {
+      width: 10rem;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.75rem;
+    }
+    svg {
+      color: white;
+      width: 1.625rem;
+      height: 1.625rem;
+      @media (max-width: 768px) {
+        width: 1rem;
+        height: 1rem;
+      }
+      @media (max-width: 576px) {
+        width: 1rem;
+        height: 1rem;
+      }
+      @media (max-width: 320px) {
+        width: 0.7rem;
+        height: 0.7rem;
+      }
+    }
+  }
+  p {
+    font-size: 0.75rem;
+    line-height: 0.8788rem;
+    color: rgba(126, 126, 126, 1);
+    padding: 1rem 1.5rem;
+    @media (max-width: 576px) {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.6rem;
+    }
+    @media (max-width: 320px) {
+      padding: 0.5rem 0.5rem;
+      font-size: 0.6rem;
+    }
+  }
+}

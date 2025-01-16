@@ -1,0 +1,26 @@
+.amount-card {
+  border-radius: 1rem;
+  padding: 0.8rem;
+  display: flex;
+  background: #1a1d21;
+  height: 3.5rem;
+  cursor: pointer;
+
+  .cardContent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    border-radius: 1rem;
+    .amounText {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ecf9f9;
+    }
+  }
+}
+.amount-card:hover {
+  background: #2dd674;
+  color: black;
+}

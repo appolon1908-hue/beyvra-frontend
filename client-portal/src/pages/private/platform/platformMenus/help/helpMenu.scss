@@ -1,0 +1,148 @@
+.helpMenu {
+  .flexHelpLnks {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+  .helpLnkContainer {
+    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+    border-radius: 0.625rem;
+    cursor: pointer;
+    width: 10rem;
+    height: 8.5rem;
+    background: rgba(241, 243, 243, 0.12);
+    border: solid 0.1rem #3f3f3f;
+    .icon {
+      height: fit-content;
+      width: fit-content;
+      margin-top: 0.1rem;
+      img {
+        width: 3rem;
+        height: 3rem;
+      }
+    }
+    p.helpHead {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin: -0.3rem 0rem 0.5rem 0.5rem;
+    }
+    p.helpTxt {
+      font-size: 0.75rem;
+      color: rgba(162, 162, 162, 1);
+      margin: 0rem 0rem 0rem 0.5rem;
+    }
+  }
+  .helpLnkContainer:hover{
+    background: #1b8748;
+  }
+  .videosContainer {
+    margin-bottom: 2rem;
+    .videoLessons {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #2dd674;
+    }
+    .videosItems {
+      padding: 0.8rem;
+      background: rgba(241, 243, 243, 0.12);
+      border: solid 0.1rem #3f3f3f;
+      margin-bottom: 1rem;
+      border-radius: 1rem;
+      .videoItemRow {
+        align-items: center;
+        .videoItemCol1 {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          .videoItemHeader {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.7;
+            color: rgba(162, 162, 162, 1);
+            svg {
+              width: 1.2rem;
+              height: 1.2rem;
+            }
+          }
+          h2 {
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 500;
+
+          }
+        }
+        .videoItemImage {
+          margin-top: 0.3rem;
+          img {
+            width: 7.5rem;
+            height: 3rem;
+          }
+        }
+      }
+    }
+    .videosItems:hover{
+      background-color: #205b39;
+    }
+  }
+}
+
+.day.helpMenu {
+  .flexHelpLnks {
+  }
+  .helpLnkContainer {
+    box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05), 0 0.063rem 0 0.063rem inset rgba(39, 255, 68, 0.26);
+    cursor: pointer;
+    .icon {
+
+      img {
+
+      }
+    }
+    p.helpHead {
+      color: black;
+
+    }
+    p.helpTxt {
+      color: rgb(59, 59, 59);
+
+    }
+  }
+  .videosContainer {
+    .videoLessons {
+      color: #2dd674;
+    }
+    .videosItems {
+      box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05), 0 0.063rem 0 0.063rem inset rgba(103, 255, 191, 0.2);
+      background: linear-gradient( to left ,rgba(22, 23, 26, 0.5), rgba(22, 23, 26, 0));
+      .videoItemRow {
+        .videoItemCol1 {
+          .videoItemHeader {
+             color: rgb(140, 253, 136);
+            svg {
+              path{
+                // fill: black 
+              }
+ 
+            }
+          }
+          h2 {
+            font-size: 0.9rem;
+            color: rgb(0, 0, 0);
+            font-weight: 500;
+
+          }
+        }
+        .videoItemImage {
+          img {
+
+          }
+        }
+      }
+    }
+  }
+}

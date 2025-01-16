@@ -1,0 +1,310 @@
+.LoanPersonalData {
+  background-color: rgba(1, 0, 6, 1);
+  padding: 4.5rem 1rem 2rem 4.6875rem;
+  @media (max-width: 992px) {
+    padding: 4.5rem 1rem 2rem 1rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .getLoanRow {
+    @media (max-width: 992px) {
+      width: 100%;
+      overflow: hidden;
+      justify-content: center;
+    }
+    .PersonalDatainputWrapper {
+      display: flex;
+      flex-direction: column;
+      @media (max-width: 992px) {
+        align-items: center;
+      }
+      .LoanInput {
+        input {
+          width: 32.875rem;
+          @media (max-width: 1112px) {
+            width: 28rem;
+          }
+          @media (max-width: 992px) {
+            width: 32rem;
+          }
+          @media (max-width: 768px) {
+            width: 28rem;
+          }
+          @media (max-width: 576px) {
+            width: 20rem;
+          }
+          @media (max-width: 350px) {
+            width: 15rem;
+          }
+        }
+      }
+      .LoanInput .ant-input-password {
+        width: 32.875rem;
+        @media (max-width: 1112px) {
+          width: 28rem;
+        }
+        @media (max-width: 992px) {
+          width: 32rem;
+        }
+        @media (max-width: 768px) {
+          width: 28rem;
+        }
+        @media (max-width: 576px) {
+          width: 20rem;
+        }
+        @media (max-width: 350px) {
+          width: 15rem;
+        }
+      }
+      h2 {
+        font-size: 1.875rem;
+        font-weight: 500;
+        color: white;
+        @media (max-width: 992px) {
+          text-align: center;
+          padding: 0rem 6rem;
+        }
+        @media (max-width: 768px) {
+          padding: 0rem 3rem;
+          font-size: 1.7rem;
+        }
+        @media (max-width: 576px) {
+          padding: 0rem 2rem;
+          font-size: 1.5rem;
+        }
+        @media (max-width: 320px) {
+          padding: 0rem 1rem;
+          font-size: 1.25rem;
+        }
+      }
+      .rectangle-download-links {
+        width: 22.813rem;
+        height: 0.813rem;
+        background: linear-gradient(
+          to right,
+          rgba(39, 162, 255, 1),
+          rgba(249, 252, 255, 0)
+        );
+        border-radius: 0.625rem;
+        margin-top: 2.125rem;
+        margin-bottom: 1rem;
+        @media (max-width: 768px) {
+          width: 18rem;
+          height: 0.7rem;
+        }
+        @media (max-width: 576px) {
+          width: 15rem;
+          height: 0.6rem;
+        }
+        @media (max-width: 320px) {
+          width: 10rem;
+          height: 0.4rem;
+        }
+      }
+      .paragraph {
+        font-size: 1.125rem;
+        line-height: 1.3181rem;
+        color: white;
+        margin-bottom: 4rem;
+        @media (max-width: 992px) {
+          text-align: center;
+          padding: 0 6rem;
+        }
+        @media (max-width: 768px) {
+          padding: 0 3rem;
+          font-size: 1rem;
+        }
+        @media (max-width: 576px) {
+          padding: 0 2rem;
+          font-size: 0.875rem;
+        }
+        @media (max-width: 320px) {
+          padding: 0 1rem;
+          font-size: 0.75rem;
+        }
+      }
+    }
+    .col {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      margin-top: 15.4rem;
+      @media (max-width: 992px) {
+        align-items: center;
+        margin-top: 0rem;
+      }
+      .loanInformationWrapper {
+        width: fit-content;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .tickIconImage {
+          display: block;
+          @media (max-width: 992px) {
+            display: none;
+          }
+        }
+        .loanTransferWrapper {
+          display: flex;
+          flex-direction: column;
+          justify-content: start;
+          align-items: start;
+          @media (max-width: 992px) {
+            align-items: center;
+          }
+          .LoanInput {
+            input {
+              width: 33.625rem;
+              @media (max-width: 1112px) {
+                width: 28rem;
+              }
+              @media (max-width: 992px) {
+                width: 32rem;
+              }
+              @media (max-width: 768px) {
+                width: 28rem;
+              }
+              @media (max-width: 576px) {
+                width: 20rem;
+              }
+              @media (max-width: 350px) {
+                width: 15rem;
+              }
+            }
+          }
+          .lastInputs {
+            display: flex;
+            gap: 2rem;
+            @media (max-width: 350px) {
+              flex-direction: row;
+              align-items: center;
+              gap: 1rem;
+            }
+            .LoanInput {
+              input {
+                width: 15.625rem;
+                @media (max-width: 1112px) {
+                  width: 13rem;
+                }
+                @media (max-width: 992px) {
+                  width: 15.5rem;
+                }
+                @media (max-width: 768px) {
+                  width: 13rem;
+                }
+                @media (max-width: 576px) {
+                  width: 9rem;
+                }
+                @media (max-width: 350px) {
+                  width: 8rem;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .AgrementCheckMark {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1rem;
+    margin-left: 1rem;
+    margin-bottom: 3.1875rem;
+    @media (max-width: 992px) {
+      padding: 0 6rem;
+      margin-top: 0.8rem;
+      align-items: start;
+      margin-bottom: 2rem;
+    }
+    @media (max-width: 768px) {
+      padding: 0 4rem;
+      margin-top: 0.6rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 576px) {
+      padding: 0 2rem;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      font-size: 1.25rem;
+      line-height: 1.465rem;
+      color: rgba(126, 126, 126, 1);
+      width: 25.1875rem;
+      @media (max-width: 992px) {
+        width: 18rem;
+        font-size: 1rem;
+      }
+      @media (max-width: 768px) {
+        width: 14rem;
+        font-size: 0.8rem;
+      }
+      @media (max-width: 576px) {
+        width: 10rem;
+      }
+      @media (max-width: 320px) {
+        width: 8rem;
+      }
+    }
+    .customCheckBox {
+      input {
+        // Change the background color
+        background-color: transparent;
+        border-color: white;
+        padding: 1rem;
+        width: 2rem;
+        height: 2rem;
+        color: green;
+        &:checked {
+          // Change the tick mark color when checked
+          color: red;
+        }
+      }
+      input[type="checkbox"] {
+        // Change the background color
+        background-color: transparent;
+        border-color: white;
+        color: green;
+        &:checked {
+          // Change the tick mark color when checked
+          color: red;
+        }
+      }
+    }
+  }
+  .buttonDiv {
+    width: 50%;
+    @media (max-width: 992px) {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    @media (max-width: 768px) {
+      width: 60%;
+    }
+    button {
+      font-size: 1rem;
+      text-align: center;
+      color: white;
+      background: rgba(0, 148, 255, 1);
+      border-radius: 0.625rem;
+      padding: 1rem 2rem;
+      margin-bottom: 2rem;
+      @media (max-width: 992px) {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+      }
+      @media (max-width: 768px) {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+      }
+      @media (max-width: 576px) {
+        padding: 0.4rem 0.5rem;
+      }
+    }
+  }
+}

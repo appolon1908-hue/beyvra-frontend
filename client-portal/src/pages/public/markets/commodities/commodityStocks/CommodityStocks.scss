@@ -1,0 +1,77 @@
+.commodityStocksContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  color: white;
+  width: 90%;
+  margin: 0 auto;
+  gap: 50px;
+  padding: 40px 0;
+
+  @media (max-width: 878px) {
+    gap: 20px;
+  }
+
+  @media (max-width: 478px) {
+    flex-direction: column;
+  }
+
+  div {
+    height: auto;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: flex-start;
+
+    @media (max-width: 478px) {
+      width: 100%;
+    }
+
+    h2 {
+      text-align: left;
+      font-weight: 600;
+      font-size: 34px;
+      color: #ffffff;
+      font-family: "Poppins";
+      font-style: normal;
+
+      @media (max-width: 878px) {
+        font-size: 24px;
+      }
+    }
+
+    span {
+      text-align: left;
+      font-weight: 400;
+      font-size: 16px;
+      color: #999999;
+      font-family: "Poppins";
+      font-style: normal;
+    }
+
+    button {
+      width: 154.81px;
+      height: 49px;
+      background: #ff1802;
+      border-radius: 8px;
+      font-family: "Poppins";
+      font-style: normal;
+      font-weight: 500;
+      font-size: 17.4375px;
+      color: #ffffff;
+    }
+  }
+
+  img {
+    width: 50%;
+    height: auto;
+    padding: 20px 0;
+
+    @media (max-width: 478px) {
+      width: 100%;
+    }
+  }
+}

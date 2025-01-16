@@ -1,0 +1,171 @@
+.commoditiesUpDownContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  color: white;
+  width: 90%;
+  margin: 0 auto;
+  gap: 50px;
+  padding: 40px 0;
+
+  @media (max-width: 878px) {
+    gap: 30px;
+  }
+
+  @media (max-width: 678px) {
+    flex-direction: column;
+  }
+
+  .commoditiesUpDownFirst {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: flex-start;
+
+    @media (max-width: 678px) {
+      width: 100%;
+    }
+
+    h2 {
+      text-align: left;
+      font-weight: 600;
+      font-size: 34px;
+      color: #ffffff;
+      font-family: "Poppins";
+      font-style: normal;
+
+      @media (max-width: 878px) {
+        font-size: 24px;
+      }
+    }
+
+    span {
+      text-align: left;
+      font-weight: 400;
+      font-size: 16px;
+      color: #999999;
+      font-family: "Poppins";
+      font-style: normal;
+    }
+
+    button {
+      width: 154.81px;
+      min-height: 49px;
+      background: #ff1802;
+      border-radius: 8px;
+      font-family: "Poppins";
+      font-style: normal;
+      font-weight: 500;
+      font-size: 17.4375px;
+      color: #ffffff;
+    }
+  }
+
+  .commoditiesUpDownSecond {
+    width: 50%;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+
+    @media (max-width: 878px) {
+      gap: 10px;
+    }
+
+    @media (max-width: 678px) {
+      width: 100%;
+    }
+
+    img {
+      width: 25%;
+      height: auto;
+      max-width: 103px;
+
+      @media (max-width: 878px) {
+        max-width: 62.59px;
+      }
+
+      @media (max-width: 878px) {
+        max-width: 74px;
+      }
+    }
+
+    .commoditiesUpDownImages {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 40px;
+      align-items: center;
+      width: 35%;
+
+      img {
+        max-width: 139px;
+        width: 100%;
+        height: auto;
+
+        @media (max-width: 878px) {
+          max-width: 84.58px;
+        }
+
+        @media (max-width: 878px) {
+          max-width: 101px;
+        }
+      }
+
+      img:last-child {
+        max-width: 103px;
+        width: 90%;
+        height: auto;
+
+        @media (max-width: 878px) {
+          max-width: 62.59px;
+        }
+
+        @media (max-width: 878px) {
+          max-width: 74px;
+        }
+      }
+    }
+
+    .commoditiesUpDownSetUp {
+      width: 40%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+
+      div {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 8.62273px;
+        min-height: 71.45px;
+        padding: 0 20px;
+        gap: 10px;
+
+        @media (max-width: 878px) {
+          min-height: 51.64px;
+          padding: 0 10px;
+        }
+
+        span {
+          font-family: "Roboto";
+          font-style: normal;
+          font-weight: 700;
+          font-size: 19.7091px;
+          letter-spacing: 0.01em;
+          color: #f9f9fa;
+
+          @media (max-width: 878px) {
+            font-size: 14.5px;
+          }
+        }
+      }
+    }
+  }
+}

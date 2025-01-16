@@ -1,0 +1,85 @@
+.simpleTrade{
+    display: flex;
+    gap: 50px;
+    width: 90%;
+    padding: 40px 10px;
+    margin: auto;
+    min-height: 340px;
+    @media (max-width: 720px) {
+        flex-direction: column;
+        gap: 10px;
+
+    }
+
+    .imagery{
+        flex: 1;
+        position: relative;
+        @media (max-width: 720px) {
+
+            flex-basis: 200px;
+
+        }
+
+    
+
+    .bg-1{
+        width: 16%;
+        top: 10%;
+        position: absolute;
+        
+    }
+
+    .bg-2{
+        position: absolute;
+        height: 60%;
+        width: 40%;
+        left: 30%;
+        top: 39%;
+        min-width: 00px;
+
+    }
+    .bg-3{
+        position: absolute;
+        height: 20%;
+        left: 30%;
+        top: 10%;
+        min-width: 00px;
+
+    }
+}
+
+.simpleTradeTextList{
+    flex: 1;
+    padding-left: 7px;
+    color: white;
+
+    h3{
+        font-size: 34px;
+        @media (max-width: 480px) {
+            text-align: center;
+            
+        }
+    }
+    ul{
+        li{
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            align-items: center;
+            padding: 8px 0;
+            span{
+                width: 27px;
+                flex-shrink: 0;
+                height: 27px;
+                border-radius: 100%;
+                background: linear-gradient(180deg, #FF1802 -21.25%, rgba(255, 24, 2, 0) 130%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    }
+
+}
+
+}

@@ -1,0 +1,79 @@
+.ant-drawer{
+    
+.ant-drawer-header-title{
+    // background-color: red;
+    // display: none;
+}
+}
+
+
+.portfolioMenu{
+    .header{
+        background-color: white;
+        border-radius: 12px;
+        margin-bottom: 0;
+
+        .searchIcon{
+            order: 1;
+
+            svg{
+                height: 17px;
+                // fill: black;
+                path{
+                    // fill: black;
+                    stroke: black;
+                } 
+            }
+        }
+        input{
+            order: 2;
+            color: rgba(0, 0, 0, 0.616);
+        }
+    }
+
+    .table-cards{
+        .card{
+            background: rgba(241, 243, 243, 0.12); ;
+        }
+        .card:hover{
+            background: #187b41;
+        }
+        .card2{
+            background: rgba(241, 243, 243, 0.12); ;
+        }
+        .card2:hover{
+            background: #187b41;
+        }
+    }
+
+    .portfolioTable{
+        width: 100%;
+        border-radius: 12px;
+        padding: 12px;
+        border: 2px solid;
+        border-image-source: linear-gradient(180deg, rgba(177, 200, 221, 0.18) 0%, rgba(229, 238, 246, 0) 100%);
+        background: #26272b;
+        margin-bottom: 30px;
+        overflow-x: hidden;
+
+        .overview-table-header{
+            border-bottom: 1px solid #ffffff80;
+            text-align: center;
+            align-items: center;
+        }
+
+        .body-tab{
+            background-color: rgb(217, 217, 217);
+            color: #26272b;
+            margin: 4px 0;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 7px;
+            text-align: center;
+            align-items: center;
+            padding: 3px 4px;
+            line-height: 15px;
+            height: 34px;
+        }
+    }
+}

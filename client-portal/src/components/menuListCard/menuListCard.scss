@@ -1,0 +1,123 @@
+.menuListCard {
+  position: relative;
+  margin-bottom: 0.738rem;
+  display: flex;
+  align-items: center;
+
+  &.danger {
+    box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05),
+      0 0.063rem 0 0.063rem inset #f15131;
+    border-radius: 0.313rem;
+  }
+
+  .cardLeftIcon {
+    margin-right: 0.938rem;
+    display: flex;
+    align-items: center;
+    color: #fff;
+
+    img,
+    svg {
+      width: 1rem;
+    }
+
+    &.disabled {
+      color: #969798;
+    }
+
+    &.textCenter {
+      position: absolute;
+      left: 0.938rem;
+      top: 50%;
+      transform: translateY(-42%);
+    }
+  }
+
+  .cardRightContent {
+    width: 100%;
+    .menuListCardTitle {
+      font-size: 1rem;
+      color: #fff;
+      font-weight: 500;
+      margin-bottom: 0.313rem;
+
+      &.noMargin {
+        margin-bottom: 0;
+      }
+
+      &.disabled {
+        color: #969798;
+      }
+
+      &.danger {
+        color: #f15131;
+      }
+
+      &.textCenter {
+        text-align: center;
+        justify-content: center;
+      }
+    }
+    .menuListCardSubtitle {
+      font-size: 0.675rem;
+      color: #ffffff99;
+      font-weight: 400;
+
+      &.subTextCenter {
+        text-align: center;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+.day.menuListCard {
+  &.danger {
+    box-shadow: 0 0.125rem 0 0.125rem rgba(0, 0, 0, 0.05),
+      0 0.063rem 0 0.063rem inset #f15131;
+  }
+
+  .cardLeftIcon {
+    color: #000000;
+
+    img,
+    svg {
+      width: 1rem;
+      path {
+        fill: #000000;
+      }
+    }
+
+    &.disabled {
+      color: #616161;
+    }
+
+    &.textCenter {
+    }
+  }
+
+  .cardRightContent {
+    .menuListCardTitle {
+      color: #0e0d0d;
+      &.noMargin {
+      }
+
+      &.disabled {
+        color: #969798;
+      }
+
+      &.danger {
+        color: #f15131;
+      }
+
+      &.textCenter {
+      }
+    }
+    .menuListCardSubtitle {
+      color: #04209c99;
+
+      &.subTextCenter {
+      }
+    }
+  }
+}

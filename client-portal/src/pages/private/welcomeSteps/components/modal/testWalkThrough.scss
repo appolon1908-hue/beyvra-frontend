@@ -1,0 +1,186 @@
+.walkThroughSidebarContainer{
+  // background-color: red;
+  width: 100%;
+  max-width: 320px;
+  @media screen and (max-width: 830px) {
+   max-width: 100%;
+   display: flex;
+   flex-direction: column;
+   gap: 0rem;
+   margin-bottom: 2%;
+   margin-top: 0%;
+}  
+.walkThroughTopBarInputs{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 320px;
+  @media screen and (max-width: 830px) {
+    gap: 0.5rem;
+   flex-direction: row;
+   max-width: 100%;
+  
+}  
+  .amountInputContainer,
+  .durationInputContainer{
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    .walkthroughInputContent {
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+        padding: 0.4rem 0.7rem;
+        border: solid 0.1rem #3f3f3f;
+        margin: 10px 0px;
+        @media screen and (max-width: 830px) {
+          margin-top: 0px;
+           margin: 3px 0px;
+           padding: 0.3rem 0.6rem;
+        }
+        input {
+          text-decoration: none;
+          outline: none;
+          background-color: transparent;
+          font-size: 18px;
+          color: white;
+          @media screen and (max-width: 830px) {
+            width: 100%;
+          }
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        /* Firefox */
+        input[type="number"] {
+          -moz-appearance: textfield;
+        }
+        label {
+          font-size: 12px;
+          margin-top: 1px;
+          color: rgb(183, 184, 185);
+        }
+      }
+      
+      .walkThroughButtonsContainer {
+        // display: flex;
+        display: flex;
+        gap: 0.4rem;
+              margin-top: 5px;
+              .walkThroughButtons {
+                width: 100%;
+                button {
+                  // background-color: #dc362e;
+                  // background-color: #00AB1B;
+                  width: 100%;
+                  padding: 0.2rem 0rem;
+                  border-radius: 6px;
+                  svg{
+                    height: 24px;
+                  }
+                  &:disabled {
+                    background-color: #283645;
+                  }
+                }
+                .negative{
+                  background-color: #dc362e;
+                }
+                .positive{
+                  background-color: #28bd66;
+                }
+              }
+            }
+          }
+          .bottomButtonNDownContainer{
+            display: flex;
+            width: 100%;
+           .walkThroughSidbarUpDown{
+          
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+        
+            @media screen and (max-width: 830px) {
+                   display: flex;
+                   justify-content: center;
+                   align-items: center;
+                   flex-direction: row;
+                   gap: 2rem;
+                  }
+                  
+                }
+                .durationInputContainer{
+                  background-color: green;
+                }
+              }
+  }
+  .bottomButtonNDownContainer{
+        display: flex;
+        width: 60%;
+       .walkThroughSidbarUpDown{
+      
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+    
+        @media screen and (max-width: 830px) {
+               display: flex;
+               justify-content: center;
+               align-items: center;
+               flex-direction: row;
+               gap: 0.5rem;
+        }
+        .walkThroughupNdown {
+          margin-top: 10px;
+          @media screen and (max-width: 830px) {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 5px;
+           }
+          .up, .down {
+            display: flex;
+            width: 100%;
+            background-color: #283645;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px 24px;
+            border-radius: 10px;
+            @media screen and (max-width: 830px) {
+              padding: 4px 10px;
+           }
+          
+          
+            &:disabled {
+              .walkThroughupNdownTitle {
+                color: #ffffff5e;
+              }
+            }
+            .walkThroughupNdownTitle {
+              color: white;
+              
+              h2 {
+                // font-weight: 500;
+                // font-size: 24px;
+              }
+              span {
+                // font-size: 11px;
+                margin-top: 2px;
+            }
+          }
+          .walkThroughBUttonIcon {
+            width: 20px;
+          }
+          }
+          .down-enabled{
+            background-color: #dc362e;
+          }
+          .up-enabled{
+            background-color: #28bd66;
+          }
+        }
+      }}
+}

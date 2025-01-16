@@ -1,0 +1,158 @@
+.trackTradeWrapper{
+    color: white;
+    display: flex;
+    align-items: center;
+    width: 90%;
+    margin: auto ;
+    @media(max-width: 900px){
+        flex-direction: column;
+    }
+.textWrapper{
+        flex: 1;
+        h1{
+            font-size: 60px;
+            line-height: 72px;
+            margin: 12px 0;
+        }
+        .subText{
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            p{
+
+            
+            font-size: 15px;
+            margin: 24px 0;
+            color: #999999;
+            }
+        }
+        button{
+            padding: 12px 52px;
+            border-radius: 8px;
+            background-color: #FF1802;
+            font-size: 16px;
+            color: #fff;
+            margin-top: 12px;
+            @media (max-width: 480px) {
+            width: 100%;                
+            }
+
+
+        }
+
+    }
+    .graphBackdrop{
+        flex: 1;
+        width: 100%;
+             
+       
+        div{
+        margin-left: auto;
+        
+        position: relative;
+        height: 400px;
+        max-width: 650px;
+        background: url('../../../../assets/trading/graph-vector.png');
+        background-repeat: no-repeat;
+        background-position: center 280px ;
+
+        width: 100%;
+        @media (max-width:1020px) {
+                width: 100%;
+                margin: auto 0;                
+            }
+            
+        img{
+            position: absolute;
+            height: 160px;
+        }
+        img.card-1{
+            right: 21%;
+            top: 40px;
+            @media (max-width:1020px) {
+                right: 30%;
+                
+            }
+        } 
+        img.card-2{
+            right: 1%;
+            top: 130px;
+            @media (max-width:1020px) {
+                right: 0%;
+                
+            }
+        }
+        img.card-3{
+            right: 30%;
+            top: 130px;
+            height: 250px;
+            @media (max-width:1020px) {
+                right: 40%;
+                top: 120px;
+            }
+        }
+        img.t-globe{
+            height: 65px;
+            right: 300px;
+            top: 50px;
+            @media (max-width:1020px) {
+                right: 70%;
+                top: 50px;
+            }
+
+        }
+        .googleWrapper{
+            position: absolute;
+            top: 200px;
+            right: 410px;
+            background: linear-gradient(180deg, #117EFF 0%, rgba(10, 76, 153, 0) 100%);
+            padding: 10px;
+            height: 40px;
+            width: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 100%;
+            @media (max-width:1020px) {
+                right: 90%;
+                top: 200px;
+            }
+
+        }
+        .text-box{
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #717886;
+            border-radius: 8px;
+            width: max-content;
+            position: absolute;
+            height: max-content;
+            padding: 8px;
+            right: 70%;
+            top: 310px;
+            @media (max-width:1020px) {
+                right: 40%;
+                top: 340px;
+            }
+            @media (max-width:620px) {
+                right: 20%;
+            }
+
+
+
+            span{
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+                background-color: red;
+                border-radius: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    }
+
+    }
+}

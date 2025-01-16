@@ -1,0 +1,57 @@
+.olymp-trade-info {
+  @media (max-width: 768px) {
+    padding: 0 5rem;
+  }
+  @media (max-width: 576px) {
+    padding: 0 2rem;
+  }
+  .btn {
+    height: 2.5rem;
+    width: fit-content;
+    border-radius: 0.5rem;
+    background-color: #393a3d;
+    border: none;
+    color: white;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+  }
+  .olymp-trade-info-about {
+    padding: 1rem;
+
+    h3 {
+      color: white;
+      font-weight: 500;
+      font-size: 0.9rem;
+      line-height: 2.036rem;
+    }
+    p {
+      color: rgba(149, 149, 149, 1);
+      font-weight: 400;
+      font-size: 0.759rem;
+      line-height: 1.063rem;
+      span {
+        font-weight: 700;
+      }
+    }
+  }
+  .olymp-trade {
+    cursor: pointer;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1a1d21;
+    padding: 1rem;
+    border-radius: 0.438rem;
+    gap: 1.5rem;
+    svg {
+      width: 1.3rem;
+      height: 1.3rem;
+    }
+    div {
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: white;
+    }
+  }
+}

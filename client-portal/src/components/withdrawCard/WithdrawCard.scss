@@ -1,0 +1,28 @@
+.Withdraw-card {
+  display: flex;
+  padding: 0.5rem 0.7rem;
+  column-gap: 0.5rem;
+  border-radius: 0.6rem;
+  border: 1px solid #757272;
+  .withdraw-subcard {
+    padding: 0rem;
+    .Withdraw-text {
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    .withdraw-link {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.2rem;
+      margin-top: 0.3rem;
+      .withdraw-link-text {
+        font-weight: 500;
+        font-size: 0.75rem;
+        line-height: 1.25rem;
+        color: #2dd674;
+      }
+    }
+  }
+}

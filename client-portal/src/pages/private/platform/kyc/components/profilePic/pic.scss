@@ -1,0 +1,15 @@
+.uploadText{
+    color: white;
+    margin-top: 3px;
+    @media (max-width: 768px) {
+        max-width: 140px;
+        font-size: 10px;
+        margin-top: 0;
+      }
+}
+
+.proImage{
+    height: 20px;
+    width: 20px;
+    margin: 2px 10px;
+}

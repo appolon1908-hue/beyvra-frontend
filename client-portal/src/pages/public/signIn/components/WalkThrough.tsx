@@ -1,0 +1,381 @@
+import { useState } from "react";
+import "./WalkThrough.scss";
+import { useDispatch } from "react-redux";
+import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
+import { useLogin } from "api/user/useLogin";
+import { GlobalLoginMaxAge } from "App";
+// Assuming you have these modal components
+
+const WalkThrough = ({ registerData }: { registerData: any }) => {
+  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [currentStep, setCurrentStep] = useState(0);
+  const totalSteps = 10;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [, setCookie] = useCookies(["access_token", "refresh_token", "step"]);
+  const [userData, setUserData] = useState(null);
+  const [showOtp, setShowOTP] = useState(false);
+
+  const { mutate: loginMutate, isPending: isLoginPending } = useLogin({
+    onSuccess: (data) => {
+      if (data?.user?.two_factor_authentication_enabled) {
+        setUserData(data);
+        setShowOTP(true);
+      } else {
+        setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
+        setCookie("refresh_token", data.refresh);
+        setCookie("step", "");
+        data?.user.is_walkthrough
+          ? navigate("/welcome")
+          : navigate("/platform");
+      }
+    },
+  });
+
+  const handleClose = () => {
+    setIsModalOpen(false);
+    loginMutate(registerData); // Trigger login after modal is closed
+  };
+
+  const handleNext = () => {
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep((prevStep) => prevStep + 1);
+    } else {
+      handleClose(); // Login when the final step is completed
+    }
+  };
+
+  if (!isModalOpen) return null;
+
+  const renderModalContent = () => {
+    switch (currentStep) {
+      case 0:
+        return <WelcomeContentModal handleNext={handleNext} />;
+      case 1:
+        return <CompanyContentModal handleNext={handleNext} />;
+      case 2:
+        return <ChartContentModal handleNext={handleNext} />;
+      case 3:
+        return <ChartChangeContentModal handleNext={handleNext} />;
+      case 4:
+        return <ChartChange2ContentModal handleNext={handleNext} />;
+      case 5:
+        return <ChartItemSelectedContentModal handleNext={handleNext} />;
+      case 6:
+        return <InvestementsContentModal handleNext={handleNext} />;
+      case 7:
+        return <Investements2ContentModal handleNext={handleNext} />;
+      case 8:
+        return <Investements3ContentModal handleNext={handleNext} />;
+      case 9:
+        return <CompleteContentModal handleNext={handleClose} />;
+      default:
+        return <CompleteContentModal handleNext={handleClose} />;
+    }
+  };
+
+  return (
+    <div className="walkthrough-modal">
+      <div className="walkthrough-content">
+        <button className="close-button" onClick={handleClose}>
+          X
+        </button>
+        <div className="modal-counter">{`${
+          currentStep + 1
+        }/${totalSteps}`}</div>
+        {renderModalContent()}
+      </div>
+    </div>
+  );
+};
+
+const WelcomeContentModal = ({ handleNext }) => {
+  return (
+    <div className="welcome-modal">
+      <img src="/walkthrough-modal/welcome-modal.png" alt="" />
+      <div className="welcome-modal_title">Welcome!</div>
+      <div className="welcome-modal_descr">
+        We&#39;ll help you take your first steps on our online trading platform.
+      </div>
+      <div className="welcome-modal_button" onClick={handleNext}>
+        Start Traning
+      </div>
+    </div>
+  );
+};
+
+const CompanyContentModal = ({ handleNext }) => {
+  return (
+    <div className="company-modal">
+      <img src="/walkthrough-modal/company.jpg" alt="" />
+      <div className="company-modal_content">
+        <div className="welcome-modal_descr">
+          Trading is an activity that lets you earn money on price fluctuations
+          of different assets such as currency pairs, commodities, and stocks.
+        </div>
+        <div
+          className="welcome-modal_button company-modal_button"
+          onClick={handleNext}
+        >
+          Next
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ChartContentModal = ({ handleNext }) => {
+  return (
+    <div className="company-modal">
+      <img
+        className="company-modal_img"
+        src="/walkthrough-modal/chart.gif"
+        alt=""
+      />
+      <img
+        className="company-modal_img-item"
+        src="/walkthrough-modal/chart-item.png"
+        alt=""
+      />
+      <div className="chart-modal_content">
+        <div className="welcome-modal_descr">
+          The chart shows how the price of an asset changes. If the line on the
+          chart is going down, it means the price is falling. If it's going up,
+          the price is rising.
+        </div>
+        <div
+          className="welcome-modal_button company-modal_button"
+          onClick={handleNext}
+        >
+          Next
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ChartChangeContentModal = ({ handleNext }) => {
+  return (
+    <div className="company-modal">
+      <img
+        className="company-modal_img"
+        src="/walkthrough-modal/chart-change.gif"
+        alt=""
+      />
+      <img
+        className="company-modal_img-item"
+        src="/walkthrough-modal/chart-item.png"
+        alt=""
+      />
+      <div className="chart-modal_content">
+        <div className="welcome-modal_descr">
+          Traders make forecasts on how the price will change in the near
+          future. Such a forecast is called a "trade".
+        </div>
+        <div
+          className="welcome-modal_button company-modal_button"
+          onClick={handleNext}
+        >
+          Next
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ChartChange2ContentModal = ({ handleNext }) => {
+  return (
+    <div className="company-modal">
+      <img
+        className="company-modal_img"
+        src="/walkthrough-modal/chart-change.gif"
+        alt=""
+      />
+      <img
+        className="company-modal_img-item"
+        src="/walkthrough-modal/chart-item.png"
+        alt=""
+      />
+      <div className="chart-modal_content">
+        <div className="welcome-modal_descr">
+          Trades of fixed duration that offer a fixed profit are known as Fixed
+          Time Trades or FTT.
+        </div>
+        <div
+          className="welcome-modal_button company-modal_button"
+          onClick={handleNext}
+        >
+          Next
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ChartItemSelectedContentModal = ({ handleNext }) => {
+  return (
+    <div className="company-modal">
+      <img
+        className="company-modal_img"
+        src="/walkthrough-modal/chart-change.png"
+        alt=""
+      />
+      <img
+        className="company-modal_img-item"
+        src="/walkthrough-modal/chart-item-selected.png"
+        alt=""
+      />
+      <div className="info-block">
+        <p>
+          FTT assets vary in profitability. In this case, you will receive
+          <strong> 85% of profit </strong> if, when the trade expires, the chart
+          will still be moving in the correct direction.
+        </p>
+        <button className="understand-button" onClick={handleNext}>
+          I Understand
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const InvestementsContentModal = ({ handleNext }) => {
+  return (
+    <div className="company-modal">
+      <img
+        className="company-modal_img"
+        src="/walkthrough-modal/chart-change.png"
+        alt=""
+      />
+      <img
+        className="company-modal_img-item"
+        src="/walkthrough-modal/chart-item-selected.png"
+        alt=""
+      />
+      <img
+        className="investments-modal_img-item"
+        src="/walkthrough-modal/investments.png"
+        alt=""
+      />
+      <div className="investment-info">
+        <p>
+          You can set the investment amount at <strong>$100</strong>. Don't
+          worry, this is training money.
+        </p>
+      </div>
+      <div className="chart-modal_content">
+        <div
+          className="welcome-modal_button company-modal_button"
+          onClick={handleNext}
+        >
+          Next
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Investements2ContentModal = ({ handleNext }) => {
+  return (
+    <div className="company-modal">
+      <img
+        className="company-modal_img"
+        src="/walkthrough-modal/chart-change.png"
+        alt=""
+      />
+      <img
+        className="company-modal_img-item"
+        src="/walkthrough-modal/chart-item-selected.png"
+        alt=""
+      />
+      <img
+        className="investments-modal_img-item"
+        src="/walkthrough-modal/ivestments2.png"
+        alt=""
+      />
+      <div className="investment-info investment-info_two">
+        <p>
+          You can select <strong>1 minute</strong> as the duration of your
+          trade.
+        </p>
+      </div>
+      <div className="chart-modal_content">
+        <div
+          className="welcome-modal_button company-modal_button"
+          onClick={handleNext}
+        >
+          Next
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Investements3ContentModal = ({ handleNext }) => {
+  return (
+    <div className="company-modal">
+      <img
+        className="company-modal_img"
+        src="/walkthrough-modal/chart-change.png"
+        alt=""
+      />
+      <img
+        className="company-modal_img-item"
+        src="/walkthrough-modal/chart-item-selected.png"
+        alt=""
+      />
+      <img
+        className="investments-modal_img-item"
+        src="/walkthrough-modal/instesments3.png"
+        alt=""
+      />
+      <div className="investment-info investment-info_three">
+        <p>
+          Look at the chart and decide where it will go next:
+          <strong>Up or Down</strong>
+        </p>
+      </div>
+      <div className="chart-modal_content">
+        <div
+          className="welcome-modal_button company-modal_button"
+          onClick={handleNext}
+        >
+          Next
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CompleteContentModal = ({ handleNext }) => {
+  return (
+    <div className="company-modal">
+      <img
+        className="company-modal_img"
+        src="/walkthrough-modal/chart-change.png"
+        alt=""
+      />
+      <img
+        className="company-modal_img-item"
+        src="/walkthrough-modal/chart-item-selected.png"
+        alt=""
+      />
+
+      <div className="chart-modal_content">
+        <div className="welcome-modal_descr">
+          Congratulations! Your trade was successful. By investing $100, you've
+          earned $85 — a 85% return in just 1 minute.
+        </div>
+        <div
+          className="welcome-modal_button company-modal_button"
+          onClick={handleNext}
+        >
+          Complete Traning
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default WalkThrough;
