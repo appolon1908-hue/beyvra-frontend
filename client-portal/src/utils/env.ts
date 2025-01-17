@@ -1,6 +1,6 @@
 export default function getEnv(name: string) {
   if (name === "VITE_API_BASE_URL") {
-    const BASE_URL = `http://localhost:8000/api`;
+    const BASE_URL = `https://tradx.io/api`;
     return (
       (window as any)?.configs?.[name] ||
       ((import.meta as any).env[name] as string) ||
