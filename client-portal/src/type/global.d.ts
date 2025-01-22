@@ -8,5 +8,6 @@ interface Window {
       [key: string]: any; // Allows additional properties on __lc
     };
     LiveChatWidget?: any;
+    TradingView: any;
   }
   
