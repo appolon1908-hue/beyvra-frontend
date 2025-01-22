@@ -76,6 +76,40 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const { data: socketData, oldData } = useSocketConnect(wsTicket as string);
 
   useCryptoSocketConnect(wsTicket as string, user?.id as string);
+  
+  useEffect(() => {
+    // Dynamically load the TradingView library
+    const script = document.createElement("script");
+    script.src = "https://s3.tradingview.com/tv.js";
+    script.async = true;
+    script.onload = () => {
+      if (window.TradingView) {
+        new window.TradingView.widget({
+          container_id: "tradingview-chart",
+          width: "100%",
+          height: "99%",
+          symbol: "BINANCE:BTCUSDT", // Replace with your desired symbol
+          interval: "D",
+          timezone: "America/New_York",
+          theme: themeSelect === "night" ? "dark" : "light",
+          style: "1",
+          locale: "en",
+          toolbar_bg: "#f1f3f6",
+          enable_publishing: false,
+          allow_symbol_change: true,
+        });
+      } else {
+        console.error("TradingView library not loaded");
+      }
+    };
+    script.onerror = () => console.error("Failed to load TradingView library");
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [themeSelect]);
+
   // Chart logic
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -369,8 +403,9 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
       style={{ height: calculateTradeContentHeight() }}
     >
       <div className="trade-graph" id="tradeGraph">
-        <div className="chart-container" style={{ height: "100%", color: "white", position: 'relative' }}>
-          {renderSelectedChartType()}
+        <div className="chart-container" style={{ height: "99%", color: "white", position: 'relative', width: "84%", float: "right" }} ref={chartContainerRef}>
+          <div id="tradingview-chart" style={{ width: "100%", height: "100%" }}></div>
+          {/* {renderSelectedChartType()} */}
           <div className="chart-options">
             {chartOptionMenus.map((data, _i) => (
               <DropdownMenu key={_i} position={data.position} type={data?.type} menuItems={data.menus}>
