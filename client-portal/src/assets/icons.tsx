@@ -1,10 +1,10 @@
 export const LogoIcon = () => {
   return (
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12.1652 8.76771L5.99457 1.01452L1 1L9.58078 11.9619L12.1652 8.76771Z" fill="#2dfe4d" stroke="white" strokeWidth="0.217786" strokeMiterlimit="10" />
-      <path d="M19.8766 1H24.2323L3.94922 21.2553L19.8766 1Z" fill="#2dfe4d" stroke="white" strokeWidth="0.217786" strokeMiterlimit="10" />
-      <path d="M19.9046 25.0859L25.0008 25.1004L15.4327 13.0496L21.7775 5.23828L1.72657 24.9553H6.86638L14.3438 14.5305L13.8501 17.3327L19.9046 25.0859Z" fill="#2dfe4d" stroke="white" strokeWidth="0.217786" strokeMiterlimit="10" />
-    </svg>
+    <img
+      src="src/assets/home/LogoIcon.png"
+      alt="Logo"
+      width="64"
+    />
   );
 };
 
