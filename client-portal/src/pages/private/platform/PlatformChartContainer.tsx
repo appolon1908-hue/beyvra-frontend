@@ -1,48 +1,49 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import TradeForm from "../../../components/tradeForm/TradeForm";
 import "./platform.scss";
-import { AreaChartIcon, BarChartIcon, CandleStickIcon, MainChartAnalysisIcon, MainChartChangeIcon, MainChartSignalsIcon, ZoomInChartIcon, ZoomOutChartIcon } from "../../../assets/icons";
-
-import MainChart from "./MainChart";
-import { useAppSelector } from "@store/hooks";
-import { isObjectEmpty, timeScaleMenu } from "utils/utils";
+import {
+  AreaChartIcon,
+  BarChartIcon,
+  CandleStickIcon,
+  MainChartChangeIcon,
+  ZoomInChartIcon,
+  ZoomOutChartIcon,
+} from "../../../assets/icons";
+import { timeScaleMenu } from "utils/utils";
 import DropdownMenu from "components/dropdownMenu/DropdownMenu";
-import { CandlestickData, ColorType, createChart, CrosshairMode, IChartApi, ISeriesApi, LineStyle, Time, WhitespaceData } from "lightweight-charts";
-import useSocketConnect, { ChartDataType } from "hooks/useSocketConnect";
-import Loading from "components/loading";
-import useCryptoSocketConnect from "hooks/useCryptoSocketConnect";
-import { createCustomMarker1 } from "./MainChart/Markers";
-
-
-
-////////////////// MY DECLARATIONS ////////////////////
-interface MainChartNProps {
-  symbol: string;
-}
-
-interface StockData {
-  // Adjust these properties based on the actual structure of your stock data
-  [key: string]: any; // Allow for dynamic keys or define specific properties
-}
-
-
-//////////////////////////////////////////////////////
+import {
+  CandlestickData,
+  ColorType,
+  createChart,
+  CrosshairMode,
+  IChartApi,
+  ISeriesApi,
+  LineStyle,
+  Time,
+} from "lightweight-charts";
 
 interface PlatformProps {
-  themeSelect: any;
+  themeSelect: string;
   topbarHeight: number;
   tradeFormHeight: number;
   bottomSidebarHeight: number;
 }
-const removeDuplicates = (data: ChartDataType[]): (CandlestickData<Time> | WhitespaceData<Time>)[] => {
-  const seen = new Set<number>();
-  return data.filter(item => {
-    if (!seen.has(Number(item.time))) {
-      seen.add(Number(item.time));
-      return true;
-    }
-    return false;
-  }) as any;
+
+const getBinanceWebSocketUrl = (symbol: string, interval: string) =>
+  `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`;
+
+const fetchHistoricalData = async (symbol: string, interval: string) => {
+  const response = await fetch(
+    `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=1000`
+  );
+  const data = await response.json();
+  return data.map((k: any) => ({
+    time: (k[0] / 1000) as Time,
+    open: parseFloat(k[1]),
+    high: parseFloat(k[2]),
+    low: parseFloat(k[3]),
+    close: parseFloat(k[4]),
+  }));
 };
 
 const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
@@ -51,387 +52,204 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   tradeFormHeight,
   bottomSidebarHeight,
 }) => {
-  const colors = {
-    backgroundColor: "transparent",
-    lineColor: "#0094FF",
-    textColor: "#70808C",
-    areaTopColor: "rgba(11, 166, 238, 0.2)",
-    areaBottomColor: "rgba(11, 166, 238, 0)",
-    gridLines: "#ffccff"
-  };
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<IChartApi | null>(null);
+  const seriesRef = useRef<ISeriesApi<"Candlestick" | "Area" | "Bar", Time> | null>(null);
 
-  // Chart refs and constants
-  let chartDataRef = useRef<ChartDataType[]>([]);
-  let chartContainerRef = useRef<HTMLDivElement>(null);
-  let chartRef = useRef<IChartApi>();
-  let seriesRef = useRef<ISeriesApi<"Candlestick" | "Area" | "Bar", Time>>();
-  let chart: IChartApi;
-  let chartContainer = null;
+  const [selectedChart, setSelectedChart] = useState<"area" | "candlesticks" | "bar">("candlesticks");
+  const [tradingPair] = useState("BTCUSDT");
+  const [candleInterval] = useState("1m");
+  const [chartData, setChartData] = useState<CandlestickData[]>([]);
+  const [userInteracted, setUserInteracted] = useState(false);
 
-  const [chartScale, setChartScale] = useState(6);
-  const [selectedChart, setSelectedChart] = useState('area');
-  const [selectedTimeScale, setSelectedTimeScale] = useState<any>(timeScaleMenu[0]);
-  const { wsTicket, user } = useAppSelector((state) => state.user);
-
-  const { data: socketData, oldData } = useSocketConnect(wsTicket as string);
-
-  useCryptoSocketConnect(wsTicket as string, user?.id as string);
-  
+  // ------------------------------------------------------------------
+  // 1) Fetch historical data + initialize WebSocket
+  // ------------------------------------------------------------------
   useEffect(() => {
-    // Dynamically load the TradingView library
-    const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/tv.js";
-    script.async = true;
-    script.onload = () => {
-      if (window.TradingView) {
-        new window.TradingView.widget({
-          container_id: "tradingview-chart",
-          width: "100%",
-          height: "99%",
-          symbol: "BINANCE:BTCUSDT", // Replace with your desired symbol
-          interval: "D",
-          timezone: "America/New_York",
-          theme: themeSelect === "night" ? "dark" : "light",
-          style: "1",
-          locale: "en",
-          toolbar_bg: "#f1f3f6",
-          enable_publishing: false,
-          allow_symbol_change: true,
-        });
-      } else {
-        console.error("TradingView library not loaded");
+    let ws: WebSocket;
+
+    const initializeChartData = async () => {
+      try {
+        const historicalData = await fetchHistoricalData(tradingPair, candleInterval);
+        setChartData(historicalData);
+
+        ws = new WebSocket(getBinanceWebSocketUrl(tradingPair, candleInterval));
+        ws.onmessage = (event) => {
+          const message = JSON.parse(event.data);
+          if (message.k) {
+            const newCandle = {
+              time: (message.k.t / 1000) as Time,
+              open: parseFloat(message.k.o),
+              high: parseFloat(message.k.h),
+              low: parseFloat(message.k.l),
+              close: parseFloat(message.k.c),
+            };
+
+            setChartData((prev) => {
+              const lastCandle = prev[prev.length - 1];
+              // Update existing candle or add new one
+              return lastCandle?.time === newCandle.time
+                ? [...prev.slice(0, -1), newCandle]
+                : [...prev, newCandle];
+            });
+          }
+        };
+      } catch (error) {
+        console.error("Failed to initialize chart data:", error);
       }
     };
-    script.onerror = () => console.error("Failed to load TradingView library");
-    document.body.appendChild(script);
 
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, [themeSelect]);
+    initializeChartData();
+    return () => ws?.close();
+  }, [tradingPair, candleInterval]);
 
-  // Chart logic
+  // ------------------------------------------------------------------
+  // 2) Initialize / update the chart
+  // ------------------------------------------------------------------
   useEffect(() => {
-    if (!chartContainerRef.current) return;
-    chartContainer = chartContainerRef.current!;
-    chart = createChart(chartContainer, {
+    if (!chartContainerRef.current || chartData.length === 0) return;
+
+    // Create or re-create the chart
+    const chart = createChart(chartContainerRef.current, {
       layout: {
-        background: { type: ColorType.Solid, color: colors?.backgroundColor },
-        // 'white',
+        background: { type: ColorType.Solid, color: "transparent" },
+        textColor: themeSelect === "night" ? "#FFFFFF" : "#000000",
       },
       grid: {
-        vertLines: {
-          color: themeSelect == "night" ? "#16171a" : "#b9b9b9",
-          visible: true,
-        },
-        horzLines: {
-          color: themeSelect == "night" ? "#16171a" : "#b9b9b9",
-          visible: true,
-        },
+        vertLines: { color: "#2B2B43", style: LineStyle.SparseDotted },
+        horzLines: { color: "#363C4E", style: LineStyle.SparseDotted },
       },
       rightPriceScale: {
         borderVisible: false,
-        textColor: "#868788",
+        scaleMargins: { top: 0.1, bottom: 0.2 },
       },
       timeScale: {
-        borderVisible: false,
-        timeVisible: true,
-        secondsVisible: true,
-        rightOffset: 70,
-        allowShiftVisibleRangeOnWhitespaceReplacement: true,
+        rightOffset: 15,
+        barSpacing: 25,
+        lockVisibleTimeRangeOnResize: true,
+        fixLeftEdge: true,
       },
-      width: chartContainer?.clientWidth,
-      height: 300,
+      width: chartContainerRef.current.clientWidth,
+      height: chartContainerRef.current.clientHeight,
     });
 
-    // Set custom price formatter for the right price scale
-    chart.priceScale('right').applyOptions({ mode: 1 });
-
-    //  candle series 
-    const series = selectedChart === 'candlesticks'
-      ? chart.addCandlestickSeries({
-        upColor: 'green',
-        downColor: 'red',
-        borderDownColor: 'red',
-        borderUpColor: 'green',
-        wickDownColor: 'red',
-        wickUpColor: 'green',
-        priceFormat: {
-          type: 'price', precision: 8, minMove: 0.000000001
-        },
-      })
-      : selectedChart === 'area' ? chart.addAreaSeries({
-        topColor: "#0c2c3b",
-        bottomColor: 'transparent',
+    // Add the proper series (candlestick, area, or bar)
+    let series: ISeriesApi<"Candlestick" | "Area" | "Bar", Time>;
+    if (selectedChart === "candlesticks") {
+      series = chart.addCandlestickSeries({
+        upColor: "#26a69a",
+        downColor: "#ef5350",
+        priceFormat: { type: "price", precision: 2, minMove: 0.01 },
+      });
+    } else if (selectedChart === "area") {
+      series = chart.addAreaSeries({
         lineColor: "#1973FA",
-        lineWidth: 2
-      }) : chart.addBarSeries({
-        upColor: 'green',
-        downColor: 'red'
-      })
+        topColor: "rgba(25, 115, 250, 0.4)",
+        bottomColor: "rgba(25, 115, 250, 0.05)",
+        priceFormat: { type: "price", precision: 2, minMove: 0.01 },
+      });
+    } else {
+      // 'bar'
+      series = chart.addBarSeries({
+        upColor: "#26a69a",
+        downColor: "#ef5350",
+        priceFormat: { type: "price", precision: 2, minMove: 0.01 },
+      });
+    }
+
+    // Set data and fit
+    series.setData(chartData);
+    chart.timeScale().fitContent();
+
+    // Auto-scroll until user interacts
+    const syncHandler = () => {
+      if (!userInteracted) {
+        chart.timeScale().scrollToRealTime();
+      }
+    };
+    chart.subscribeCrosshairMove(() => setUserInteracted(true));
+    chart.timeScale().subscribeVisibleTimeRangeChange(syncHandler);
+
     chartRef.current = chart;
     seriesRef.current = series;
 
-    // @ts-ignore
-    if (chartDataRef.current.length > 0) {
-      const sortedAndUniqueData = removeDuplicates(chartDataRef.current.sort((a, b) => Number(a.time) - Number(b.time)));
-      if (selectedChart === 'area') {
-        const reformattedData = sortedAndUniqueData.map(item => ({
-          time: item.time,
-          value: item.customValues,
-        }));
-        series.setData(reformattedData);
-      } else {
-        series.setData(sortedAndUniqueData);
-      }
-    }
-    else if (oldData.length > 0) {
-      const sortedAndUniqueData = removeDuplicates(oldData.sort((a, b) => Number(a.time) - Number(b.time)));
-      if (selectedChart === 'area') {
-        const reformattedData = sortedAndUniqueData.map(item => ({
-          time: item.time,
-          value: item.customValues,
-        }));
-        series.setData(reformattedData);
-      } else {
-        series.setData(sortedAndUniqueData);
-      }
-      chartDataRef.current = oldData;
-    }
+    return () => {
+      chart.unsubscribeCrosshairMove();
+      chart.timeScale().unsubscribeVisibleTimeRangeChange(syncHandler);
+      chart.remove();
+    };
+  }, [selectedChart, themeSelect, chartData, userInteracted]);
 
-    chart.applyOptions({
-      crosshair: {
-        mode: CrosshairMode.Normal,
-        vertLine: {
-          width: 1,
-          color: "#48494b",
-          style: LineStyle.Dashed,
-          labelBackgroundColor: "#48494b",
-        },
-        horzLine: {
-          width: 1,
-          color: "#48494b",
-          style: LineStyle.Dashed,
-          labelBackgroundColor: "#48494b",
-        },
+  // ------------------------------------------------------------------
+  // 3) Handle window resize
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    const handleResize = () => {
+      if (!chartRef.current || !chartContainerRef.current) return;
+      chartRef.current.applyOptions({
+        width: chartContainerRef.current.clientWidth,
+      });
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-      },
+  // ------------------------------------------------------------------
+  // 4) Zoom controls
+  // ------------------------------------------------------------------
+  const handleZoom = (zoomIn: boolean) => {
+    if (!chartRef.current) return;
+    const currentSpacing = chartRef.current.timeScale().options().barSpacing || 25;
+    // Example: "zoom in" = multiply by 0.9, so that effectively moves the view closer
+    const newSpacing = zoomIn ? currentSpacing * 0.9 : currentSpacing * 1.1;
+    chartRef.current.timeScale().applyOptions({
+      barSpacing: Math.max(5, Math.min(100, newSpacing)),
     });
-
-    const handleResize = (entries: ResizeObserverEntry[]) => {
-      const newRect = entries[0].contentRect;
-      chart.applyOptions({ height: newRect.height, width: newRect.width });
-    };
-
-    const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(chartContainer);
-
-
-    return () => {
-      window.removeEventListener(
-        "resize",
-        handleResize as unknown as EventListener
-      );
-      resizeObserver.disconnect();
-      chartRef.current?.remove();
-    };
-
-  }, [selectedChart, oldData]);
-
-  useEffect(() => {
-    // @ts-ignore
-    if (!isObjectEmpty(socketData)) {
-      chartDataRef.current = [...chartDataRef.current, socketData];
-      // @ts-ignore
-      if (selectedChart === 'area') {
-        seriesRef.current?.update({
-          value: socketData?.close,
-          time: socketData?.time as any
-        });
-      } else {
-        seriesRef.current?.update(socketData as any);
-      }
-    };
-  }, [socketData, selectedChart]);
-
-  useEffect(() => {
-    if (!chartRef.current || !seriesRef.current || !socketData) return;
-    const chart = chartRef.current;
-    const series = seriesRef.current;
-    const createOrUpdateMarker = () => {
-      let marker = document.getElementById('textElement1');
-      if (!marker) {
-        marker = createCustomMarker1(socketData?.open);
-        marker.id = 'textElement1';
-        chartContainerRef.current?.appendChild(marker);
-      }
-      const updateMarkerPosition = () => {
-        if (!marker) return;
-        // Update the marker content with the latest value
-        const newValue = socketData?.value;
-        const priceTextElement = marker.querySelector('#price-text'); // Select the nested span
-        if (priceTextElement && newValue !== undefined) {
-          priceTextElement.textContent = newValue.toString(); // Update the nested span's text content
-        }
-        const priceCoordinate = series.priceToCoordinate(newValue);
-        let timeCoordinate = chart.timeScale().timeToCoordinate(socketData?.timestamp);
-        if (priceCoordinate && timeCoordinate) {
-          marker.style.top = `${(priceCoordinate - marker.offsetHeight / 2) + 0}px`;
-          marker.style.left = `${timeCoordinate + 0}px`;
-        }
-      }
-      requestAnimationFrame(updateMarkerPosition);
-      chart.subscribeCrosshairMove(updateMarkerPosition);
-    };
-    createOrUpdateMarker();
-    return () => {
-      chart.unsubscribeCrosshairMove(createOrUpdateMarker);
-    };
-  }, [socketData]);
-
-  const calculateTradeContentHeight = () => {
-    const totalHeight =
-      topbarHeight +
-      (window.innerWidth <= 767 ? tradeFormHeight : 0) +
-      (window.innerWidth <= 767 ? bottomSidebarHeight : 0);
-    return `calc(100% - ${totalHeight}px)`;
   };
 
-  const handleZoomChartScale = (increase = true) => {
-    if (increase) {
-      setChartScale(chartScale + 1);
-    } else {
-      setChartScale(chartScale > 1 ? chartScale - 1 : chartScale);
-    }
-  };
-
-  const removeAllIndicators = () => {
-    const marker1 = document.getElementById('textElement2');
-    const marker2 = document.getElementById('textElement4');
-
-    marker1?.remove()
-    marker2?.remove()
-
-  };
-
-  const handleChartSelectionClick = (type = "candlesticks") => {
-    setSelectedChart(type);
-    removeAllIndicators()
-  };
-
-  const renderSelectedChartType = () => {
-    if (oldData.length === 0) {
-      return (
-        <Loading />
-      );
-    }
-
-    switch (selectedChart) {
-      // Case for other charts can go here if needed
-
-      default:
-        return (
-          <>
-            <MainChart
-              data={socketData}
-              selectedTimeScale={selectedTimeScale}
-              refs={{ chartContainerRef, chartRef, seriesRef }}
-              chartScale={chartScale}
-            />
-
-            
-            
-          </>
-        );
-    }
-  };
-
-  const selectTimeScale = (timeScaleSelection = timeScaleMenu[0]) => {
-    setSelectedTimeScale(timeScaleSelection);
-  };
-
-  const renderTimeScaleOptions = () => (
-    <div className="grid-container">
-      {timeScaleMenu.map((datum: any, _i: number) => (
-        <button className="selected" onClick={() => selectTimeScale(datum)}>{datum?.text}</button>
-      ))}
-    </div>
-  );
-
-  const chartOptionMenus = [
-    {
-      onClick: undefined,
-      icon: <MainChartChangeIcon />,
-      tooltipText: 'Chart types',
-      type: 'drop-down',
-      position: 'right',
-      menus: [
-        {
-          text: 'Area Chart',
-          onclick: () => handleChartSelectionClick('area'),
-          icon: <AreaChartIcon />
-        },
-        {
-          text: 'Candlesticks',
-          onclick: () => handleChartSelectionClick('candlesticks'),
-          icon: <CandleStickIcon />
-        },
-        {
-          text: 'Bars',
-          onclick: () => handleChartSelectionClick('bar'),
-          icon: <BarChartIcon />
-        }
-
-      ]
-    },
-    {
-      onClick: undefined,
-      icon: <MainChartAnalysisIcon />,
-      tooltipText: 'Technical Analysis'
-    },
-    {
-      onClick: undefined,
-      icon: <MainChartSignalsIcon />,
-      tooltipText: 'Signals'
-    },
-  ];
-
+  // ------------------------------------------------------------------
+  // 5) Return matching design
+  // ------------------------------------------------------------------
   return (
     <div
       className="trade-content"
-      id="tradeContent"
-      style={{ height: calculateTradeContentHeight() }}
+      style={{
+        height: `calc(100% - ${topbarHeight}px)`,
+      }}
     >
-      <div className="trade-graph" id="tradeGraph">
-        <div className="chart-container" style={{ height: "99%", color: "white", position: 'relative', width: "84%", float: "right" }} ref={chartContainerRef}>
-          <div id="tradingview-chart" style={{ width: "100%", height: "100%" }}></div>
-          {/* {renderSelectedChartType()} */}
-          <div className="chart-options">
-            {chartOptionMenus.map((data, _i) => (
-              <DropdownMenu key={_i} position={data.position} type={data?.type} menuItems={data.menus}>
-                <div className="chart-option" onClick={data.onClick}>
-                  {data.icon}
-                </div>
-              </DropdownMenu>
-            ))}
-          </div>
-          <div className="chart-zoom-controls">
-            <div className="chart-control left-control" onClick={() => handleZoomChartScale(false)}>
-              <ZoomOutChartIcon />
-            </div>
-            <DropdownMenu position="top" type="drop-down" menuItems={<>{renderTimeScaleOptions()}</>} customMenuItem>
-              <div className="chart-control center">
-                <span>{selectedTimeScale?.text.toUpperCase()}</span>
-              </div>
+      <div className="trade-graph">
+        {/* Chart Container */}
+        <div ref={chartContainerRef} className="chart-container" style={{ height: "94%", position: 'relative', width: "84%", float: "right" }} >
+          {/* Chart Controls */}
+          <div className="chart-controls">
+            {/* Chart Type Dropdown */}
+            <DropdownMenu
+              menuItems={[
+                { text: "Candlesticks", onclick: () => setSelectedChart("candlesticks") },
+                { text: "Area", onclick: () => setSelectedChart("area") },
+                { text: "Bars", onclick: () => setSelectedChart("bar") },
+              ]}
+            >
+              <button className="chart-type-button">
+                <MainChartChangeIcon />
+              </button>
             </DropdownMenu>
-            <div className="chart-control right-control" onClick={() => handleZoomChartScale()}>
-              <ZoomInChartIcon />
+
+            {/* Zoom Buttons */}
+            <div className="zoom-controls">
+              <button onClick={() => handleZoom(true)}>
+                <ZoomInChartIcon />
+              </button>
+              <button onClick={() => handleZoom(false)}>
+                <ZoomOutChartIcon />
+              </button>
             </div>
           </div>
-
         </div>
       </div>
-      <TradeForm bottomSidebarHeight={bottomSidebarHeight} socketData={socketData} />
+
+      {/* Bottom Section (Trade Form) */}
+      <TradeForm bottomSidebarHeight={bottomSidebarHeight} />
     </div>
   );
 };
