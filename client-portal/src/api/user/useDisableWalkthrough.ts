@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import {  IUser } from "@interfaces";
 import getEnv from "utils/env";
 
-export async function disableUserWalkThrough( token: string): Promise<boolean> {
+export async function disableUserWalkThrough(token: string): Promise<IUser> {
   const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
     const response = await fetch(`${BASE_URL}/user/disable_walkthrough/`, {
@@ -38,7 +38,7 @@ export const useDisableWalkThrough = (props: useDisableWalkThroughProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, unknown, any>({
+  return useMutation<IUser, Error, { token: string }>({
     mutationFn: (variables) => disableUserWalkThrough(variables.token),
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {

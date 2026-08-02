@@ -109,6 +109,7 @@ const App: React.FunctionComponent = () => {
               <Route path="transactions" element={<Transactions />} />
               <Route path="/lender" element={<Lender />} />
               <Route path="/statusDetails" element={<StatusDetails />} />
+              <Route path="/walkThrough" element={<WalkThrough />} />
             </Route>
             <Route path="/" element={<LandingPage />} />
             {/* <Route path="/home" element={<Home />} /> */}
@@ -140,7 +141,6 @@ const App: React.FunctionComponent = () => {
             <Route path="*" element={<NotFoundPage />} />
             
             
-            <Route path="/walkThrough" element={<WalkThrough registerData={undefined} />} /> 
             <Route path="/welcomeSteps" element={<WelcomeSteps />} /> 
             <Route path="/prv" element={<Prv />} /> 
             <Route path="/reg" element={<Reg />} /> 

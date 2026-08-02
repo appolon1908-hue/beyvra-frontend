@@ -2,10 +2,12 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import getEnv from "utils/env";
 import { ApiError, getApiErrorMessage } from "api/errors";
+import type { IUser } from "@interfaces";
 
 export interface RegisterResponse {
-  id: number;
-  email: string;
+  access: string;
+  refresh: string;
+  user: IUser;
 }
 
 export async function fetchRegister(data: Record<string, string>): Promise<RegisterResponse> {
@@ -32,8 +34,8 @@ export async function fetchRegister(data: Record<string, string>): Promise<Regis
 export const fethRegister = fetchRegister;
 
 type useRegisterProps = {
-  onSuccess?: (data: unknown, variables: unknown, context: unknown) => void;
-  onError?: (error: unknown, variables: unknown, context: unknown) => void;
+  onSuccess?: (data: RegisterResponse, variables: Record<string, string>, context: unknown) => void;
+  onError?: (error: Error, variables: Record<string, string>, context: unknown) => void;
   [index: string]: any;
 };
 export const useRegister = (props: useRegisterProps) => {

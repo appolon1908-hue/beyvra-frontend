@@ -1,5 +1,6 @@
 import { Form, Button } from "antd";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useCookies } from "react-cookie";
 
 import useRegister from "api/user/useRegister";
 import { toast } from "react-toastify";
@@ -8,8 +9,7 @@ import CountryCode from "../../../../helpers/CountryCode.json";
 import Select, { type StylesConfig } from "react-select";
 //import WalkThrough from "./WalkThrough";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setSignInTab } from "@store/slices/global";
+import { GlobalLoginMaxAge } from "App";
 
 
 import "./WalkThrough.scss";
@@ -61,9 +61,9 @@ const SignUpForm = () => {
   type CountryOption = (typeof countriesList)[number];
   const [countryCode, setCountryCode] = useState<CountryOption>(countriesList[0]);
   const [show, setShow] = useState(false);
-  const { handleSubmit, register, reset, watch, formState: { errors } } = useForm<SignUpFormData>();
+  const { handleSubmit, register, setError, watch, formState: { errors } } = useForm<SignUpFormData>();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [, setCookie] = useCookies(["access_token", "refresh_token", "step"]);
   const password = watch("password", "");
   const strength = evaluatePasswordStrength(password);
   //const [showWalkThrough, setShowWalkThrough] = useState(false);
@@ -84,21 +84,28 @@ const SignUpForm = () => {
           } else {
             setCountryCode(countriesList[0]);
           }
-        });
+        })
+        .catch(() => undefined);
     }
   }, [countriesList]);
 
   const { mutate, isPending } = useRegister({
-    onSuccess: () => {
-      reset();
-      toast.success("Registration successful. Sign in to continue.");
-      dispatch(setSignInTab("1"));
-      navigate("/signIn");
+    onSuccess: (response) => {
+      const cookieOptions = { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict" as const, path: "/" };
+      setCookie("access_token", response.access, cookieOptions);
+      setCookie("refresh_token", response.refresh, cookieOptions);
+      setCookie("step", "", cookieOptions);
+      toast.success("Your account is ready. Welcome to Tradi.");
+      navigate("/walkThrough", { replace: true });
     },
   });
 
   const onSubmit: SubmitHandler<SignUpFormData> = (data) => {
     const localPhone = data.phone_number.replace(/\D/g, "");
+    if (`${countryCode.value}${localPhone}`.replace(/\D/g, "").length > 15) {
+      setError("phone_number", { message: "The full international number cannot exceed 15 digits" });
+      return;
+    }
     const payload = {
       email: data.email.trim().toLowerCase(),
       first_name: data.first_name.trim(),
@@ -141,6 +148,10 @@ const SignUpForm = () => {
   return (
     <>
       <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
+        <div className="registration-intro">
+          <h2>Create your trading account</h2>
+          <p>Start with a demo wallet and learn the platform before placing a trade.</p>
+        </div>
         <Form.Item
           validateStatus={errors.first_name ? "error" : undefined}
           help={errors.first_name?.message}
@@ -195,8 +206,8 @@ const SignUpForm = () => {
               value={countryCode}
               onChange={handleCountryChange}
               className="loginInput no-padding"
-              key={Math.random().toString()}
               styles={customStyles}
+              aria-label="Country calling code"
             />
           }
           <Form.Item

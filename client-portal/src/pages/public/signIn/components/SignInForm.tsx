@@ -35,7 +35,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
     setCookie("access_token", data.access, cookieOptions);
     setCookie("refresh_token", data.refresh, cookieOptions);
     setCookie("step", "", cookieOptions);
-    navigate(destination || (data.user.is_walkthrough ? "/welcome" : "/platform"), { replace: true });
+    navigate(destination || (data.user.is_walkthrough ? "/walkThrough" : "/platform"), { replace: true });
   };
   const { mutate, isPending } = useLogin({
     onSuccess: (data) => {

@@ -101,6 +101,22 @@ body{
     .ant-form {
       width: 100% !important;
     }
+    .registration-intro {
+      margin-bottom: 1rem;
+
+      h2 {
+        color: #fff;
+        font-size: 1.25rem;
+        margin: 0 0 0.35rem;
+      }
+
+      p {
+        color: #9cb0c2;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        margin: 0;
+      }
+    }
     .ant-form-item {
       margin-bottom: 0;
 

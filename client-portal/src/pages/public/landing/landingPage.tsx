@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from "react-cookie";
 
@@ -20,14 +20,15 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [cookies] = useCookies(['access_token']);
   const isAuthenticated = Boolean(cookies.access_token);
+  const wasAuthenticatedOnMount = useRef(isAuthenticated);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (wasAuthenticatedOnMount.current) {
       navigate('/platform'); // Redirect to main page if authenticated
     }
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
-  if (isAuthenticated) {
+  if (wasAuthenticatedOnMount.current) {
     return null;
   }
 
