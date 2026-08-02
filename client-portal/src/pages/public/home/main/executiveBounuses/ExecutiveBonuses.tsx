@@ -3,7 +3,7 @@ import './executiveBounuses.scss'
 import ExecutiveImage from '../../../../../assets/home/executiveBonusImage.png' 
 import ExecutiveIcon1 from '../../../../../assets/home/executiveIcon1.png' 
 import ExecutiveIcon2 from '../../../../../assets/home/executiveIcon2.png' 
-import Slider from 'react-slick';
+import Slider from 'components/slider/Slider';
 import { useTranslation } from 'react-i18next';
 const ExecutiveBonuses = () => {
     const settings_3 = {

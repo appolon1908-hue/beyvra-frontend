@@ -15,3 +15,18 @@ Set `VITE_API_BASE_URL` to the public HTTPS API endpoint when starting the conta
 Serve the container behind TLS and add a strict Content Security Policy at the ingress after enumerating the application’s required third-party origins (TradingView, Segment, LiveChat, and market/news providers).
 
 The generated application is a single-page app; Nginx routes unknown paths to `index.html`.
+
+## Staging HTTPS
+
+Copy `.env.staging.example` to `.env.staging`, set a DNS name that resolves to
+the server, and start the edge profile:
+
+```sh
+docker compose --env-file .env.staging --profile edge up -d --build
+curl --fail https://YOUR_STAGING_DOMAIN/
+```
+
+`deploy/Caddyfile.public` obtains and renews a public certificate automatically.
+For a DNS-less local rehearsal, use `deploy/Caddyfile.staging`; it issues an
+internal certificate and should not be used for public clients. Ports 80 and
+443 must be free or mapped by the server's existing edge proxy.

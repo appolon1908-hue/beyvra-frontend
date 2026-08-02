@@ -3,7 +3,7 @@ import "./categorySlider.scss";
 import { ArrowLeftOS, ArrowRightOS } from "assets/icons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import Slider from "react-slick";
+import Slider from "components/slider/Slider";
 
 interface CategorySliderProps {
   allPairsData: Array<{

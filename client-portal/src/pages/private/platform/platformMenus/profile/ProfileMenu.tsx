@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import React from "react";
 import { Col, Row, Modal } from "antd";
 import { Story } from "react-insta-stories/dist/interfaces";
-import Slider from "react-slick";
+import Slider from "components/slider/Slider";
 
 import { useAppSelector } from "@store/hooks";
 import { UserSliceState } from "@store/slices/user";

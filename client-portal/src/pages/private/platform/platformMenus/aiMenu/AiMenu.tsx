@@ -3,7 +3,7 @@ import { StarIcon } from "../../../../../assets/icons";
 import PrimaryButton from "../../../../../components/primaryButton/PrimaryButton";
 import "./aiMenu.scss";
 import { Dispatch, SetStateAction, useState } from "react";
-import Slider from "react-slick";
+import Slider from "components/slider/Slider";
 import TextArea from "antd/es/input/TextArea";
 import { LeftSubDrawer } from "../../types";
 import { useAppSelector } from "@store/hooks";

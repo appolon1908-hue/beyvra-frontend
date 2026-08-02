@@ -9,6 +9,9 @@ dist/
 
 # Local secrets and runtime configuration
 .env
+.env.staging
+client-portal/playwright-report/
+client-portal/test-results/
 .env.*
 !.env.example
 !**/.env.example

@@ -9,7 +9,7 @@
  
   }
   .line-width::before{
-    content: url('../../../../assets/icons/welcomeIcons/step-5-green-blured-img.svg');
+    content: url('../../../../../assets/icons/welcomeIcons/step-5-green-blured-img.svg');
     position: absolute;
     bottom: -8px;
     left: 0px;
@@ -18,7 +18,7 @@
     animation: blink ease-in-out 2.5s infinite;
   }
   .line-width::after{
-    content: url('../../../../assets/icons/welcomeIcons/step-5-red-blurred-img.svg');
+    content: url('../../../../../assets/icons/welcomeIcons/step-5-red-blurred-img.svg');
     position: absolute;
     top: -2px;
     left: 0px;

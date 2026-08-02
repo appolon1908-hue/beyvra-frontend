@@ -1,6 +1,6 @@
 export default function getEnv(name: string) {
   if (name === "VITE_API_BASE_URL") {
-    const BASE_URL = `https://tradx.io/api`;
+    const BASE_URL = `/api`;
     return (
       (window as any)?.configs?.[name] ||
       ((import.meta as any).env[name] as string) ||
@@ -8,7 +8,7 @@ export default function getEnv(name: string) {
     );
   }
   if (name === "VITE_SOCKET_BASE_URL") {
-    const BASE_URL = `wss://tradx.io/`;
+    const BASE_URL = `AUTO`;
     const configured = (
       (window as any)?.configs?.[name] ||
       ((import.meta as any).env[name] as string) ||
