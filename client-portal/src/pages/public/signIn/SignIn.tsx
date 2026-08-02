@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs } from "antd";
 import type { TabsProps } from "antd";
 
@@ -11,6 +11,7 @@ import { withTranslation } from "react-i18next";
 import { useAppSelector } from "@store/hooks";
 import { GlobalStates, setSignInTab } from "@store/slices/global";
 import { useDispatch } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 
 interface SignInProps { }
 
@@ -21,6 +22,13 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
   );
 
   const dispatch = useDispatch()
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+
+  useEffect(() => {
+    if (requestedTab === "registration") dispatch(setSignInTab("2"));
+    if (requestedTab === "login") dispatch(setSignInTab("1"));
+  }, [dispatch, requestedTab]);
 
   const items: TabsProps["items"] = [
     {
@@ -35,7 +43,6 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
     },
   ];
 
-  console.log(signInTab);
   return (
     <div className="loginContainer">
       <div className="centerWrapper">
@@ -48,7 +55,10 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
             items={items}
             indicatorSize={150}
             tabBarGutter={100}
-            onChange={(key) => dispatch(setSignInTab(key))}
+            onChange={(key) => {
+              dispatch(setSignInTab(key));
+              setSearchParams({ tab: key === "2" ? "registration" : "login" }, { replace: true });
+            }}
           />
         )}
       </div>

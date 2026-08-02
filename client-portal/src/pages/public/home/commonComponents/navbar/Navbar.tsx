@@ -14,8 +14,6 @@ import { Link, useNavigate } from "react-router-dom";
 import i18n from "../../../../../i18n";
 import { languages } from "../../../../../constants";
 import { useCookies } from "react-cookie";
-import { useDispatch } from "react-redux";
-import { setSignInTab } from "@store/slices/global";
 
 
 const Navbar= () => {
@@ -36,13 +34,6 @@ const Navbar= () => {
     };
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const openAuthentication = (tab: "1" | "2") => {
-    dispatch(setSignInTab(tab));
-    navigate("/signIn");
-    setToggleMobileNav(false);
-  };
 
   const getVisitorIp = async()=>{
     // setLoading(true)
@@ -306,14 +297,12 @@ const Navbar= () => {
             </div>
           </div>
         </div>
-        <button
+        <Link
           className="primaryButton"
-          onClick={() => {
-            openAuthentication("2");
-          }}
+          to="/signIn?tab=registration"
         >
           Registration
-        </button>
+        </Link>
         
       </div>
       <div className="menuBarButton" onClick={() => setToggleMobileNav(true)}>
@@ -384,22 +373,20 @@ const Navbar= () => {
               </div>
             </div>
             <div>
-              <button
+              <Link
                 className="primaryButton"
-                onClick={() => {
-                  openAuthentication("1");
-                }}
+                to="/signIn?tab=login"
+                onClick={() => setToggleMobileNav(false)}
               >
                 Login
-              </button>
-              <button
+              </Link>
+              <Link
                 className="secondaryButton"
-                onClick={() => {
-                  openAuthentication("2");
-                }}
+                to="/signIn?tab=registration"
+                onClick={() => setToggleMobileNav(false)}
               >
                 Sign Up
-              </button>
+              </Link>
             </div>
           </div>
         </div>
