@@ -1,9 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import {
-  ArrowRightOS,
-  EventIcon,
-  HistoryIcon,
-} from "../../../../../assets/icons";
+import { ArrowRightOS, EventIcon } from "../../../../../assets/icons";
 import "./eventsMenu.scss";
 import { LeftSubDrawer } from "../../types";
 import { useAppSelector } from "@store/hooks";
@@ -20,9 +16,6 @@ const EventsMenu: React.FunctionComponent<EventsMenuProps> = ({
   const {themeSelect} = useAppSelector(state => state.themeBg)
   return (
     <div className={themeSelect}>
-      <div className="eventHistoryIcon" onClick={() => {}}>
-        <HistoryIcon />
-      </div>
       <div className="eventsContainer">
         <div className="eventsTagLineCon">
           <p className="eventsTagLine">

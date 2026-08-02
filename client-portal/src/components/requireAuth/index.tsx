@@ -1,7 +1,7 @@
 import useRefreshToken from "api/user/useRefreshToken";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { useAppDispatch } from "@store/hooks";
 import { setUser } from "@store/slices/user";
@@ -13,6 +13,7 @@ import WarningIcon from "assets/icons/WarningIcon";
 import "./styles.scss";
 import { GlobalLoginMaxAge } from "App";
 import useKyc from "api/kyc/useKycInfo";
+import { revokeSession } from "api/user/logout";
 
 
 const idleTimeLimit = 15 * 60 * 1000; // 15 minutes in milliseconds
@@ -21,6 +22,7 @@ let timeoutId: NodeJS.Timeout;
 
 const RequireAuth = () => {
   let location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [cookies, setCookie, removeCookie] = useCookies([
     "access_token",
@@ -44,10 +46,9 @@ const RequireAuth = () => {
     onSuccess: () => { },
     onError: (error: any) => {
       console.error("error refreshing the token", error?.refresh);
-      removeCookie("access_token");
-      removeCookie("refresh_token");
-
-      return <Navigate to="/signIn" state={{ from: location }} />;
+      removeCookie("access_token", { path: "/" });
+      removeCookie("refresh_token", { path: "/" });
+      navigate("/signIn", { replace: true, state: { from: location } });
     },
   });
 
@@ -64,13 +65,18 @@ const RequireAuth = () => {
     );
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await revokeSession(cookies.access_token, cookies.refresh_token);
+    } catch (error) {
+      console.error("Unable to revoke the server session", error);
+    }
     dispatch(setUser(null));
     dispatch(setWallets([]));
-    removeCookie("access_token");
-    removeCookie("refresh_token");
+    removeCookie("access_token", { path: "/" });
+    removeCookie("refresh_token", { path: "/" });
     setIsIdle(false);
-    window.location.reload();
+    navigate("/signIn", { replace: true });
   };
 
 

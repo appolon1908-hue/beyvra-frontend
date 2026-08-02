@@ -34,7 +34,7 @@ const Footer = () => {
 
             <div className="footer__container">
 
-                <ul data-test="footer-social" className="get__social">
+                <ul data-test="footer-social" className="get__social" hidden aria-hidden="true">
                     
                     <li data-test="footer-social-twitter" className="social__item" data-ga="click/footer/socials/X">
                         <a className="href_url_params" href="#" title="X" target="_blank">

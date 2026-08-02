@@ -229,7 +229,7 @@ const CreateAccount: React.FC<createAccountProps> = ({ handleNext }) => {
         </div>
 
         <Form.Item name="terms" valuePropName="checked" className="agree-terms">
-          <Checkbox className="custom-checkbox">I agree to the <a className="text-[#2dd674]">terms and Conditions</a></Checkbox>
+          <Checkbox className="custom-checkbox">I agree to the <a href="/reg" target="_blank" rel="noreferrer" className="text-[#2dd674]">terms and Conditions</a></Checkbox>
         </Form.Item>
 
         <Form.Item name="notice" valuePropName="checked" className="">
@@ -245,7 +245,7 @@ const CreateAccount: React.FC<createAccountProps> = ({ handleNext }) => {
       </Form>
 
       <p className="text-base my-6 text-[#C1C1C3]">
-        Already have an account? <NavLink to={"#"} onClick={() => handleNext("next")} className="text-[#2dd674]"> Sign In</NavLink>
+        Already have an account? <button type="button" onClick={() => handleNext("next")} className="text-[#2dd674]"> Sign In</button>
       </p>
     </div>
   );

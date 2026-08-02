@@ -123,8 +123,8 @@ const EventsSignalsClub = () => {
       </ArrowsSlider>
       <PrimaryButton
         className="btnPrime"
-        Title="Join for Free"
-        onClick={() => {}}
+        Title="Membership unavailable"
+        disabled
       />
       <StoriesModal
         open={modalOpen}

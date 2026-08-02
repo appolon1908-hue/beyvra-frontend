@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import getEnv from "utils/env";
 
-export async function fethLogin(data: ISignInForm): Promise<boolean> {
+export async function fethLogin(data: ISignInForm): Promise<LoginSuccess> {
   const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
     const response = await fetch(`${BASE_URL}/user/token/`, {
@@ -26,10 +26,12 @@ export async function fethLogin(data: ISignInForm): Promise<boolean> {
   }
 }
 
-interface LoginSuccess {
-  access: string;
-  refresh: string;
-  user: IUser
+export interface LoginSuccess {
+  access?: string;
+  refresh?: string;
+  user?: IUser;
+  mfa_required?: boolean;
+  login_token?: string;
 }
 
 type useLoginProps = {
@@ -49,7 +51,7 @@ export const useLogin = (props: useLoginProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, unknown, ISignInForm>({
+  return useMutation<LoginSuccess, Error, ISignInForm>({
     mutationFn: fethLogin,
     onSuccess: (data, variables, context) => {
       /* Add On success actions here if needed */

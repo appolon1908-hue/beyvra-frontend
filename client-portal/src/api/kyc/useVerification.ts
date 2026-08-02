@@ -4,10 +4,8 @@ import getEnv from "utils/env";
 
 export async function fetchVerification(data: any): Promise<boolean> {
   const BASE_URL = getEnv("VITE_API_BASE_URL");
-  console.log("my data", data.formData)
 
   for (let [key, value] of data.formData.entries()) {
-    console.log(key, value);
   }
   try {
     const response = await fetch(`${BASE_URL}/user/kyc/`, {
@@ -20,7 +18,6 @@ export async function fetchVerification(data: any): Promise<boolean> {
       body: data.formData,
     });
     const result = await response.json();
-    console.log("verification response:", response, result )
 
     if (!response.ok) {
       Object.keys(result).forEach((field) => {

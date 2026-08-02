@@ -37,7 +37,6 @@ const DocumnetUpload: React.FC<documentProps>  = ({handleNext}) => {
 
     const { mutate: mutateKYCData } = useKyc({
       onSuccess: (data) => {
-        console.log("pull key",data)
         setKycId(data.results[0].id)
      
         }
@@ -68,7 +67,6 @@ const DocumnetUpload: React.FC<documentProps>  = ({handleNext}) => {
         addressDoc
       });
   
-      console.log(cookies.access_token);
     }
   };
   

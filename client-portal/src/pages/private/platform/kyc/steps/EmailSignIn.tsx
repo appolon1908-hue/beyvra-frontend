@@ -123,7 +123,7 @@ const EmailSignInForm: React.FC<SignInFormProps> = ({ handleNext }) => {
             />
 
           </Form.Item>
-          <a className="flex text-base text-[#2dd674] gap-4 items-center mt-[-10px] "> Forgot password?</a>
+          <button type="button" onClick={() => navigate("/signIn")} className="flex text-base text-[#2dd674] gap-4 items-center mt-[-10px] "> Forgot password?</button>
         </div>
 
         <Form.Item name="fieldA" valuePropName="checked" className="agree-terms mt-8">

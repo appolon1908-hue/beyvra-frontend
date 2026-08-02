@@ -18,16 +18,14 @@ type useWalletTypesProps = {
 };
 
 export async function fetchTradeList(token: string) {
-    console.log(token.token);
   const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
     const response = await fetch(`${BASE_URL}/trades/assets/`, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${token?.token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response);
     const result = await response.json();
 
     if (!response.ok) {

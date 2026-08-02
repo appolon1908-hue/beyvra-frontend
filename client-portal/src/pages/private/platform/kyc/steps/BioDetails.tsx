@@ -110,7 +110,6 @@ const BioDetails: React.FC<BioDetailsProps> = ({ handleNext }) => {
   const onSubmit: SubmitHandler<SignUpFormData> = () => {
 
     if (!cookies?.access_token) {
-      console.log(cookies.access_token)
       toast.error("Session expired: Please go to login")
     }
 

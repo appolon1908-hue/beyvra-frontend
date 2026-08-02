@@ -27,7 +27,7 @@ export async function fetchNewsArticle({ token, articleId }: FetchNewsParams): P
   const BASE_URL = getEnv("VITE_API_BASE_URL");
   
   try {
-    const response = await fetch(`${BASE_URL}/news/${articleId}`, {
+    const response = await fetch(`${BASE_URL}/news/${articleId}/`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

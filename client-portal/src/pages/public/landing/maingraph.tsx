@@ -1,6 +1,5 @@
 import "./landing.scss";
 import mainGR from "./mainGR.svg";
-import Lottie from '@lottielab/lottie-player/react';
 
 const Maingraph = () => {
     
@@ -11,7 +10,7 @@ const Maingraph = () => {
         <div className="maingraphCard">
             <div className="maingraphLeft">
                 
-                <Lottie src="https://cdn.lottielab.com/l/B7HXfC6FsqMvAj.json" autoplay className="maingraph"/>
+                <img src={mainGR} alt="Trading chart illustration" className="maingraph" />
                 <div className="watermarkOverlay"></div>
                 
             </div>

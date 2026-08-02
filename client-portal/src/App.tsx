@@ -101,6 +101,7 @@ const App: React.FunctionComponent = () => {
           <Routes>
             <Route element={<RequireAuth />}>
               <Route path="/platform" element={<Platform />} />
+              <Route path="/home" element={<Platform />} />
               <Route path="/kyc-document" element={<KYC />} />
               <Route path="/welcome" element={<PrivateRoute />}>
                 <Route path="/welcome" element={<Welcome />} />
@@ -111,7 +112,6 @@ const App: React.FunctionComponent = () => {
             </Route>
             <Route path="/" element={<LandingPage />} />
             {/* <Route path="/home" element={<Home />} /> */}
-            <Route path="/home" element={<Platform />} />
             <Route path="/markets/Commodities" element={<Commodities />} />
             <Route path="/markets/shares" element={<Shares />} />
             <Route path="/markets/indices" element={<Indices />} />

@@ -16,7 +16,6 @@ export async function tradeTransaction(
 ): Promise<boolean> {
   const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
-    console.log(token);
     const response = await fetch(`${BASE_URL}/trades/`, {
       method: "POST",
       headers: {
@@ -25,7 +24,6 @@ export async function tradeTransaction(
       },
       body: JSON.stringify(data),
     });
-    console.log(response);
     const result = await response.json();
 
     if (!response.ok) {

@@ -6,7 +6,6 @@ import { CalendarIcon, InfoCircleIcon } from "../../../../../assets/icons";
 
 import "../../transactions.scss";
 import "./profile.scss";
-import { Link } from "react-router-dom";
 
 export const ProfilePart = () => {
   const [isOpenCollapse, setIsOpenCollapse] = useState<boolean>(false);
@@ -32,7 +31,7 @@ export const ProfilePart = () => {
         children: (
           <div className="collaps-info-children">
             <p className="whiteColor">You have no trading limits</p>
-            <Link to="#" className="whiteColor">Limit reasons</Link>
+            <span className="whiteColor">No limit reasons to display</span>
           </div>
         ),
         showArrow: false,

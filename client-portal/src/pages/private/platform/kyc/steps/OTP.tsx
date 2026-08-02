@@ -77,9 +77,9 @@ const OTPVerification: React.FC<OTPProps> = ({ handleNext }) => {
       <p className='text-white text-base font-medium my-6'>
         We have sent a verification code to your email (or phone number). You can resend the code after 1 minute.
       </p>
-      <a className='text-[#2dd674] block my-10' href="">
-        Resend
-      </a>
+      <button type="button" className='text-[#2dd674] block my-10' disabled title="Resend becomes available after the verification timer expires">
+        Resend unavailable
+      </button>
 
       <Form layout="vertical" onFinish={onSubmit} >
         <div className='grid grid-cols-4 gap-6 my-10'>

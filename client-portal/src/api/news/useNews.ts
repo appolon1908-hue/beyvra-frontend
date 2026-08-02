@@ -54,25 +54,19 @@ export async function fetchNews(data: {
   token: string;
   queryParams?: NewsQueryParams;
 }): Promise<NewsResponse> {
-  // const BASE_URL = getEnv("VITE_API_BASE_URL");
+  const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
-    // const queryParams = data.queryParams
-    //   ? new URLSearchParams(
-    //       Object.entries(data.queryParams).map(([key, value]) => [
-    //         key,
-    //         (typeof value as string) === "boolean" ? value.toString() : value,
-    //       ])
-    //     ).toString()
-    //   : "";
-    
-
-      // const response = await fetch(`https://news.tradx.io/?${queryParams}`, {
-      //   mode: 'no-cors',
-      // method: "GET",
-      // headers: {
-      //   Authorization: `Bearer ${data.token}`,
-      // },
-    const response = await fetch(`https://news.tradx.io?/`);
+    const queryParams = data.queryParams
+      ? new URLSearchParams(
+          Object.entries(data.queryParams)
+            .filter(([, value]) => value !== undefined)
+            .map(([key, value]) => [key, String(value)])
+        ).toString()
+      : "";
+    const response = await fetch(`${BASE_URL}/news/${queryParams ? `?${queryParams}` : ""}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${data.token}` },
+    });
     const result = await response.json();
   
     

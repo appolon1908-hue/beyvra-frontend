@@ -1,7 +1,7 @@
-FROM node:18.18.0
+FROM node:22-bookworm-slim
 WORKDIR /app
 COPY package*.json /app/
-RUN npm install
+RUN npm ci
 COPY . .
 EXPOSE 8080
 CMD [ "npm", "run", "dev" ]

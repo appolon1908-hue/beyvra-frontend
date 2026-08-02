@@ -3,7 +3,7 @@ import { useCookies } from "react-cookie";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ISignInForm } from "@interfaces";
-import { useLogin } from "api/user/useLogin";
+import { LoginSuccess, useLogin } from "api/user/useLogin";
 import { useState } from "react";
 import use2FAVerify from "api/user/use2FAVerify";
 import { GlobalLoginMaxAge } from "App";
@@ -17,7 +17,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
   setForgotPasswordView,
 }) => {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<LoginSuccess | null>(null);
   const [showOtp, setShowOTP] = useState(false);
   const [show, setShow] = useState(false);
   const [otp, setOTP] = useState('');
@@ -26,16 +26,17 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
   const { handleSubmit, register } = useForm<ISignInForm>();
   const { mutate, isPending } = useLogin({
     onSuccess: (data) => {
-      if (data?.user?.two_factor_authentication_enabled) {
+      if (data.mfa_required) {
         setUserData(data);
         setShowOTP(true);
       }
       else {
-        setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
-        setCookie("refresh_token", data.refresh);
+        if (!data.access || !data.refresh || !data.user) return;
+        setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict", path: "/" });
+        setCookie("refresh_token", data.refresh, { secure: true, sameSite: "strict", path: "/" });
         setCookie("step", '');
 
-        data?.user.is_walkthrough ? navigate('/welcome') : navigate("/platform");
+        data.user.is_walkthrough ? navigate('/welcome') : navigate("/platform");
       }
     },
 
@@ -43,11 +44,12 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
 
   const { mutate: mutateVerify } = use2FAVerify({
     onSuccess: (data) => {
-      setCookie("access_token", userData?.access, { maxAge: GlobalLoginMaxAge });
-      setCookie("refresh_token", userData?.refresh);
+      if (!data.access || !data.refresh || !data.user) return;
+      setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict", path: "/" });
+      setCookie("refresh_token", data.refresh, { secure: true, sameSite: "strict", path: "/" });
       setCookie("step", '')
 
-      userData?.user.is_walkthrough ? navigate('/welcome') : navigate("/platform");
+      data?.user?.is_walkthrough ? navigate('/welcome') : navigate("/platform");
     },
     onError: (error) => { },
   });
@@ -72,7 +74,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
           onClick={() => {
             mutateVerify({
               otp: otp,
-              token: userData?.access,
+              loginToken: userData?.login_token,
             })
           }}
           style={{ marginTop: 16 }}
