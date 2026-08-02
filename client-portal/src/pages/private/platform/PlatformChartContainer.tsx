@@ -21,6 +21,9 @@ import {
   LineStyle,
   Time,
 } from "lightweight-charts";
+import { useCookies } from "react-cookie";
+import { useAppSelector } from "@store/hooks";
+import { getApiUrl, getSocketUrl } from "utils/env";
 
 interface PlatformProps {
   themeSelect: string;
@@ -28,23 +31,6 @@ interface PlatformProps {
   tradeFormHeight: number;
   bottomSidebarHeight: number;
 }
-
-const getBinanceWebSocketUrl = (symbol: string, interval: string) =>
-  `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`;
-
-const fetchHistoricalData = async (symbol: string, interval: string) => {
-  const response = await fetch(
-    `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=1000`
-  );
-  const data = await response.json();
-  return data.map((k: any) => ({
-    time: (k[0] / 1000) as Time,
-    open: parseFloat(k[1]),
-    high: parseFloat(k[2]),
-    low: parseFloat(k[3]),
-    close: parseFloat(k[4]),
-  }));
-};
 
 const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   themeSelect,
@@ -61,47 +47,96 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const [candleInterval] = useState("1m");
   const [chartData, setChartData] = useState<CandlestickData[]>([]);
   const [userInteracted, setUserInteracted] = useState(false);
+  const [connectionState, setConnectionState] = useState<"loading" | "connected" | "disconnected" | "error">("loading");
+  const [chartError, setChartError] = useState("");
+  const [cookies] = useCookies(["access_token"]);
+  const { wsTicket } = useAppSelector((state) => state.user);
 
   // ------------------------------------------------------------------
   // 1) Fetch historical data + initialize WebSocket
   // ------------------------------------------------------------------
   useEffect(() => {
-    let ws: WebSocket;
+    let ws: WebSocket | undefined;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let disposed = false;
+    let retryCount = 0;
+
+    const connect = () => {
+      if (disposed || !wsTicket || ws?.readyState === WebSocket.OPEN || ws?.readyState === WebSocket.CONNECTING) return;
+      ws = new WebSocket(getSocketUrl("ws/market-data/", {
+        ws_ticket: wsTicket,
+        symbol: tradingPair,
+        interval: candleInterval,
+      }));
+      ws.onopen = () => {
+        retryCount = 0;
+        setConnectionState("connected");
+        setChartError("");
+      };
+      ws.onclose = () => {
+        if (disposed) return;
+        setConnectionState("disconnected");
+        retryCount += 1;
+        retryTimer = setTimeout(connect, Math.min(1000 * 2 ** retryCount, 30000));
+      };
+      ws.onerror = () => setConnectionState("disconnected");
+      ws.onmessage = (event) => {
+        let message: Record<string, unknown>;
+        try {
+          message = JSON.parse(event.data) as Record<string, unknown>;
+        } catch {
+          setChartError("The market feed returned an invalid response");
+          setConnectionState("error");
+          return;
+        }
+        if (message.type === "status") {
+          setConnectionState(message.status === "connected" ? "connected" : "disconnected");
+          return;
+        }
+        if (message.type !== "candle") return;
+        const newCandle = {
+          time: message.time as Time,
+          open: Number(message.open), high: Number(message.high),
+          low: Number(message.low), close: Number(message.close),
+        };
+        setChartData((current) => {
+          const lastCandle = current[current.length - 1];
+          return lastCandle?.time === newCandle.time
+            ? [...current.slice(0, -1), newCandle]
+            : [...current, newCandle].slice(-1000);
+        });
+      };
+    };
 
     const initializeChartData = async () => {
       try {
-        const historicalData = await fetchHistoricalData(tradingPair, candleInterval);
-        setChartData(historicalData);
-
-        ws = new WebSocket(getBinanceWebSocketUrl(tradingPair, candleInterval));
-        ws.onmessage = (event) => {
-          const message = JSON.parse(event.data);
-          if (message.k) {
-            const newCandle = {
-              time: (message.k.t / 1000) as Time,
-              open: parseFloat(message.k.o),
-              high: parseFloat(message.k.h),
-              low: parseFloat(message.k.l),
-              close: parseFloat(message.k.c),
-            };
-
-            setChartData((prev) => {
-              const lastCandle = prev[prev.length - 1];
-              // Update existing candle or add new one
-              return lastCandle?.time === newCandle.time
-                ? [...prev.slice(0, -1), newCandle]
-                : [...prev, newCandle];
-            });
-          }
-        };
+        setConnectionState("loading");
+        const response = await fetch(
+          getApiUrl(`trades/market/history/?symbol=${tradingPair}&interval=${candleInterval}&limit=500`),
+          { headers: { Authorization: `Bearer ${cookies.access_token}` } },
+        );
+        if (!response.ok) throw new Error("Market history is unavailable");
+        const payload = await response.json();
+        if (!disposed) {
+          const results = Array.isArray(payload.results) ? payload.results : [];
+          setChartData(results);
+          if (results.length === 0) setChartError("No market history is available for this asset");
+        }
+        connect();
       } catch (error) {
-        console.error("Failed to initialize chart data:", error);
+        if (disposed) return;
+        setChartError(error instanceof Error ? error.message : "Market data is unavailable");
+        setConnectionState("error");
       }
     };
 
-    initializeChartData();
-    return () => ws?.close();
-  }, [tradingPair, candleInterval]);
+    if (cookies.access_token && wsTicket) void initializeChartData();
+    return () => {
+      disposed = true;
+      if (retryTimer) clearTimeout(retryTimer);
+      ws?.close();
+    };
+  }, [cookies.access_token, tradingPair, candleInterval, wsTicket]);
 
   // ------------------------------------------------------------------
   // 2) Initialize / update the chart
@@ -220,7 +255,14 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     >
       <div className="trade-graph">
         {/* Chart Container */}
-        <div ref={chartContainerRef} className="chart-container" style={{ height: "94%", position: 'relative', width: "84%", float: "right" }} >
+        <div ref={chartContainerRef} className="chart-container" aria-label={`${tradingPair} market chart`}>
+          {connectionState !== "connected" && (
+            <div className={`market-data-state market-data-state--${connectionState}`} role="status" aria-live="polite">
+              {connectionState === "loading" && "Loading market history…"}
+              {connectionState === "disconnected" && "Live market feed disconnected. Reconnecting…"}
+              {connectionState === "error" && chartError}
+            </div>
+          )}
           {/* Chart Controls */}
           <div className="chart-controls">
             {/* Chart Type Dropdown */}
@@ -231,17 +273,17 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
                 { text: "Bars", onclick: () => setSelectedChart("bar") },
               ]}
             >
-              <button className="chart-type-button">
+              <button type="button" className="chart-type-button" aria-label="Select chart type">
                 <MainChartChangeIcon />
               </button>
             </DropdownMenu>
 
             {/* Zoom Buttons */}
             <div className="zoom-controls">
-              <button onClick={() => handleZoom(true)}>
+              <button type="button" onClick={() => handleZoom(true)} aria-label="Zoom chart in">
                 <ZoomInChartIcon />
               </button>
-              <button onClick={() => handleZoom(false)}>
+              <button type="button" onClick={() => handleZoom(false)} aria-label="Zoom chart out">
                 <ZoomOutChartIcon />
               </button>
             </div>

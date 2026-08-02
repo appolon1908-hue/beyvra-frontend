@@ -9,7 +9,7 @@ import { setWalletTypes } from "@store/slices/wallet";
 import useWalletTypes from "api/wallet/useWalletTypes";
 import { useEffect } from "react";
 import { useCookies } from "react-cookie";
-import getEnv from "utils/env";
+import { getSocketUrl } from "utils/env";
 
 const useCryptoSocketConnect = (wsTicket: string, id: string) => {
   const dispatch = useAppDispatch();
@@ -30,11 +30,7 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
   useEffect(() => {
     let webSocket: WebSocket | undefined;
     if (wsTicket) {
-      webSocket = new WebSocket(
-        `${getEnv(
-          "VITE_SOCKET_BASE_URL"
-        )}ws/current-balance/${id}/?ws_ticket=${wsTicket}`
-      );
+      webSocket = new WebSocket(getSocketUrl(`ws/current-balance/${id}/`, { ws_ticket: wsTicket }));
 
       webSocket.onerror = function (event) {
         throw Error("Websocket connection error");
@@ -55,11 +51,7 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
   useEffect(() => {
     let webSocket: WebSocket | undefined;
     if (wsTicket) {
-      webSocket = new WebSocket(
-        `${getEnv(
-          "VITE_SOCKET_BASE_URL"
-        )}ws/profit-loss/${id}/?ws_ticket=${wsTicket}`
-      );
+      webSocket = new WebSocket(getSocketUrl(`ws/profit-loss/${id}/`, { ws_ticket: wsTicket }));
 
       webSocket.onerror = function (event) {
         throw Error("Websocket connection error");
@@ -80,11 +72,7 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
   useEffect(() => {
     let webSocket: WebSocket | undefined;
     if (wsTicket) {
-      webSocket = new WebSocket(
-        `${getEnv(
-          "VITE_SOCKET_BASE_URL"
-        )}ws/crypto-market-data/?ws_ticket=${wsTicket}`
-      );
+      webSocket = new WebSocket(getSocketUrl("ws/crypto-market-data/", { ws_ticket: wsTicket }));
 
       webSocket.onerror = function (event) {
         throw Error("Websocket connection error");
@@ -107,11 +95,7 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
   useEffect(() => {
     let webSocket: WebSocket | undefined;
     if (wsTicket) {
-      webSocket = new WebSocket(
-        `${getEnv(
-          "VITE_SOCKET_BASE_URL"
-        )}ws/stock-market-data/?ws_ticket=${wsTicket}`
-      );
+      webSocket = new WebSocket(getSocketUrl("ws/stock-market-data/", { ws_ticket: wsTicket }));
 
       webSocket.onerror = function (event) {
         throw Error("Websocket connection error");

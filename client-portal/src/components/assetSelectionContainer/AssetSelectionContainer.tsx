@@ -13,6 +13,7 @@ import {
   setChartSymbol,
 } from "@store/slices/socketStockCrypto";
 import type { CryptoChartDataType } from "hooks/useSocketConnect";
+import { getSocketUrl } from "utils/env";
 
 function calculatePercentageChange(
   currentPrice: number,
@@ -81,7 +82,13 @@ const AssetSelectionContainer: React.FunctionComponent = () => {
 
   useEffect(() => {
     if (wsTicket) {
-      const webSocket = new WebSocket(`wss://cryptx.tradx.io/ws`);
+      const webSocket = new WebSocket(
+        getSocketUrl("ws/market-data/", {
+          ws_ticket: wsTicket,
+          symbol: "BTCUSDT",
+          interval: "1m",
+        }),
+      );
 
       webSocket.onerror = () => {
         console.error("WebSocket connection error");
@@ -89,18 +96,19 @@ const AssetSelectionContainer: React.FunctionComponent = () => {
       };
 
       webSocket.onopen = () => {
-        const request = {
-          type: "general",
-          symbol: "BTC",
-          range: "1y",
-        };
-        webSocket.send(JSON.stringify(request)); // Send the request after opening the socket
         setCryptoSocket(webSocket); // Set WebSocket after it's successfully opened
       };
 
       webSocket.onmessage = (event) => {
         try {
-          const data = JSON.parse(event.data) as CryptoChartDataType;
+          const message = JSON.parse(event.data);
+          if (message.type !== "candle") return;
+          const data = {
+            id: 1,
+            p: Number(message.close),
+            t: String(message.time),
+            symbol: String(message.symbol).replace(/USDT$/, ""),
+          } as CryptoChartDataType;
           console.log("WebSocket data received:", data);
 
           // Update chart data

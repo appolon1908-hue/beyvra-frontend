@@ -24,3 +24,15 @@ export default function getEnv(name: string) {
     ((import.meta as any).env[name] as string)
   );
 }
+
+export const getApiUrl = (path: string) => {
+  const base = getEnv("VITE_API_BASE_URL").replace(/\/$/, "");
+  return `${base}/${path.replace(/^\//, "")}`;
+};
+
+export const getSocketUrl = (path: string, params?: Record<string, string | number>) => {
+  const base = getEnv("VITE_SOCKET_BASE_URL").replace(/\/$/, "");
+  const url = new URL(`${base}/${path.replace(/^\//, "")}`);
+  for (const [key, value] of Object.entries(params || {})) url.searchParams.set(key, String(value));
+  return url.toString();
+};

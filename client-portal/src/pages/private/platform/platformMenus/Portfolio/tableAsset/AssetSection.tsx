@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@store/hooks";
+import { getSocketUrl } from "utils/env";
 
 const AssetSection = () => {
   interface CryptoAsset {
@@ -14,27 +15,26 @@ const AssetSection = () => {
   const [cryptoData, setCryptoData] = useState<CryptoAsset[]>([]);
   // Redux state for stock data
   const { stockData } = useAppSelector((state) => state.socketStockCrypto);
+  const { wsTicket } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     let webSocket: WebSocket | null = null;
 
     try {
       // Establish WebSocket connection
-      webSocket = new WebSocket(`wss://cryptx.tradx.io/ws`);
+      if (!wsTicket) return;
+      webSocket = new WebSocket(getSocketUrl("ws/market-data/", {
+        ws_ticket: wsTicket,
+        symbol: "BTCUSDT",
+        interval: "1m",
+      }));
       //webSocket = new WebSocket(`ws://127.0.0.1:8000/ws`);
 
 
       webSocket.onopen = () => {
         console.log("WebSocket connection established.");
 
-        // WebSocket request to fetch crypto data
-        const request = {
-          type: "general",
-          symbol: "BTC", // You can dynamically change this symbol based on your requirements
-          range: "1y",
-        };
-
-        webSocket?.send(JSON.stringify(request)); // Send request to WebSocket
+        // The server subscribes using the validated URL parameters.
       };
 
       webSocket.onmessage = (event) => {
@@ -42,9 +42,15 @@ const AssetSection = () => {
           const incomingData = JSON.parse(event.data);
           console.log("Data received from WebSocket:", incomingData);
 
-          if (incomingData) {
-            // Update local state with the first 10 crypto assets
-            setCryptoData(Array.isArray(incomingData) ? incomingData : incomingData.data || []);
+          if (incomingData.type === "candle") {
+            setCryptoData([{
+              symbol: incomingData.symbol,
+              volume: Number(incomingData.volume),
+              change_percentage: 0,
+              circulating_supply: 0,
+              price: Number(incomingData.close),
+              wk_52_change_percentage: 0,
+            }]);
           }
         } catch (error) {
           console.error("Error parsing WebSocket message:", error);
@@ -69,7 +75,7 @@ const AssetSection = () => {
         console.log("WebSocket connection cleaned up.");
       }
     };
-  }, []); // Empty dependency array to run once on mount
+  }, [wsTicket]);
 
   return (
     <div className="portfolioTable mt-3">

@@ -8,6 +8,7 @@ import {
 } from "@store/slices/wallet";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import { getSocketUrl } from "utils/env";
 
 export type CryptoChartDataType = {
   id: number;
@@ -68,9 +69,7 @@ const useSocketConnect = (wsTicket: string): SocketConnectReturn => {
   useEffect(() => {
     let webSocket: WebSocket | undefined;
     if (wsTicket) {
-      webSocket = new WebSocket(
-        `wss://tradx.io/ws/external-api/?ws_ticket=${wsTicket}`
-      );
+      webSocket = new WebSocket(getSocketUrl("ws/external-api/", { ws_ticket: wsTicket }));
 
       webSocket.onerror = function (event) {
         throw Error("Websocket connection error");
@@ -137,11 +136,11 @@ const useSocketConnect = (wsTicket: string): SocketConnectReturn => {
         chartSocket.current?.close();
         isFirstTime = true;
       }
-      webSocket = new WebSocket(
-        `wss://1cryptoscr.tradx.io/ws/ticker/?session_id=${
-           wsTicket + "" + Math.random()
-         }&symbol=${chartSymbol}`
-      );
+      webSocket = new WebSocket(getSocketUrl("ws/market-data/", {
+        ws_ticket: wsTicket,
+        symbol: `${chartSymbol || "BTC"}USDT`,
+        interval: "1m",
+      }));
 
       webSocket.onerror = function (event) {
         throw Error("Websocket connection error");

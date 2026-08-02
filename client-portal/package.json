@@ -16,6 +16,7 @@
     "i18n:extract": "node scripts/i18n-catalog.mjs --write",
     "i18n:check": "node scripts/i18n-catalog.mjs --check",
     "i18n:translate": "node scripts/libretranslate.mjs",
+    "audit:gate": "node scripts/audit-gate.mjs",
     "test": "npm run typecheck && npm run build:prod",
     "test:contract": "node scripts/check-api-contract.mjs",
     "test:e2e": "playwright test"
@@ -47,7 +48,7 @@
     "react-insta-stories": "^2.6.2",
     "react-qr-code": "2.2.0",
     "react-redux": "9.3.0",
-    "react-router-dom": "^7.18.2",
+    "react-router-dom": "7.18.2",
     "react-select": "5.10.2",
     "react-slick": "0.31.0",
     "react-toastify": "^10.0.4",

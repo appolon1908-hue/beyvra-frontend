@@ -34,6 +34,39 @@
     transition: margin-left 0.25s ease;
   }
 }
+
+.chart-container {
+  position: relative;
+  float: right;
+  width: 84%;
+  height: 94%;
+
+  @media (max-width: 767px) {
+    float: none;
+    width: 100%;
+  }
+}
+
+.market-data-state {
+  position: absolute;
+  z-index: 5;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 2rem);
+  padding: 0.625rem 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.5rem;
+  background: rgba(14, 15, 18, 0.92);
+  color: #f5f7fa;
+  font: 500 0.875rem/1.4 Inter, system-ui, sans-serif;
+  text-align: center;
+}
+
+.market-data-state--disconnected,
+.market-data-state--error {
+  border-color: #ef5350;
+}
 // default mode-night
 .ml-106 {
   &.leftSubDrawer {

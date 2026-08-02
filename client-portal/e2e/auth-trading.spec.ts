@@ -27,8 +27,13 @@ test("registers, logs in, enters the platform, creates a demo trade, and logs ou
   const auth = { Authorization: `Bearer ${session.access}` };
   const walletsResponse = await request.get(`${origin}/api/wallet/wallets/`, { headers: auth });
   const assetsResponse = await request.get(`${origin}/api/trades/assets/`, { headers: auth });
+  const marketResponse = await request.get(
+    `${origin}/api/trades/market/history/?symbol=BTCUSDT&interval=1m&limit=10`,
+    { headers: auth },
+  );
   expect(walletsResponse.ok(), `wallets returned ${walletsResponse.status()}`).toBeTruthy();
   expect(assetsResponse.ok(), `assets returned ${assetsResponse.status()}`).toBeTruthy();
+  expect(marketResponse.ok(), `market history returned ${marketResponse.status()}`).toBeTruthy();
   const walletsPayload = await walletsResponse.json();
   const assetsPayload = await assetsResponse.json();
   const wallets = walletsPayload.results ?? walletsPayload;
@@ -36,6 +41,8 @@ test("registers, logs in, enters the platform, creates a demo trade, and logs ou
   const demoWallet = wallets.find((wallet: { is_real: boolean }) => !wallet.is_real);
   expect(demoWallet).toBeTruthy();
   expect(assets.length).toBeGreaterThan(0);
+  const marketPayload = await marketResponse.json();
+  expect(marketPayload.results.length).toBeGreaterThan(0);
 
   const trade = await request.post(`${origin}/api/trades/`, {
     headers: auth,
