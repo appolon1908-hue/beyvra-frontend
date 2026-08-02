@@ -28,9 +28,6 @@ const AssetSection = () => {
         symbol: "BTCUSDT",
         interval: "1m",
       }));
-      //webSocket = new WebSocket(`ws://127.0.0.1:8000/ws`);
-
-
       webSocket.onopen = () => {
         console.log("WebSocket connection established.");
 

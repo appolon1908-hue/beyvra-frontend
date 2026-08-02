@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useAppSelector } from "@store/hooks";
+import { getSocketUrl } from "utils/env";
 
 interface CryptoAsset {
   id: string;
@@ -16,30 +18,45 @@ interface CryptoAsset {
 
 const AssetSection = () => {
   const [cryptoData, setCryptoData] = useState<CryptoAsset[]>([]);
-  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<string>("Connecting...");
+  const { wsTicket } = useAppSelector((state) => state.user);
 
   useEffect(() => {
+    let ws: WebSocket | undefined;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let disposed = false;
     const connectWebSocket = () => {
-      const ws = new WebSocket(`ws://127.0.0.1:8000/ws`);
-      setWebSocket(ws);
+      if (!wsTicket || disposed || ws?.readyState === WebSocket.OPEN || ws?.readyState === WebSocket.CONNECTING) return;
+      ws = new WebSocket(getSocketUrl("ws/market-data/", {
+        ws_ticket: wsTicket,
+        symbol: "BTCUSDT",
+        interval: "1m",
+      }));
 
       ws.onopen = () => {
         console.log("WebSocket connection established.");
         setConnectionStatus("Connected");
 
-        // Initial request for general data type
-        const request = { type: "general" };
-        ws.send(JSON.stringify(request));
       };
 
       ws.onmessage = (event) => {
         try {
           const incomingData = JSON.parse(event.data);
 
-          if (incomingData.type === "general" && Array.isArray(incomingData.data)) {
-            // Update state with the incoming general data
-            setCryptoData(incomingData.data);
+          if (incomingData.type === "candle") {
+            setCryptoData([{
+              id: incomingData.symbol,
+              symbol: incomingData.symbol,
+              price: String(incomingData.close),
+              change: "0",
+              change_percentage: "0",
+              market_cap: "0",
+              volume: String(incomingData.volume),
+              volume_in_currencies_24h: "0",
+              total_volume_all_currencies_24h: "0",
+              circulating_supply: "0",
+              im: incomingData.symbol,
+            }]);
           }
         } catch (error) {
           console.error("Error parsing WebSocket message:", error);
@@ -56,7 +73,7 @@ const AssetSection = () => {
         setConnectionStatus("Connection closed. Reconnecting...");
 
         // Attempt to reconnect after a delay
-        setTimeout(connectWebSocket, 3000);
+        if (!disposed) retryTimer = setTimeout(connectWebSocket, 3000);
       };
     };
 
@@ -64,12 +81,11 @@ const AssetSection = () => {
 
     // Clean up WebSocket connection on component unmount
     return () => {
-      if (webSocket) {
-        webSocket.close();
-        console.log("WebSocket connection cleaned up.");
-      }
+      disposed = true;
+      if (retryTimer) clearTimeout(retryTimer);
+      ws?.close();
     };
-  }, [webSocket]);
+  }, [wsTicket]);
   //  // Mapping for crypto images
   //  const cryptoImages: Record<string, string> = {
   //   Bitcoin: Bitcoin, // Bitcoin
