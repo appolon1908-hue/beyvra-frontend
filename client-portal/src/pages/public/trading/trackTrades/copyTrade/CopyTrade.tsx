@@ -3,7 +3,7 @@ import './copyTrade.scss'
 import user from '../../../../../assets/trading/adam-nowakowski-D4LDw5eXhgg.png'
 import flagIcon from '../../../../../assets/trading/flagIcon.png'
 import groupIcon from '../../../../../assets/trading/Group_3539.png'
-import ProfilePic from '../../../../../assets/trading/profile-pic.jpeg'
+import ProfilePic from 'assets/trading/profile-pic.jpeg'
 const CopyTrade = () => {
   return (
     <div className='copyTrade-wrapper'>

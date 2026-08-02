@@ -1,7 +1,7 @@
 import React from 'react'
 import './profileCard.scss'
 import { Card, Col, Row } from 'antd'
-import pic from '../../../../../assets/trading/profile-pic.jpeg'
+import pic from 'assets/trading/profile-pic.jpeg'
 const ProfileCard = () => {
   return (
     <Card className='profile-card'> 

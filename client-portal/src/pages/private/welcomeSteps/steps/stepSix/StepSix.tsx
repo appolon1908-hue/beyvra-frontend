@@ -1,7 +1,6 @@
 import "./StepSix.scss";
 import { FC } from "react";
 import { AreaChart } from "pages/private/platform/MainChart/AreaChart";
-import { Markers } from "pages/private/platform/MainChart/Markers";
 
 interface StepSixProps {
   setStep: (step: number | ((prevStep: number) => number)) => void;

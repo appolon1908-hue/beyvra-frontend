@@ -3,7 +3,7 @@ import "./StepThree.scss";
 import { useTranslation } from "react-i18next";
 import { FC } from "react";
 import { AreaChart } from "pages/private/platform/MainChart/AreaChart";
-import SecondStepIcon from '/public/chart.gif'
+const SecondStepIcon = '/chart.gif';
 
 interface StepThreeProps {
   setStep: (step: number | ((prevStep: number) => number)) => void;
@@ -40,4 +40,3 @@ const StepThree: FC<StepThreeProps> = ({ setStep, step, chartData }) => {
 };
 
 export default StepThree;
-

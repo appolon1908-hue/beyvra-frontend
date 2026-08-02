@@ -1,8 +1,8 @@
 import React from 'react';
 import './stepElevenDown.scss'
-import TestWalkThrough from 'components/welcomeSteps/components/modal/TestWalkThrough';
-import CustomMarkerOne from 'components/welcomeSteps/components/customMarkerOne/CustomMarkerOne';
-import CustomMarkerTwo from 'components/welcomeSteps/components/customMarkerTwo/CustomMarkerTwo';
+import TestWalkThrough from 'pages/private/welcomeSteps/components/modal/TestWalkThrough';
+import CustomMarkerOne from 'pages/private/welcomeSteps/components/customMarkerOne/CustomMarkerOne';
+import CustomMarkerTwo from 'pages/private/welcomeSteps/components/customMarkerTwo/CustomMarkerTwo';
 import MyButton from 'components/UI/buttons/MyButton';
 import { useTranslation } from 'react-i18next';
 interface StepElevenProps {

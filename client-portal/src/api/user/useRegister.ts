@@ -2,7 +2,12 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import getEnv from "utils/env";
 
-export async function fethRegister(data: any): Promise<boolean> {
+export interface RegisterResponse {
+  id: number;
+  email: string;
+}
+
+export async function fethRegister(data: Record<string, string>): Promise<RegisterResponse> {
   const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
     const response = await fetch(`${BASE_URL}/user/create/`, {
@@ -45,7 +50,7 @@ export const useRegister = (props: useRegisterProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, unknown, any>({
+  return useMutation<RegisterResponse, Error, Record<string, string>>({
     mutationFn: fethRegister,
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {

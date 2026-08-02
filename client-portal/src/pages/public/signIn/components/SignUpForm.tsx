@@ -3,17 +3,11 @@ import { useForm, SubmitHandler } from "react-hook-form";
 
 import useRegister from "api/user/useRegister";
 import { toast } from "react-toastify";
-import { GlobalStates, setSignInTab } from "@store/slices/global";
-import { useDispatch } from "react-redux";
-import { useAppSelector } from "@store/hooks";
 import { useEffect, useState } from "react";
 import CountryCode from "../../../../helpers/CountryCode.json";
 import Select from "react-select";
 //import WalkThrough from "./WalkThrough";
-import WelcomeSteps from "../../../private/welcomeSteps/steps/WelcomeSteps";
-
-
-import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
 
 import "./WalkThrough.scss";
@@ -60,18 +54,14 @@ const evaluatePasswordStrength = (password: string) => {
 };
 
 const SignUpForm = () => {
-  const [countryCode, setCountryCode] = useState();
+  type CountryOption = (typeof countriesList)[number];
+  const [countryCode, setCountryCode] = useState<CountryOption>(countriesList[0]);
   const [show, setShow] = useState(false);
   const { handleSubmit, register, reset, watch } = useForm<SignUpFormData>();
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const password = watch("password", "");
   const strength = evaluatePasswordStrength(password);
   //const [showWalkThrough, setShowWalkThrough] = useState(false);
-  const [showWelcomeSteps, setShowWelcomeSteps] = useState(false);
-  const [registerData, setRegisterData] = useState(false);
-
-
-  const [cookies, setCookie] = useCookies(['session_token']);
 
 
 
@@ -94,34 +84,21 @@ const SignUpForm = () => {
   }, [countriesList]);
 
   const { mutate, isPending } = useRegister({
-    onSuccess: (data) => {
-      //console.log("SUCCES REGISTRATION");
-      //console.log(registerData);
-      //showWelcomeSteps(true);
-      
-      //Write my code here - ER
-
-      
-      setCookie("session_token", data.session_token, { maxAge: GlobalLoginMaxAge });
-      
-
-      // reset();
-      // toast.success(
-      //   "Success! An email has been sent to your account. Please verify your email to complete the registration process."
-      // );
+    onSuccess: () => {
+      reset();
+      toast.success("Registration successful. Sign in to continue.");
+      navigate("/signIn");
     },
   });
 
   const onSubmit: SubmitHandler<SignUpFormData> = (data) => {
-    window.location.href = "/welcomesteps";
-    setRegisterData(data);
     const temp = { ...data };
     temp.phone_number = countryCode.value + temp.phone_number;
     mutate(temp);
   };
 
-  const handleCountryChange = (selectedOption) => {
-    setCountryCode(selectedOption);
+  const handleCountryChange = (selectedOption: CountryOption | null) => {
+    if (selectedOption) setCountryCode(selectedOption);
   };
 
   const customStyles = {
@@ -151,7 +128,6 @@ const SignUpForm = () => {
 
   return (
     <>
-      {showWelcomeSteps && <WelcomeSteps />}
       <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
         <Form.Item
           name="first_name"
