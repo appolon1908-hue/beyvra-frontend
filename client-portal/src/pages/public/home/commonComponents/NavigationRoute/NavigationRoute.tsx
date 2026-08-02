@@ -14,7 +14,7 @@ const NavigationRoute = () => {
         <div className="navigationRoutes">
             <Link to='/'>
             <div className='navigationHomeIcon'>
-            <HomeIcon height='14'/>
+            <HomeIcon />
             <h2>Home</h2>
             </div>
             </Link>

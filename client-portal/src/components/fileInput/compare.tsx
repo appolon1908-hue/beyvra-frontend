@@ -90,7 +90,7 @@ const FileInput: React.FC<FileInputProps> = ({ handleChange }) => {
           </div>
           <div className='text-wrap ant-upload-text h-2 flex-1 my-2'>
             <Progress
-              percent={Math.round(uploadProgress)}
+              percent={Math.round(uploadProgress ?? 0)}
               status="active"
               showInfo={true}
               strokeColor="#1890ff"

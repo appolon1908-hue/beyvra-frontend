@@ -16,7 +16,7 @@ const DepositSelectCurrency = () => {
   useEffect(() => {
     const debouncedSearch = debounce(() => {
       const filteredItems = InitialAccountsList.filter((item) =>
-        item.title.toLowerCase().includes(searchTerm.toLowerCase())
+        (item.title || "").toLowerCase().includes(searchTerm.toLowerCase())
       );
       setItems(filteredItems);
     }, 300);

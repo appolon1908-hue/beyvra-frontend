@@ -22,13 +22,13 @@ interface FormData {
 interface TestWalkThroughProps {
   step: number;
   setStep: Function;
-  setTrade: Function
+  setTrade?: Function
   trade?: string;
   formInactive?: boolean;
-  bidDuration: number;
-  bidAmount: number;
-  setBidDuration: Function;
-  setBidAmount: Function;
+  bidDuration?: number;
+  bidAmount?: number;
+  setBidDuration?: Function;
+  setBidAmount?: Function;
 }
 
 
@@ -36,12 +36,12 @@ const TestWalkThrough: FC<TestWalkThroughProps> = ({
   step, 
   setStep, 
   trade, 
-  setTrade, 
+  setTrade = () => {},
   formInactive= false,
-  bidAmount, 
-  bidDuration, 
-  setBidAmount, 
-  setBidDuration
+  bidAmount = 90,
+  bidDuration = 30,
+  setBidAmount = () => {},
+  setBidDuration = () => {}
  }) => {
   const { t } = useTranslation();
   const [tradeForm, setFormData] = useState<FormData>({

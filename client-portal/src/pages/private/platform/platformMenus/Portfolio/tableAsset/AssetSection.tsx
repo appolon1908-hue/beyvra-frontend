@@ -2,8 +2,16 @@ import { useEffect, useState } from "react";
 import { useAppSelector } from "@store/hooks";
 
 const AssetSection = () => {
+  interface CryptoAsset {
+    symbol: string;
+    volume: number;
+    change_percentage: number;
+    circulating_supply: number;
+    price: number;
+    wk_52_change_percentage: number;
+  }
   // Local state for crypto data
-  const [cryptoData, setCryptoData] = useState<any[]>([]);
+  const [cryptoData, setCryptoData] = useState<CryptoAsset[]>([]);
   // Redux state for stock data
   const { stockData } = useAppSelector((state) => state.socketStockCrypto);
 
@@ -26,7 +34,7 @@ const AssetSection = () => {
           range: "1y",
         };
 
-        webSocket.send(JSON.stringify(request)); // Send request to WebSocket
+        webSocket?.send(JSON.stringify(request)); // Send request to WebSocket
       };
 
       webSocket.onmessage = (event) => {
@@ -36,7 +44,7 @@ const AssetSection = () => {
 
           if (incomingData) {
             // Update local state with the first 10 crypto assets
-            setCryptoData(incomingData);
+            setCryptoData(Array.isArray(incomingData) ? incomingData : incomingData.data || []);
           }
         } catch (error) {
           console.error("Error parsing WebSocket message:", error);
@@ -76,9 +84,8 @@ const AssetSection = () => {
 
       {/* Render Crypto Data from local state */}
       <p className="text-white/90 text-sm my-3 capitalize">crypto</p>
-      {console.log(cryptoData.data)}
-      {cryptoData.data && cryptoData.data.length > 0 ? (
-        cryptoData.data.slice(0, 10).map((asset, index) => (
+      {cryptoData.length > 0 ? (
+        cryptoData.slice(0, 10).map((asset, index) => (
           <div
             key={index}
             className="asset-grid w-full grid grid-cols-6 body-tab"
@@ -125,7 +132,7 @@ const AssetSection = () => {
             key={index}
             className="asset-grid w-full grid grid-cols-6 body-tab"
           >
-            <span>{asset.symbol}</span>
+            <span>{asset.T}</span>
             <span>{asset.v}</span>
             <span>${asset.vw}</span>
             <span>{asset.n}</span>

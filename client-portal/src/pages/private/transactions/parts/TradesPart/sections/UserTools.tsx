@@ -45,10 +45,10 @@ const accountsOptions = useMemo(
   [wallets]
 );
 
-const assetsOptions = useMemo(() => assets.map((elm) => ({
+const assetsOptions = useMemo(() => (Array.isArray(assets) ? assets : []).map((elm) => ({
   value: elm.symbol,
   label: elm.name,
-})),[])
+})),[assets])
 
 const typeOrStatusHandler = (value: string) => {
   const findItem = statusAndTypesList.filter((item) => item.value === value)[0];

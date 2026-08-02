@@ -50,7 +50,7 @@ const getTitle = (name: string): string => {
 
 const PortfolioModal: React.FC<PortfolioModalProps> = ({ isModalOpen, setModalOpen, setIsRightDrawerOpen, setIsRightSubDrawerOpen }) => {
   const [userProfile, setUserProfile] = useState<IUserKYCProps>()
-  const [kycInfo, setKycInfo] = useState<string>()
+  const [kycInfo, setKycInfo] = useState<string>("F")
   const dispatch = useAppDispatch()
 
   const navigate = useNavigate()

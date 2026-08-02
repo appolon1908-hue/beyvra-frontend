@@ -3,7 +3,7 @@ import "./WalkThrough.scss";
 import { useDispatch } from "react-redux";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
-import { useLogin } from "api/user/useLogin";
+import { LoginSuccess, useLogin } from "api/user/useLogin";
 import { GlobalLoginMaxAge } from "App";
 // Assuming you have these modal components
 
@@ -14,7 +14,7 @@ const WalkThrough = ({ registerData }: { registerData: any }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [, setCookie] = useCookies(["access_token", "refresh_token", "step"]);
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<LoginSuccess | null>(null);
   const [showOtp, setShowOTP] = useState(false);
 
   const { mutate: loginMutate, isPending: isLoginPending } = useLogin({
@@ -23,10 +23,11 @@ const WalkThrough = ({ registerData }: { registerData: any }) => {
         setUserData(data);
         setShowOTP(true);
       } else {
+        if (!data.access || !data.refresh || !data.user) return;
         setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
         setCookie("refresh_token", data.refresh);
         setCookie("step", "");
-        data?.user.is_walkthrough
+        data.user.is_walkthrough
           ? navigate("/welcome")
           : navigate("/platform");
       }
@@ -90,7 +91,9 @@ const WalkThrough = ({ registerData }: { registerData: any }) => {
   );
 };
 
-const WelcomeContentModal = ({ handleNext }) => {
+type WalkthroughStepProps = { handleNext: () => void };
+
+const WelcomeContentModal = ({ handleNext }: WalkthroughStepProps) => {
   return (
     <div className="welcome-modal">
       <img src="/walkthrough-modal/welcome-modal.png" alt="" />
@@ -105,7 +108,7 @@ const WelcomeContentModal = ({ handleNext }) => {
   );
 };
 
-const CompanyContentModal = ({ handleNext }) => {
+const CompanyContentModal = ({ handleNext }: WalkthroughStepProps) => {
   return (
     <div className="company-modal">
       <img src="/walkthrough-modal/company.jpg" alt="" />
@@ -125,7 +128,7 @@ const CompanyContentModal = ({ handleNext }) => {
   );
 };
 
-const ChartContentModal = ({ handleNext }) => {
+const ChartContentModal = ({ handleNext }: WalkthroughStepProps) => {
   return (
     <div className="company-modal">
       <img
@@ -155,7 +158,7 @@ const ChartContentModal = ({ handleNext }) => {
   );
 };
 
-const ChartChangeContentModal = ({ handleNext }) => {
+const ChartChangeContentModal = ({ handleNext }: WalkthroughStepProps) => {
   return (
     <div className="company-modal">
       <img
@@ -184,7 +187,7 @@ const ChartChangeContentModal = ({ handleNext }) => {
   );
 };
 
-const ChartChange2ContentModal = ({ handleNext }) => {
+const ChartChange2ContentModal = ({ handleNext }: WalkthroughStepProps) => {
   return (
     <div className="company-modal">
       <img
@@ -213,7 +216,7 @@ const ChartChange2ContentModal = ({ handleNext }) => {
   );
 };
 
-const ChartItemSelectedContentModal = ({ handleNext }) => {
+const ChartItemSelectedContentModal = ({ handleNext }: WalkthroughStepProps) => {
   return (
     <div className="company-modal">
       <img
@@ -240,7 +243,7 @@ const ChartItemSelectedContentModal = ({ handleNext }) => {
   );
 };
 
-const InvestementsContentModal = ({ handleNext }) => {
+const InvestementsContentModal = ({ handleNext }: WalkthroughStepProps) => {
   return (
     <div className="company-modal">
       <img
@@ -276,7 +279,7 @@ const InvestementsContentModal = ({ handleNext }) => {
   );
 };
 
-const Investements2ContentModal = ({ handleNext }) => {
+const Investements2ContentModal = ({ handleNext }: WalkthroughStepProps) => {
   return (
     <div className="company-modal">
       <img
@@ -312,7 +315,7 @@ const Investements2ContentModal = ({ handleNext }) => {
   );
 };
 
-const Investements3ContentModal = ({ handleNext }) => {
+const Investements3ContentModal = ({ handleNext }: WalkthroughStepProps) => {
   return (
     <div className="company-modal">
       <img
@@ -348,7 +351,7 @@ const Investements3ContentModal = ({ handleNext }) => {
   );
 };
 
-const CompleteContentModal = ({ handleNext }) => {
+const CompleteContentModal = ({ handleNext }: WalkthroughStepProps) => {
   return (
     <div className="company-modal">
       <img

@@ -4,11 +4,10 @@ import PrimaryButton from 'components/primaryButton/PrimaryButton';
 import { useNavigate } from 'react-router-dom';
 import VerificationStatus from '../components/verification/VerificationStatus';
 import './verificationstatus.scss'
-import IKYC from '@interfaces/IKYC';
 import { setUserKYC } from '@store/slices/userBio';
 
 interface verificationProps{
-    userKyc: IKYC | undefined
+    userKyc: string
 }
 const VerificationPage: React.FC<verificationProps>  = ({userKyc}) => {
     // const navigate = useNavigate();

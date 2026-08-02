@@ -20,7 +20,7 @@ const CookieDisclosure = () => {
   return ( 
     <div className='cookieDisclosurePageContainer'>
         <Navbar/>
-        <CategorySlider/>
+        <CategorySlider allPairsData={[]}/>
         {/* <HeadIntro/> */}
         {/* <TradeTable/> */}
       {/* custom routing */}

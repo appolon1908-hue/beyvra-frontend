@@ -7,14 +7,14 @@ import data from "./data.json";
 import SecondStepIcon from '/public/welcome-icons/welcome_step_two_background.png'
 
 interface StepTwoProps {
-  setStep: (step: number | ((prevStep: number) => number)) => void;
+  setStep: () => void;
 }
 
 const StepTwo: FC<StepTwoProps> = ({ setStep }) => {
   const { t } = useTranslation();
 
   const handleClick = () => {
-    setStep((prevStep: number) => prevStep + 1);
+    setStep();
   };
   
   const getFirstStep = () => {
@@ -34,13 +34,14 @@ const StepTwo: FC<StepTwoProps> = ({ setStep }) => {
   const addAnimation = () => {
     const scrollers = document.querySelectorAll(".scroller");
     scrollers.forEach((scroller) => {
-      scroller.setAttribute("data-animated", true);
-      const scrollerInner = scroller.querySelector(".scroller__inner");
+      scroller.setAttribute("data-animated", "true");
+      const scrollerInner = scroller.querySelector<HTMLElement>(".scroller__inner");
+      if (!scrollerInner) return;
       const scrollerContent = Array.from(scrollerInner.children);
   
       scrollerContent.forEach((item) => {
-        const duplicatedItem = item.cloneNode(true);
-        duplicatedItem.setAttribute("aria-hidden", true);
+        const duplicatedItem = item.cloneNode(true) as HTMLElement;
+        duplicatedItem.setAttribute("aria-hidden", "true");
         scrollerInner.appendChild(duplicatedItem);
       });
     });

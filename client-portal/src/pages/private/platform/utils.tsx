@@ -272,8 +272,8 @@ export function rightDrawerTitleHandler(
 export function rightDrawerBodyHandler(
   rightDrawerContent: RightDrawerContent,
   setIsRightSubDrawerOpen: Dispatch<SetStateAction<boolean>>,
-  setIsRightSubDrawerContent: Dispatch<SetStateAction<RightSubDrawerContent>>
-  // setIsRightDrawerContent: Dispatch<SetStateAction<RightDrawerContent>>
+  setIsRightSubDrawerContent: Dispatch<SetStateAction<RightSubDrawerContent>>,
+  setIsRightDrawerOpen: Dispatch<SetStateAction<boolean>>
 ): JSX.Element | null {
   switch (rightDrawerContent) {
     case "payments":
@@ -288,6 +288,7 @@ export function rightDrawerBodyHandler(
         <ProfileMenu
           setIsRightSubDrawerOpen={setIsRightSubDrawerOpen}
           setIsRightSubDrawerContent={setIsRightSubDrawerContent}
+          setIsRightDrawerOpen={setIsRightDrawerOpen}
         />
       );
     case "account":
@@ -482,8 +483,12 @@ export function rightSubDrawerBodyHandler(
     case "withdraw":
       return (
         <WithdrawMenu
-          setIsRightSubDrawerOpen={setIsRightSubDrawerOpen}
-          setIsRightSubDrawerContent={setIsRightSubDrawerContent}
+          isModalOpen
+          setIsModalOpen={setIsRightSubDrawerOpen}
+          setIsWithdrawAccountModalOpen={(open: boolean) => {
+            setIsRightSubDrawerOpen(open);
+            if (open) setIsRightSubDrawerContent("select-withdraw-account");
+          }}
         />
       );
     case "add-account":
@@ -516,25 +521,30 @@ export function rightSubDrawerBodyHandler(
     case "select-withdraw-account":
       return (
         <WithdrawAccount
-          setIsRightSubDrawerOpen={setIsRightSubDrawerOpen}
-          setIsRightSubDrawerContent={setIsRightSubDrawerContent}
-          rightSubDrawerContent={rightSubDrawerContent}
+          isModalOpen
+          setIsModalOpen={setIsRightSubDrawerOpen}
+          setIsWithdrawPaymentModalOpen={(open: boolean) => {
+            setIsRightSubDrawerOpen(open);
+            if (open) setIsRightSubDrawerContent("withdraw-payment");
+          }}
         />
       );
     case "withdraw-payment":
       return (
         <WithdrawPayment
-          setIsRightSubDrawerOpen={setIsRightSubDrawerOpen}
-          setIsRightSubDrawerContent={setIsRightSubDrawerContent}
-          rightSubDrawerContent={rightSubDrawerContent}
+          isModalOpen
+          setIsModalOpen={setIsRightSubDrawerOpen}
+          setIsWithdrawRequestModalOpen={((open: boolean) => {
+            setIsRightSubDrawerOpen(open);
+            if (open) setIsRightSubDrawerContent("select-withdarw-request");
+          }) as Dispatch<SetStateAction<boolean>>}
         />
       );
     case "select-withdarw-request":
       return (
         <WithdrawRequest
-          setIsRightSubDrawerOpen={setIsRightSubDrawerOpen}
-          rightSubDrawerContent={rightSubDrawerContent}
-          setIsRightSubDrawerContent={setIsRightSubDrawerContent}
+          isModalOpen
+          setIsModalOpen={setIsRightSubDrawerOpen}
         />
       );
     case "boost-cubes":

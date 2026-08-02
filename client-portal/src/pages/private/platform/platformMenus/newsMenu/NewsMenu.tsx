@@ -54,9 +54,7 @@ const RenderTab = ({
 };
 
 interface NewsFeedProps {
-  articles: {
-    [key: string]: { [key: string]: INews };
-  };
+  articles: Record<string, INews>;
   label: string;
   searchTerm: string; 
 
@@ -155,28 +153,14 @@ const NewsMenu: React.FunctionComponent<NewsMenuProps> = () => {
 
   
 
-const getSelectedArticles = () => {
-  const newArticles = {};
-  let uniqueIndex = 1; 
-
-  const addArticles = (category) => {
-    Object.keys(category || {}).forEach((key) => {
-      newArticles[uniqueIndex] = category[key];
-      uniqueIndex++;
-    });
-  };
-
-  if (selectedFeed === "all") {
-    
-    addArticles(data?.news?.forex);
-    addArticles(data?.news?.stocks);
-    addArticles(data?.news?.commodities);
-    addArticles(data?.news?.crypto);
-  } else {
-    addArticles(data?.news?.[selectedFeed.toLowerCase()]);
-  }
-
-  return newArticles; 
+const getSelectedArticles = (): Record<string, INews> => {
+  const articles = data?.results || [];
+  const filtered = selectedFeed === "all"
+    ? articles
+    : articles.filter((article) =>
+        article.category?.some((category) => category.toLowerCase() === selectedFeed.toLowerCase())
+      );
+  return Object.fromEntries(filtered.map((article) => [article.article_id, article]));
 };
 
   const selectedArticles = getSelectedArticles();

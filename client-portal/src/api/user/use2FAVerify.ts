@@ -9,7 +9,10 @@ type Props = {
   [index: string]: any;
 };
 
-export async function fetchVerify(data: { loginToken: string; otp: string }): Promise<LoginSuccess> {
+type VerifyArgs = { loginToken?: string; token?: string; otp: string };
+type VerifyResponse = Partial<LoginSuccess> & { message?: string };
+
+export async function fetchVerify(data: VerifyArgs): Promise<VerifyResponse> {
   const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
     const response = await fetch(`${BASE_URL}/user/verify_mfa_code/`, {
@@ -17,8 +20,9 @@ export async function fetchVerify(data: { loginToken: string; otp: string }): Pr
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        ...(data.token ? { Authorization: `Bearer ${data.token}` } : {}),
       },
-      body: JSON.stringify({ otp: data.otp, login_token: data.loginToken }),
+      body: JSON.stringify({ otp: data.otp, ...(data.loginToken ? { login_token: data.loginToken } : {}) }),
     });
     const result = await response.json();
 
@@ -39,7 +43,7 @@ export const use2FAVerify = (props: Props) => {
     ...rest
   } = props;
 
-  return useMutation<LoginSuccess, Error, { loginToken: string; otp: string }>({
+  return useMutation<VerifyResponse, Error, VerifyArgs>({
     mutationFn: fetchVerify,
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {

@@ -73,7 +73,8 @@ export const AreaChart = ({chartData, liveLoading = false, bidOngoing=false, tim
         const textElement1 =  createCustomMarker1(`${chartData[chartData.length - 1].value}`);
         const textElement2 = createCustomMarker2(`${chartData[chartData.length - 1].value}`, tradeType);
 
-        const updatePosition1 = (data: null) => {
+        type Point = { value: number; time: number };
+        const updatePosition1 = (data?: Point) => {
             const currentData = data? data :  chartData[chartData.length - 1];
             const priceCoordinate = areaSeries.priceToCoordinate(currentData.value);
             const lastPriceCoordinate = areaSeries.priceToCoordinate(lastData.value);
@@ -103,7 +104,7 @@ export const AreaChart = ({chartData, liveLoading = false, bidOngoing=false, tim
             }
         };
         
-        const updatePosition2 = (data: null) => {
+        const updatePosition2 = (data?: Point) => {
           const currentData = data? data :  chartData[chartData.length - 1];
           const priceCoordinate = areaSeries.priceToCoordinate(currentData.value);
           const lineWidthChild = textElement2.querySelector('.line-width');
@@ -133,7 +134,7 @@ export const AreaChart = ({chartData, liveLoading = false, bidOngoing=false, tim
       
         const ensureChartReady = () => {
           setTimeout(() => {
-            chart.subscribeCrosshairMove(updatePosition1);
+            chart.subscribeCrosshairMove(() => updatePosition1());
             updatePosition1();
             if(bidOngoing) updatePosition2();
             
@@ -171,7 +172,7 @@ export const AreaChart = ({chartData, liveLoading = false, bidOngoing=false, tim
         const interval = setInterval(() => {
           
           seriesRef.current.update(newData);
-          chart.subscribeCrosshairMove(updatePosition1);
+          chart.subscribeCrosshairMove(() => updatePosition1());
           updatePosition1(newData);
           c += 1;
           if(c === time){

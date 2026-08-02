@@ -33,7 +33,7 @@ const TransferAccountSelectMenu: React.FC<TransferAccountSelectMenuProps> = ({
         );
       } else {
         const filteredItems = InitialAccountsList.filter((item) =>
-          item.title.toLowerCase().includes(searchTerm.toLowerCase())
+          (item.title || "").toLowerCase().includes(searchTerm.toLowerCase())
         ).filter((item) => item.id !== pinnedAccount.id);
         setItems(filteredItems);
       }

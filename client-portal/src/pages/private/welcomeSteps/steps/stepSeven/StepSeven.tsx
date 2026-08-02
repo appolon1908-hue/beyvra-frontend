@@ -13,6 +13,7 @@ interface StepSevenProps {
   bidAmount: number;
   setBidDuration: Function;
   setBidAmount: Function;
+  formInactive?: boolean;
 }
 
 const StepSeven: FC<StepSevenProps> = ({ 

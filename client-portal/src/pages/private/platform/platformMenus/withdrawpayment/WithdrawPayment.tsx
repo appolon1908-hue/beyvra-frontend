@@ -2,7 +2,7 @@ import { EuroFlag, PaymentIcon } from "../../../../../assets/icons";
 import DepositCard from "../../../../../components/depositCard/DepositCard";
 import DepositInput from "../../../../../components/depositInput/DepositInput";
 import "./WithdrawPayment.scss";
-import { Dispatch, FC, SetStateAction } from "react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
 import PrimaryButton from "../../../../../components/primaryButton/PrimaryButton";
 import { Modal } from "antd";
 
@@ -17,6 +17,7 @@ const WithdrawPayment: FC<WithdrawPaymentProps> = ({
   setIsModalOpen,
   setIsWithdrawRequestModalOpen,
 }) => {
+  const [amount, setAmount] = useState("");
   const handleCancle = () => {
     setIsModalOpen(false);
   };
@@ -49,6 +50,10 @@ const WithdrawPayment: FC<WithdrawPaymentProps> = ({
             marginTop
             classname="bordercolor"
             placeholder="Amount - USD"
+            name="amount"
+            value={amount}
+            format=""
+            onChange={(event) => setAmount(event.target.value)}
           />
         </div>
         <div className="withdraw-details">

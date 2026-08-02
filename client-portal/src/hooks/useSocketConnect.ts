@@ -44,7 +44,7 @@ interface OnlineTradersData {
 
 interface SocketConnectReturn {
   oldData: ChartDataType[];
-  data: ChartDataType;
+  data: ChartDataType | null;
 }
 let isFirstTime = true;
 

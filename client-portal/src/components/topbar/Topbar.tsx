@@ -98,7 +98,7 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
               <div className="amount">
                 <p className="value">
                   {selectedWallet?.currency?.symbol || "D"}{" "}
-                  {formatMoney(selectedWallet?.balance) || "9,999.00"}
+                  {formatMoney(selectedWallet?.balance ?? 0) || "9,999.00"}
                 </p>
               </div>
             </>

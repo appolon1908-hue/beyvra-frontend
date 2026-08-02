@@ -167,14 +167,15 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
         chart.timeScale().scrollToRealTime();
       }
     };
-    chart.subscribeCrosshairMove(() => setUserInteracted(true));
+    const interactionHandler = () => setUserInteracted(true);
+    chart.subscribeCrosshairMove(interactionHandler);
     chart.timeScale().subscribeVisibleTimeRangeChange(syncHandler);
 
     chartRef.current = chart;
     seriesRef.current = series;
 
     return () => {
-      chart.unsubscribeCrosshairMove();
+      chart.unsubscribeCrosshairMove(interactionHandler);
       chart.timeScale().unsubscribeVisibleTimeRangeChange(syncHandler);
       chart.remove();
     };
