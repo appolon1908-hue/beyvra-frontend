@@ -39,7 +39,7 @@
   
     useEffect(() => {
       getClockMutate(cookies.access_token);
-    }, []);
+    }, [cookies.access_token, getClockMutate]);
   
   
     useEffect(() => {
@@ -55,7 +55,7 @@
           },
         });
       }
-    }, [markets.symbol, clockData]);
+    }, [markets.symbol, clockData, marketDataMutation, cookies.access_token]);
   
     useEffect(() => {
       // Load the list of assets
@@ -72,7 +72,7 @@
           },
         }
       );
-    }, [cookies.access_token]);
+    }, [assetsListMutate, cookies.access_token, dispatch]);
   
     useEffect(() => {
       if (market && typeof market === "object") {
@@ -119,7 +119,7 @@
         //   })
         // );
       }
-    }, [market]);
+    }, [dispatch, market, markets?.symbol]);
   
     // useEffect(() => {
     //   // if (markets?.crypto[markets?.symbol]?.length > 0) {
@@ -141,7 +141,7 @@
       
       }
       
-    },[finished])
+    },[finished, trade])
   
 
 

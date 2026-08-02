@@ -85,7 +85,7 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
     if (cookies.access_token) {
       webSocketTicketMutate(cookies.access_token);
     }
-  }, [cookies.access_token]);
+  }, [cookies.access_token, webSocketTicketMutate]);
 
   useEffect(() => {
     const topbarElement = document.getElementById("topbarContainer");
@@ -110,7 +110,7 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
     } else {
       setMainSidebarWidth(0);
     }
-  }, [window.innerWidth, storedScale]);
+  }, [storedScale]);
 
   useEffect(() => {
     const handleResize = () => {

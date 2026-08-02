@@ -81,7 +81,7 @@ useEffect(() => {
       }
     );
   }
-}, [currency, startDate, endDate, status, type]);
+}, [currency, startDate, endDate, status, type, asset, transactionsMutate, cookies.access_token, setTableData]);
   
   return (
     <div className="user-options-bar user-options-trades">

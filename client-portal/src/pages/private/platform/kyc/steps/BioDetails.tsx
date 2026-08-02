@@ -158,7 +158,7 @@ const BioDetails: React.FC<BioDetailsProps> = ({ handleNext }) => {
       token: cookies.access_token
     })
 
-  }, [])
+  }, [cookies.access_token, mutateKYCData])
 
   console.log(formData)
 

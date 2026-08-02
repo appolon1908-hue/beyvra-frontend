@@ -57,7 +57,7 @@ const ChooseTrade: React.FC<ChooseTradeProps> = ({
       // Cleanup interval on component unmount or when time reaches 0
       return () => clearInterval(timerInterval);
     }
-  }, [displayTimer, time]);
+  }, [displayTimer, setStep, time]);
 
   return (
     <div className={`walkthroughStep chooeseTradeStep ${className}`}>

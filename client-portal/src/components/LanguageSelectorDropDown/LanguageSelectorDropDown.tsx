@@ -1,13 +1,11 @@
 import { ArrowDownOS } from 'assets/icons';
 import { useEffect, useRef, useState } from 'react';
 import { localFlagHandler } from 'i18n/helpers';
-import { Spin } from 'antd';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import './languageSelectorDropDown.scss';
 import { useTranslation } from 'react-i18next';
 
-import {languages} from '../../constants'
 
 interface NavbarProps {
     countryCode: string;
@@ -16,10 +14,7 @@ interface NavbarProps {
 }
 const LanguageSelectorDropDown = () => {
     const { t, i18n } = useTranslation();
-    const [ipAddress, setIpAddress] = useState('');
-    const [geoInfo, setGeoInfo] = useState<{countryCode:string}>()
-    const [countryCode, setCountryCode] = useState('EN')
-    const [loading, setLoading] = useState(false);
+    const [countryCode, setCountryCode] = useState(i18n.resolvedLanguage || 'en')
 
     const navigate = useNavigate()
 
@@ -58,26 +53,6 @@ const LanguageSelectorDropDown = () => {
     //   }
     // },[ipAddress])
 
-    useEffect(() => {
-      setLoading(true)
-      const browserLanguage = navigator.language;
-      const matchedLanguage = languages.find(language => language.languageKey.toLowerCase() === browserLanguage.toLocaleLowerCase());
-      console.log(browserLanguage);
-      console.log(countryCode);
-      console.log(languages);
-      if (matchedLanguage) {
-        console.log(matchedLanguage);
-        setCountryCode(browserLanguage)
-        i18n.changeLanguage(matchedLanguage.languageKey.toLocaleLowerCase());
-        setLoading(false)
-      } else {
-        setCountryCode('EN')
-        i18n.changeLanguage("en");
-        setLoading(false)
-      }
-    }, [])
-
-    
     const [toggleLanguageSelector,setToggleLanguageSelector] = useState(false)
     const languageSelectorRef = useRef<HTMLDivElement>(null)
 
@@ -102,17 +77,11 @@ const LanguageSelectorDropDown = () => {
 
     return (
         <div className='languageSelectorContainer'>
-            {loading ? (
-                <div>
-                <Spin/>
-                </div>
-            ): (
-                <div className='languageButton' onClick={()=>setToggleLanguageSelector(!toggleLanguageSelector)}>
+            <div className='languageButton' onClick={()=>setToggleLanguageSelector(!toggleLanguageSelector)}>
                 <img src={localFlagHandler(countryCode.toLocaleLowerCase())} alt="" />
                 <h2 className="text-white">{countryCode.toLocaleUpperCase()}</h2>
                 <ArrowDownOS height="15" width="10"/>
             </div>
-            )}
             
             <div ref={languageSelectorRef} className={`languageDropDownMenu ${toggleLanguageSelector ? 'showLanguageDropDown': 'closeLanguageDropDown'}`}>
                 <div className='languageValue' onClick={()=>{

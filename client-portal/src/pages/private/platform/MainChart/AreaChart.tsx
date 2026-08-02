@@ -195,7 +195,7 @@ export const AreaChart = ({chartData, liveLoading = false, bidOngoing=false, tim
         return () => clearInterval(interval);
       }
    
-  },[]);
+  },[bidOngoing, chartData, liveLoading, time, tradeType]);
 
 
 

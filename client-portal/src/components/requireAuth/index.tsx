@@ -110,7 +110,7 @@ const RequireAuth = () => {
       window.removeEventListener('mousemove', resetTimer);
       window.removeEventListener('keydown', resetTimer);
     };
-  }, []);
+  }, [cookies.access_token, mutateKYC]);
 
   useEffect(() => {
     if (cookies?.access_token) {
@@ -145,7 +145,7 @@ const RequireAuth = () => {
 
       return () => clearInterval(intervalId);
     }
-  }, [cookies.access_token]);
+  }, [cookies?.access_token, cookies.refresh_token, mutate, setCookie]);
 
   if (!cookies.access_token) {
     return <Navigate to="/signIn" state={{ from: location }} />;

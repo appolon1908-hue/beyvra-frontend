@@ -92,7 +92,7 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ isModalOpen, setModalOp
     mutate({
       token: cookies.access_token
     })
-  }, [])
+  }, [cookies.access_token, mutate])
 
 
 

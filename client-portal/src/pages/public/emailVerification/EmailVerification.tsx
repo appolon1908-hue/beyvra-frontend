@@ -38,7 +38,7 @@ const EmailVerification: React.FunctionComponent<
     const token = queryParams.get("token") || undefined;
 
     mutate({ uidb64, token });
-  }, [mutate]);
+  }, [location.search, mutate]);
   
 
   return (

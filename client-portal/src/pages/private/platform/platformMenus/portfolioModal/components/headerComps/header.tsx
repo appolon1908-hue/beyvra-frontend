@@ -33,7 +33,7 @@ const HeaderComponents = () => {
     useEffect(()=>{
         mutate(cookies.access_token)
 
-    },[])
+    },[cookies.access_token, mutate])
 
     console.log("selected cuuresncy", selectedCurrency)
     const selectedCurrencyItem = currencies.find(item => item.currency.longer_name === selectedCurrency);

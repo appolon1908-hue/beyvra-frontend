@@ -87,7 +87,7 @@ const SignUpForm = () => {
         })
         .catch(() => undefined);
     }
-  }, [countriesList]);
+  }, []);
 
   const { mutate, isPending } = useRegister({
     onSuccess: (response) => {

@@ -30,7 +30,7 @@ const WireTransfer = () => {
 
   useEffect(() => {
     mutate(cookies.access_token)
-  }, [cookies.access_token])
+  }, [cookies.access_token, mutate])
 
   return (
 

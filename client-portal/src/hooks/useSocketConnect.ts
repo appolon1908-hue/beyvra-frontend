@@ -57,7 +57,6 @@ let closePrice: number = 0;
 const useSocketConnect = (wsTicket: string): SocketConnectReturn => {
   const [oldData, setOldData] = useState<ChartDataType[]>([]);
   const [data, setData] = useState<ChartDataType | null>(null);
-  const [socket, setSocket] = useState<any>(null);
   const chartSocket = useRef<WebSocket | undefined>(undefined);
 
   const dispatch = useDispatch();
@@ -67,8 +66,9 @@ const useSocketConnect = (wsTicket: string): SocketConnectReturn => {
   const { chartSymbol } = useAppSelector((state) => state.socketStockCrypto);
 
   useEffect(() => {
+    let webSocket: WebSocket | undefined;
     if (wsTicket) {
-      const webSocket = new WebSocket(
+      webSocket = new WebSocket(
         `wss://tradx.io/ws/external-api/?ws_ticket=${wsTicket}`
       );
 
@@ -77,19 +77,18 @@ const useSocketConnect = (wsTicket: string): SocketConnectReturn => {
       };
 
       webSocket.onopen = () => {
-        webSocket.send(
+        webSocket?.send(
           JSON.stringify({
             group_name: "BTC",
             type: "join_group",
           })
         );
-        webSocket.send(
+        webSocket?.send(
           JSON.stringify({
             type: "join_group",
             group_name: "o_c",
           })
         );
-        return setSocket(webSocket);
       };
 
       webSocket.onmessage = (event) => {
@@ -123,11 +122,9 @@ const useSocketConnect = (wsTicket: string): SocketConnectReturn => {
     }
 
     return () => {
-      if (socket) {
-        socket.close();
-      }
+      webSocket?.close();
     };
-  }, [wsTicket]);
+  }, [dispatch, wallets, wsTicket]);
 
   useEffect(() => {
     let webSocket: WebSocket;

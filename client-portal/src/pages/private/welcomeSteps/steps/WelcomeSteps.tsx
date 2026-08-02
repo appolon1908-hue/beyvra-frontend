@@ -74,7 +74,7 @@ const WelcomeSteps = () => {
     if (savedStep) {
       setWelcomeStep(Number(savedStep));
     }
-  }, []);
+  }, [cookies.step]);
 
   useEffect(() => {
     setCookie("step", step.toString(), { path: "/", maxAge: 604800 });

@@ -147,12 +147,10 @@ const TestWalkThrough: FC<TestWalkThroughProps> = ({
 
   useEffect(( )=> {
    
-    setFormData({
-      ...tradeForm,
-      amount: bidAmount,
-      duration: bidDuration
-    })
-  }, [])
+    setFormData((current) => current.amount === bidAmount && current.duration === bidDuration
+      ? current
+      : { ...current, amount: bidAmount, duration: bidDuration });
+  }, [bidAmount, bidDuration])
   return (
       <div className="walkThroughSidebarContainer">
         <div className="walkThroughTopBarInputs">

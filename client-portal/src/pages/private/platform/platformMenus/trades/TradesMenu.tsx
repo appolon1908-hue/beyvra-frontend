@@ -202,7 +202,7 @@ const RenderFixedTime: React.FunctionComponent = ({handleMenuClick}: any) =>{
       token: cookies.access_token
     })
 
-  },[])
+  },[cookies.access_token, mutate])
   return(
   <RenderTab
     title="Active Trades"
@@ -224,7 +224,7 @@ const RenderForex = ({handleMenuClick}: any) => {
       token: cookies.access_token
     })
 
-  },[])
+  },[cookies.access_token, mutate])
   return(
 
   // @ts-ignore
@@ -248,7 +248,7 @@ const RenderStocks = ({handleMenuClick}: any) => {
       token: cookies.access_token
     })
 
-  },[])
+  },[cookies.access_token, mutate])
   return(
       // @ts-ignore
 
@@ -273,7 +273,7 @@ const RenderCrypto = ({handleMenuClick}: any) => {
     mutate({
       token: cookies.access_token
     })
-  },[])
+  },[cookies.access_token, mutate])
   return(
     
     // @ts-ignore

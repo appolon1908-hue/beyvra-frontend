@@ -58,7 +58,7 @@ const StepTen: React.FC<StepTenProps> = ({
     }, 1000);
 
     return () => clearInterval(timerId);
-}, [endTime]);
+}, [endTime, setStep]);
 
 const formatTimeHIS = (seconds: number, { short = false } = {})  => {
   const pad = (num: any) => num < 10 ? `0${num}` : num

@@ -94,7 +94,7 @@ const useInitializeData = () => {
       setWalletsLoading(true);
       walletMutate(cookies.access_token);
     }
-  }, [cookies.access_token, walletMutate]);
+  }, [cookies.access_token, walletMutate, wallets]);
 
   // Effect to fetch wallet data on login initializatio
   useEffect(() => {
@@ -102,7 +102,7 @@ const useInitializeData = () => {
       setNotificationLoading(true);
       notificationListMutate(cookies.access_token);
     }
-  }, [cookies.access_token, notificationListMutate]);
+  }, [cookies.access_token, notificationList, notificationListMutate]);
 
 
 

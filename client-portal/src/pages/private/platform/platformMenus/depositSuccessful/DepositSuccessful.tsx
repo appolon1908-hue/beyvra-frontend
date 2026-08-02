@@ -35,7 +35,7 @@ const DepositSuccessful = () => {
         token: cookies.access_token,
       });
     }
-  }, [mutate]);
+  }, [cookies.access_token, mutate, selectedTransactionId]);
 
   return (
     <div className="deposit-success">

@@ -48,7 +48,7 @@ const Deposit: FC<DepositProps> = ({
 
   useEffect(() => {
     mutate(cookies.access_token);
-  }, []);
+  }, [cookies.access_token, mutate]);
 
   const paymentCheckoutHandler = useCallback(() => {
     if (amount && selectedPaymentMethod?.name) {
@@ -57,7 +57,7 @@ const Deposit: FC<DepositProps> = ({
     } else {
       toast.error("Amount or Payment method invalid");
     }
-  }, [amount, selectedPaymentMethod?.name, cookies]);
+  }, [amount, selectedPaymentMethod?.name, setIsConfirmPaymentModalOpen, setIsModalOpen]);
 
   return (
     <Modal

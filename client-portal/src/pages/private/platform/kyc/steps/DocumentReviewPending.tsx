@@ -30,7 +30,7 @@ const DocumentReviewPending = () => {
         mutate({
             token: cookies.access_token
         })
-    },[])
+    },[cookies.access_token, mutate])
 
     const idFile = getLatestDoc(kycFiles || [], "identity")
     const proofOfAddress = getLatestDoc(kycFiles || [], "proof_of_address")

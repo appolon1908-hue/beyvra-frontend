@@ -66,12 +66,11 @@ const AccountRename: React.FunctionComponent<AccountRenameProps> = ({
   useEffect(() => {
     setState({
       formData: {
-        ...formData,
         name: editableWallet?.name
       }
     })
 
-  }, []);
+  }, [editableWallet?.name]);
   return (
     <div className="editNameMenu">
       <Typography.Text className="editNameMenu-text">

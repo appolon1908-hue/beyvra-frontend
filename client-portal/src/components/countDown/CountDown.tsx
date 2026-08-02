@@ -37,7 +37,7 @@ const CountDown:React.FC<{time: number,color?:string}> = ({time,color:colorProps
         }, 1000);
 
         return () => clearInterval(timerId);
-    }, [endTime, finished]);
+    }, [dispatch, endTime, finished]);
 
 const formatTime = () => {
     const mins = Math.floor(timeLeft / 60);

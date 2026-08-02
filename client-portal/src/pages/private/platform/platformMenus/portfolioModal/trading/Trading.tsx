@@ -31,7 +31,7 @@ const Trading = () => {
 
       )
 
-  }, [])
+  }, [cookies.access_token, mutate])
   return (
     <div className='h-full bg-[#1d1d1f] p-8 rounded-xl overflow-y-auto'>
         <Statistics

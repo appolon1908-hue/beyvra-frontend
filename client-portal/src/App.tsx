@@ -71,7 +71,7 @@ const App: React.FunctionComponent = () => {
     if (storedScale) {
       updateScale(parseFloat(storedScale ? storedScale : "1"));
     }
-  }, []);
+  }, [i18n]);
 
   const updateScale = (scale: number) => {
     const root = document.documentElement;

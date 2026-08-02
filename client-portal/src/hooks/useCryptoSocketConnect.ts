@@ -7,19 +7,13 @@ import {
 } from "@store/slices/socketStockCrypto";
 import { setWalletTypes } from "@store/slices/wallet";
 import useWalletTypes from "api/wallet/useWalletTypes";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useCookies } from "react-cookie";
 import getEnv from "utils/env";
 
 const useCryptoSocketConnect = (wsTicket: string, id: string) => {
   const dispatch = useAppDispatch();
   const [cookies] = useCookies(["access_token"]);
-  const [cryptoSocket, setCryptoSocket] = useState<WebSocket | null>(null);
-  const [stockSocket, setStockSocket] = useState<WebSocket | null>(null);
-  const [balanceSocket, setBalanceSocket] = useState<WebSocket | null>(null);
-  const [profitLossSocket, setProfitLossSocket] = useState<WebSocket | null>(
-    null
-  );
   const { mutate: getCurrency } = useWalletTypes({
     onSuccess: (data) => {
       dispatch(setWalletTypes(data.results));
@@ -31,11 +25,12 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
 
   useEffect(() => {
     getCurrency(cookies.access_token);
-  }, [cookies.access_token]);
+  }, [cookies.access_token, getCurrency]);
 
   useEffect(() => {
+    let webSocket: WebSocket | undefined;
     if (wsTicket) {
-      const webSocket = new WebSocket(
+      webSocket = new WebSocket(
         `${getEnv(
           "VITE_SOCKET_BASE_URL"
         )}ws/current-balance/${id}/?ws_ticket=${wsTicket}`
@@ -43,10 +38,6 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
 
       webSocket.onerror = function (event) {
         throw Error("Websocket connection error");
-      };
-
-      webSocket.onopen = () => {
-        return setBalanceSocket(webSocket);
       };
 
       webSocket.onmessage = (event) => {
@@ -57,15 +48,14 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
       };
     }
     return () => {
-      if (balanceSocket) {
-        balanceSocket.close();
-      }
+      webSocket?.close();
     };
-  }, [wsTicket, id]);
+  }, [wsTicket, id, dispatch]);
 
   useEffect(() => {
+    let webSocket: WebSocket | undefined;
     if (wsTicket) {
-      const webSocket = new WebSocket(
+      webSocket = new WebSocket(
         `${getEnv(
           "VITE_SOCKET_BASE_URL"
         )}ws/profit-loss/${id}/?ws_ticket=${wsTicket}`
@@ -73,10 +63,6 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
 
       webSocket.onerror = function (event) {
         throw Error("Websocket connection error");
-      };
-
-      webSocket.onopen = () => {
-        return setProfitLossSocket(webSocket);
       };
 
       webSocket.onmessage = (event) => {
@@ -87,15 +73,14 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
       };
     }
     return () => {
-      if (profitLossSocket) {
-        profitLossSocket.close();
-      }
+      webSocket?.close();
     };
-  }, [wsTicket, id]);
+  }, [wsTicket, id, dispatch]);
 
   useEffect(() => {
+    let webSocket: WebSocket | undefined;
     if (wsTicket) {
-      const webSocket = new WebSocket(
+      webSocket = new WebSocket(
         `${getEnv(
           "VITE_SOCKET_BASE_URL"
         )}ws/crypto-market-data/?ws_ticket=${wsTicket}`
@@ -103,10 +88,6 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
 
       webSocket.onerror = function (event) {
         throw Error("Websocket connection error");
-      };
-
-      webSocket.onopen = () => {
-        return setCryptoSocket(webSocket);
       };
 
       webSocket.onmessage = (event) => {
@@ -119,15 +100,14 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
       };
     }
     return () => {
-      if (cryptoSocket) {
-        cryptoSocket.close();
-      }
+      webSocket?.close();
     };
-  }, [wsTicket]);
+  }, [dispatch, wsTicket]);
 
   useEffect(() => {
+    let webSocket: WebSocket | undefined;
     if (wsTicket) {
-      const webSocket = new WebSocket(
+      webSocket = new WebSocket(
         `${getEnv(
           "VITE_SOCKET_BASE_URL"
         )}ws/stock-market-data/?ws_ticket=${wsTicket}`
@@ -135,10 +115,6 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
 
       webSocket.onerror = function (event) {
         throw Error("Websocket connection error");
-      };
-
-      webSocket.onopen = () => {
-        return setStockSocket(webSocket);
       };
 
       webSocket.onmessage = (event) => {
@@ -151,11 +127,9 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
       };
     }
     return () => {
-      if (stockSocket) {
-        stockSocket.close();
-      }
+      webSocket?.close();
     };
-  }, [wsTicket]);
+  }, [dispatch, wsTicket]);
 };
 
 export default useCryptoSocketConnect;
