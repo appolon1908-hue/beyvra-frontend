@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import "./JoinInThreeSteps.scss";
 import { ListData } from "./data";
-import Slider from "react-slick";
+import Slider from "components/slider/Slider";
 
 const JoinInThreeSteps = () => {
   const { t } = useTranslation();

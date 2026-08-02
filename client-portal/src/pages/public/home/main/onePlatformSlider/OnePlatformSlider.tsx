@@ -1,4 +1,4 @@
-import Slider from 'react-slick'
+import Slider from 'components/slider/Slider'
 import './onePlatformSlider.scss'
 import {  ArrowLeftOS, ArrowRightOS } from 'assets/icons';
 

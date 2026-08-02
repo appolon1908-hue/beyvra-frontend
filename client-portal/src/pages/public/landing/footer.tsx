@@ -8,10 +8,10 @@ const Footer = () => {
         <div className="container">
             
             <div className="footer__container">
-                <h1>TRADX</h1>
+                <h1>TRADI</h1>
 
                 <p>
-                Tradx.io is an international broker that provides its users access to 100+ financial instruments on its platform.
+                Tradi is a paper-trading platform that gives users access to demo financial instruments for learning and practice.
                 </p>
 
                 <h4>Coderstra SRL</h4>
@@ -37,7 +37,7 @@ const Footer = () => {
                 <ul data-test="footer-social" className="get__social" hidden aria-hidden="true">
                     
                     <li data-test="footer-social-twitter" className="social__item" data-ga="click/footer/socials/X">
-                        <a className="href_url_params" href="#" title="X" target="_blank">
+                        <a className="href_url_params" href="https://x.com" title="X" target="_blank" rel="noreferrer">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="none">
                                 <g fill="#fff" clip-path="url(#a)">
                                     <path fill-rule="evenodd" d="M28 2H12C6.477 2 2 6.477 2 12v16c0 5.523 4.477 10 10 10h16c5.523 0 10-4.477 10-10V12c0-5.523-4.477-10-10-10ZM12 0C5.373 0 0 5.373 0 12v16c0 6.627 5.373 12 12 12h16c6.627 0 12-5.373 12-12V12c0-6.627-5.373-12-12-12H12Z" clip-rule="evenodd"></path>
@@ -53,7 +53,7 @@ const Footer = () => {
                     </li>
                     
                     <li data-test="footer-social-facebook" className="social__item" data-ga="click/footer/socials/Facebook">
-                        <a className="href_url_params" href="#" title="Facebook" target="_blank">
+                        <a className="href_url_params" href="https://www.facebook.com" title="Facebook" target="_blank" rel="noreferrer">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
                                 <g clip-path="url(#clip0_4683_7182)">
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M28 2H12C6.47715 2 2 6.47715 2 12V28C2 33.5228 6.47715 38 12 38H28C33.5228 38 38 33.5228 38 28V12C38 6.47715 33.5228 2 28 2ZM12 0C5.37258 0 0 5.37258 0 12V28C0 34.6274 5.37258 40 12 40H28C34.6274 40 40 34.6274 40 28V12C40 5.37258 34.6274 0 28 0H12Z" fill="white">
@@ -71,7 +71,7 @@ const Footer = () => {
                     </li>
 
                     <li data-test="footer-social-instagram" className="social__item" data-ga="click/footer/socials/Instagram">
-                        <a className="href_url_params" href="#" title="Instagram" target="_blank">
+                        <a className="href_url_params" href="https://www.instagram.com" title="Instagram" target="_blank" rel="noreferrer">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
                                 <g clip-path="url(#clip0_4683_7186)">
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M28 2H12C6.47715 2 2 6.47715 2 12V28C2 33.5228 6.47715 38 12 38H28C33.5228 38 38 33.5228 38 28V12C38 6.47715 33.5228 2 28 2ZM12 0C5.37258 0 0 5.37258 0 12V28C0 34.6274 5.37258 40 12 40H28C34.6274 40 40 34.6274 40 28V12C40 5.37258 34.6274 0 28 0H12Z" fill="white"></path>
@@ -88,7 +88,7 @@ const Footer = () => {
                     </li>
                     
                     <li data-test="footer-social-youtube" className="social__item" data-ga="click/footer/socials/YouTube">
-                        <a className="href_url_params" href="#" title="YouTube" target="_blank">
+                        <a className="href_url_params" href="https://www.youtube.com" title="YouTube" target="_blank" rel="noreferrer">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
                                 <g clip-path="url(#clip0_4683_7184)">
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M28 2H12C6.47715 2 2 6.47715 2 12V28C2 33.5228 6.47715 38 12 38H28C33.5228 38 38 33.5228 38 28V12C38 6.47715 33.5228 2 28 2ZM12 0C5.37258 0 0 5.37258 0 12V28C0 34.6274 5.37258 40 12 40H28C34.6274 40 40 34.6274 40 28V12C40 5.37258 34.6274 0 28 0H12Z" fill="white"></path>
@@ -104,7 +104,7 @@ const Footer = () => {
                     </li>
 
                     <li data-test="footer-social-linkedin" className="social__item" data-ga="click/footer/socials/LinkedIn">
-                        <a className="href_url_params" href="#" title="LinkedIn" target="_blank">
+                        <a className="href_url_params" href="https://www.linkedin.com" title="LinkedIn" target="_blank" rel="noreferrer">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
                                 <g clip-path="url(#clip0_4683_7184)">
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M28 2H12C6.47715 2 2 6.47715 2 12V28C2 33.5228 6.47715 38 12 38H28C33.5228 38 38 33.5228 38 28V12C38 6.47715 33.5228 2 28 2ZM12 0C5.37258 0 0 5.37258 0 12V28C0 34.6274 5.37258 40 12 40H28C34.6274 40 40 34.6274 40 28V12C40 5.37258 34.6274 0 28 0H12Z" fill="white"></path>
@@ -126,8 +126,8 @@ const Footer = () => {
         </div>
 
         <div className="rightreserved">
-            <h4> <span >Tradx.io </span> | Owned and Controlled by Codestra.co
-            2023 © Tradx.io, All Rights Reserved </h4>
+            <h4> <span>Tradi</span> | Owned and Controlled by Codestra.co
+            2026 © Tradi, All Rights Reserved </h4>
         </div>
 
         

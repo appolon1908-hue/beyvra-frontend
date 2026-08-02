@@ -25,12 +25,12 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
   const items: TabsProps["items"] = [
     {
       key: "1",
-      label: "Login",
+      label: <span className={signInTab === "1" ? "auth-tab-active" : ""}>Login</span>,
       children: <SignInForm setForgotPasswordView={setForgotPasswordView} />,
     },
     {
       key: "2",
-      label: "Registration",
+      label: <span className={signInTab === "2" ? "auth-tab-active" : ""}>Registration</span>,
       children: <SignUpForm />,
     },
   ];

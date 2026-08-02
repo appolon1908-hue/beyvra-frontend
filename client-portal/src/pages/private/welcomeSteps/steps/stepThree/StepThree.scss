@@ -40,7 +40,7 @@
    
   }
   .line-width::before{
-    content: url('../../../../assets/icons/welcomeIcons/green-line.svg');
+    content: url('../../../../../assets/icons/welcomeIcons/green-line.svg');
     position: absolute;
     bottom:-14px;
     left: -10px;
@@ -49,7 +49,7 @@
     animation: blink ease-in-out 1.5s infinite;
   }
   .line-width::after{
-    content: url('../../../../assets/icons/welcomeIcons/red-dotted-line.svg');
+    content: url('../../../../../assets/icons/welcomeIcons/red-dotted-line.svg');
     position: absolute;
     top: -2px;
     left: -10px;

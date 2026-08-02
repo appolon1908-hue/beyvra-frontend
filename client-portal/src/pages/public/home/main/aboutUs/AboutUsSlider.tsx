@@ -1,4 +1,4 @@
-import Slider from 'react-slick'
+import Slider from 'components/slider/Slider'
 import { ArrowLeftOS, ArrowRightOS } from 'assets/icons';
 
 import './aboutUsSlider.scss'

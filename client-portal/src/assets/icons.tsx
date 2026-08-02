@@ -1,7 +1,9 @@
+import logoIconImage from "./home/LogoIcon.png";
+
 export const LogoIcon = () => {
   return (
     <img
-      src="src/assets/home/LogoIcon.png"
+      src={logoIconImage}
       alt="Logo"
       width="64"
     />
