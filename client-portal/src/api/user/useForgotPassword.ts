@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import getEnv from "utils/env";
+import { ApiError, getApiErrorMessage } from "api/errors";
 
 type ForgotPassResponse = {
   detail: string;
@@ -13,7 +14,7 @@ type useFrogotPassowrdProps = {
     context: unknown
   ) => void;
   onError?: (
-    error: ForgotPassResponse,
+    error: Error,
     variables: unknown,
     context: unknown
   ) => void;
@@ -24,27 +25,24 @@ type ForgotPasswordVariables = {
   email: string;
 };
 
-export async function fetchForgotPassword(data: ForgotPasswordVariables) {
+export async function fetchForgotPassword(data: ForgotPasswordVariables): Promise<ForgotPassResponse> {
   const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/user/password_reset/`, {
+  const response = await fetch(`${BASE_URL}/user/password_reset/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       referrerPolicy: "no-referrer",
       body: JSON.stringify(data),
-    });
-    const result = await response.json();
+  });
+  const result: unknown = await response.json().catch(() => null);
 
-    if (!response.ok) {
-      toast.error(result.detail);
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
+  if (!response.ok) {
+    const message = getApiErrorMessage(result, "Unable to request a password reset. Please try again.");
+    toast.error(message);
+    throw new ApiError(message, response.status);
   }
+  return result as ForgotPassResponse;
 }
 
 export const useFrogotPassowrd = (props: useFrogotPassowrdProps) => {
@@ -56,7 +54,7 @@ export const useFrogotPassowrd = (props: useFrogotPassowrdProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, ForgotPassResponse, any>({
+  return useMutation<ForgotPassResponse, Error, ForgotPasswordVariables>({
     mutationFn: fetchForgotPassword,
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {

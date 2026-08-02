@@ -2,13 +2,11 @@ import { useState } from "react";
 import { Form, Button } from "antd";
 import { useForm } from "react-hook-form";
 
-import { ISignInForm } from "@interfaces";
-
 import useFrogotPassowrd from "api/user/useForgotPassword";
 import { CheckIconLarge } from "assets/icons/CheckIconLarge";
 
 const ForgotPasswordForm = () => {
-  const { handleSubmit, register } = useForm<ISignInForm>();
+  const { handleSubmit, register, formState: { errors } } = useForm<{ email: string }>();
   const [emailSent, setEmailSent] = useState(false);
 
   const { mutate, isPending } = useFrogotPassowrd({
@@ -46,16 +44,14 @@ const ForgotPasswordForm = () => {
             we will send you a link to reset your password.
           </p>
 
-          <Form.Item
-            name="email"
-            rules={[{ required: true, message: "Email is required" }]}
-          >
+          <Form.Item validateStatus={errors.email ? "error" : undefined} help={errors.email?.message}>
             <input
               className="loginInput"
               type="email"
               id="email"
               placeholder="Email"
-              {...register("email")}
+              autoComplete="email"
+              {...register("email", { required: "Email is required" })}
             />
           </Form.Item>
 
