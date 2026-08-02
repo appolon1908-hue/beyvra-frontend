@@ -10,7 +10,7 @@ pipelines:
           - cd client-portal
           - npm ci
           - npm run lint
-          - npm run build:prod
+          - npm run build
   branches:
     main:
       - step:

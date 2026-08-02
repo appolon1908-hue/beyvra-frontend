@@ -3,7 +3,7 @@ import './button.scss';
 import { Spin } from 'antd';
 
 
-const KYCButton = (props: any): JSX.Element => {
+const KYCButton = (props: any): React.ReactElement => {
     const { text, action, className, icon, isLoading, disabled, animateClass, ...rest } = props;
 
     const btnLoadingComponent = () => (

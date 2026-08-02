@@ -2,8 +2,8 @@
 import React, { RefObject, useCallback, useEffect, useState } from "react";
 
 type UseTooltipProps = {
-  ref: RefObject<HTMLElement>;
-  tooltipRef: RefObject<HTMLDivElement>;
+  ref: RefObject<HTMLElement | null>;
+  tooltipRef: RefObject<HTMLDivElement | null>;
 };
 
 type Position = {

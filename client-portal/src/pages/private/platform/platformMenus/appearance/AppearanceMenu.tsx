@@ -20,7 +20,7 @@ import { setBgTheme } from "@store/slices/theme";
 interface AppearanceMenuProps {}
 
 const AppearanceMenu: React.FunctionComponent<AppearanceMenuProps> = () => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] =
     useState<boolean>(false);
   const [isSoundDropdownOpen, setIsSoundDropdownOpen] =
@@ -68,7 +68,7 @@ const AppearanceMenu: React.FunctionComponent<AppearanceMenuProps> = () => {
                     <div className="dropDownMenuItemIcon">
                       <VolumeCrossIcon />
                     </div>
-                    Slient
+                    {t("silentSound")}
                   </div>
                 ),
               },
@@ -79,7 +79,7 @@ const AppearanceMenu: React.FunctionComponent<AppearanceMenuProps> = () => {
                     <div className="dropDownMenuItemIcon">
                       <VolumeIcon />
                     </div>
-                    Gambling
+                    {t("gamblingSoundPack")}
                   </div>
                 ),
               },
@@ -90,7 +90,7 @@ const AppearanceMenu: React.FunctionComponent<AppearanceMenuProps> = () => {
                     <div className="dropDownMenuItemIcon">
                       <VolumeIcon />
                     </div>
-                    Default Pack
+                    {t("defaultSoundPack")}
                   </div>
                 ),
               },
@@ -110,7 +110,7 @@ const AppearanceMenu: React.FunctionComponent<AppearanceMenuProps> = () => {
                     <div className="dropDownMenuItemIcon">
                       <LightIcon />
                     </div>
-                    <div className="dropDownMenuItemText">Day </div>
+                    <div className="dropDownMenuItemText">{t("dayTheme")}</div>
                   </div>
                 ),
               },
@@ -121,7 +121,7 @@ const AppearanceMenu: React.FunctionComponent<AppearanceMenuProps> = () => {
                     <div className="dropDownMenuItemIcon">
                       <DarkIcon />
                     </div>
-                    <div className="dropDownMenuItemText">Night </div>
+                    <div className="dropDownMenuItemText">{t("nightTheme")}</div>
                   </div>
                 ),
               },

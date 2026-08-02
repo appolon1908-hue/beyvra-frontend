@@ -119,32 +119,32 @@ const LanguageSelectorDropDown = () => {
                     onLanguageChange('en')
                     }}>
                 <img src={localFlagHandler('en')} alt="" />
-                <h2>English</h2> 
+                <h2>{t("languageEnglish")}</h2>
                 </div>
                 <div className='languageValue' onClick={()=>{
                     onLanguageChange('es')
                     }}>
                 <img src={localFlagHandler('es')} alt="" />
-                <h2>Spanish</h2> 
+                <h2>{t("languageSpanish")}</h2>
                 </div>
                 <div className='languageValue' onClick={()=>{
                     onLanguageChange('ja')
 
                 }}>
                     <img src={localFlagHandler('ja')} alt="" />
-                    <h2>Japanese</h2> 
+                    <h2>{t("languageJapanese")}</h2>
                 </div>
                 <div className='languageValue' onClick={()=>{
                     onLanguageChange('ar')
                 }}>
                     <img src={localFlagHandler('ar')} alt="" />
-                    <h2>Arabic</h2> 
+                    <h2>{t("languageArabic")}</h2>
                 </div>
                 <div className='languageValue' onClick={()=>{
                     onLanguageChange('hi')
                 }}>
                 <img src={localFlagHandler('hi')} alt="" />
-                <h2>India</h2> 
+                <h2>{t("languageHindi")}</h2>
                 </div>
             </div>
         </div>

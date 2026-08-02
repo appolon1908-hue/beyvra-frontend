@@ -110,7 +110,7 @@ export function leftDrawerBodyHandler(
   setLeftSubDrawer: Dispatch<SetStateAction<LeftSubDrawer>>,
   setIsLeftSubDrawerOpen: Dispatch<SetStateAction<boolean>>,
   setIsDrawerOpen: Dispatch<SetStateAction<boolean>>
-): JSX.Element | null {
+): React.ReactElement | null {
   switch (currentDrawer) {
     case "trades":
       return (
@@ -198,7 +198,7 @@ export function leftSubDrawerTitleHandler(
 export function leftSubDrawerBodyHandler(
   leftSubDrawer: LeftSubDrawer,
   setLeftSubDrawer: Dispatch<SetStateAction<LeftSubDrawer>>
-): JSX.Element | null {
+): React.ReactElement | null {
   switch (leftSubDrawer) {
     case "help-center":
       return <HelpCenter setLeftSubDrawer={setLeftSubDrawer} />;
@@ -274,7 +274,7 @@ export function rightDrawerBodyHandler(
   setIsRightSubDrawerOpen: Dispatch<SetStateAction<boolean>>,
   setIsRightSubDrawerContent: Dispatch<SetStateAction<RightSubDrawerContent>>,
   setIsRightDrawerOpen: Dispatch<SetStateAction<boolean>>
-): JSX.Element | null {
+): React.ReactElement | null {
   switch (rightDrawerContent) {
     case "payments":
       return (
@@ -400,7 +400,7 @@ export function rightSubDrawerBodyHandler(
     React.SetStateAction<RightSubDrawerContent>
   >,
   setIsRightDrawerContent: Dispatch<React.SetStateAction<RightDrawerContent>>
-): JSX.Element | null {
+): React.ReactElement | null {
   switch (rightSubDrawerContent) {
     case "settings":
       return (
@@ -590,7 +590,7 @@ export function rightSubDrawerExtraHandler(
   setIsRightSubDrawerContent: Dispatch<
     React.SetStateAction<RightSubDrawerContent>
   >
-): JSX.Element | null {
+): React.ReactElement | null {
   switch (rightSubDrawerContent) {
     case "account-archive-success-menu":
     case "crypto-payment-processing":

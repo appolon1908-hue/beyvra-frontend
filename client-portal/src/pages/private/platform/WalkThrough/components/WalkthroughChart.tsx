@@ -40,9 +40,9 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
     gridLines = "#ffccff",
   } = colors || {};
 
-  const chartContainerRef: RefObject<HTMLDivElement> =
+  const chartContainerRef: RefObject<HTMLDivElement | null> =
     useRef<HTMLDivElement>(null);
-  const chartRef = useRef<IChartApi>();
+  const chartRef = useRef<IChartApi | undefined>(undefined);
 
   useEffect(() => {
     const chartContainer = chartContainerRef.current!;

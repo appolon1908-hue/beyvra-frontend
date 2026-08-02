@@ -7,7 +7,7 @@ import { ToastContainer } from "react-toastify";
 
 export const queryClient = new QueryClient();
 
-const Providers = ({ children }: { children: JSX.Element }) => {
+const Providers = ({ children }: { children: React.ReactElement }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <ReduxProvider store={store}>

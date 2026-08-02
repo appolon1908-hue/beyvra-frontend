@@ -5,7 +5,7 @@ import distribution from "../../../../../../../assets/portfolio/Chart.png"
 import { ColorType, createChart } from 'lightweight-charts'
 
 const Distributions = () => {
-  const distributionCharRef = useRef()
+  const distributionCharRef = useRef(null)
 
 
   useEffect(()=> {

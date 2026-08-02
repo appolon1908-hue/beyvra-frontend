@@ -15,7 +15,8 @@ import TradingConditions from "pages/public/trading/TradingConditions/Index";
 import CFDTrading from "pages/public/trading/cfdTrading";
 import ForexProfitCalculator from "pages/public/trading/ForexProfitCalculator";
 import KYC from "pages/private/platform/kyc";
-import { languages } from "./constants";
+import LocaleMetadata from "components/LocaleMetadata";
+import { applyGeoLocaleHint } from "./i18n/geoLocale";
 
 const Commodities = lazy(() => import("pages/public/markets/commodities/Commodities"))
 const Crypto = lazy(() => import("pages/public/markets/crypto/Crypto"))
@@ -61,22 +62,10 @@ export const GlobalLoginMaxAge = 2629746;
 
 const App: React.FunctionComponent = () => {
   const { i18n } = useTranslation();
-  document.body.dir = i18n.dir();
   useInitializeData();
 
   useEffect(() => {
-    fetch('https://ipapi.co/json/')
-      .then(response => response.json())
-      .then(data => {
-        const localLang = data.languages.split(',')[0];
-        const lang = localLang.split('-');
-        const matchedLanguage = languages.find(language => language.value.toLowerCase() === lang[0].toLowerCase());
-        if (matchedLanguage) {
-          i18n.changeLanguage(matchedLanguage?.languageKey);
-        } else {
-          i18n.changeLanguage('en');
-        }
-      });
+    void applyGeoLocaleHint(i18n);
     const storedScale = localStorage.getItem("scale");
 
     if (storedScale) {
@@ -98,6 +87,7 @@ const App: React.FunctionComponent = () => {
     <div data-theme={"dark"} style={{ backgroundColor: '#000000' }}>
       <Suspense fallback={<div className="fullLoadingBackground"><Loading /></div>}>
         <Router>
+          <LocaleMetadata />
           <Routes>
             <Route element={<RequireAuth />}>
               <Route path="/platform" element={<Platform />} />

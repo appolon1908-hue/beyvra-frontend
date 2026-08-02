@@ -124,7 +124,11 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
 
   const [toggleContent, setToggleContent] = useState(0);
 
-  const toggleContentData = [AllPairs, <h1>content2</h1>, <h1>content3</h1>];
+  const toggleContentData = [
+    AllPairs,
+    <h1>{t("marketDataComingSoon")}</h1>,
+    <h1>{t("marketDataComingSoon")}</h1>,
+  ];
   return (
     <div className="categorySliderPageContainer">
       <div className="categorySliderTabContainer">

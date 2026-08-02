@@ -5,9 +5,9 @@ import { additionalDataArray, tradeDownData, tradeUpData } from "./areaData";
 
 export const AreaChart = ({chartData, liveLoading = false, bidOngoing=false, time = 40, tradeType="up" }: any) => {
 
-    const resizeObserver: any = useRef();
+    const resizeObserver: any = useRef(undefined);
     const chartContainerRef: any = useRef(null);
-    const seriesRef: any = useRef();
+    const seriesRef: any = useRef(undefined);
 
     useEffect(() => {
       const chartContainer = chartContainerRef.current!;

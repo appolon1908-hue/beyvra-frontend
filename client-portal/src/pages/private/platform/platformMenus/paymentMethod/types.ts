@@ -1,14 +1,14 @@
 export type PaymentMethodDataType = {
   bankCards: {
     name: string;
-    methodIcon: JSX.Element;
+    methodIcon: React.ReactElement;
   }[];
   ePaymentSystems: {
     name: string;
-    methodIcon: JSX.Element;
+    methodIcon: React.ReactElement;
   }[];
   crypto: {
     name: string;
-    methodIcon: JSX.Element;
+    methodIcon: React.ReactElement;
   }[];
 };

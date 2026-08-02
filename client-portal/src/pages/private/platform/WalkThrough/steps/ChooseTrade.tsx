@@ -85,7 +85,7 @@ const ChooseTrade: React.FC<ChooseTradeProps> = ({
           </p>
 
           <button className="walkthroughButton" onClick={onSkipWalkthrough}>
-           {t("finishTradings")}
+           {t("finishTrading")}
           </button>
         </div>
       </div>

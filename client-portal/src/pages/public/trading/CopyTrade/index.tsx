@@ -28,10 +28,10 @@ const TrackTrades = () => {
         text: t("benefitTxt2")
     },{
         title: t("benefitTitle3"),
-        text: t("benefitTxt13")
+        text: t("benefitTxt3")
     },{
         title: t("benefitTitle4"),
-        text: t("benefitTxt14")
+        text: t("benefitTxt4")
     },{
         title: t("benefitTitle5"),
         text: t("benefitTxt5")

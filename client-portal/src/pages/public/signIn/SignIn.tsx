@@ -7,7 +7,7 @@ import SignInForm from "./components/SignInForm";
 
 import "./signIn.scss";
 import ForgotPasswordForm from "./components/ForgotPasswordForm";
-import { withTranslation } from "react-i18next";
+import { useTranslation, withTranslation } from "react-i18next";
 import { useAppSelector } from "@store/hooks";
 import { GlobalStates, setSignInTab } from "@store/slices/global";
 import { useDispatch } from "react-redux";
@@ -22,6 +22,7 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
   );
 
   const dispatch = useDispatch()
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedTab = searchParams.get("tab");
 
@@ -33,12 +34,12 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
   const items: TabsProps["items"] = [
     {
       key: "1",
-      label: <span className={signInTab === "1" ? "auth-tab-active" : ""}>Login</span>,
+      label: <span className={signInTab === "1" ? "auth-tab-active" : ""}>{t("login")}</span>,
       children: <SignInForm setForgotPasswordView={setForgotPasswordView} />,
     },
     {
       key: "2",
-      label: <span className={signInTab === "2" ? "auth-tab-active" : ""}>Registration</span>,
+      label: <span className={signInTab === "2" ? "auth-tab-active" : ""}>{t("registration")}</span>,
       children: <SignUpForm />,
     },
   ];

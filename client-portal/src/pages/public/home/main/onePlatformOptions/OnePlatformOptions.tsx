@@ -56,10 +56,10 @@ const OnePlatformOptions = () => {
         <div className='assetTableContainer'>
         <div className="asset-table-container">
       <div className="asset-table-header">
-        <div>Asset</div>
-        <div>Sell</div>
-        <div>Buy</div>
-        <div>Change (%)</div>
+        <div>{t("asset")}</div>
+        <div>{t("sell")}</div>
+        <div>{t("buy")}</div>
+        <div>{t("changePercent")}</div>
       </div>
       {data.map((item, index) => (
         <div className="asset-table-row" key={index}>

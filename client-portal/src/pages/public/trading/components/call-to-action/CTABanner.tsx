@@ -26,7 +26,7 @@ const CTABanner = () => {
 
                 </div>
 
-                <button> Enter  </button>
+                <button>{t("enter")}</button>
             </div>
             <div className='bg-sect'>
                 <div className='underlay'></div>

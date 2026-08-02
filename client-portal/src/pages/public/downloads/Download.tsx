@@ -128,7 +128,7 @@ const Download = () => {
             <img src="/downloads/IosLogo.svg" alt="iOSLogo" />
             <div className="elipse-ios"></div>
           </div>
-          <p>{t("iOS")}</p>
+          <p>{t("ios")}</p>
         </Col>
         <Col
           onClick={() => handleClick("Android")}

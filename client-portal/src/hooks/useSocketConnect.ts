@@ -58,7 +58,7 @@ const useSocketConnect = (wsTicket: string): SocketConnectReturn => {
   const [oldData, setOldData] = useState<ChartDataType[]>([]);
   const [data, setData] = useState<ChartDataType | null>(null);
   const [socket, setSocket] = useState<any>(null);
-  const chartSocket = useRef<WebSocket>();
+  const chartSocket = useRef<WebSocket | undefined>(undefined);
 
   const dispatch = useDispatch();
   const { wallets } = useAppSelector(

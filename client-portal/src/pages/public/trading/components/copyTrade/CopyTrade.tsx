@@ -40,7 +40,10 @@ const CopyTrade = () => {
   )
 }
 
-export const ImageCard = ({avatar, name, profit, ROI, style} : {avatar: string,  name: string, profit: string, ROI: string, style?: {}}) => (
+export const ImageCard = ({avatar, name, profit, ROI, style} : {avatar: string,  name: string, profit: string, ROI: string, style?: {}}) => {
+  const { t } = useTranslation();
+
+  return (
     <div style={style} className='pic-card'>
         <div className='pic-wrapper'>
         <img src={avatar} alt="pic" />
@@ -48,11 +51,12 @@ export const ImageCard = ({avatar, name, profit, ROI, style} : {avatar: string, 
         <div className='pic-info'>
             <p className='name'>{name}</p>
             <p className='fig'>{profit}</p>
-            <p className='ROI'>ROI <span>{ROI}</span> </p>
-            <button>follow</button>
+            <p className='ROI'>{t("roi")} <span>{ROI}</span> </p>
+            <button>{t("follow")}</button>
         </div>
     </div>
-)
+  );
+}
 
 
 
