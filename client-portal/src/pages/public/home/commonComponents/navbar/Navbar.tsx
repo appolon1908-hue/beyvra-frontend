@@ -14,6 +14,8 @@ import { Link, useNavigate } from "react-router-dom";
 import i18n from "../../../../../i18n";
 import { languages } from "../../../../../constants";
 import { useCookies } from "react-cookie";
+import { useDispatch } from "react-redux";
+import { setSignInTab } from "@store/slices/global";
 
 
 const Navbar= () => {
@@ -34,6 +36,13 @@ const Navbar= () => {
     };
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const openAuthentication = (tab: "1" | "2") => {
+    dispatch(setSignInTab(tab));
+    navigate("/signIn");
+    setToggleMobileNav(false);
+  };
 
   const getVisitorIp = async()=>{
     // setLoading(true)
@@ -300,8 +309,7 @@ const Navbar= () => {
         <button
           className="primaryButton"
           onClick={() => {
-            // dispatch(setSignInTab('1'))
-            navigate("/");
+            openAuthentication("2");
           }}
         >
           Registration
@@ -379,9 +387,7 @@ const Navbar= () => {
               <button
                 className="primaryButton"
                 onClick={() => {
-                  // dispatch(setSignInTab('1'))
-                  navigate("/signIn");
-                  setToggleMobileNav(false);
+                  openAuthentication("1");
                 }}
               >
                 Login
@@ -389,9 +395,7 @@ const Navbar= () => {
               <button
                 className="secondaryButton"
                 onClick={() => {
-                  // dispatch(setSignInTab('2'))
-                  navigate("/signIn");
-                  setToggleMobileNav(false);
+                  openAuthentication("2");
                 }}
               >
                 Sign Up

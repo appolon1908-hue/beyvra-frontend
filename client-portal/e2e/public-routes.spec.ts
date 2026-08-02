@@ -28,8 +28,9 @@ test("all public application routes render without browser errors", async ({ pag
 
 test("landing authentication controls are actionable", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("button", { name: "Log In" })).toBeEnabled();
-  await page.getByRole("tab", { name: "Registration" }).click();
+  await page.getByRole("button", { name: "Registration", exact: true }).click();
+  await expect(page).toHaveURL(/\/signIn$/);
+  await expect(page.getByRole("tab", { name: "Registration" })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("button", { name: "Register" })).toBeVisible();
   await page.screenshot({ path: "test-results/audit/02-registration.png", fullPage: false });
 });
