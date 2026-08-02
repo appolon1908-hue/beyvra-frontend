@@ -34,11 +34,11 @@ export const socketStockCryptoSlice = createSlice({
   name: "socketStockCrypto",
   initialState,
   reducers: {
-    setCryptoData: (state, action: PayloadAction<Data[]>) => {
+    setCryptoData: (state, action: PayloadAction<CryptoStockDataType[]>) => {
       state.cryptoData = action.payload;
       return state;
     },
-    setStockData: (state, action: PayloadAction<Data[]>) => {
+    setStockData: (state, action: PayloadAction<CryptoStockDataType[]>) => {
       state.stockData = action.payload;
       return state;
     },

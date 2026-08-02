@@ -3,7 +3,11 @@ import './customTimeSelector.scss'
 import { SetDuration } from '@store/slices/trade'
 import { useState } from 'react'
 
-const CustomTimeSelector = ({setToggleTimeSelector}) => {
+interface CustomTimeSelectorProps {
+  setToggleTimeSelector: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const CustomTimeSelector = ({setToggleTimeSelector}: CustomTimeSelectorProps) => {
     const [toggleMenu, setToggleMenu] = useState(0)
     const dispatch = useDispatch()
 

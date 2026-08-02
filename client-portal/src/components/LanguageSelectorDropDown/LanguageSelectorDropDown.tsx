@@ -1,4 +1,3 @@
-import { MouseEvent } from 'react';
 import { ArrowDownOS } from 'assets/icons';
 import { useEffect, useRef, useState } from 'react';
 import { localFlagHandler } from 'i18n/helpers';
@@ -80,9 +79,9 @@ const LanguageSelectorDropDown = () => {
 
     
     const [toggleLanguageSelector,setToggleLanguageSelector] = useState(false)
-    const languageSelectorRef = useRef()
+    const languageSelectorRef = useRef<HTMLDivElement>(null)
 
-    const handleClickOutside = (event: MouseEvent<Document>) => {
+    const handleClickOutside = (event: globalThis.MouseEvent) => {
       if (languageSelectorRef.current && !languageSelectorRef.current.contains(event.target as Node)) {
         setToggleLanguageSelector(false);
       }

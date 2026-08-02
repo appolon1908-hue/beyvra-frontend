@@ -72,9 +72,10 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
           className="login"
           type="primary"
           onClick={() => {
+            if (!userData?.login_token) return;
             mutateVerify({
               otp: otp,
-              loginToken: userData?.login_token,
+              loginToken: userData.login_token,
             })
           }}
           style={{ marginTop: 16 }}

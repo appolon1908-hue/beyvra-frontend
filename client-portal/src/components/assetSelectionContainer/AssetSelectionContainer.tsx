@@ -10,9 +10,9 @@ import { useEffect, useState } from "react";
 import DropdownMenu from "components/dropdownMenu/DropdownMenu";
 import { useAppDispatch, useAppSelector } from "@store/hooks";
 import {
-  CryptoStockDataType,
   setChartSymbol,
 } from "@store/slices/socketStockCrypto";
+import type { CryptoChartDataType } from "hooks/useSocketConnect";
 
 function calculatePercentageChange(
   currentPrice: number,
@@ -150,7 +150,7 @@ const AssetSelectionContainer: React.FunctionComponent = () => {
             }}
             onClick={() => {
               setSelectedIndex(index);
-              dispatch(setChartSymbol(item?.T));
+              dispatch(setChartSymbol(item.symbol));
             }}
           >
             <img
@@ -219,7 +219,7 @@ const AssetSelectionContainer: React.FunctionComponent = () => {
             </div>
           </div>
           <div className="asset-list-scrollable">
-            {Object.values(data.undefined.data).map((item, index) => (
+            {Object.values(data).map((item, index) => (
               <div
                 key={index}
                 className="asset-list-item-container"

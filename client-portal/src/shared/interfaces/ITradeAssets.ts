@@ -1,4 +1,5 @@
 export default interface ITradeAssets {
+    id?: number;
     name?: string;
     image?: string;
     value?: string;

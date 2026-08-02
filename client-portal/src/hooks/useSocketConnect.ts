@@ -24,6 +24,7 @@ export type CryptoChartDataType = {
   fmc24hpc: number;
   t: string;
   symbol: string;
+  change_percentage?: number;
 };
 
 export type ChartDataType = {

@@ -1,7 +1,6 @@
 import "./navbar.scss";
 import TradxLogo from "../../../../../assets/home/tradxlogo.png";
 
-import { MouseEvent } from "react";
 import {
   ArrowDownOS,
   MenuBar,
@@ -78,9 +77,9 @@ const Navbar= () => {
   const [toggleMobileNav, setToggleMobileNav] = useState(false);
   console.log(localFlagHandler(countryCode.toLocaleLowerCase()));
   console.log(countryCode.toLocaleLowerCase());
-  const languageSelectorRef = useRef();
+  const languageSelectorRef = useRef<HTMLDivElement>(null);
 
-  const handleClickOutside = (event: MouseEvent<Document>) => {
+  const handleClickOutside = (event: globalThis.MouseEvent) => {
     if (
       languageSelectorRef.current &&
       !languageSelectorRef.current.contains(event.target as Node)

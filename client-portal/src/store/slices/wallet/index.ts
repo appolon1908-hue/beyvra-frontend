@@ -5,6 +5,7 @@ import { InitialAccountsList, InitialAccountsListProps } from "pages/private/pla
 
 export interface WalletData {
   account_type?: number;
+  account_type__symbol?: string;
   name?: string;
   user?: number;
   updated_at?: string;

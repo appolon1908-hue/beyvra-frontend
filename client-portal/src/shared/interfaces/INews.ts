@@ -9,6 +9,7 @@ export default interface INews {
   content: string | null;
   pubDate: string;
   full_description: string;
+  full_text?: string;
   image_url: string | null;
   source_id: string;
   country: string[];

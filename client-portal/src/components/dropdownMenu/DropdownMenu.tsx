@@ -3,12 +3,11 @@ import './DropdownMenu.scss';
 
 const DropdownMenu = (props: any) => {
     const { position = "right", menuItems, children, type, customMenuItem = false } = props;
-    const dropdownRef = useRef();
+    const dropdownRef = useRef<HTMLDivElement>(null);
     const [open, setOpen] = useState(false);
 
     useEffect(() => {
         const handler = (e: any) => {
-            // @ts-ignore
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
                 setOpen(false);
             }

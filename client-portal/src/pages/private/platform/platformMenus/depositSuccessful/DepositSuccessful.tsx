@@ -46,16 +46,14 @@ const DepositSuccessful = () => {
         </Typography.Text>
         <div>
           <Typography.Title className="deposited-payment">
-            {data?.currency} {data?.amount}
+            {data?.currency?.symbol ?? data?.currency?.name ?? ""} {data?.amount}
           </Typography.Title>
         </div>
       </div>
       <PrimaryButton
         className="button"
         Title="Close"
-        onClick={function (): void {
-          throw new Error("Function not implemented.");
-        }}
+        onClick={() => dispatch(setTransactionId(null))}
       />
       <div className="deposited-trust">
         <Typography.Text className="deposited-trust-text">

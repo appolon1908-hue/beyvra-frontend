@@ -5,7 +5,7 @@ import useRegister from "api/user/useRegister";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import CountryCode from "../../../../helpers/CountryCode.json";
-import Select from "react-select";
+import Select, { type StylesConfig } from "react-select";
 //import WalkThrough from "./WalkThrough";
 import { useNavigate } from "react-router-dom";
 
@@ -101,7 +101,7 @@ const SignUpForm = () => {
     if (selectedOption) setCountryCode(selectedOption);
   };
 
-  const customStyles = {
+  const customStyles: StylesConfig<CountryOption, false> = {
     control: (provided) => ({
       ...provided,
       width: 112,

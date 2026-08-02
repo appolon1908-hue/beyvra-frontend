@@ -32,7 +32,9 @@ const ConfirmPayment: FC<ConfirmPaymentProps> = (
       <div className="confirmPayment">
         <div className="header">
           {/* <BlueCardIcon /> */}
-          {selectedPaymentMethod?.methodIcon}
+          {selectedPaymentMethod?.icon && (
+            <img src={selectedPaymentMethod.icon} alt={selectedPaymentMethod.name} />
+          )}
           <p>Payment Amount</p>
           <h2>EUR {amount}</h2>
         </div>

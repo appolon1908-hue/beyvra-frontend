@@ -50,15 +50,15 @@ const CryptoPayments: React.FunctionComponent<CryptoPaymentsProps> = ({
             below into your crypto wallet app
           </p>
           <div className="QRCode">
-            <QRCode
+            {selectedPaymentMethod?.account_id && <QRCode
               bgColor="#05233b"
               fgColor="#ffffff"
               className="QRCodeScan"
               size={56}
               style={{ height: "auto", maxWidth: "80%", width: "60%" }}
-              value={selectedPaymentMethod?.account_id}
+              value={selectedPaymentMethod.account_id}
               viewBox={`0 0 56 56`}
-            />
+            />}
           </div>
           <div className="btnContainer">
             <SecondaryButton

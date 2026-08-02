@@ -51,6 +51,7 @@ interface TradeFormProps {
   durationTooltipPlacement?: TooltipPlacement;
   hintTradesTooltipPlacement?: TooltipPlacement;
   socketData?: any;
+  onDecreaseDuration?: () => void;
 }
 
 const TradeForm: React.FunctionComponent<TradeFormProps> = ({
@@ -75,6 +76,7 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
   durationTooltipPlacement = "left",
   hintTradesTooltipPlacement = "left",
   socketData,
+  onDecreaseDuration,
 }) => {
   const { duration, amount } = useAppSelector(
     (state: { trades: TradeStates }) => state.trades
@@ -82,7 +84,7 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
   const [cookies] = useCookies(["access_token"]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [toggleTimeSelector, setToggleTimeSelector] = useState(false);
-  const amountContainerRef = useRef();
+  const amountContainerRef = useRef<HTMLDivElement>(null);
   const { assetPairs } = useAppSelector(
     (state: { assetPair: AssetPairSliceState }) => state.assetPair
   );
@@ -117,7 +119,9 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
   }, []);
 
   const handleInputUp = () => {
-    const { id, name, balance, currency } = selectedWallet;
+    const walletId = selectedWallet?.id;
+    const assetId = assetPairs[0]?.id;
+    if (!walletId || !assetId || !socketData || !cookies.access_token) return;
     // const {id} = currency
     dispatch(setTrade("up"));
     dispatch(SetDuration(duration));
@@ -132,8 +136,8 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
       trade_type: "up",
       is_active: true,
       duration: duration,
-      wallet: id.toString(),
-      asset: assetPairs[0]?.id.toString(),
+      wallet: walletId.toString(),
+      asset: assetId.toString(),
       open: socketData.open,
       close: socketData.close,
     };
@@ -143,7 +147,9 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
     });
   };
   const handleInputDown = () => {
-    const { id } = selectedWallet;
+    const walletId = selectedWallet?.id;
+    const assetId = assetPairs[0]?.id;
+    if (!walletId || !assetId || !socketData || !cookies.access_token) return;
     dispatch(setTrade("down"));
     dispatch(SetDuration(duration));
     dispatch(setAmount(amount));
@@ -156,8 +162,8 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
       trade_type: "down",
       is_active: true,
       duration: duration,
-      wallet: id.toString(),
-      asset: assetPairs[0]?.id.toString(),
+      wallet: walletId.toString(),
+      asset: assetId.toString(),
       open: socketData.open,
       close: socketData.close,
     };
@@ -172,6 +178,7 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
     dispatch(changeDuration("increase"));
   };
   const handleDecreaseDuration = () => {
+    onDecreaseDuration?.();
     console.log("decrease duration");
     if (duration > 10) {
       dispatch(changeDuration("decrease"));
@@ -191,10 +198,10 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
       dispatch(changeAmount("decrease"));
     }
   };
-  const handleClickOutside = (e) => {
+  const handleClickOutside = (e: React.MouseEvent | globalThis.MouseEvent) => {
     if (
       amountContainerRef.current &&
-      !amountContainerRef.current.contains(e.target)
+      !amountContainerRef.current.contains(e.target as Node | null)
     ) {
       setToggleTimeSelector(false);
       console.log("triggered");
@@ -214,11 +221,12 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
   }, [toggleTimeSelector]);
 
   useEffect(() => {
-    const iframe = document.getElementById("video-iframe");
+    const iframe = document.getElementById("video-iframe") as HTMLIFrameElement | null;
 
     const handleIframeLoad = () => {
       try {
-        const iframeDocument = iframe.contentWindow.document;
+        const iframeDocument = iframe?.contentWindow?.document;
+        if (!iframeDocument) return;
         const videoElement = iframeDocument.querySelector("video");
 
         if (videoElement) {
@@ -231,7 +239,7 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
 
         const skipAdButton = iframeDocument.querySelector(".skip-ad-button");
         if (skipAdButton) {
-          skipAdButton.click();
+          (skipAdButton as HTMLElement).click();
         }
       } catch (error) {
         console.warn(

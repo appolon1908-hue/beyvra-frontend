@@ -37,7 +37,7 @@ type FetchTransactionsArgs = {
 export async function fetchTransactions({
   token,
   options,
-}: FetchTransactionsArgs): Promise<TransactionResult> {
+}: FetchTransactionsArgs): Promise<TransactionResultType> {
   const BASE_URL = getEnv("VITE_API_BASE_URL");
 
   const searchParams = new URLSearchParams();
@@ -47,7 +47,7 @@ export async function fetchTransactions({
       if (options[key as keyof FetchTransactionsArgs["options"]]) {
         return searchParams.set(
           key,
-          options[key as keyof FetchTransactionsArgs["options"]]!
+          String(options[key as keyof FetchTransactionsArgs["options"]])
         );
       }
     });
@@ -77,7 +77,7 @@ export async function fetchTransactions({
 export async function fetchTransactions2({
   token,
   options,
-}: FetchTransactionsArgs): Promise<TransactionResult> {
+}: FetchTransactionsArgs): Promise<TransactionResultType> {
   const BASE_URL = getEnv("VITE_API_BASE_URL");
 
   const searchParams = new URLSearchParams();
@@ -87,7 +87,7 @@ export async function fetchTransactions2({
       if (options[key as keyof FetchTransactionsArgs["options"]]) {
         return searchParams.set(
           key,
-          options[key as keyof FetchTransactionsArgs["options"]]!
+          String(options[key as keyof FetchTransactionsArgs["options"]])
         );
       }
     });

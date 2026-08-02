@@ -5,7 +5,6 @@ import "./PaymentMethod.scss";
 import { useDispatch } from "react-redux";
 import { setPaymentMethod } from "@store/slices/payment";
 import { useAppSelector } from "@store/hooks";
-import { group } from "console";
 
 interface PaymentMethodProps {
   isModalOpen: any
@@ -40,8 +39,8 @@ const PaymentMethod: FC<PaymentMethodProps> = ({
     { type: "all" },
     ...(paymentMethodList || []),
   ];
-  const allPaymentMethods = paymentMethodListWithAll?.filter(() => true);
-  const filteredPaymentMethods = paymentMethodListWithAll?.filter(
+  const allPaymentMethods = paymentMethodList || [];
+  const filteredPaymentMethods = (paymentMethodList || []).filter(
     (method) => paymentType === "all" || method.type === paymentType
   );
 
