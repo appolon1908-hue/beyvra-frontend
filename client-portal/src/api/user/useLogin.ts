@@ -2,29 +2,30 @@ import { ISignInForm, IUser } from "@interfaces";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import getEnv from "utils/env";
+import { ApiError, getApiErrorMessage } from "api/errors";
 
-export async function fethLogin(data: ISignInForm): Promise<LoginSuccess> {
+export async function fetchLogin(data: ISignInForm): Promise<LoginSuccess> {
   const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/user/token/`, {
+  const response = await fetch(`${BASE_URL}/user/token/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       referrerPolicy: "no-referrer",
       body: JSON.stringify(data),
-    });
-    const result = await response.json();
+  });
+  const result: unknown = await response.json().catch(() => null);
 
-    if (!response.ok) {
-      toast.error(result.non_field_errors[0]);
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
+  if (!response.ok) {
+    const message = getApiErrorMessage(result, "Unable to sign in. Please try again.");
+    toast.error(message);
+    throw new ApiError(message, response.status);
   }
+  return result as LoginSuccess;
 }
+
+/** @deprecated Use fetchLogin. */
+export const fethLogin = fetchLogin;
 
 export interface LoginSuccess {
   access?: string;
@@ -52,7 +53,7 @@ export const useLogin = (props: useLoginProps) => {
   } = receivedProps;
 
   return useMutation<LoginSuccess, Error, ISignInForm>({
-    mutationFn: fethLogin,
+    mutationFn: fetchLogin,
     onSuccess: (data, variables, context) => {
       /* Add On success actions here if needed */
       if (onSuccessOverride) {

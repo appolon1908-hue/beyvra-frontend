@@ -1,4 +1,4 @@
-import { Checkbox, Form, Button } from "antd";
+import { Form, Button } from "antd";
 import { useForm, SubmitHandler } from "react-hook-form";
 
 import useRegister from "api/user/useRegister";
@@ -8,6 +8,8 @@ import CountryCode from "../../../../helpers/CountryCode.json";
 import Select, { type StylesConfig } from "react-select";
 //import WalkThrough from "./WalkThrough";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setSignInTab } from "@store/slices/global";
 
 
 import "./WalkThrough.scss";
@@ -26,6 +28,8 @@ interface SignUpFormData {
   first_name: string;
   last_name: string;
   password: string;
+  confirm_password: string;
+  accepted_terms: boolean;
 }
 
 const evaluatePasswordStrength = (password: string) => {
@@ -57,8 +61,9 @@ const SignUpForm = () => {
   type CountryOption = (typeof countriesList)[number];
   const [countryCode, setCountryCode] = useState<CountryOption>(countriesList[0]);
   const [show, setShow] = useState(false);
-  const { handleSubmit, register, reset, watch } = useForm<SignUpFormData>();
+  const { handleSubmit, register, reset, watch, formState: { errors } } = useForm<SignUpFormData>();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const password = watch("password", "");
   const strength = evaluatePasswordStrength(password);
   //const [showWalkThrough, setShowWalkThrough] = useState(false);
@@ -87,14 +92,21 @@ const SignUpForm = () => {
     onSuccess: () => {
       reset();
       toast.success("Registration successful. Sign in to continue.");
+      dispatch(setSignInTab("1"));
       navigate("/signIn");
     },
   });
 
   const onSubmit: SubmitHandler<SignUpFormData> = (data) => {
-    const temp = { ...data };
-    temp.phone_number = countryCode.value + temp.phone_number;
-    mutate(temp);
+    const localPhone = data.phone_number.replace(/\D/g, "");
+    const payload = {
+      email: data.email.trim().toLowerCase(),
+      first_name: data.first_name.trim(),
+      last_name: data.last_name.trim(),
+      password: data.password,
+      phone_number: `${countryCode.value}${localPhone}`,
+    };
+    mutate(payload);
   };
 
   const handleCountryChange = (selectedOption: CountryOption | null) => {
@@ -130,41 +142,50 @@ const SignUpForm = () => {
     <>
       <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
         <Form.Item
-          name="first_name"
-          rules={[{ required: true, message: "First Name is required" }]}
+          validateStatus={errors.first_name ? "error" : undefined}
+          help={errors.first_name?.message}
         >
           <input
             className="loginInput"
             type="text"
             id="first_name"
             placeholder="First Name"
-            {...register("first_name")}
+            autoComplete="given-name"
+            {...register("first_name", {
+              required: "First name is required",
+              pattern: { value: /^[a-zA-Z ]+$/, message: "Use letters and spaces only" },
+            })}
           />
         </Form.Item>
 
         <Form.Item
-          name="last_name"
-          rules={[{ required: true, message: "Last Name is required" }]}
+          validateStatus={errors.last_name ? "error" : undefined}
+          help={errors.last_name?.message}
         >
           <input
             className="loginInput"
             type="text"
             id="last_name"
             placeholder="Last Name"
-            {...register("last_name")}
+            autoComplete="family-name"
+            {...register("last_name", {
+              required: "Last name is required",
+              pattern: { value: /^[a-zA-Z ]+$/, message: "Use letters and spaces only" },
+            })}
           />
         </Form.Item>
 
         <Form.Item
-          name="email"
-          rules={[{ required: true, message: "Email is required" }]}
+          validateStatus={errors.email ? "error" : undefined}
+          help={errors.email?.message}
         >
           <input
             className="loginInput"
             type="email"
             id="email"
             placeholder="Email"
-            {...register("email")}
+            autoComplete="email"
+            {...register("email", { required: "Email is required" })}
           />
         </Form.Item>
         <div style={{ display: "flex", width: "100%" }}>
@@ -179,40 +200,43 @@ const SignUpForm = () => {
             />
           }
           <Form.Item
-            name="phone_number"
-            rules={[{ required: true, message: "Phone number is required" }]}
+            validateStatus={errors.phone_number ? "error" : undefined}
+            help={errors.phone_number?.message}
             style={{ width: "100%" }}
           >
             <input
               className="loginInput"
               style={{ width: "100%" }}
-              type="text"
+              type="tel"
               id="phone_number"
               placeholder="Phone number"
-              {...register("phone_number")}
+              autoComplete="tel-national"
+              inputMode="numeric"
+              {...register("phone_number", {
+                required: "Phone number is required",
+                pattern: { value: /^\d{6,14}$/, message: "Enter 6 to 14 digits without the country code" },
+              })}
             />
           </Form.Item>
         </div>
         <Form.Item
-          name="password"
-          rules={[{ required: true, message: "Password is required" }]}
+          validateStatus={errors.password ? "error" : undefined}
+          help={errors.password?.message}
         >
           <input
             className="loginInput"
             type={show ? "text" : "password"}
             id="password"
             placeholder="Password"
-            {...register("password")}
+            autoComplete="new-password"
+            {...register("password", {
+              required: "Password is required",
+              minLength: { value: 8, message: "Use at least 8 characters" },
+              maxLength: { value: 20, message: "Use no more than 20 characters" },
+            })}
           />
         </Form.Item>
-        {/* <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: -8,
-            marginBottom: 16,
-          }}
-        >
+        <div className="password-meta">
           <span style={{ color: "white", fontSize: 12 }}>
             {"Password strength: " + strength}
           </span>
@@ -222,15 +246,29 @@ const SignUpForm = () => {
           >
             {show ? "Hide password" : "Show password"}
           </span>
-        </div> */}
+        </div>
 
+        <Form.Item validateStatus={errors.confirm_password ? "error" : undefined} help={errors.confirm_password?.message}>
+          <input
+            className="loginInput"
+            type={show ? "text" : "password"}
+            id="confirm_password"
+            placeholder="Confirm password"
+            autoComplete="new-password"
+            {...register("confirm_password", {
+              required: "Please confirm your password",
+              validate: (value) => value === password || "Passwords do not match",
+            })}
+          />
+        </Form.Item>
 
-        <Form.Item>
-          <Checkbox>
+        <Form.Item validateStatus={errors.accepted_terms ? "error" : undefined} help={errors.accepted_terms?.message}>
+          <label className="agreement-checkbox">
+            <input type="checkbox" {...register("accepted_terms", { required: "You must accept the service agreement" })} />
             <span className="agreementSpan">
               I confirm that I am of legal age, I have read and agree to the<a href="/prv" target="_blank">&nbsp;Service agreement</a>.
             </span>
-          </Checkbox>
+          </label>
         </Form.Item>
 
 

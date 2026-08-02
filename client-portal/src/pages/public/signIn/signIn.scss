@@ -122,6 +122,24 @@ body{
         font-size: 0.9rem;
       }
     }
+    .password-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: -0.25rem 0 0.75rem;
+    }
+    .agreement-checkbox {
+      align-items: flex-start;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      gap: 0.6rem;
+
+      input {
+        accent-color: #2dfe4d;
+        margin-top: 0.2rem;
+      }
+    }
     .ant-input-affix-wrapper {
       background: #14161a;
       padding: 0.85rem 0.9375rem;
