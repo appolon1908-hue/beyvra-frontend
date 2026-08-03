@@ -12,3 +12,22 @@
 .platform-overview__grid p { margin:0; color:var(--color-text-secondary); line-height:1.5; }
 .platform-overview__disclosure { margin:40px auto 0; color:var(--color-text-muted); font-size:13px; }
 @media (max-width:700px) { .platform-overview__grid { grid-template-columns:1fr; } }
+
+/* Give wide monitors and headset browsers a useful reading width instead of
+   leaving the experience as a tiny desktop card in the middle of the view. */
+@media (min-width: 1920px) {
+  .platform-overview { padding-inline: clamp(40px, 8vw, 180px); }
+  .platform-overview h1 { max-width: 1100px; font-size: clamp(56px, 4vw, 76px); }
+  .platform-overview__lead { max-width: 860px; font-size: 21px; }
+  .platform-overview__grid { max-width: 1440px; gap: 24px; }
+  .platform-overview__grid article { padding: 32px; min-height: 180px; }
+}
+
+@media (min-width: 3200px) {
+  .platform-overview { padding-top: 220px; }
+  .platform-overview__grid { max-width: 1800px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+  .platform-overview__grid article { padding: 40px; min-height: 240px; }
+  .platform-overview__grid h2 { font-size: 28px; }
+  .platform-overview__grid p { font-size: 20px; }
+  .platform-overview__disclosure { font-size: 16px; }
+}
