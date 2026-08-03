@@ -23,14 +23,12 @@ import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
 
 interface PlatformProps {
   themeSelect: string;
-  topbarHeight: number;
   tradeFormHeight: number;
   bottomSidebarHeight: number;
 }
 
 const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   themeSelect,
-  topbarHeight,
   tradeFormHeight,
   bottomSidebarHeight,
 }) => {
@@ -231,7 +229,17 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     chartRef.current = chart;
     seriesRef.current = series;
 
+    const resizeObserver = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(([entry]) => {
+          const { width, height } = entry.contentRect;
+          if (width < 1 || height < 1) return;
+          chart.applyOptions({ width: Math.floor(width), height: Math.floor(height) });
+        })
+      : undefined;
+    resizeObserver?.observe(chartContainerRef.current);
+
     return () => {
+      resizeObserver?.disconnect();
       chart.unsubscribeCrosshairMove(interactionHandler);
       chart.timeScale().unsubscribeVisibleTimeRangeChange(syncHandler);
       chart.remove();
@@ -275,12 +283,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   // 5) Return matching design
   // ------------------------------------------------------------------
   return (
-    <div
-      className="trade-content"
-      style={{
-        height: `calc(100% - ${topbarHeight}px)`,
-      }}
-    >
+    <div className="trade-content">
       <div className="trade-graph">
         {/* Chart Container */}
         <div ref={chartContainerRef} className="chart-container" aria-label={`${tradingPair} market chart`}>

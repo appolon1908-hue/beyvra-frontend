@@ -56,7 +56,6 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
   const [currentDrawer, setCurrentDrawer] = useState<CurrentDrawerType>(null);
   const [leftSubDrawer, setLeftSubDrawer] = useState<LeftSubDrawer>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [topbarHeight, setTopbarHeight] = useState(0);
   const [tradeFormHeight, setTradeFormHeight] = useState(0);
   const [mainSidebarWidth, setMainSidebarWidth] = useState(0);
   const [bottomSidebarHeight, setBottomSidebarHeight] = useState(0);
@@ -97,7 +96,6 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
     const bottomSidebarElement = document.getElementById("bottom_sidebar");
 
     const measure = () => {
-      setTopbarHeight(topbarElement?.clientHeight ?? 0);
       setTradeFormHeight(tradeFormElement?.clientHeight ?? 0);
       setBottomSidebarHeight(bottomSidebarElement?.clientHeight ?? 0);
       setMainSidebarWidth(mainSidebarElement?.clientWidth ?? 0);
@@ -300,7 +298,6 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
 
         <PlatformChartContainer
           themeSelect={themeSelect}
-          topbarHeight={topbarHeight}
           tradeFormHeight={tradeFormHeight}
           bottomSidebarHeight={bottomSidebarHeight}
         />
