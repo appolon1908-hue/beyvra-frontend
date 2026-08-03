@@ -32,6 +32,13 @@ export const apiEndpoints = {
   },
   market: {
     history: "trades/market/history/",
+    snapshot: "v1/market/snapshot",
+    candles: "v1/market/candles",
+  },
+  realtime: {
+    news: "v1/news",
+    economicCalendar: "v1/economic-calendar",
+    health: "v1/realtime/health",
   },
   integrations: {
     users: "v1/users",
@@ -47,6 +54,10 @@ export const apiEndpoints = {
 } as const;
 
 export const socketEndpoints = {
+  realtimeMarket: "ws/v1/market-data",
+  realtimeNews: "ws/v1/news",
+  realtimeAccount: "ws/v1/account",
+  realtimePlatform: "ws/v1/platform",
   market: "ws/market-data/",
   trades: "ws/trades/",
   users: "ws/users/",
