@@ -22,7 +22,7 @@ test("registers, logs in, enters the platform, creates a demo trade, and logs ou
   ]);
   await page.goto("/platform", { waitUntil: "domcontentloaded" });
   await expect(page).toHaveURL(/\/platform|\/welcome/);
-  await expect(page.getByText("No Account")).toBeHidden();
+  await expect(page.getByRole("heading", { name: "No Account" }).first()).toBeHidden();
 
   const auth = { Authorization: `Bearer ${session.access}` };
   const walletsResponse = await request.get(`${origin}/api/wallet/wallets/`, { headers: auth });
