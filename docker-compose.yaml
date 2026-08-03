@@ -1,5 +1,6 @@
 services:
   frontend:
+    image: ${FRONTEND_IMAGE:-front-frontend:local}
     build:
       context: ./client-portal
       dockerfile: Dockerfile.prod
