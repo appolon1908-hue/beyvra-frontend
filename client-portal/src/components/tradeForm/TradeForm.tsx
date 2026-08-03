@@ -380,6 +380,8 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
             ) : null}
             <button
               onClick={handleInputUp}
+              disabled={isPending}
+              aria-busy={isPending}
               className={`up ${hintTrades ? "hint" : ""}`}
             >
               <div className="textContainerBtns">
@@ -394,6 +396,8 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
             </button>
             <button
               onClick={handleInputDown}
+              disabled={isPending}
+              aria-busy={isPending}
               className={`down ${hintTrades ? "hint" : ""}`}
             >
               <div className="textContainerBtns">

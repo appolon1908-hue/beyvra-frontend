@@ -1,8 +1,9 @@
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 
-import getEnv from "utils/env";
 import { WalletData } from "@store/slices/wallet";
+import { authenticatedRequest } from "api/client";
+import { apiEndpoints } from "api/endpoints";
 
 type useUpdateWalletProps = {
   onSuccess?: (data: {wallet: WalletData}, variables: unknown, context: unknown) => void;
@@ -14,30 +15,17 @@ export async function tradeTransaction(
   data: WalletData,
   token: string,
 ): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
-    const response = await fetch(`${BASE_URL}/trades/`, {
+    return await authenticatedRequest<boolean>(apiEndpoints.trades.list, token, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        "Idempotency-Key": crypto.randomUUID(),
       },
       body: JSON.stringify(data),
     });
-    const result = await response.json();
-
-    if (!response.ok) {
-      Object.keys(result).forEach((field) => {
-        const errors = result[field];
-        errors.forEach((errorMessage: string) => {
-          toast.error(`${field}: ${errorMessage}`);
-        });
-      });
-      throw new Error(`${result}`);
-    }
-    return result;
   } catch (error) {
-    throw new Error(error as string);
+    toast.error(error instanceof Error ? error.message : "Trade could not be placed");
+    throw error;
   }
 }
 

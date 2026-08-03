@@ -70,7 +70,7 @@ const WithdrawMenu: FC<WithdrawMenuProps> = ({
               <PrimaryButton
                 Title="Select Account"
                 className="SelectAccountButton"
-                onClick={() => null}
+                onClick={() => setIsWithdrawAccountModalOpen(true)}
               />
             </Col>
             <Col span={12}>

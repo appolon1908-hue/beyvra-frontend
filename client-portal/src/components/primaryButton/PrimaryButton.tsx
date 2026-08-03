@@ -27,6 +27,8 @@ const PrimaryButton = ({
       type={buttonType}
       className={`ButtonContainer ${disabled ? "disable" : ""} ${className}`}
       onClick={onClick}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       style={{backgroundColor: backgroundColor}}
     >
       {icon}

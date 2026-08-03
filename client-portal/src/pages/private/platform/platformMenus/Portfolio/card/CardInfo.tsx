@@ -1,7 +1,9 @@
-import { useAppSelector } from "@store/hooks";
+interface CardInfoProps {
+    totalBalance: number;
+    profitLoss: number;
+}
 
-const CardInfo = () => {
-    const { current_balance, profit_loss } = useAppSelector((state) => state.socketStockCrypto);
+const CardInfo = ({ totalBalance, profitLoss }: CardInfoProps) => {
     return (
         <div className="grid w-full md:grid-cols-2 gap-4 table-cards">
 
@@ -10,7 +12,7 @@ const CardInfo = () => {
                     Total Portfolio Balance
                 </p>
                 <p className='my-3 text-4xl'>
-                    {`$${current_balance}`}
+                    {totalBalance.toLocaleString(undefined, { style: "currency", currency: "USD" })}
                 </p>
             </div>
             <div className='py-2 px-3 bg-gray-100/20 rounded-lg card2'>
@@ -18,7 +20,7 @@ const CardInfo = () => {
                     Total Portfolio Profit/Loss
                 </p>
                 <p className='my-3 text-4xl'>
-                    {`$${profit_loss}`}
+                    {profitLoss.toLocaleString(undefined, { style: "currency", currency: "USD" })}
                 </p>
             </div>
 
