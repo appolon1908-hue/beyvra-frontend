@@ -12,7 +12,7 @@ Status: staging-only implementation, demo-first. Deployed to staging on
   Google disabled until approved OAuth credentials and legal versions exist.
 - The sign-in bundle contains the truthful disabled Google control; no live
   provider or financial capability was enabled.
-- Route-repair image: `codestra-frontend:staging-route-repair-20260803`.
+- Route-repair image: `codestra-frontend:staging-route-repair-final`.
 - Unauthenticated `/platform` and nested routes now redirect to `/login` with
   an encoded local `redirect` destination.
 - `/platform-overview` is an original demo-workspace overview; legacy trading
