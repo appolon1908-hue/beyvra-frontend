@@ -70,3 +70,31 @@ MEDIA_OWNERSHIP_STATUS=UNVERIFIED_FOR_EXISTING_ASSETS
 
 No production files, databases, DNS, payment providers, or live trading paths
 are in scope.
+
+## Initial remediation completed
+
+- `d1e46735`: centralized dark/demo-first tokens, removed the inline hero login,
+  routed `/signIn` to the existing authenticated form, and added safe public
+  CTA coverage.
+- `7ed57195`: removed the unverified hero/media/withdrawal/testimonial marketing
+  sections from the homepage and replaced them with three original demo-only
+  capability cards. Existing legacy pages remain available by direct route but
+  are not promoted from the homepage.
+- Mobile navigation now uses semantic menu buttons and working Markets/Trading
+  links. Focus-visible and reduced-motion rules are global.
+
+Verification from the local frontend worktree:
+
+```text
+npm run lint=PASS
+npm run typecheck=PASS
+npm run i18n:check=PASS (339 keys across 7 catalogs)
+npm run build=PASS (Vite warning: existing large chunks)
+Playwright public-routes=3/3 PASS
+```
+
+Remaining release blockers are intentional: legal/entity approval, ownership
+and licensing metadata for existing media, managed-media API/storage, full
+auth lifecycle coverage (MFA/session expiry/logout), and a full platform
+responsive/accessibility audit. Staging has not been redeployed from these
+commits yet.
