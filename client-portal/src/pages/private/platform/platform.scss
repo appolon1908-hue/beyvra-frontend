@@ -35,6 +35,56 @@
   }
 }
 
+/* Codestra/Tradi platform parity shell: fixed rail, flexible chart and ticket. */
+@media (min-width: 1024px) {
+  .platformWrapper {
+    .sidebar {
+      width: 64px;
+    }
+    .trade-section {
+      margin-left: 64px;
+      width: calc(100% - 64px);
+    }
+    .trade-content {
+      display: grid !important;
+      grid-template-columns: minmax(560px, minmax(0, 1fr)) 320px;
+      grid-template-rows: minmax(0, 1fr);
+      height: calc(100dvh - var(--header-height));
+      min-width: 0;
+    }
+    .trade-graph {
+      min-width: 0;
+      width: auto !important;
+      height: 100% !important;
+    }
+    .chart-container {
+      float: none;
+      width: 100% !important;
+      height: calc(100% - 48px) !important;
+      margin-left: 0 !important;
+    }
+    .trade-form {
+      width: 320px;
+      min-width: 320px;
+      height: 100%;
+      overflow-y: auto;
+      border-left: 1px solid var(--color-border);
+      background: var(--color-surface-1);
+    }
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .platformWrapper {
+    .sidebar { width: 64px; }
+    .trade-section { margin-left: 64px; width: calc(100% - 64px); }
+    .trade-content { display: block !important; height: calc(100dvh - var(--header-height)); }
+    .trade-graph { height: 100% !important; width: 100% !important; }
+    .chart-container { float: none; width: 100% !important; margin-left: 0 !important; }
+    .trade-form { position: fixed; right: 0; top: var(--header-height); width: min(360px, 42vw); height: calc(100dvh - var(--header-height)); z-index: 20; background: var(--color-surface-1); border-left: 1px solid var(--color-border); }
+  }
+}
+
 .chart-container {
   position: relative;
   float: right;
@@ -67,6 +117,31 @@
 .market-data-state--error {
   border-color: #ef5350;
 }
+
+.chart-status-bar {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 8px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 36px;
+  padding: 0 12px;
+  color: var(--color-text-secondary);
+  background: color-mix(in srgb, var(--color-surface-1) 92%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.quote-state--connected { color: var(--color-positive); }
+.quote-state--error, .quote-state--disconnected { color: var(--color-warning); }
+.timeframe-controls { display: flex; gap: 4px; margin-top: 8px; }
+.timeframe-controls button { min-width: 44px; min-height: 36px; border-radius: 8px; color: var(--color-text-secondary); background: var(--color-surface-2); }
+.timeframe-controls button.selected { color: var(--color-brand-contrast); background: var(--color-brand); }
 // default mode-night
 .ml-106 {
   &.leftSubDrawer {

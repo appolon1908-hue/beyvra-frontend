@@ -34,6 +34,8 @@ import PlatformChartContainer from "./PlatformChartContainer";
 import useWebSocketTicket from "api/user/useWebSocketTicket";
 import { setWSTicket } from "@store/slices/user";
 import { useCookies } from "react-cookie";
+import { usePlatformConfig } from "api/platform/usePlatformConfig";
+import { stagingPlatformFeatures } from "config/platformFeatures";
 
 interface PlatformProps { }
 
@@ -61,6 +63,7 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
   const storedScale = localStorage.getItem("scale");
   const { togglePortfolioWindow } = useAppSelector(state => state.app)
   const [cookies] = useCookies(["access_token"]);
+  const { data: platformFeatures = stagingPlatformFeatures } = usePlatformConfig();
 
 
   const dispatch = useDispatch();
@@ -140,6 +143,7 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
         isLeftSubDrawerOpen={isLeftSubDrawerOpen}
         currentDrawer={currentDrawer}
         setCurrentDrawer={setCurrentDrawer}
+        features={platformFeatures}
         id={id ? id : ""}
       />
     );

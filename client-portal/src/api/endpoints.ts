@@ -39,6 +39,7 @@ export const apiEndpoints = {
     news: "v1/news",
     economicCalendar: "v1/economic-calendar",
     health: "v1/realtime/health",
+    platformConfig: "platform/config",
   },
   integrations: {
     users: "v1/users",

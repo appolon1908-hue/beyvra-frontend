@@ -11,6 +11,7 @@ import { Spin } from "antd";
 import { useAppDispatch, useAppSelector } from "@store/hooks";
 import { setPortfolioWindow } from "@store/slices/app";
 import { CurrentDrawerType } from "pages/private/platform/types";
+import { featureEnabled, PlatformFeatureFlags, stagingPlatformFeatures } from "config/platformFeatures";
 
 type DrawerType =
   | "trades"
@@ -31,6 +32,7 @@ interface SidebarProps {
   id?: string;
   currentDrawer: DrawerType;
   setCurrentDrawer: React.Dispatch<React.SetStateAction<CurrentDrawerType>>;
+  features?: PlatformFeatureFlags;
 }
 
 const Sidebar: React.FunctionComponent<SidebarProps> = ({
@@ -40,6 +42,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
   isLeftSubDrawerOpen,
   currentDrawer,
   setCurrentDrawer,
+  features = stagingPlatformFeatures,
   id,
 }) => {
   const { togglePortfolioWindow } = useAppSelector(state => state.app)
@@ -103,7 +106,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
         </button>
 
         <button
-          aria-label="Market"
+          aria-label="Assets"
           onClick={() => onSelect("market")}
           className={isDrawerOpen && currentDrawer === "market" ? "active" : ""}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
@@ -111,7 +114,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
           <div className="icon flex justify-center whiteIcons">
             <MarketIcon />
           </div>
-          <p className="text">Market</p>
+          <p className="text">Assets</p>
         </button>
 
         <button
@@ -137,7 +140,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
           </div>
           <p className="text">Help</p>
         </button>
-        <button
+        {featureEnabled("newsStream", features) && <button
           aria-label="News"
           onClick={() => onSelect("news")}
           className={isDrawerOpen && currentDrawer === "news" ? "active" : ""}
@@ -147,7 +150,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
             <NewsIcon />
           </div>
           <p className="text">News</p>
-        </button>
+        </button>}
       </div>
       <div className="bottom">
         <div className="online">

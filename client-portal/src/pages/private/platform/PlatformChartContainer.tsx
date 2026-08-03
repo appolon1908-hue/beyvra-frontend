@@ -41,12 +41,17 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const [selectedChart, setSelectedChart] = useState<"area" | "candlesticks" | "bar">("candlesticks");
   const chartSymbol = useAppSelector((state) => state.socketStockCrypto.chartSymbol) || "BTC";
   const tradingPair = `${chartSymbol.replace(/USDT$|\/USD$/i, "").toUpperCase()}USDT`;
-  const [candleInterval] = useState("1m");
+  const [candleInterval, setCandleInterval] = useState("1m");
   const [chartData, setChartData] = useState<CandlestickData[]>([]);
   const [userInteracted, setUserInteracted] = useState(false);
+  const chartDataRef = useRef<CandlestickData[]>([]);
+  const userInteractedRef = useRef(false);
   const [connectionState, setConnectionState] = useState<"loading" | "connected" | "disconnected" | "error">("loading");
   const [chartError, setChartError] = useState("");
   const [cookies] = useCookies(["access_token"]);
+  const hasChartData = chartData.length > 0;
+
+  useEffect(() => { chartDataRef.current = chartData; }, [chartData]);
 
   // ------------------------------------------------------------------
   // 1) Fetch historical data + initialize WebSocket
@@ -123,6 +128,8 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     const initializeChartData = async () => {
       try {
         setConnectionState("loading");
+        userInteractedRef.current = false;
+        setUserInteracted(false);
         const response = await fetch(
           getApiUrl(`trades/market/history/?symbol=${tradingPair}&interval=${candleInterval}&limit=500`),
           { headers: { Authorization: `Bearer ${cookies.access_token}` } },
@@ -154,7 +161,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   // 2) Initialize / update the chart
   // ------------------------------------------------------------------
   useEffect(() => {
-    if (!chartContainerRef.current || chartData.length === 0) return;
+    if (!chartContainerRef.current || !hasChartData) return;
 
     // Create or re-create the chart
     const chart = createChart(chartContainerRef.current, {
@@ -205,16 +212,19 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     }
 
     // Set data and fit
-    series.setData(chartData);
+    series.setData(chartDataRef.current);
     chart.timeScale().fitContent();
 
     // Auto-scroll until user interacts
     const syncHandler = () => {
-      if (!userInteracted) {
+      if (!userInteractedRef.current) {
         chart.timeScale().scrollToRealTime();
       }
     };
-    const interactionHandler = () => setUserInteracted(true);
+    const interactionHandler = () => {
+      userInteractedRef.current = true;
+      setUserInteracted(true);
+    };
     chart.subscribeCrosshairMove(interactionHandler);
     chart.timeScale().subscribeVisibleTimeRangeChange(syncHandler);
 
@@ -226,7 +236,13 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
       chart.timeScale().unsubscribeVisibleTimeRangeChange(syncHandler);
       chart.remove();
     };
-  }, [selectedChart, themeSelect, chartData, userInteracted]);
+  }, [selectedChart, themeSelect, hasChartData]);
+
+  useEffect(() => {
+    if (!seriesRef.current || chartData.length === 0) return;
+    seriesRef.current.setData(chartData as never);
+    if (!userInteracted) chartRef.current?.timeScale().scrollToRealTime();
+  }, [chartData, userInteracted]);
 
   // ------------------------------------------------------------------
   // 3) Handle window resize
@@ -275,6 +291,11 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
               {connectionState === "error" && chartError}
             </div>
           )}
+          <div className="chart-status-bar" role="status" aria-live="polite">
+            <span>{tradingPair}</span>
+            <span className={`quote-state quote-state--${connectionState}`}>{connectionState === "connected" ? "Demo feed connected" : connectionState}</span>
+            <span>Interval: {candleInterval}</span>
+          </div>
           {/* Chart Controls */}
           <div className="chart-controls">
             {/* Chart Type Dropdown */}
@@ -299,12 +320,28 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
                 <ZoomOutChartIcon />
               </button>
             </div>
+            <div className="timeframe-controls" aria-label="Chart timeframe">
+              {["1m", "5m", "15m"].map((interval) => (
+                <button
+                  key={interval}
+                  type="button"
+                  className={candleInterval === interval ? "selected" : ""}
+                  onClick={() => { userInteractedRef.current = false; setUserInteracted(false); setCandleInterval(interval); }}
+                  aria-pressed={candleInterval === interval}
+                >{interval}</button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Bottom Section (Trade Form) */}
-      <TradeForm bottomSidebarHeight={bottomSidebarHeight} />
+      <TradeForm
+        bottomSidebarHeight={bottomSidebarHeight}
+        disabled={connectionState !== "connected" || chartData.length === 0}
+        showSetupOrder={false}
+        showProfit={false}
+      />
     </div>
   );
 };

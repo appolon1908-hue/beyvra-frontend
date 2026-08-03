@@ -347,6 +347,19 @@
   }
 }
 
+.trade-form {
+  .upNdown button.up,
+  .upNdown button.down,
+  .upNdown button.setupOrder {
+    min-height: 56px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 650;
+  }
+  .mathButtons button { min-width: 44px; min-height: 44px; }
+  .profit { color: var(--color-text-secondary); }
+}
+
 .smallLiveVideo {
   position: absolute;
   top: 0;
