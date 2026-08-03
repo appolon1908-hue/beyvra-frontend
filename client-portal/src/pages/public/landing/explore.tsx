@@ -1,4 +1,5 @@
 import "./landing.scss";
+import { Link } from "react-router-dom";
 
 
 const Explore = () => {
@@ -15,13 +16,11 @@ const Explore = () => {
                     Demo account <br/>
                         <span> designed for practice </span>
                 </p>
-                <button>
-                    Try now
-                </button>
+                <Link to="/signIn"><button type="button">Try now</button></Link>
 
-                <span>
+                <Link to="/trading"><span>
                     Learn more &gt;
-                </span>
+                </span></Link>
 
             </div>
             <div className="cardRight">

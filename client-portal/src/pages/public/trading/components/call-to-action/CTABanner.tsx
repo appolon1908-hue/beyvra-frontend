@@ -5,8 +5,10 @@ import './ctabanner.scss'
 import BarIcon  from "../../../../../assets/trading/majocamelo_bar_chart_3d_icon_black_6ec4c2c2-17aa-4f4c-9610-7defe9438f35-removebg-preview 1.png"
 import RedGiftIcon from "../../../../../assets/trading/majocamelo_Red_icon_gift_box_3d_cinema_4d_rounded_corner_77e04dfc-3a3b-4733-84ae-bc5912b8b3db-removebg-preview 1.png"
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 const CTABanner = () => {
     const {t} = useTranslation()
+    const navigate = useNavigate()
   return (
     <div className='callToAction'>
         <div className='left'>
@@ -26,7 +28,7 @@ const CTABanner = () => {
 
                 </div>
 
-                <button>{t("enter")}</button>
+                <button type="button" onClick={() => navigate('/signIn')}>{t("enter")}</button>
             </div>
             <div className='bg-sect'>
                 <div className='underlay'></div>

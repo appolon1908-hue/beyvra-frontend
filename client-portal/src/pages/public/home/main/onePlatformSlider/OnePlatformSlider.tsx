@@ -74,14 +74,14 @@ const ArrowButtonNext:React.FC<{onClick: any}>  = ({onClick }) => {
                 <div className='onePlatformSliderInnerItem'>
                   <h2>{t("forex")}</h2>
                   <img src={Forex} alt="Forex" />
-                  <button>{t("moreInfo")}</button>
+                  <Link to="/trading/forexProfitCalculator"><button type="button">{t("moreInfo")}</button></Link>
                 </div>
             </div>
             <div className='onePlatformSliderItem'>
                 <div className='onePlatformSliderInnerItem'>
                   <h2>{t("stocks")}</h2>
                   <img src={Stocks} alt="Forex" />
-                  <button>{t("moreInfo")}</button>
+                  <Link to="/markets/shares"><button type="button">{t("moreInfo")}</button></Link>
                 </div>
             </div>
             <div className='onePlatformSliderItem'>

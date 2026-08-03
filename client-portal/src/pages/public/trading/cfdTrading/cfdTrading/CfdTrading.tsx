@@ -1,9 +1,11 @@
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import "./CfdTrading.scss";
 import MainImg from "./main.png";
 
 const CfdTradingBlock = () => {
   const {t} = useTranslation()
+  const navigate = useNavigate()
   return (
     <div className="cfdTradingContainer">
       <div>
@@ -11,7 +13,7 @@ const CfdTradingBlock = () => {
         <span>
           {t("CFDTradeTxt")}
         </span>
-        <button>{t("startTrade")}</button>
+        <button type="button" onClick={() => navigate('/signIn')}>{t("startTrade")}</button>
       </div>
       <img src={MainImg} alt="" />
     </div>

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import './headIntro.scss'
 
 interface HeadIntroProps{
@@ -8,12 +9,13 @@ interface HeadIntroProps{
 }
 const HeadIntro:React.FC<HeadIntroProps> = ({title,detail,buttonTitle}) => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
  
   return (
     <div className="headIntroContainer">
         <h2>{t(title)}</h2>
         <p>{t(detail)}</p>
-        <button>{t(buttonTitle)}</button>
+        <button type="button" onClick={() => navigate('/signIn')}>{t(buttonTitle)}</button>
     </div>
   )
 }
