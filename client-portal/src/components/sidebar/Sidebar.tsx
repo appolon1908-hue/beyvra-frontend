@@ -1,5 +1,4 @@
 import {
-  EventsIcon,
   HelpIcon,
   LogoIcon,
   MarketIcon,
@@ -113,18 +112,6 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
             <MarketIcon />
           </div>
           <p className="text">Market</p>
-        </button>
-
-        <button
-          aria-label="Events"
-          onClick={() => onSelect("events")}
-          className={isDrawerOpen && currentDrawer === "events" ? "active" : ""}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
-        >
-          <div className="icon flex justify-center whiteIcons">
-            <EventsIcon />
-          </div>
-          <p className="text">Events</p>
         </button>
 
         <button

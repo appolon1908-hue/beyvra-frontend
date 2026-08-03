@@ -54,7 +54,7 @@ test.describe("authenticated dashboard responsive audit", () => {
     await expectNoHorizontalOverflow(page);
     await page.screenshot({ path: `${auditDir}/01-desktop-platform.png` });
 
-    for (const [index, menu] of ["Trades", "Market", "Events", "Help", "News"].entries()) {
+    for (const [index, menu] of ["Trades", "Market", "Help", "News"].entries()) {
       await page.getByRole("button", { name: menu, exact: true }).click();
       await page.waitForTimeout(350);
       await expect(page.locator(".leftMainDrawer")).toBeVisible();
@@ -70,17 +70,17 @@ test.describe("authenticated dashboard responsive audit", () => {
     await expect(page.locator(".windowDrawer").getByText("Loading portfolio…")).toBeHidden({ timeout: 15_000 });
     await expect(page.locator(".windowDrawer [role=alert]")).toHaveCount(0);
     await page.waitForTimeout(350);
-    await page.screenshot({ path: `${auditDir}/07-desktop-portfolio.png` });
+    await page.screenshot({ path: `${auditDir}/06-desktop-portfolio.png` });
     await page.locator(".windowDrawer button.ant-drawer-close").click();
 
     const desktopProfile = page.locator(".payProfileTab:not(.payProfileTabMobile) button.profile");
     await desktopProfile.click();
     await page.waitForTimeout(350);
-    await page.screenshot({ path: `${auditDir}/08-desktop-profile.png` });
+    await page.screenshot({ path: `${auditDir}/07-desktop-profile.png` });
 
     await page.getByRole("button", { name: "Open notifications" }).click();
     await page.waitForTimeout(350);
-    await page.screenshot({ path: `${auditDir}/09-desktop-notifications.png` });
+    await page.screenshot({ path: `${auditDir}/08-desktop-notifications.png` });
 
     await page.keyboard.press("Escape");
     await page.keyboard.press("Tab");
@@ -89,53 +89,53 @@ test.describe("authenticated dashboard responsive audit", () => {
       return { tag: node?.tagName, label: node?.getAttribute("aria-label") || node?.textContent?.trim() || "" };
     });
     expect(focusable.tag).not.toBe("BODY");
-    await page.screenshot({ path: `${auditDir}/10-desktop-keyboard-focus.png` });
+    await page.screenshot({ path: `${auditDir}/09-desktop-keyboard-focus.png` });
   });
 
   test("mobile navigation, drawers, keyboard, and reflow", async ({ page, context, request, baseURL }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await authenticate(page, context, request, baseURL);
     await expectNoHorizontalOverflow(page);
-    await page.screenshot({ path: `${auditDir}/11-mobile-platform.png` });
+    await page.screenshot({ path: `${auditDir}/10-mobile-platform.png` });
 
     await page.getByRole("button", { name: "Trades", exact: true }).click();
     await page.waitForTimeout(350);
     await expectNoHorizontalOverflow(page);
-    await page.screenshot({ path: `${auditDir}/12-mobile-trades.png` });
+    await page.screenshot({ path: `${auditDir}/11-mobile-trades.png` });
     await page.locator(".leftMainDrawer button.ant-drawer-close").click();
 
     await page.getByRole("button", { name: "News", exact: true }).click();
     await page.waitForTimeout(350);
     await expectNoHorizontalOverflow(page);
-    await page.screenshot({ path: `${auditDir}/13-mobile-news.png` });
+    await page.screenshot({ path: `${auditDir}/12-mobile-news.png` });
     await page.locator(".leftMainDrawer button.ant-drawer-close").click();
 
     await page.getByRole("button", { name: "Open profile" }).last().click();
     await page.waitForTimeout(350);
     await expectNoHorizontalOverflow(page);
-    await page.screenshot({ path: `${auditDir}/14-mobile-profile.png` });
+    await page.screenshot({ path: `${auditDir}/13-mobile-profile.png` });
 
     await page.getByRole("button", { name: "Open notifications" }).click();
     await page.waitForTimeout(350);
     await expectNoHorizontalOverflow(page);
-    await page.screenshot({ path: `${auditDir}/15-mobile-notifications.png` });
+    await page.screenshot({ path: `${auditDir}/14-mobile-notifications.png` });
 
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
     const activeTag = await page.evaluate(() => document.activeElement?.tagName);
     expect(activeTag).not.toBe("BODY");
-    await page.screenshot({ path: `${auditDir}/16-mobile-keyboard-focus.png` });
+    await page.screenshot({ path: `${auditDir}/15-mobile-keyboard-focus.png` });
 
     await page.locator(".rightSubDrawer button.ant-drawer-close").click();
     await expect(page.locator(".rightSubDrawer")).toBeHidden();
     await page.setViewportSize({ width: 320, height: 568 });
     await expect(page.getByText("Live market feed disconnected. Reconnecting…")).toBeHidden({ timeout: 15_000 });
     await expectNoHorizontalOverflow(page);
-    await page.screenshot({ path: `${auditDir}/17-small-mobile-platform.png` });
+    await page.screenshot({ path: `${auditDir}/16-small-mobile-platform.png` });
 
     await page.setViewportSize({ width: 768, height: 1024 });
     await expect(page.getByText("Live market feed disconnected. Reconnecting…")).toBeHidden({ timeout: 15_000 });
     await expectNoHorizontalOverflow(page);
-    await page.screenshot({ path: `${auditDir}/18-tablet-platform.png` });
+    await page.screenshot({ path: `${auditDir}/17-tablet-platform.png` });
   });
 });

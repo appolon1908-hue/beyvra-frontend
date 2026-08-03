@@ -1,8 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction } from "react";
 import "./helpMenu.scss";
-import { VideoIcon } from "../../../../../assets/icons";
 import { LeftSubDrawer } from "../../types";
-import { Col, Row } from "antd";
 import { useAppSelector } from "@store/hooks";
 
 interface HelpMenuProps {
@@ -31,33 +29,6 @@ const HelpLink = ({
     </div>
   );
 };
-
-const HelpMenuList = [
-  {
-    id: 1,
-    title: "Discover the Platform",
-    time: "02:01",
-    img: "/menu-images/svgs/ScholarHat.svg",
-  },
-  {
-    id: 2,
-    title: "Opening Trades",
-    time: "02:46",
-    img: "/menu-images/svgs/TradingSignalsSky.svg",
-  },
-  {
-    id: 3,
-    title: "Making Forecasts",
-    time: "04:46",
-    img: "/menu-images/svgs/SearchBigImage.svg",
-  },
-  {
-    id: 4,
-    title: "Deposit & Withdrawal",
-    time: "04:46",
-    img: "/menu-images/svgs/DollarSignSky.svg",
-  },
-];
 
 const HelpMenu: React.FunctionComponent<HelpMenuProps> = ({
   setLeftSubDrawer,
@@ -107,24 +78,7 @@ const HelpMenu: React.FunctionComponent<HelpMenuProps> = ({
           }}
         />
       </div>
-      <div className="videosContainer">
-        <h2 className="videoLessons">Video Lessons</h2>
-        {HelpMenuList.map((item) => (
-          <div key={item.id} className="videosItems">
-            <Row className="videoItemRow">
-              <Col span={14} className="videoItemCol1">
-                <div className="videoItemHeader">
-                  <VideoIcon /> {item.time}
-                </div>
-                <h2>{item.title}</h2>
-              </Col>
-              <Col span={10} className="videoItemImage">
-                <img src={item.img} alt="" />
-              </Col>
-            </Row>
-          </div>
-        ))}
-      </div>
+      <p className="helpMenuNote">Choose a support topic above. Walkthrough lessons are available from your account walkthrough.</p>
     </div>
   );
 };

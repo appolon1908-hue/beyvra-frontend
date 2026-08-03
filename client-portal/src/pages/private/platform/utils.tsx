@@ -118,10 +118,7 @@ export function leftDrawerBodyHandler(
       );
     case "market":
       return (
-        <MarketMenu
-          setLeftSubDrawer={setLeftSubDrawer}
-          setIsLeftSubDrawerOpen={setIsLeftSubDrawerOpen}
-        />
+        <MarketMenu />
       );
     case "events":
       return (
