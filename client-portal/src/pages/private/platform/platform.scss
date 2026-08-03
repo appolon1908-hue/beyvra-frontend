@@ -16,6 +16,7 @@
     position: relative;
     .trade-content {
       display: flex;
+      position: relative;
 
       @media (max-width: 767px) {
         flex-direction: column;
@@ -69,14 +70,7 @@
       height: 100% !important;
       margin-left: 0 !important;
     }
-    .trade-form {
-      width: 320px;
-      min-width: 320px;
-      height: 100%;
-      overflow-y: auto;
-      border-left: 1px solid var(--color-border);
-      background: var(--color-surface-1);
-    }
+    .trade-ticket-shell { width: 320px; min-width: 320px; }
   }
 }
 
@@ -87,7 +81,31 @@
     .trade-content { display: block !important; height: calc(100dvh - var(--header-height)); }
     .trade-graph { height: 100% !important; width: 100% !important; }
     .chart-container { float: none; width: 100% !important; margin-left: 0 !important; }
-    .trade-form { position: fixed; right: 0; top: var(--header-height); width: min(360px, 42vw); height: calc(100dvh - var(--header-height)); z-index: 20; background: var(--color-surface-1); border-left: 1px solid var(--color-border); }
+    .trade-ticket-shell {
+      position: fixed;
+      z-index: 40;
+      top: var(--header-height);
+      right: 0;
+      bottom: 0;
+      width: min(320px, calc(100vw - 64px));
+      height: auto;
+      transform: translateX(100%);
+      transition: transform 160ms ease-out;
+    }
+    .trade-ticket-shell.is-open { transform: translateX(0); }
+    .trade-ticket-shell .trade-ticket-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 52px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text);
+      font-weight: 650;
+    }
+    .trade-ticket-shell .trade-ticket-header button { min-width: 44px; min-height: 44px; color: var(--color-text); background: transparent; border: 0; font-size: 24px; }
+    .platformWrapper .ticket-trigger { display: inline-flex; align-items: center; justify-content: center; }
+    .platformWrapper .ticket-backdrop { display: block; position: fixed; z-index: 39; inset: var(--header-height) 0 0 64px; border: 0; background: var(--color-overlay); }
   }
 }
 
@@ -158,6 +176,42 @@
 .platformWrapper * { box-sizing: border-box; }
 
 .platformWrapper .topbarContainer { flex-shrink: 0; }
+
+.trade-ticket-shell {
+  grid-column: 2;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--color-surface-1);
+  border-left: 1px solid var(--color-border);
+}
+.trade-ticket-shell .trade-ticket-header { display: none; }
+.trade-ticket-shell .trade-form {
+  position: static !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  max-height: none !important;
+  margin: 0 !important;
+  border: 0;
+}
+.ticket-trigger {
+  display: none;
+  position: absolute;
+  z-index: 8;
+  right: 12px;
+  bottom: 64px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  font: 600 14px/1.2 var(--font-ui);
+}
+.ticket-trigger:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+.ticket-backdrop { display: none; }
 
 @media (max-width: 767px) {
   .platformWrapper {
@@ -242,6 +296,36 @@
     overflow-y: auto;
     overscroll-behavior: contain;
   }
+
+  .platformWrapper .ticket-trigger { display: inline-flex; align-items: center; justify-content: center; bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .platformWrapper .ticket-backdrop { display: block; position: fixed; z-index: 39; inset: 56px 0 calc(64px + env(safe-area-inset-bottom)); border: 0; background: var(--color-overlay); }
+  .platformWrapper .trade-ticket-shell {
+    position: fixed;
+    z-index: 40;
+    left: 0;
+    right: 0;
+    bottom: calc(64px + env(safe-area-inset-bottom));
+    width: 100%;
+    height: min(72vh, 560px);
+    max-height: calc(100dvh - 56px);
+    transform: translateY(110%);
+    transition: transform 180ms ease-out;
+    border: 1px solid var(--color-border);
+    border-radius: 16px 16px 0 0;
+  }
+  .platformWrapper .trade-ticket-shell.is-open { transform: translateY(0); }
+  .platformWrapper .trade-ticket-shell .trade-ticket-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 52px;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-weight: 650;
+  }
+  .platformWrapper .trade-ticket-shell .trade-ticket-header button { min-width: 44px; min-height: 44px; color: var(--color-text); background: transparent; border: 0; font-size: 24px; }
+  .platformWrapper .trade-ticket-shell .trade-form { height: calc(100% - 52px) !important; max-height: none; }
 
   .platformWrapper #bottom_sidebar {
     left: 0;

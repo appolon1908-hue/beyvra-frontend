@@ -46,6 +46,16 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const userInteractedRef = useRef(false);
   const [connectionState, setConnectionState] = useState<"loading" | "connected" | "disconnected" | "error">("loading");
   const [chartError, setChartError] = useState("");
+  const [isTicketOpen, setIsTicketOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isTicketOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsTicketOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isTicketOpen]);
   const [cookies] = useCookies(["access_token"]);
   const hasChartData = chartData.length > 0;
 
@@ -338,13 +348,32 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
         </div>
       </div>
 
-      {/* Bottom Section (Trade Form) */}
-      <TradeForm
-        bottomSidebarHeight={bottomSidebarHeight}
-        disabled={connectionState !== "connected" || chartData.length === 0}
-        showSetupOrder={false}
-        showProfit={false}
-      />
+      <button
+        type="button"
+        className="ticket-trigger"
+        onClick={() => setIsTicketOpen(true)}
+        aria-controls="platform-order-ticket"
+        aria-expanded={isTicketOpen}
+      >
+        Open Demo Trade
+      </button>
+      {isTicketOpen && <button type="button" className="ticket-backdrop" onClick={() => setIsTicketOpen(false)} aria-label="Close demo trade ticket" />}
+      <div
+        id="platform-order-ticket"
+        className={`trade-ticket-shell${isTicketOpen ? " is-open" : ""}`}
+        data-open={isTicketOpen}
+      >
+        <div className="trade-ticket-header">
+          <span>Demo order</span>
+          <button type="button" onClick={() => setIsTicketOpen(false)} aria-label="Close demo trade ticket">×</button>
+        </div>
+        <TradeForm
+          bottomSidebarHeight={bottomSidebarHeight}
+          disabled={connectionState !== "connected" || chartData.length === 0}
+          showSetupOrder={false}
+          showProfit={false}
+        />
+      </div>
     </div>
   );
 };
