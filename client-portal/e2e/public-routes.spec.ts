@@ -28,9 +28,15 @@ test("all public application routes render without browser errors", async ({ pag
 
 test("landing authentication controls are actionable", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Registration", exact: true }).click();
-  await expect(page).toHaveURL(/\/signIn\?tab=registration$/);
+  await page.getByRole("link", { name: "Try Demo", exact: true }).first().click();
+  await expect(page).toHaveURL(/\/signIn\?tab=registration&mode=demo$/);
   await expect(page.getByRole("tab", { name: "Registration" })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("button", { name: "Register" })).toBeVisible();
   await page.screenshot({ path: "test-results/audit/02-registration.png", fullPage: false });
+});
+
+test("sign-in is a dedicated route with a safe demo alternative", async ({ page }) => {
+  await page.goto("/signIn?tab=login");
+  await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Log In" })).toHaveAttribute("aria-selected", "true");
 });

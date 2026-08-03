@@ -47,6 +47,11 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
   return (
     <div className="loginContainer">
       <div className="centerWrapper">
+        <div className="authBranding">
+          <span className="authEyebrow">{t("authPracticePlatform")}</span>
+          <h1>{t("authWelcomeBack")}</h1>
+          <p>{t("authContinueDemo")}</p>
+        </div>
         {forgotPasswordView ? (
           <ForgotPasswordForm />
         ) : (

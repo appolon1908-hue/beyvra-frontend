@@ -489,5 +489,13 @@
   "marketDataComingSoon": "Market data coming soon",
   "estimatedHours": "Estimated time: {{count}} hours",
   "estimatedHours_one": "Estimated time: {{count}} hour",
-  "estimatedHours_other": "Estimated time: {{count}} hours"
+  "estimatedHours_other": "Estimated time: {{count}} hours",
+  "authPracticePlatform": "Codestra practice platform",
+  "authWelcomeBack": "Welcome back",
+  "authContinueDemo": "Sign in to continue to your demo workspace.",
+  "heroPracticePlatform": "Codestra practice platform",
+  "heroTitle": "Practice market decisions with clarity.",
+  "heroLead": "Explore charts, test ideas and learn the platform with clearly labeled virtual demo funds. No deposits or live orders.",
+  "tryDemo": "Try the demo",
+  "demoDisclosure": "Simulated trading only. Demo results are not real financial results."
 }

@@ -62,7 +62,7 @@ const Navbar= () => {
       {/* left side nav */}
       <div className="leftSideNav">
         <Link to="/">
-          <img src={TradxLogo} alt="" />
+          <img src={TradxLogo} alt="Tradi home" />
         </Link>
 
         <div className="navContent">
@@ -215,28 +215,26 @@ const Navbar= () => {
             </div>
           </div>
         </div>
-        <Link
-          className="primaryButton"
-          to="/signIn?tab=registration"
-        >
-          Registration
-        </Link>
+        <Link className="navSignIn" to="/signIn?tab=login">Sign In</Link>
+        <Link className="primaryButton" to="/signIn?tab=registration&mode=demo">Try Demo</Link>
         
       </div>
-      <div className="menuBarButton" onClick={() => setToggleMobileNav(true)}>
+      <button type="button" className="menuBarButton" aria-label="Open navigation menu" aria-expanded={toggleMobileNav} onClick={() => setToggleMobileNav(true)}>
         <MenuBar height="30px" width="30px" />
-      </div>
+      </button>
       <div
         className={`${toggleMobileNav ? "mobileNavOpen" : "mobileNavClose"}`}
       >
-        <div
+        <button
+          type="button"
           className="menuCloseIcon"
+          aria-label="Close navigation menu"
           onClick={() => setToggleMobileNav(false)}
         >
           <MenuCloseIcon />
-        </div>
+        </button>
         <div className="mobileNavLogo">
-          <img src={TradxLogo} alt="" />
+          <img src={TradxLogo} alt="Tradi home" />
         </div>
 
         <div className="mobileNavContent">
@@ -245,8 +243,8 @@ const Navbar= () => {
             <SearchIcon height="13" width="13" />
             <input id="search" name="search" type="text" placeholder="Search" />
           </div>
-          <span>Markets</span>
-          <span>Trading</span>
+          <Link to="/markets/crypto" onClick={() => setToggleMobileNav(false)}>Markets</Link>
+          <Link to="/trading" onClick={() => setToggleMobileNav(false)}>Trading</Link>
           {/* <span>Learn</span> */}
           <div className="mobileBottomNav">
             {/* language selector */}
@@ -296,14 +294,14 @@ const Navbar= () => {
                 to="/signIn?tab=login"
                 onClick={() => setToggleMobileNav(false)}
               >
-                Login
+                Sign In
               </Link>
               <Link
                 className="secondaryButton"
-                to="/signIn?tab=registration"
+                to="/signIn?tab=registration&mode=demo"
                 onClick={() => setToggleMobileNav(false)}
               >
-                Sign Up
+                Try Demo
               </Link>
             </div>
           </div>

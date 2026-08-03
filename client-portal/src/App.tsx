@@ -128,7 +128,7 @@ const App: React.FunctionComponent = () => {
             <Route path="/trading/cfdTrading" element={<CFDTrading />} />
             <Route path="/trading" element={<Trading />} />
             <Route path="/downloads" element={<Download />} />
-            <Route path="/signIn" element={<LandingPage />} />
+            <Route path="/signIn" element={<SignIn />} />
             <Route path="/password-reset" element={<ResetPassword />} />
             <Route path="*" element={<NotFoundPage />} />
             
