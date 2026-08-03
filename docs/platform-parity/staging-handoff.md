@@ -12,6 +12,11 @@ Status: staging-only implementation, demo-first. Deployed to staging on
   Google disabled until approved OAuth credentials and legal versions exist.
 - The sign-in bundle contains the truthful disabled Google control; no live
   provider or financial capability was enabled.
+- Registration now uses the PostgreSQL-backed email OTP flow. The deployed
+  registration bundle includes the responsive verification-code screen.
+- Migration `users.0030_user_email_verification_source_and_more` is applied in
+  staging. Transactional email delivery remains disabled; OTP and welcome
+  events are queued in the outbox until an approved provider is configured.
 
 ## Implemented in this pass
 
