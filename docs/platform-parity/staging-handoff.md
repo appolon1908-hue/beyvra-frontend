@@ -1,7 +1,17 @@
 # Codestra/Tradi platform parity staging handoff
 
-Status: staging-only implementation, demo-first. Production is unchanged and
-activation remains blocked.
+Status: staging-only implementation, demo-first. Deployed to staging on
+2026-08-03. Production is unchanged and activation remains blocked.
+
+## Current staging images
+
+- Backend: `codestra-backend:staging-google-52989b3`
+- Frontend: `codestra-frontend:staging-google-570f908`
+- Staging URL: `https://staging.codestra.cloud/`
+- Google provider response: `GET /api/v1/auth/providers` returns HTTP 200 with
+  Google disabled until approved OAuth credentials and legal versions exist.
+- The sign-in bundle contains the truthful disabled Google control; no live
+  provider or financial capability was enabled.
 
 ## Implemented in this pass
 
@@ -52,9 +62,10 @@ npm run build:prod      PASS (existing Sass/Vite/chunk warnings only)
 npm run test:contract   PASS (42 frontend paths checked against 165 backend paths)
 ```
 
-The full browser matrix and staging deployment smoke test were not run in this
-local pass because no staging deployment was authorized. Run the existing
-Playwright suites at 360, 390, 768, 1024, 1280, and 1440px after staging deploy.
+The deployed smoke checks passed for the staging homepage, sign-in bundle,
+provider configuration endpoint, and backend/frontend container health. The
+full browser matrix remains a follow-up because Playwright device coverage is
+not available in this shell.
 
 ## Rollback
 
