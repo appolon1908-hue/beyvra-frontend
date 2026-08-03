@@ -497,5 +497,18 @@
   "heroTitle": "Practice market decisions with clarity.",
   "heroLead": "Explore charts, test ideas and learn the platform with clearly labeled virtual demo funds. No deposits or live orders.",
   "tryDemo": "Try the demo",
-  "demoDisclosure": "Simulated trading only. Demo results are not real financial results."
+  "demoDisclosure": "Simulated trading only. Demo results are not real financial results.",
+  "demoSectionEyebrow": "A clearer place to practice",
+  "demoSectionTitle": "Learn the controls before you trade",
+  "demoSectionLead": "Use a resettable virtual balance to explore the workspace, understand order states and build confidence without moving real money.",
+  "demoHighlightOneTitle": "Virtual funds",
+  "demoHighlightOneBody": "Every practice session is clearly labeled and separate from real financial balances.",
+  "demoHighlightTwoTitle": "Guided decisions",
+  "demoHighlightTwoBody": "Explore chart context, duration and direction with plain-language feedback.",
+  "demoHighlightThreeTitle": "Honest states",
+  "demoHighlightThreeBody": "See loading, delayed, offline and rejected states instead of placeholder success.",
+  "learnHowItWorks": "See how it works",
+  "demoFooterDisclosure": "Demo environment · Simulated trading only · No deposits or live orders.",
+  "privacy": "Privacy",
+  "terms": "Terms"
 }

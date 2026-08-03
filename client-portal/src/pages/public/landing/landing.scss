@@ -175,6 +175,30 @@
     margin: 20px auto 0;
 }
 
+.demoHighlights {
+    background: var(--color-surface-1);
+    border-top: 1px solid var(--color-border);
+    padding: 88px clamp(20px, 6vw, 96px);
+    text-align: center;
+}
+.demoHighlightsIntro { margin: 0 auto; max-width: 680px; }
+.demoHighlights h2 { color: var(--color-text); font-size: clamp(28px, 4vw, 44px); margin: 10px 0 14px; }
+.demoHighlightsIntro > p:last-child { color: var(--color-text-secondary); font-size: 17px; line-height: 1.55; }
+.demoHighlightGrid { display: grid; gap: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 40px auto; max-width: 1100px; text-align: left; }
+.demoHighlightCard { background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 24px; }
+.demoHighlightCard h3 { color: var(--color-text); font-size: 18px; margin-bottom: 10px; }
+.demoHighlightCard p { color: var(--color-text-secondary); line-height: 1.55; margin: 0; }
+.demoLearnLink { display: inline-flex; }
+.demoFooter { background: var(--color-canvas); border-top: 1px solid var(--color-border); color: var(--color-text-muted); display: flex; flex-wrap: wrap; font-size: 13px; gap: 16px; justify-content: space-between; padding: 24px clamp(20px, 6vw, 96px); }
+.demoFooter p { margin: 0; }
+.demoFooter nav { display: flex; gap: 16px; }
+.demoFooter a { color: var(--color-text-secondary); }
+@media (max-width: 767px) {
+    .demoHighlights { padding: 64px 20px; }
+    .demoHighlightGrid { grid-template-columns: 1fr; margin: 28px auto; }
+    .demoFooter { flex-direction: column; }
+}
+
 
 .herodatarow{
     width: 100%;
