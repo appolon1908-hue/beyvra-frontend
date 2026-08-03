@@ -12,7 +12,7 @@ Status: staging-only implementation, demo-first. Deployed to staging on
   Google disabled until approved OAuth credentials and legal versions exist.
 - The sign-in bundle contains the truthful disabled Google control; no live
   provider or financial capability was enabled.
-- Route-repair image: `codestra-frontend:staging-responsive-20260803c`.
+- Route-repair image: `codestra-frontend:staging-platform-chart-20260803a`.
 - Unauthenticated `/platform` and nested routes now redirect to `/login` with
   an encoded local `redirect` destination.
 - `/platform-overview` is an original demo-workspace overview; legacy trading
@@ -48,6 +48,11 @@ Status: staging-only implementation, demo-first. Deployed to staging on
   navigation and order sheet.
 - Added ultra-wide overview scaling so the demo entry surface remains readable
   at 1920px+ and 3200px+ widths rather than collapsing into a tiny centered card.
+- Restored graph-first platform proportions: the desktop shell now owns a 64px
+  top bar, flexible chart workspace, 320px ticket column, and 48px status area;
+  the chart host fills its workspace and resizes through `ResizeObserver`.
+  Reconnecting state is a compact non-blocking badge, while quote safety still
+  disables order submission.
 
 ## Button/action matrix (implemented surfaces)
 
@@ -92,6 +97,12 @@ Responsive smoke evidence (staging, unauthenticated) passed with no horizontal
 overflow at `360x800`, `768x1024`, `1363x936`, and `3840x2160`. Screenshots were
 captured under `/tmp/codestra-final-*.png` during the deployment check. The
 authenticated chart/order flow still requires an authorized staging account.
+
+The requested authenticated platform geometry could not be captured against a
+real session because no authorized staging credentials were available in this
+workspace. Source-level layout checks and production build checks passed; chart,
+ticket, websocket and order behavior remain explicitly unproven until that
+account is supplied.
 
 ## Rollback
 
