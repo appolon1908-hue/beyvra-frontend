@@ -12,7 +12,7 @@ Status: staging-only implementation, demo-first. Deployed to staging on
   Google disabled until approved OAuth credentials and legal versions exist.
 - The sign-in bundle contains the truthful disabled Google control; no live
   provider or financial capability was enabled.
-- Route-repair image: `codestra-frontend:staging-route-repair-final`.
+- Route-repair image: `codestra-frontend:staging-responsive-20260803c`.
 - Unauthenticated `/platform` and nested routes now redirect to `/login` with
   an encoded local `redirect` destination.
 - `/platform-overview` is an original demo-workspace overview; legacy trading
@@ -41,6 +41,13 @@ Status: staging-only implementation, demo-first. Deployed to staging on
 - Preserved the existing server-authoritative trade mutation and idempotency
   key path. No live orders, deposits, withdrawals, rewards, or tournaments were
   enabled.
+- Fixed platform sizing for phone, tablet, desktop, ultra-wide and headset-like
+  viewports: removed the `100vw` plus fixed-rail overflow, removed the duplicated
+  desktop top-bar offset, added resize-aware measurements, constrained chart and
+  order-ticket flex sizing, and reserved mobile safe-area space for the bottom
+  navigation and order sheet.
+- Added ultra-wide overview scaling so the demo entry surface remains readable
+  at 1920px+ and 3200px+ widths rather than collapsing into a tiny centered card.
 
 ## Button/action matrix (implemented surfaces)
 
@@ -80,6 +87,11 @@ not available in this shell.
 The targeted Playwright smoke check also passed for `/platform`, all required
 platform subroutes, `/platform-overview`, `/trading/tradingPlatform`, `/prv`,
 homepage CTA destinations, and the preserved local login redirect.
+
+Responsive smoke evidence (staging, unauthenticated) passed with no horizontal
+overflow at `360x800`, `768x1024`, `1363x936`, and `3840x2160`. Screenshots were
+captured under `/tmp/codestra-final-*.png` during the deployment check. The
+authenticated chart/order flow still requires an authorized staging account.
 
 ## Rollback
 
