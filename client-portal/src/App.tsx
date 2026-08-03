@@ -10,7 +10,8 @@ import PrivateRoute from "utils/ProtectedRoute ";
 import Platform from "pages/private/platform/Platform";
 import Loading from "components/loading";
 import NotFoundPage from "pages/private/platform/platformMenus/notFound/NotFoundPage";
-import Trading from "pages/public/trading/Trading";
+import PlatformOverview from "pages/public/platformOverview/PlatformOverview";
+import ContentReview from "pages/public/contentReview/ContentReview";
 import TradingConditions from "pages/public/trading/TradingConditions/Index";
 import ForexProfitCalculator from "pages/public/trading/ForexProfitCalculator";
 import KYC from "pages/private/platform/kyc";
@@ -27,15 +28,12 @@ const Indices = lazy(() => import("pages/public/markets/indices/Indices"))
 const Shares = lazy(() => import("pages/public/markets/shares/Shares"))
 const Ipo = lazy(() => import("pages/public/markets/ipo/Ipo"))
 
-const TradingPlatform = lazy(() => import("pages/public/trading/platform"))
-const MobileTrading = lazy(() => import("pages/public/trading/tradingMobile"))
+// Legacy live-trading marketing pages are quarantined from staging.
 // Unsupported leveraged/live surfaces remain intentionally unavailable in staging.
 const CommoditiesProfitCalculator = lazy(() => import("pages/public/trading/CommoditiesProfitCal/Index"))
 const ForexMarginCalculator = lazy(() => import("pages/public/trading/forexMarginCalculator"))
 const EconomicCalendar = lazy(() => import("pages/public/trading/economicCalendar/Index"))
 const ExpirationDates = lazy(() => import("pages/public/trading/expirationDates/Index"))
-const Prv = lazy(() => import("pages/public/home/privacyPolicy/PrivacyPolicy"))
-const Reg = lazy(() => import("pages/public/home/regulation/Regulation"))
 
 // Lazy load components
 const Lender = lazy(() => import("./pages/private/lender/Lender"));
@@ -91,6 +89,17 @@ const App: React.FunctionComponent = () => {
           <Routes>
             <Route element={<RequireAuth />}>
               <Route path="/platform" element={<Platform />} />
+              <Route path="/platform/assets" element={<Platform />} />
+              <Route path="/platform/trades" element={<Platform />} />
+              <Route path="/platform/trades/:tradeId" element={<Platform />} />
+              <Route path="/platform/portfolio" element={<Platform />} />
+              <Route path="/platform/analytics" element={<Platform />} />
+              <Route path="/platform/learn" element={<Platform />} />
+              <Route path="/platform/help" element={<Platform />} />
+              <Route path="/platform/profile" element={<Platform />} />
+              <Route path="/platform/settings" element={<Platform />} />
+              <Route path="/platform/settings/security" element={<Platform />} />
+              <Route path="/platform/settings/sessions" element={<Platform />} />
               <Route path="/home" element={<Platform />} />
               <Route path="/kyc-document" element={<KYC />} />
               <Route path="/welcome" element={<PrivateRoute />}>
@@ -111,8 +120,9 @@ const App: React.FunctionComponent = () => {
             <Route path="/markets/bonds" element={<Bonds />} />
             <Route path="/markets/ipos" element={<Ipo />} />
             <Route path="/markets/crypto" element={<Crypto />} />
-            <Route path="/trading/tradingPlatform" element={<TradingPlatform />} />
-            <Route path="/trading/MobileTrading" element={<MobileTrading />} />
+            <Route path="/platform-overview" element={<PlatformOverview />} />
+            <Route path="/trading/tradingPlatform" element={<ContentReview />} />
+            <Route path="/trading/MobileTrading" element={<ContentReview />} />
             <Route path="/trading/metaTradingFour" element={<DisabledFeatureRoute />} />
             <Route path="/trading/metaTradingFive" element={<DisabledFeatureRoute />} />
             <Route path="/trading/copyTrading" element={<DisabledFeatureRoute />} />
@@ -125,7 +135,7 @@ const App: React.FunctionComponent = () => {
             <Route path="/trading/tradingConditions" element={<TradingConditions />} />
             <Route path="/trading/expirationDate" element={<ExpirationDates />} />
             <Route path="/trading/cfdTrading" element={<DisabledFeatureRoute />} />
-            <Route path="/trading" element={<Trading />} />
+            <Route path="/trading" element={<ContentReview />} />
             <Route path="/downloads" element={<Download />} />
             <Route path="/signIn" element={<SignIn />} />
             <Route path="/login" element={<SignIn />} />
@@ -135,12 +145,18 @@ const App: React.FunctionComponent = () => {
             <Route path="/verify-email" element={<EmailVerification />} />
             <Route path="/session-expired" element={<SessionExpired />} />
             <Route path="/logout" element={<SignIn />} />
+            <Route path="/dashboard" element={<Navigate to="/platform" replace />} />
+            <Route path="/terms" element={<ContentReview />} />
+            <Route path="/privacy" element={<ContentReview />} />
+            <Route path="/cookies" element={<ContentReview />} />
+            <Route path="/demo-disclosure" element={<ContentReview />} />
+            <Route path="/accessibility" element={<ContentReview />} />
             <Route path="*" element={<NotFoundPage />} />
             
             
             <Route path="/welcomeSteps" element={<WelcomeSteps />} /> 
-            <Route path="/prv" element={<Prv />} /> 
-            <Route path="/reg" element={<Reg />} /> 
+            <Route path="/prv" element={<Navigate to="/privacy" replace />} />
+            <Route path="/reg" element={<Navigate to="/terms" replace />} />
 
           </Routes>
         </Router>

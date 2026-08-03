@@ -283,7 +283,7 @@ const SignUpForm = () => {
           <label className="agreement-checkbox">
             <input type="checkbox" {...register("accepted_terms", { required: "You must accept the service agreement" })} />
             <span className="agreementSpan">
-              I confirm that I am of legal age, I have read and agree to the<a href="/prv" target="_blank">&nbsp;Service agreement</a>.
+              I confirm that I am of legal age, I have read and agree to the<a href="/terms" target="_blank" rel="noreferrer">&nbsp;Service agreement</a>.
             </span>
           </label>
         </Form.Item>

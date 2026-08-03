@@ -162,7 +162,8 @@ const RequireAuth = () => {
   }, [dispatch, navigate, removeCookie]);
 
   if (!cookies.access_token) {
-    return <Navigate to="/signIn" state={{ from: location }} />;
+    const destination = `${location.pathname}${location.search}`;
+    return <Navigate to={`/login?redirect=${encodeURIComponent(destination)}`} replace state={{ from: location }} />;
   }
 
   return (

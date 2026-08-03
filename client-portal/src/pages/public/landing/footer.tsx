@@ -23,8 +23,8 @@ const Footer = () => {
             
             <div className="footer__container margintop">
 
-                <a href="/reg"><h4>Terms and Conditions</h4></a>
-                <a href="/prv"><h4>Privacy Policy</h4></a>
+                <a href="/terms"><h4>Terms and Conditions</h4></a>
+                <a href="/privacy"><h4>Privacy Policy</h4></a>
 
             </div>
 

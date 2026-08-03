@@ -24,7 +24,7 @@ const DemoHighlights = () => {
           </article>
         ))}
       </div>
-      <Link className="heroSecondaryAction demoLearnLink" to="/trading/tradingPlatform">
+      <Link className="heroSecondaryAction demoLearnLink" to="/platform-overview">
         {t("learnHowItWorks")}
       </Link>
     </section>

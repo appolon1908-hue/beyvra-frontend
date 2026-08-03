@@ -27,7 +27,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
   const [, setCookie] = useCookies(["step", "access_token", "refresh_token",]);
 
   const { handleSubmit, register, formState: { errors } } = useForm<ISignInForm>();
-  const destination = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
+  const destination = new URLSearchParams(location.search).get("redirect") || (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
 
   const finishLogin = (data: LoginSuccess) => {
     if (!data.access || !data.refresh || !data.user) return;

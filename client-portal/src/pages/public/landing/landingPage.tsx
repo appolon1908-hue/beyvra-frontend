@@ -37,8 +37,8 @@ const LandingPage = () => {
       <footer className="demoFooter">
         <p>{t("demoFooterDisclosure")}</p>
         <nav aria-label="Legal">
-          <a href="/prv">{t("privacy")}</a>
-          <a href="/reg">{t("terms")}</a>
+          <a href="/privacy">{t("privacy")}</a>
+          <a href="/terms">{t("terms")}</a>
         </nav>
       </footer>
     </div>

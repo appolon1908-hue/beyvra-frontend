@@ -12,6 +12,11 @@ Status: staging-only implementation, demo-first. Deployed to staging on
   Google disabled until approved OAuth credentials and legal versions exist.
 - The sign-in bundle contains the truthful disabled Google control; no live
   provider or financial capability was enabled.
+- Route-repair image: `codestra-frontend:staging-route-repair-20260803`.
+- Unauthenticated `/platform` and nested routes now redirect to `/login` with
+  an encoded local `redirect` destination.
+- `/platform-overview` is an original demo-workspace overview; legacy trading
+  and unapproved legal routes show a content-under-review screen.
 - Registration now uses the PostgreSQL-backed email OTP flow. The deployed
   registration bundle includes the responsive verification-code screen.
 - Migration `users.0030_user_email_verification_source_and_more` is applied in
@@ -71,6 +76,10 @@ The deployed smoke checks passed for the staging homepage, sign-in bundle,
 provider configuration endpoint, and backend/frontend container health. The
 full browser matrix remains a follow-up because Playwright device coverage is
 not available in this shell.
+
+The targeted Playwright smoke check also passed for `/platform`, all required
+platform subroutes, `/platform-overview`, `/trading/tradingPlatform`, `/prv`,
+homepage CTA destinations, and the preserved local login redirect.
 
 ## Rollback
 
