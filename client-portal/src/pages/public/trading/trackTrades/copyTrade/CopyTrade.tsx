@@ -4,7 +4,9 @@ import user from '../../../../../assets/trading/adam-nowakowski-D4LDw5eXhgg.png'
 import flagIcon from '../../../../../assets/trading/flagIcon.png'
 import groupIcon from '../../../../../assets/trading/Group_3539.png'
 import ProfilePic from 'assets/trading/profile-pic.jpeg'
+import { useNavigate } from 'react-router-dom'
 const CopyTrade = () => {
+  const navigate = useNavigate()
   return (
     <div className='copyTrade-wrapper'>
 
@@ -31,7 +33,7 @@ const CopyTrade = () => {
            
            
            <p className='extra-note'>*Trading carries a considerable risk of capital loss. Please trade wisely.</p>
-            <button>Join Now</button>
+            <button type="button" onClick={() => navigate('/signIn')}>Join Now</button>
             </div>
 
         </div>
@@ -41,7 +43,9 @@ const CopyTrade = () => {
   )
 }
 
-export const ImageCard = ({avatar, name, profit, ROI, style} : {avatar: string,  name: string, profit: string, ROI: string, style?: {}}) => (
+export const ImageCard = ({avatar, name, profit, ROI, style} : {avatar: string,  name: string, profit: string, ROI: string, style?: {}}) => {
+  const navigate = useNavigate();
+  return (
     <div style={style} className='pic-card'>
         <div className='pic-wrapper'>
         <img src={avatar} alt="pic" />
@@ -50,10 +54,11 @@ export const ImageCard = ({avatar, name, profit, ROI, style} : {avatar: string, 
             <p className='name'>{name}</p>
             <p className='fig'>{profit}</p>
             <p className='ROI'>ROI <span>{ROI}</span> </p>
-            <button>follow</button>
+            <button type="button" onClick={() => navigate('/signIn')}>follow</button>
         </div>
     </div>
-)
+  )
+}
 
 
 
