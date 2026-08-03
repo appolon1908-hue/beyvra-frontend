@@ -204,3 +204,17 @@
     &::after { display: none; }
   }
 }
+
+.topbarContainer {
+  font-family: var(--font-ui), Inter, system-ui, sans-serif;
+  background: var(--platform-surface, var(--color-surface-1));
+  border-bottom-color: var(--platform-border, var(--color-border));
+  .conversionDiv { overflow-x: auto; scrollbar-width: none; }
+  .conversionDiv::-webkit-scrollbar { display: none; }
+  .payProfileTab .demo { min-height: 48px; border-radius: 10px; }
+  .payProfileTab .demo:hover { background: var(--platform-surface-raised, #2a2d35); }
+  .payProfileTab .demo .dem span { font-size: 13px; font-weight: 600; }
+  .payProfileTab .demo .amount .value { font-variant-numeric: tabular-nums; font-size: 16px; font-weight: 650; }
+  .payProfileTab .profile { min-width: 48px; min-height: 48px; }
+  button:focus-visible { outline: 2px solid var(--platform-accent, #00e65c); outline-offset: 2px; }
+}

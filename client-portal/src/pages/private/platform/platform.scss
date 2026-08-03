@@ -1,8 +1,18 @@
 .platformWrapper {
   --header-height: 64px;
+  --platform-bg: #121316;
+  --platform-surface: #181a1f;
+  --platform-rail: #181a1f;
+  --platform-surface-raised: #2a2d35;
+  --platform-border: #313840;
+  --platform-text: #f3f6f4;
+  --platform-muted: #8e9299;
+  --platform-accent: #00e65c;
+  --platform-positive: #26d477;
+  --platform-negative: #ff4d4d;
   box-sizing: border-box;
   display: flex;
-  background: #0e0f12;
+  background: var(--platform-bg);
   width: 100%;
   min-width: 0;
   height: 100dvh;
@@ -351,6 +361,18 @@
   .platformWrapper .chart-status-bar { left: 24px; right: 24px; min-height: 44px; font-size: 16px; }
   .platformWrapper .trade-form { padding: 24px; }
 }
+
+/* Approved Codestra density and surface treatment. */
+.platformWrapper {
+  font-family: var(--font-ui), Inter, system-ui, sans-serif;
+  color: var(--platform-text);
+  background: var(--platform-bg);
+}
+.platformWrapper .trade-section { background: var(--platform-bg); }
+.platformWrapper .trade-ticket-shell { background: var(--platform-surface); border-color: var(--platform-border); }
+.platformWrapper .ticket-trigger { background: var(--platform-surface-raised); border-color: var(--platform-border); }
+.platformWrapper .trade-form .upNdown button.up { background: var(--platform-positive); }
+.platformWrapper .trade-form .upNdown button.down { background: var(--platform-negative); }
 // default mode-night
 .ml-106 {
   &.leftSubDrawer {
