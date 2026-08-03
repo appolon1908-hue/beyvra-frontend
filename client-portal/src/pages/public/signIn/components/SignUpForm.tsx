@@ -2,7 +2,6 @@ import { Form, Button } from "antd";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useCookies } from "react-cookie";
 
-import useRegister from "api/user/useRegister";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import CountryCode from "../../../../helpers/CountryCode.json";
@@ -10,6 +9,7 @@ import Select, { type StylesConfig } from "react-select";
 //import WalkThrough from "./WalkThrough";
 import { useNavigate } from "react-router-dom";
 import { GlobalLoginMaxAge } from "App";
+import { getApiUrl } from "utils/env";
 import GoogleAuthButton from "./GoogleAuthButton";
 
 
@@ -62,6 +62,9 @@ const SignUpForm = () => {
   type CountryOption = (typeof countriesList)[number];
   const [countryCode, setCountryCode] = useState<CountryOption>(countriesList[0]);
   const [show, setShow] = useState(false);
+  const [pendingRegistration, setPendingRegistration] = useState<{ id: string; email: string } | null>(null);
+  const [otp, setOtp] = useState("");
+  const [otpPending, setOtpPending] = useState(false);
   const { handleSubmit, register, setError, watch, formState: { errors } } = useForm<SignUpFormData>();
   const acceptedTerms = watch("accepted_terms", false);
   const navigate = useNavigate();
@@ -72,16 +75,7 @@ const SignUpForm = () => {
 
 
 
-  const { mutate, isPending } = useRegister({
-    onSuccess: (response) => {
-      const cookieOptions = { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict" as const, path: "/" };
-      setCookie("access_token", response.access, cookieOptions);
-      setCookie("refresh_token", response.refresh, cookieOptions);
-      setCookie("step", "", cookieOptions);
-      toast.success("Your account is ready. Welcome to Tradi.");
-      navigate("/walkThrough", { replace: true });
-    },
-  });
+  const [isPending, setIsPending] = useState(false);
 
   const onSubmit: SubmitHandler<SignUpFormData> = (data) => {
     const localPhone = data.phone_number.replace(/\D/g, "");
@@ -96,7 +90,12 @@ const SignUpForm = () => {
       password: data.password,
       phone_number: `${countryCode.value}${localPhone}`,
     };
-    mutate(payload);
+    setIsPending(true);
+    fetch(getApiUrl("v1/auth/register"), { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, displayName: `${payload.first_name} ${payload.last_name}`, legalAccepted: data.accepted_terms, locale: "en" }) })
+      .then(async (response) => { const result = await response.json(); if (!response.ok && response.status !== 202) throw new Error(result.message || "Registration failed"); return result; })
+      .then((result) => { if (result.registrationId) { setPendingRegistration({ id: result.registrationId, email: result.maskedEmail || payload.email }); toast.success("Check your email for a verification code."); } })
+      .catch((error) => toast.error(error.message || "Registration failed."))
+      .finally(() => setIsPending(false));
   };
 
   const handleCountryChange = (selectedOption: CountryOption | null) => {
@@ -127,6 +126,30 @@ const SignUpForm = () => {
       color: "#fff",
     }),
   };
+
+  if (pendingRegistration) {
+    const verifyOtp = async () => {
+      if (!/^\d{6}$/.test(otp) || otpPending) return;
+      setOtpPending(true);
+      try {
+        const response = await fetch(getApiUrl("v1/auth/email-verification/verify"), { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ registrationId: pendingRegistration.id, code: otp }) });
+        const result = await response.json();
+        if (!response.ok) throw new Error("The verification code is invalid or expired.");
+        const cookieOptions = { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict" as const, path: "/" };
+        setCookie("access_token", result.access, cookieOptions); setCookie("refresh_token", result.refresh, cookieOptions); setCookie("step", "", cookieOptions);
+        toast.success("Your account is ready."); navigate("/walkThrough", { replace: true });
+      } catch (error) { toast.error(error instanceof Error ? error.message : "Verification failed."); }
+      finally { setOtpPending(false); }
+    };
+    return <Form layout="vertical" onFinish={verifyOtp} className="otp-verification-form">
+      <div className="registration-intro"><h2>Verify your email</h2><p>We sent a six-digit code to <strong>{pendingRegistration.email}</strong>.</p></div>
+      <label htmlFor="registration-otp">Verification code</label>
+      <input id="registration-otp" className="loginInput otp-input" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, ""))} aria-describedby="otp-help" />
+      <p id="otp-help" className="otp-help">The code expires in 10 minutes. Do not share it with anyone.</p>
+      <Button type="primary" htmlType="submit" className="login" loading={otpPending} disabled={otp.length !== 6}>Verify email</Button>
+      <button type="button" className="forgotPass" onClick={() => setPendingRegistration(null)}>Change email</button>
+    </Form>;
+  }
 
   return (
     <>
