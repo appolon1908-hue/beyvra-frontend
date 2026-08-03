@@ -33,6 +33,17 @@ export const apiEndpoints = {
   market: {
     history: "trades/market/history/",
   },
+  integrations: {
+    users: "v1/users",
+    imports: "v1/users/imports",
+    importTemplate: "v1/users/imports/template",
+    importDetail: (id: string) => `v1/users/imports/${id}`,
+    importRows: (id: string) => `v1/users/imports/${id}/rows`,
+    importCommit: (id: string) => `v1/users/imports/${id}/commit`,
+    importCancel: (id: string) => `v1/users/imports/${id}/cancel`,
+    crmConnections: "v1/integrations/crm/connections",
+    crmConnection: (id: string) => `v1/integrations/crm/connections/${id}`,
+  },
 } as const;
 
 export const socketEndpoints = {
