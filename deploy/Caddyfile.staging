@@ -2,9 +2,21 @@
     tls internal
     encode zstd gzip
 
-    @backend path /api/* /admin/* /static/* /media/* /metrics
+    @metrics {
+        path /metrics
+        remote_ip 127.0.0.1 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+    }
+    handle @metrics {
+        reverse_proxy nginx:80 {
+            header_up X-Forwarded-For {remote_host}
+        }
+    }
+
+    @backend path /api/* /admin/* /static/* /media/*
     handle @backend {
-        reverse_proxy nginx:80
+        reverse_proxy nginx:80 {
+            header_up X-Forwarded-For {remote_host}
+        }
     }
 
     @websocket path /ws/*
@@ -12,6 +24,7 @@
         reverse_proxy nginx:80 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote_host}
         }
     }
 
