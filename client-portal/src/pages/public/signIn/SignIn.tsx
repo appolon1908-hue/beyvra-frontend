@@ -12,6 +12,10 @@ import { useAppSelector } from "@store/hooks";
 import { GlobalStates, setSignInTab } from "@store/slices/global";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+import { getApiUrl } from "utils/env";
+import { useCookies } from "react-cookie";
+import { toast } from "react-toastify";
+import { GlobalLoginMaxAge } from "App";
 
 interface SignInProps { }
 
@@ -24,12 +28,49 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
   const dispatch = useDispatch()
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [, setCookie] = useCookies(["access_token", "refresh_token", "step"]);
   const requestedTab = searchParams.get("tab");
 
   useEffect(() => {
     if (requestedTab === "registration") dispatch(setSignInTab("2"));
     if (requestedTab === "login") dispatch(setSignInTab("1"));
   }, [dispatch, requestedTab]);
+
+  useEffect(() => {
+    const ticket = searchParams.get("google_ticket");
+    const authError = searchParams.get("auth_error");
+    if (authError) {
+      toast.error("We could not complete Google authentication. Please try again.");
+      searchParams.delete("auth_error");
+      setSearchParams(searchParams, { replace: true });
+      return;
+    }
+    if (!ticket) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await fetch(getApiUrl("v1/auth/google/credential"), {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ticket }),
+        });
+        const result = await response.json();
+        if (!response.ok || !result.access || !result.refresh) throw new Error("GOOGLE_TICKET_INVALID");
+        if (cancelled) return;
+        const cookieOptions = { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict" as const, path: "/" };
+        setCookie("access_token", result.access, cookieOptions);
+        setCookie("refresh_token", result.refresh, cookieOptions);
+        setCookie("step", "", cookieOptions);
+        searchParams.delete("google_ticket");
+        setSearchParams(searchParams, { replace: true });
+        window.location.assign(result.user?.is_walkthrough ? "/walkThrough" : "/platform");
+      } catch {
+        if (!cancelled) toast.error("We could not complete Google authentication. Please try again.");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [searchParams, setCookie, setSearchParams]);
 
   const items: TabsProps["items"] = [
     {

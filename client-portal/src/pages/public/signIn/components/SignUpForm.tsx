@@ -10,6 +10,7 @@ import Select, { type StylesConfig } from "react-select";
 //import WalkThrough from "./WalkThrough";
 import { useNavigate } from "react-router-dom";
 import { GlobalLoginMaxAge } from "App";
+import GoogleAuthButton from "./GoogleAuthButton";
 
 
 import "./WalkThrough.scss";
@@ -62,6 +63,7 @@ const SignUpForm = () => {
   const [countryCode, setCountryCode] = useState<CountryOption>(countriesList[0]);
   const [show, setShow] = useState(false);
   const { handleSubmit, register, setError, watch, formState: { errors } } = useForm<SignUpFormData>();
+  const acceptedTerms = watch("accepted_terms", false);
   const navigate = useNavigate();
   const [, setCookie] = useCookies(["access_token", "refresh_token", "step"]);
   const password = watch("password", "");
@@ -276,6 +278,9 @@ const SignUpForm = () => {
         >
           Register
         </Button>
+
+        <div className="auth-divider" aria-hidden="true"><span>Or continue with</span></div>
+        <GoogleAuthButton action="register" legalAccepted={acceptedTerms} />
 
         
       </Form>

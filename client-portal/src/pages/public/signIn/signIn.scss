@@ -302,6 +302,16 @@ body{
   }
 }
 
+.auth-divider { display:flex; align-items:center; gap:12px; margin:18px 0 12px; color:var(--color-text-muted); font-size:12px; }
+.auth-divider::before, .auth-divider::after { content:""; height:1px; flex:1; background:var(--color-border); }
+.google-auth-button { width:100%; min-height:48px; border:1px solid var(--color-border-strong); border-radius:12px; background:var(--color-surface-2); color:var(--color-text); display:flex; align-items:center; justify-content:center; gap:10px; font-weight:600; cursor:pointer; }
+.google-auth-button:hover:not(:disabled) { background:var(--color-surface-3); }
+.google-auth-button:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.google-auth-button:disabled { opacity:.55; cursor:not-allowed; }
+.google-auth-mark { width:24px; height:24px; border-radius:50%; background:#fff; color:#4285f4; display:inline-flex; align-items:center; justify-content:center; font-weight:800; }
+.google-auth-hint, .google-auth-error { font-size:12px; margin:8px 0 0; color:var(--color-text-muted); }
+.google-auth-error { color:var(--color-negative); }
+
 .tabinactive{
   background-color: #242424;
 }

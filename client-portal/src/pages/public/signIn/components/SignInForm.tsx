@@ -7,6 +7,7 @@ import { LoginSuccess, useLogin } from "api/user/useLogin";
 import { useState } from "react";
 import use2FAVerify from "api/user/use2FAVerify";
 import { GlobalLoginMaxAge } from "App";
+import GoogleAuthButton from "./GoogleAuthButton";
 // import { useEffect } from "react";
 
 interface SignInFormProps {
@@ -149,6 +150,9 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
         >
           Log In
         </Button>
+
+        <div className="auth-divider" aria-hidden="true"><span>Or continue with</span></div>
+        <GoogleAuthButton action="login" />
 
         
       </Form>
