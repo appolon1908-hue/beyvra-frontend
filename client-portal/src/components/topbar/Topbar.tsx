@@ -11,7 +11,6 @@ import {
   CloseIconsm,
   DropUpIcon,
   ProfileIcon,
-  WalletIcon,
 } from "../../assets/icons";
 import {
   CurrentDrawerType,
@@ -95,12 +94,13 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
             <>
               <div className="dem">
                 <span style={{ textTransform: 'capitalize' }}>{selectedWallet?.name || "Demo Account"}</span>
+                <span className="demoBadge">DEMO</span>
                 <CaretDownIcon />
               </div>
               <div className="amount">
                 <p className="value">
                   {selectedWallet?.currency?.symbol || "D"}{" "}
-                  {formatMoney(selectedWallet?.balance ?? 0) || "9,999.00"}
+                  {formatMoney(selectedWallet?.balance ?? 0) || "0.00"}
                 </p>
               </div>
             </>
@@ -124,17 +124,6 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
 
       <div className="payProfileTab" id="top_right">
         <WalletsButton />
-        <button
-          aria-label="Open payments"
-          onClick={() => {
-            setIsRightDrawerOpen(true);
-            setIsRightDrawerContent("payments");
-          }}
-          className="payments"
-        >
-          Payments
-        </button>
-        
         <div className="profileButtons">
           <button
             aria-label="Open profile"
@@ -175,16 +164,6 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
           </button>
         </div>
         <WalletsButton />
-        <button
-          aria-label="Open payments"
-          onClick={() => {
-            setIsRightDrawerOpen(true);
-            setIsRightDrawerContent("payments");
-          }}
-          className="profile"
-        >
-          <WalletIcon />
-        </button>
       </div>
     </div>
   );

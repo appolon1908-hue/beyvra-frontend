@@ -154,6 +154,12 @@ body{
         margin-bottom: 0.6rem;
       }
     }
+    .ant-form-item label {
+      color: var(--color-text-secondary);
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 0.35rem;
+    }
     input.loginInput,
     .ant-input-affix-wrapper {
       border-radius: 0.53894rem;
@@ -219,7 +225,9 @@ body{
       color: #fff;
       font-weight: 400;
     }
-    p.forgotPass {
+    .forgotPass {
+      background: transparent;
+      border: 0;
       cursor: pointer;
       color: #6aff41;
       font-weight: 400;

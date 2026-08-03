@@ -39,6 +39,10 @@ test("sign-in is a dedicated route with a safe demo alternative", async ({ page 
   await page.goto("/signIn?tab=login");
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
   await expect(page.getByRole("tab", { name: "Log In" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByLabel("Email")).toBeVisible();
+  await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: "Keep me signed in" })).not.toBeChecked();
+  await expect(page.getByRole("button", { name: "Show password" })).toBeVisible();
 });
 
 test("session-expired route provides a safe recovery path", async ({ page }) => {

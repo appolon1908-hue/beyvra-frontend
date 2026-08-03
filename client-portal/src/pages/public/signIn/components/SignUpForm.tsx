@@ -4,7 +4,7 @@ import { useCookies } from "react-cookie";
 
 import useRegister from "api/user/useRegister";
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CountryCode from "../../../../helpers/CountryCode.json";
 import Select, { type StylesConfig } from "react-select";
 //import WalkThrough from "./WalkThrough";
@@ -69,25 +69,6 @@ const SignUpForm = () => {
   //const [showWalkThrough, setShowWalkThrough] = useState(false);
 
 
-
-  useEffect(() => {
-    if (countriesList.length > 0) {
-      fetch("https://ipapi.co/json/")
-        .then((response) => response.json())
-        .then((data) => {
-          const cCode = data.country_code;
-          const matchedLanguage = countriesList.find(
-            (item) => item.code.toLowerCase() === cCode.toLowerCase()
-          );
-          if (matchedLanguage) {
-            setCountryCode(matchedLanguage);
-          } else {
-            setCountryCode(countriesList[0]);
-          }
-        })
-        .catch(() => undefined);
-    }
-  }, []);
 
   const { mutate, isPending } = useRegister({
     onSuccess: (response) => {

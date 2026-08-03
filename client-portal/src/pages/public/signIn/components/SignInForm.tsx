@@ -22,7 +22,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
   const [showOtp, setShowOTP] = useState(false);
   const [show, setShow] = useState(false);
   const [otp, setOTP] = useState('');
-  const [rememberMe, setRememberMe] = useState(true);
+  const [rememberMe, setRememberMe] = useState(false);
   const [, setCookie] = useCookies(["step", "access_token", "refresh_token",]);
 
   const { handleSubmit, register, formState: { errors } } = useForm<ISignInForm>();
@@ -96,6 +96,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
           validateStatus={errors.email ? "error" : undefined}
           help={errors.email?.message}
         >
+          <label htmlFor="email">Email</label>
           <input
             className="loginInput"
             type="email"
@@ -110,6 +111,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
           validateStatus={errors.password ? "error" : undefined}
           help={errors.password?.message}
         >
+          <label htmlFor="password">Password</label>
           <input
             className="loginInput"
             type={show ? 'text' : "password"}
@@ -120,16 +122,24 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
           />
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: -8, marginBottom: 16 }}>
-          <span onClick={() => setShow(!show)} style={{ color: 'white', fontSize: 10, cursor: 'pointer' }}>{show ? 'Hide password' : 'Show password'}</span>
+          <button
+            type="button"
+            aria-pressed={show}
+            aria-label={show ? "Hide password" : "Show password"}
+            onClick={() => setShow(!show)}
+            style={{ background: "transparent", color: "white", fontSize: 12, cursor: "pointer" }}
+          >
+            {show ? 'Hide password' : 'Show password'}
+          </button>
         </div>
 
         <Checkbox checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)}>
           Keep me signed in
         </Checkbox>
 
-        <p className="forgotPass" onClick={() => setForgotPasswordView(true)}>
+        <button type="button" className="forgotPass" onClick={() => setForgotPasswordView(true)}>
           Forgot your password?
-        </p>
+        </button>
 
         <Button
           className="login"
