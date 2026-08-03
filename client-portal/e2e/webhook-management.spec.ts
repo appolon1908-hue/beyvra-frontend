@@ -18,6 +18,8 @@ test("authenticated users can create, test, inspect, disable, and delete a webho
 
   await page.goto("/platform", { waitUntil: "domcontentloaded" });
   await expect(page.locator(".platformWrapper")).toBeVisible();
+  const profile = page.locator(".payProfileTab:not(.payProfileTabMobile) button.profile");
+  if (await profile.count()) await profile.click();
   await page.getByRole("button", { name: "Open notifications" }).click();
   await expect(page.getByRole("heading", { name: "Webhook integrations" })).toBeVisible();
   await page.getByLabel("Webhook HTTPS URL").fill(`${origin}/api/notification/staging-receiver/`);
