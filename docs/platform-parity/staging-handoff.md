@@ -12,7 +12,7 @@ Status: staging-only implementation, demo-first. Deployed to staging on
   Google disabled until approved OAuth credentials and legal versions exist.
 - The sign-in bundle contains the truthful disabled Google control; no live
   provider or financial capability was enabled.
-- Route-repair image: `codestra-frontend:staging-ticket-drawer-20260803a`.
+- Route-repair image: `codestra-frontend:staging-platform-ui-20260803a`.
 - Unauthenticated `/platform` and nested routes now redirect to `/login` with
   an encoded local `redirect` destination.
 - `/platform-overview` is an original demo-workspace overview; legacy trading
@@ -57,6 +57,10 @@ Status: staging-only implementation, demo-first. Deployed to staging on
   right drawer at 768–1279px, and a bottom sheet below 768px. Added an accessible
   Open Demo Trade trigger, Escape/backdrop close behavior, and focus-safe close
   control. Payments and live features remain absent.
+- Applied the approved Codestra visual density: 64px rail, 64px top bar, compact
+  56px rail targets, dark slate surfaces, muted labels, tabular balances, green
+  primary demo actions, and red directional Down actions. Unsupported Payments,
+  Rewards, InZone and shop controls remain hidden by feature policy.
 
 ## Button/action matrix (implemented surfaces)
 
