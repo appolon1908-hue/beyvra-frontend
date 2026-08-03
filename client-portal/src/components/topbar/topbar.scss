@@ -67,6 +67,9 @@
       padding: 0.2rem 0.6rem;
       margin-right: 10px;
       width: max-content;
+      color: inherit;
+      border: 0;
+      background: transparent;
 
       p.value {
         color: #fff;
@@ -156,6 +159,10 @@
         width: 5rem;
         height: 5rem;
       }
+    }
+    button:focus-visible {
+      outline: 3px solid #80bfff;
+      outline-offset: 2px;
     }
   }
 }

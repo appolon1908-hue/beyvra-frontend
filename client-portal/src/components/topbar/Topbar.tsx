@@ -80,7 +80,9 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
   };
 
   const WalletsButton = () => (
-    <div
+    <button
+      type="button"
+      aria-label="Choose account"
       className="demo"
       onClick={() => {
         setIsRightDrawerOpen(true);
@@ -110,7 +112,7 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
             <Spin />
           )
       }
-    </div>
+    </button>
   );
 
   return (
@@ -123,6 +125,7 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
       <div className="payProfileTab" id="top_right">
         <WalletsButton />
         <button
+          aria-label="Open payments"
           onClick={() => {
             setIsRightDrawerOpen(true);
             setIsRightDrawerContent("payments");
@@ -134,6 +137,7 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
         
         <div className="profileButtons">
           <button
+            aria-label="Open profile"
             className="dropup-icon"
             onClick={() => {
               setIsRightDrawerOpen(true);
@@ -143,6 +147,7 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
             <DropUpIcon />
           </button>
           <button
+            aria-label="Open profile"
             className="profile"
             onClick={() => {
               setIsRightDrawerOpen(true);
@@ -159,6 +164,7 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
       <div className="payProfileTab payProfileTabMobile">
         <div className="profileButtons">
           <button
+            aria-label="Open profile"
             className="profile"
             onClick={() => {
               setIsRightDrawerOpen(true);
@@ -170,6 +176,7 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
         </div>
         <WalletsButton />
         <button
+          aria-label="Open payments"
           onClick={() => {
             setIsRightDrawerOpen(true);
             setIsRightDrawerContent("payments");

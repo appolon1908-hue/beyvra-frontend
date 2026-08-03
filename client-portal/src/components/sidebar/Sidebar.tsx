@@ -49,11 +49,8 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
   const onSelect = (activeDrawer: CurrentDrawerType) => {
     if (isLeftSubDrawerOpen) {
       setIsLeftSubDrawerOpen(false);
-    } else {
-      setIsDrawerOpen(
-        isDrawerOpen && currentDrawer === activeDrawer ? false : true
-      );
     }
+    setIsDrawerOpen(!(isDrawerOpen && currentDrawer === activeDrawer));
     if (togglePortfolioWindow) {
       dispatch(setPortfolioWindow(false))
       // setIsDrawerOpen(false)
@@ -65,7 +62,6 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
       setIsLeftSubDrawerOpen(false);
       dispatch(setPortfolioWindow(true));
       setIsDrawerOpen(false)
-      console.log("set  false")
 
 
     } else if (togglePortfolioWindow) {
@@ -87,7 +83,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
 
 
   return (
-    <div className="sidebar" id={id ? id : ""} style={{ zIndex: '900' }}>
+    <div className="sidebar" id={id ? id : ""}>
       
       <div className="logo">
           <a href="/platform"> <LogoIcon /></a>
@@ -96,6 +92,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
       <div className="top">
         
         <button
+          aria-label="Trades"
           onClick={() => onSelect("trades")}
           className={isDrawerOpen && currentDrawer === "trades" ? "active" : ""}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
@@ -107,6 +104,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
         </button>
 
         <button
+          aria-label="Market"
           onClick={() => onSelect("market")}
           className={isDrawerOpen && currentDrawer === "market" ? "active" : ""}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
@@ -118,6 +116,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
         </button>
 
         <button
+          aria-label="Events"
           onClick={() => onSelect("events")}
           className={isDrawerOpen && currentDrawer === "events" ? "active" : ""}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
@@ -129,6 +128,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
         </button>
 
         <button
+          aria-label="Portfolio"
           onClick={() => handlePortfolioNavigation("portfolio")}
           className={isDrawerOpen && currentDrawer === "events" ? "active" : ""}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
@@ -140,6 +140,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
         </button>
 
         <button
+          aria-label="Help"
           onClick={() => onSelect("help")}
           className={isDrawerOpen && currentDrawer === "help" ? "active" : ""}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
@@ -150,6 +151,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
           <p className="text">Help</p>
         </button>
         <button
+          aria-label="News"
           onClick={() => onSelect("news")}
           className={isDrawerOpen && currentDrawer === "news" ? "active" : ""}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}

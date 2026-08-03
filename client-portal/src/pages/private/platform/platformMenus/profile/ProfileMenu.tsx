@@ -86,7 +86,9 @@ const ProfileMenu: React.FunctionComponent<ProfileMenuProps> = ({
 
   return (
     <div className={`${themeSelect}`}>
-      <div
+      <button
+        type="button"
+        aria-label="Open notifications"
         className="headerExtraIcon"
         onClick={() => {
           setIsRightSubDrawerOpen(true);
@@ -94,7 +96,7 @@ const ProfileMenu: React.FunctionComponent<ProfileMenuProps> = ({
         }}
       >
         <NotificationIcon2 />
-      </div>
+      </button>
       <div className="flexTraderProfile">
         <div className="trader">
           <p className="traderHead">

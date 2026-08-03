@@ -1,254 +1,103 @@
-import {
-  PlusIcon2,
-  SearchIcon2,
-  InfoCircleIconSmall,
-  ArrowDownOS,
-  FilterBarsIcon,
-} from "../../assets/icons";
-import "./assetSelectionContainer.scss";
-import { useEffect, useState } from "react";
-import DropdownMenu from "components/dropdownMenu/DropdownMenu";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useCookies } from "react-cookie";
 import { useAppDispatch, useAppSelector } from "@store/hooks";
-import {
-  setChartSymbol,
-} from "@store/slices/socketStockCrypto";
-import type { CryptoChartDataType } from "hooks/useSocketConnect";
-import { getSocketUrl } from "utils/env";
+import { setChartSymbol } from "@store/slices/socketStockCrypto";
+import { authenticatedRequest } from "api/client";
+import { apiEndpoints } from "api/endpoints";
+import { PlusIcon2, SearchIcon2 } from "../../assets/icons";
+import "./assetSelectionContainer.scss";
 
-function calculatePercentageChange(
-  currentPrice: number,
-  percentageChange: number
-): number {
-  const value = currentPrice / (1 + percentageChange / 100);
-  return Number.isNaN(value) ? 0 : value;
-}
-
-const SortFilter = () => {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="filter-assets-dropdown-container">
-      <DropdownMenu
-        position="bottom dropdown-position-fixed"
-        type="drop-down"
-        menuItems={[
-          {
-            text: "Profitability",
-            onclick: () => {},
-            icon: <FilterBarsIcon height="20" width="20" />,
-          },
-          {
-            text: "Popularity",
-            onclick: () => {},
-            icon: <FilterBarsIcon height="20" width="20" />,
-          },
-          {
-            text: "Name A–Z",
-            onclick: () => {},
-            icon: <FilterBarsIcon height="20" width="20" />,
-          },
-          {
-            text: "Name Z–A",
-            onclick: () => {},
-            icon: <FilterBarsIcon height="20" width="20" />,
-          },
-        ]}
-        callback={setOpen}
-      >
-        <div className="filter-assets-item-container">
-          <FilterBarsIcon height="20" width="20" />
-          <h5 className="filter-assets-item-text">Profitability</h5>
-          <div className={open ? "arrow-svg" : ""}>
-            <ArrowDownOS height="12" width="12" />
-          </div>
-        </div>
-      </DropdownMenu>
-    </div>
-  );
+type MarketAsset = {
+  id: number;
+  name: string;
+  symbol: string;
+  image?: string | null;
 };
 
-let isAdded = false;
+type AssetResponse = MarketAsset[] | {
+  results: MarketAsset[];
+};
 
 const AssetSelectionContainer: React.FunctionComponent = () => {
   const dispatch = useAppDispatch();
-  const [isOpen, setOpen] = useState<boolean>(false);
-  const [isSelected, setSelected] = useState<number>(0);
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const [headerData, setHeaderData] = useState<{
-    [key: number]: CryptoChartDataType;
-  }>({});
-  const [data, setData] = useState<{ [key: number]: CryptoChartDataType }>({});
-  const [cryptoSocket, setCryptoSocket] = useState<WebSocket | null>(null);
-  const { wsTicket } = useAppSelector((state) => state.user);
-
-  useEffect(() => {
-    if (wsTicket) {
-      const webSocket = new WebSocket(
-        getSocketUrl("ws/market-data/", {
-          ws_ticket: wsTicket,
-          symbol: "BTCUSDT",
-          interval: "1m",
-        }),
+  const [cookies] = useCookies(["access_token"]);
+  const [isOpen, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const chartSymbol = useAppSelector((state) => state.socketStockCrypto.chartSymbol) || "BTC";
+  const assets = useQuery({
+    queryKey: ["trade-assets"],
+    queryFn: async (): Promise<MarketAsset[]> => {
+      const response = await authenticatedRequest<AssetResponse>(
+        apiEndpoints.trades.assets,
+        cookies.access_token,
       );
+      return Array.isArray(response) ? response : response.results;
+    },
+    enabled: Boolean(cookies.access_token),
+    staleTime: 5 * 60_000,
+  });
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return (assets.data ?? []).filter((asset: MarketAsset) =>
+      !term || asset.name.toLowerCase().includes(term) || asset.symbol.toLowerCase().includes(term)
+    );
+  }, [assets.data, search]);
 
-      webSocket.onerror = () => {
-        console.error("WebSocket connection error");
-        throw new Error("WebSocket connection error");
-      };
-
-      webSocket.onopen = () => {
-        setCryptoSocket(webSocket); // Set WebSocket after it's successfully opened
-      };
-
-      webSocket.onmessage = (event) => {
-        try {
-          const message = JSON.parse(event.data);
-          if (message.type !== "candle") return;
-          const data = {
-            id: 1,
-            p: Number(message.close),
-            t: String(message.time),
-            symbol: String(message.symbol).replace(/USDT$/, ""),
-          } as CryptoChartDataType;
-          console.log("WebSocket data received:", data);
-
-          // Update chart data
-          setData((prev) => ({
-            ...prev,
-            [data.id]: data,
-          }));
-
-          // Add header data if it's not already added
-          if (!isAdded) {
-            isAdded = true;
-            setHeaderData((prev) => ({
-              ...prev,
-              [data.id]: data,
-            }));
-
-            // Dispatch action to set chart symbol
-            dispatch(setChartSymbol(data.symbol));
-          }
-        } catch (error) {
-          console.error("Error parsing WebSocket message:", error);
-        }
-      };
-
-      return () => {
-        // Clean up: close WebSocket connection
-        webSocket.close();
-      };
-    }
-  }, [wsTicket, dispatch]);
+  const selectAsset = (asset: MarketAsset) => {
+    dispatch(setChartSymbol(asset.symbol));
+    setOpen(false);
+  };
 
   return (
     <div className="trade-assets-main-container">
-      <div
+      <button
+        type="button"
         className={isOpen ? "close-svg" : "plus-svg"}
-        onClick={() => setOpen(!isOpen)}
+        aria-label={isOpen ? "Close asset selector" : "Add or change asset"}
+        aria-expanded={isOpen}
+        onClick={() => setOpen((value) => !value)}
       >
         <PlusIcon2 />
-      </div>
+      </button>
       <div className="header-assets-list-container">
-        {Object.values(headerData).map((item, index) => (
-          <div
-            key={index}
-            className="header-assets-item-container"
-            style={{
-              background: index === selectedIndex ? "#f2f2f22e" : "#f2f2f214",
-            }}
-            onClick={() => {
-              setSelectedIndex(index);
-              dispatch(setChartSymbol(item.symbol));
-            }}
-          >
-            <img
-              src="cryptoIcon.svg"
-              alt={item.symbol}
-              style={{ width: 28, height: 28 }}
-            />
-            <div className="header-assets-text-container">
-              <h5 className="header-asset-text-title">{item.symbol}</h5>
-              <h5 className="header-asset-text-per">{`${calculatePercentageChange(
-                item?.p,
-                item?.p24h
-              ).toFixed(2)}%`}</h5>
-            </div>
+        <button type="button" className="header-assets-item-container" aria-label={`Selected asset ${chartSymbol}`}>
+          <img src="cryptoIcon.svg" alt="" style={{ width: 28, height: 28 }} />
+          <div className="header-assets-text-container">
+            <h5 className="header-asset-text-title">{chartSymbol}</h5>
           </div>
-        ))}
+        </button>
       </div>
 
       {isOpen && (
-        <div className="trade-assets-dropdown-container">
-          <div className="container">
-            <div
-              className="section"
-              onClick={() => {
-                //setData([]);           -----------------      Commented By ER
-                setSelected(0);
-              }}
-            >
-              <h3 className={isSelected === 0 ? "seletecColor" : ""}>Crypto</h3>
-              <div
-                className={`unseletecTabLine ${
-                  isSelected === 0 ? "seletecTabLine" : ""
-                }`}
-              />
-            </div>
-            <div
-              className="section"
-              onClick={() => {
-                //setData([]);             -----------------      Commented By ER
-                setSelected(1);
-              }}
-            >
-              <h3 className={isSelected === 1 ? "seletecColor" : ""}>Stocks</h3>
-              <div
-                className={`unseletecTabLine ${
-                  isSelected === 1 ? "seletecTabLine" : ""
-                }`}
-              />
-            </div>
-          </div>
-          <div className="search-container">
-            <div className="search-box">
+        <div className="trade-assets-dropdown-container" role="dialog" aria-label="Choose trading asset">
+          <label className="search-container">
+            <span className="sr-only">Search assets</span>
+            <span className="search-box">
               <input
                 className="search-input"
                 name="asset-search-field"
-                placeholder="Search"
-                type="text"
+                placeholder="Search assets"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
               />
               <SearchIcon2 />
-            </div>
-          </div>
-          <div className="asset-list-container">
-            <div className="asset-list-subtitle-container">
-              <h5 className="asset-list-subtitle">Name</h5>
-              <h5 className="asset-list-subtitle">Profitability</h5>
-            </div>
-          </div>
-          <div className="asset-list-scrollable">
-            {Object.values(data).map((item, index) => (
-              <div
-                key={index}
+            </span>
+          </label>
+          <div className="asset-list-scrollable" aria-live="polite">
+            {assets.isPending && <p role="status">Loading assets…</p>}
+            {assets.isError && <p role="alert">Assets could not be loaded.</p>}
+            {!assets.isPending && !assets.isError && filtered.length === 0 && <p>No assets match your search.</p>}
+            {filtered.map((asset: MarketAsset) => (
+              <button
+                type="button"
+                key={asset.id}
                 className="asset-list-item-container"
-                onClick={() => {
-                  setHeaderData((prev) => ({
-                    ...prev,
-                    [item.id]: item,
-                  }));
-                  const selectedIdx = Object.values(data).findIndex(
-                    (subItem) => subItem.symbol === item.symbol
-                  );
-                  setSelectedIndex(selectedIdx);
-                  dispatch(setChartSymbol(item.symbol));
-                }}
+                onClick={() => selectAsset(asset)}
               >
-                <h5 className="asset-list-item-title">{item?.symbol}</h5>
-                <h5 className="asset-list-item-per">
-                  {item?.change_percentage}%
-                </h5>
-                <InfoCircleIconSmall />
-              </div>
+                <span className="asset-list-item-title">{asset.name}</span>
+                <span className="asset-list-item-per">{asset.symbol}</span>
+              </button>
             ))}
           </div>
         </div>

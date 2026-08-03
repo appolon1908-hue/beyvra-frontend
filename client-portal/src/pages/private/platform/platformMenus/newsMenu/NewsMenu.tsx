@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import { Button } from "antd";
 import moment from "moment";
@@ -117,6 +117,7 @@ const NewsMenu: React.FunctionComponent<NewsMenuProps> = () => {
   const [selectedFeed, setSelectedFeed] = useState("all");
   const { themeSelect } = useAppSelector((state) => state.themeBg);
   const [searchTerm, setSearchTerm] = useState("");
+  const requestedForToken = useRef<string | null>(null);
 
   const result = useNews({
     onSuccess: () => console.log("returned success"),
@@ -144,7 +145,10 @@ const NewsMenu: React.FunctionComponent<NewsMenuProps> = () => {
   };
 
   useEffect(() => {
-    mutateNews({ token: cookies.access_token });
+    if (cookies.access_token && requestedForToken.current !== cookies.access_token) {
+      requestedForToken.current = cookies.access_token;
+      mutateNews({ token: cookies.access_token });
+    }
   }, [mutateNews, cookies.access_token]);
 
   if (isPending) {
@@ -154,7 +158,7 @@ const NewsMenu: React.FunctionComponent<NewsMenuProps> = () => {
   
 
 const getSelectedArticles = (): Record<string, INews> => {
-  const articles = data?.results || [];
+  const articles = Array.isArray(data?.results) ? data.results : [];
   const filtered = selectedFeed === "all"
     ? articles
     : articles.filter((article) =>

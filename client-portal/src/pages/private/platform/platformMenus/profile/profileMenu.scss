@@ -3,10 +3,18 @@
   position: absolute;
   top: 1.3125rem;
   right: 5.3125rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
 
   svg {
     width: 2rem;
   }
+}
+
+.headerExtraIcon:focus-visible {
+  outline: 3px solid #80bfff;
+  outline-offset: 2px;
 }
 
 .flexTraderProfile {

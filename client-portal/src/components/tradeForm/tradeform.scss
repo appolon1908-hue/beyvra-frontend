@@ -89,9 +89,12 @@
   @media (max-width: 767px) {
     width: 100%;
     position: absolute;
-    bottom: 0;
+    bottom: 4.25rem;
     left: 0;
     padding: 0.5rem;
+    z-index: 4;
+    background: var(--surface-canvas);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .coinInfo {
@@ -135,6 +138,10 @@
       gap: 12px;
       width: 100%;
       padding: 0.5rem 1rem;
+    }
+    @media (max-width: 360px) {
+      gap: 0.375rem;
+      padding: 0.25rem;
     }
     .amountContainer {
       position: relative;

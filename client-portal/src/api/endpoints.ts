@@ -10,6 +10,7 @@ export const apiEndpoints = {
   },
   trades: {
     list: "trades/",
+    assets: "trades/assets/",
     detail: (tradeId: number) => `trades/${tradeId}/`,
     cancel: (tradeId: number) => `trades/${tradeId}/cancel/`,
   },

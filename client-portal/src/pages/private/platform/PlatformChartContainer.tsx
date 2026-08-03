@@ -2,20 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import TradeForm from "../../../components/tradeForm/TradeForm";
 import "./platform.scss";
 import {
-  AreaChartIcon,
-  BarChartIcon,
-  CandleStickIcon,
   MainChartChangeIcon,
   ZoomInChartIcon,
   ZoomOutChartIcon,
 } from "../../../assets/icons";
-import { timeScaleMenu } from "utils/utils";
 import DropdownMenu from "components/dropdownMenu/DropdownMenu";
 import {
   CandlestickData,
   ColorType,
   createChart,
-  CrosshairMode,
   IChartApi,
   ISeriesApi,
   LineStyle,
@@ -24,6 +19,7 @@ import {
 import { useCookies } from "react-cookie";
 import { useAppSelector } from "@store/hooks";
 import { getApiUrl, getSocketUrl } from "utils/env";
+import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
 
 interface PlatformProps {
   themeSelect: string;
@@ -43,14 +39,14 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const seriesRef = useRef<ISeriesApi<"Candlestick" | "Area" | "Bar", Time> | null>(null);
 
   const [selectedChart, setSelectedChart] = useState<"area" | "candlesticks" | "bar">("candlesticks");
-  const [tradingPair] = useState("BTCUSDT");
+  const chartSymbol = useAppSelector((state) => state.socketStockCrypto.chartSymbol) || "BTC";
+  const tradingPair = `${chartSymbol.replace(/USDT$|\/USD$/i, "").toUpperCase()}USDT`;
   const [candleInterval] = useState("1m");
   const [chartData, setChartData] = useState<CandlestickData[]>([]);
   const [userInteracted, setUserInteracted] = useState(false);
   const [connectionState, setConnectionState] = useState<"loading" | "connected" | "disconnected" | "error">("loading");
   const [chartError, setChartError] = useState("");
   const [cookies] = useCookies(["access_token"]);
-  const { wsTicket } = useAppSelector((state) => state.user);
 
   // ------------------------------------------------------------------
   // 1) Fetch historical data + initialize WebSocket
@@ -60,14 +56,30 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
     let disposed = false;
     let retryCount = 0;
+    let connecting = false;
 
-    const connect = () => {
-      if (disposed || !wsTicket || ws?.readyState === WebSocket.OPEN || ws?.readyState === WebSocket.CONNECTING) return;
-      ws = new WebSocket(getSocketUrl("ws/market-data/", {
-        ws_ticket: wsTicket,
-        symbol: tradingPair,
-        interval: candleInterval,
-      }));
+    const connect = async () => {
+      if (disposed || connecting || !cookies.access_token || ws?.readyState === WebSocket.OPEN || ws?.readyState === WebSocket.CONNECTING) return;
+      connecting = true;
+      try {
+        const { ws_ticket } = await webSocketTicketFetcher(cookies.access_token);
+        if (disposed) return;
+        ws = new WebSocket(getSocketUrl("ws/market-data/", {
+          ws_ticket,
+          symbol: tradingPair,
+          interval: candleInterval,
+        }));
+      } catch (error) {
+        if (disposed) return;
+        setConnectionState("error");
+        setChartError(error instanceof Error ? error.message : "Live market access is unavailable");
+        retryCount += 1;
+        retryTimer = setTimeout(() => void connect(), Math.min(1000 * 2 ** retryCount, 30000));
+        return;
+      } finally {
+        connecting = false;
+      }
+      if (!ws) return;
       ws.onopen = () => {
         retryCount = 0;
         setConnectionState("connected");
@@ -77,7 +89,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
         if (disposed) return;
         setConnectionState("disconnected");
         retryCount += 1;
-        retryTimer = setTimeout(connect, Math.min(1000 * 2 ** retryCount, 30000));
+        retryTimer = setTimeout(() => void connect(), Math.min(1000 * 2 ** retryCount, 30000));
       };
       ws.onerror = () => setConnectionState("disconnected");
       ws.onmessage = (event) => {
@@ -122,7 +134,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
           setChartData(results);
           if (results.length === 0) setChartError("No market history is available for this asset");
         }
-        connect();
+        void connect();
       } catch (error) {
         if (disposed) return;
         setChartError(error instanceof Error ? error.message : "Market data is unavailable");
@@ -130,13 +142,13 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
       }
     };
 
-    if (cookies.access_token && wsTicket) void initializeChartData();
+    if (cookies.access_token) void initializeChartData();
     return () => {
       disposed = true;
       if (retryTimer) clearTimeout(retryTimer);
       ws?.close();
     };
-  }, [cookies.access_token, tradingPair, candleInterval, wsTicket]);
+  }, [cookies.access_token, tradingPair, candleInterval]);
 
   // ------------------------------------------------------------------
   // 2) Initialize / update the chart

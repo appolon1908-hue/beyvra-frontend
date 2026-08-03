@@ -14,7 +14,7 @@
   }
  
   @media (max-width: 767px) {
-    z-index: 100;
+    z-index: 1200;
     position: absolute;
     bottom: 0;
     height: auto;
@@ -45,6 +45,7 @@
       min-height: 3rem;
       cursor: pointer;
       margin-bottom: 0.5rem;
+      min-width: 3rem;
       svg {
         width: 1.425rem;
       }
@@ -68,6 +69,10 @@
           width: 1.3rem;
         }
       }
+    }
+    button:focus-visible {
+      outline: 3px solid #80bfff;
+      outline-offset: 2px;
     }
     button:hover {
       background-color:  rgba(103, 103, 103, 0.416);;

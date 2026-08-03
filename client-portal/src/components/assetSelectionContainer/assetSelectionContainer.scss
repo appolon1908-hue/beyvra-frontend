@@ -17,6 +17,7 @@
     display: flex;
     border-radius: 8px;
     flex-shrink: 0;
+    border: 0;
     svg {
       transition: transform 80ms ease-out;
       transform: rotate(0deg);
@@ -33,6 +34,7 @@
     display: flex;
     flex-shrink: 0;
     border-radius: 8px;
+    border: 0;
     svg {
       transition: transform 80ms ease-out;
       transform: rotate(45deg);
@@ -161,6 +163,9 @@
     padding: 0px 16px;
     cursor: pointer;
     margin-bottom: 16px;
+    width: 100%;
+    border: 0;
+    background: transparent;
   }
   .asset-list-item-title {
     font-size: 0.9rem;
@@ -213,6 +218,13 @@
     height: 50px;
     user-select: none;
     cursor: pointer;
+    color: inherit;
+  }
+
+  button:focus-visible,
+  input:focus-visible {
+    outline: 3px solid #80bfff;
+    outline-offset: 2px;
   }
   .header-assets-text-container {
     display: flex;
