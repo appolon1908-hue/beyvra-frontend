@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Topbar from "../../../components/topbar/Topbar";
 import "./platform.scss";
@@ -90,29 +90,29 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
     }
   }, [cookies.access_token, webSocketTicketMutate]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const topbarElement = document.getElementById("topbarContainer");
     const tradeFormElement = document.getElementById("tradeForm");
     const mainSidebarElement = document.getElementById("main_sidebar");
     const bottomSidebarElement = document.getElementById("bottom_sidebar");
 
-    if (topbarElement) {
-      setTopbarHeight(topbarElement.clientHeight);
-    }
+    const measure = () => {
+      setTopbarHeight(topbarElement?.clientHeight ?? 0);
+      setTradeFormHeight(tradeFormElement?.clientHeight ?? 0);
+      setBottomSidebarHeight(bottomSidebarElement?.clientHeight ?? 0);
+      setMainSidebarWidth(mainSidebarElement?.clientWidth ?? 0);
+    };
 
-    if (tradeFormElement && window.innerWidth <= 767) {
-      setTradeFormHeight(tradeFormElement.clientHeight);
-    }
-
-    if (bottomSidebarElement && window.innerWidth <= 767) {
-      setBottomSidebarHeight(bottomSidebarElement.clientHeight);
-    }
-
-    if (mainSidebarElement) {
-      setMainSidebarWidth(mainSidebarElement.clientWidth);
-    } else {
-      setMainSidebarWidth(0);
-    }
+    measure();
+    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : undefined;
+    [topbarElement, tradeFormElement, bottomSidebarElement, mainSidebarElement]
+      .filter(Boolean)
+      .forEach((element) => observer?.observe(element as Element));
+    window.addEventListener("resize", measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, [storedScale]);
 
   useEffect(() => {
@@ -290,7 +290,6 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
       <div className={isDrawerOpen ? "trade-section ml-378" : "trade-section"}>
 
         <Topbar
-          style={{ marginLeft: `${mainSidebarWidth}px` }}
           isDrawerOpen={isDrawerOpen}
           setIsRightDrawerOpen={setIsRightDrawerOpen}
           setIsRightDrawerContent={setIsRightDrawerContent}
