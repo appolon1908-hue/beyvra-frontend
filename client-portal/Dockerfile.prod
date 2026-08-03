@@ -13,7 +13,14 @@ RUN VITE_API_BASE_URL=$VITE_API_BASE_URL \
  VITE_GEOIP_ENDPOINT=$VITE_GEOIP_ENDPOINT \
  npm run build
 
-FROM nginx:1.27.4-alpine AS production-stage
+FROM nginx:alpine AS production-stage
+ARG VCS_REF=unknown
+ARG BUILD_VERSION=unreleased
+ARG BUILD_DATE=unknown
+LABEL org.opencontainers.image.source="https://github.com/appolon1908-hue/trading-frontend" \
+      org.opencontainers.image.revision="$VCS_REF" \
+      org.opencontainers.image.version="$BUILD_VERSION" \
+      org.opencontainers.image.created="$BUILD_DATE"
 COPY nginx-default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 COPY config.js.template /etc/nginx/templates/config.js.template
