@@ -95,6 +95,7 @@ const RequireAuth = () => {
   };
 
   useEffect(() => {
+    if (!cookies.access_token) return;
     mutateKYC({
       token: cookies.access_token
     });
