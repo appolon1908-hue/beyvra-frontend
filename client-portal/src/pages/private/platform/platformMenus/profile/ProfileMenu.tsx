@@ -12,8 +12,6 @@ import {
   NotificationIcon2,
   ReloadIcon,
   SettingsIcon2,
-  SignalsIcon,
-  TooltipIcon,
 } from "../../../../../assets/icons";
 import StoriesModal from "./components/Stories";
 import { StorieList, storiesList } from "./data";
@@ -137,38 +135,6 @@ const ProfileMenu: React.FunctionComponent<ProfileMenuProps> = ({
             </div>
           ))}
         </Slider>
-      </div>
-
-      <div
-        className="profileCard-set"
-        onClick={() => {
-          setIsRightSubDrawerOpen(true);
-          setIsRightSubDrawerContent("traders-way");
-        }}
-      >
-        <div className="levelCard">
-          <div className="levelCardTitleContainer">
-            <SignalsIcon />
-            <p className="levelCardTitle">Beginner</p>
-          </div>
-          <div className="levelBar">
-            <p>LEVEL 1</p>
-            <p className="levelText">0/50 XP</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="statusTooltip">
-        <div
-          className="statusTooltipInner"
-          onClick={() => {
-            setIsRightSubDrawerOpen(true);
-            setIsRightSubDrawerContent("status");
-          }}
-        >
-          <p>What are Statuses?</p>
-          <TooltipIcon />
-        </div>
       </div>
 
       <div className="taskCards">

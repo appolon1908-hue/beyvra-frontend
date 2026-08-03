@@ -58,3 +58,20 @@
   color: #ababad;
   font-size: .75rem;
 }
+
+.notification-inbox__load-more {
+  width: 100%;
+  margin-top: 12px;
+  min-height: 44px;
+  border: 1px solid #6f7179;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+}
+
+.notification-inbox__load-more:focus-visible,
+.notification-container button:focus-visible,
+.notification-inbox__header button:focus-visible {
+  outline: 3px solid #80bfff;
+  outline-offset: 2px;
+}

@@ -6,8 +6,6 @@ import { FC, useState } from "react";
 import "./withdrawMenu.scss";
 import { Col, Modal, Row } from "antd";
 import PrimaryButton from "../../../../../components/primaryButton/PrimaryButton";
-import SecondaryButton from "../../../../../components/secondaryButton/SecondaryButton";
-import WithdrawWireTransfer from "./WithdrawWireTransfer";
 import WithdrawHelpCenter from "../withdrawHelpCenter/WithdrawHelpCenter";
 
 interface WithdrawMenuProps {
@@ -23,8 +21,6 @@ const WithdrawMenu: FC<WithdrawMenuProps> = ({
   setIsWithdrawAccountModalOpen,
   setIsModalDepositOpen,
 }) => {
-  const [show, setShow] = useState(false);
-
   const [modalVisible, setModalVisible] = useState(false);
   
   const showModal = () => {
@@ -66,31 +62,16 @@ const WithdrawMenu: FC<WithdrawMenuProps> = ({
             setIsModalDepositOpen={setIsModalDepositOpen}
           />
           <Row gutter={15} className="buttonsRow">
-            <Col span={12}>
+            <Col span={24}>
               <PrimaryButton
                 Title="Select Account"
                 className="SelectAccountButton"
                 onClick={() => setIsWithdrawAccountModalOpen(true)}
               />
             </Col>
-            <Col span={12}>
-              <SecondaryButton Title="Wire Transfer" onClick={() => setShow(true)} />
-            </Col>
           </Row>
         </div>
       </Modal>
-      <Modal
-        open={show}
-        onCancel={() => setShow(false)}
-        closable={true}
-        footer={null}
-        style={{ width: 600 }}
-        className="withdrawWireTransferModal"
-        centered
-      >
-        <WithdrawWireTransfer />
-      </Modal>
-
       <Modal
         title={null}
         open={modalVisible} // Updated to the new state variable name

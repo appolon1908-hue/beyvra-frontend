@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authenticatedRequest } from "api/client";
 import { apiEndpoints, socketEndpoints } from "api/endpoints";
 import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
@@ -25,12 +25,23 @@ type InboxResponse = NotificationEvent[] | {
 export const notificationInboxKey = ["notification-inbox"] as const;
 
 export function useNotificationInbox(token?: string) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: notificationInboxKey,
-    queryFn: async () => {
-      const response = await authenticatedRequest<InboxResponse>(apiEndpoints.notifications.inbox, token!);
-      return Array.isArray(response) ? response : response.results;
+    initialPageParam: 1,
+    queryFn: async ({ pageParam }) => {
+      const response = await authenticatedRequest<InboxResponse>(
+        `${apiEndpoints.notifications.inbox}?page=${pageParam}`,
+        token!,
+      );
+      if (Array.isArray(response)) {
+        return { results: response, nextPage: undefined };
+      }
+      const nextPage = response.next
+        ? Number(new URL(response.next, window.location.origin).searchParams.get("page")) || undefined
+        : undefined;
+      return { results: response.results, nextPage };
     },
+    getNextPageParam: (lastPage) => lastPage.nextPage,
     enabled: Boolean(token),
     refetchInterval: 30_000,
   });

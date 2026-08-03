@@ -1,5 +1,4 @@
 import {
-  AiIcon,
   EventsIcon,
   HelpIcon,
   LogoIcon,
@@ -20,9 +19,9 @@ type DrawerType =
   | "events"
   | "help"
   | "news"
-  | "ai"
   | "assets"
   | "portfolio"
+  | "ai"
   | null;
 
 interface SidebarProps {
@@ -159,16 +158,6 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
             <NewsIcon />
           </div>
           <p className="text">News</p>
-        </button>
-        <button
-          onClick={() => onSelect("ai")}
-          className={isDrawerOpen && currentDrawer === "ai" ? "active" : ""}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
-        >
-          <div className="icon flex justify-center whiteIcons">
-            <AiIcon />
-          </div>
-          <p className="text">AI</p>
         </button>
       </div>
       <div className="bottom">

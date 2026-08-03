@@ -24,6 +24,10 @@ export const apiEndpoints = {
     inbox: "notification/inbox/",
     read: (eventId: string) => `notification/inbox/${eventId}/read/`,
     readAll: "notification/inbox/read-all/",
+    webhooks: "notification/webhooks/",
+    webhook: (webhookId: string) => `notification/webhooks/${webhookId}/`,
+    webhookTest: (webhookId: string) => `notification/webhooks/${webhookId}/test/`,
+    webhookDeliveries: (webhookId: string) => `notification/webhooks/${webhookId}/deliveries/`,
   },
   market: {
     history: "trades/market/history/",

@@ -53,9 +53,7 @@ import WithdrawPayment from "./platformMenus/withdrawpayment/WithdrawPayment";
 import StatusMenu from "./platformMenus/status/StatusMenu";
 import AddAccountName from "./platformMenus/addAccountName/AddAccountName";
 import PublishedStrategiesMenu from "./platformMenus/publishedStrategiesMenu/PublishedStrategiesMenu";
-import AiMenu from "./platformMenus/aiMenu/AiMenu";
 import NewsMenu from "./platformMenus/newsMenu/NewsMenu";
-import AiAssetSummaryMenu from "./platformMenus/aiAssetSummaryMenu/AiAssetSummaryMenu";
 import ForexMarketSubMenu from "./platformMenus/marketSubMenu/ForexMarketSubMenu";
 import AstroMarketSubMenu from "./platformMenus/marketSubMenu/AstroMarketSubMenu";
 import CryptoMarketSubMenu from "./platformMenus/marketSubMenu/CryptoMarketSubMenu";
@@ -87,8 +85,6 @@ export function leftDarwerTitleHandler(
       return "Help";
     case "assets":
       return "Assets";
-    case "ai":
-      return "AI";
     case "news":
       return "News";
     default:
@@ -143,13 +139,6 @@ export function leftDrawerBodyHandler(
       );
     case "assets":
       return <AssetsMenu setIsDrawerOpen={setIsDrawerOpen} />;
-    case "ai":
-      return (
-        <AiMenu
-          setLeftSubDrawer={setLeftSubDrawer}
-          setIsLeftSubDrawerOpen={setIsLeftSubDrawerOpen}
-        />
-      );
     case "news":
       return <NewsMenu />;
     default:
@@ -189,8 +178,6 @@ export function leftSubDrawerTitleHandler(
       return "Trading Tutorials";
     case "why-coose-us":
       return "Help Center";
-    case "ai-asset-summary":
-      return "AI";
     default:
       return "";
   }
@@ -238,8 +225,6 @@ export function leftSubDrawerBodyHandler(
       return <TradingPlatformInfo setLeftSubDrawer={setLeftSubDrawer} />;
     case "why-coose-us":
       return <OlympTradeInfo setLeftSubDrawer={setLeftSubDrawer} />;
-    case "ai-asset-summary":
-      return <AiAssetSummaryMenu />;
     case "event-join-leagues":
       return <JoinLeagues />;
     case "events-signals-club":

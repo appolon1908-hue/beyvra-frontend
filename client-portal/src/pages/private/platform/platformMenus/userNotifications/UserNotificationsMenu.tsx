@@ -15,7 +15,8 @@ const UserNotificationsMenu = () => {
   const markRead = useMarkNotificationRead(cookies.access_token);
   const markAll = useMarkAllNotificationsRead(cookies.access_token);
   const connected = useNotificationSocket(cookies.access_token);
-  const unread = (inbox.data || []).filter((item: NotificationEvent) => !item.is_read).length;
+  const notifications = inbox.data?.pages.flatMap((page) => page.results) ?? [];
+  const unread = notifications.filter((item: NotificationEvent) => !item.is_read).length;
 
   if (inbox.isPending) return <div className="userNotificationsMenu"><p>Loading notifications…</p></div>;
   if (inbox.isError) return (
@@ -33,9 +34,9 @@ const UserNotificationsMenu = () => {
           Mark all read
         </button>
       </header>
-      {!inbox.data?.length ? (
+      {!notifications.length ? (
         <div className="userNotificationsMenu"><p className="menuText">No notifications yet</p></div>
-      ) : inbox.data.map((item: NotificationEvent) => (
+      ) : notifications.map((item: NotificationEvent) => (
         <MainItemCard
           variant={3}
           className={`notification-container${item.is_read ? " is-read" : ""}`}
@@ -53,6 +54,16 @@ const UserNotificationsMenu = () => {
           </button>
         </MainItemCard>
       ))}
+      {inbox.hasNextPage ? (
+        <button
+          type="button"
+          className="notification-inbox__load-more"
+          disabled={inbox.isFetchingNextPage}
+          onClick={() => inbox.fetchNextPage()}
+        >
+          {inbox.isFetchingNextPage ? "Loading…" : "Load more"}
+        </button>
+      ) : null}
     </section>
   );
 };
