@@ -17,11 +17,11 @@ export default function GoogleAuthButton({ action, legalAccepted = false }: Goog
       .catch(() => { if (active) setEnabled(false); });
     return () => { active = false; };
   }, []);
-  if (enabled !== true) return null;
+  const providerUnavailable = enabled !== true;
   const disabled = state === "loading" || (action === "register" && !legalAccepted);
 
   const begin = async () => {
-    if (disabled) return;
+    if (disabled || providerUnavailable) return;
     setState("loading");
     try {
       const response = await fetch(getApiUrl("v1/auth/google/start"), {
@@ -40,12 +40,13 @@ export default function GoogleAuthButton({ action, legalAccepted = false }: Goog
 
   return (
     <div className="google-auth-control">
-      <button type="button" className="google-auth-button" onClick={begin} disabled={disabled} aria-busy={state === "loading"}>
+      <button type="button" className="google-auth-button" onClick={begin} disabled={disabled || providerUnavailable} aria-busy={state === "loading"}>
         <span className="google-auth-mark" aria-hidden="true">G</span>
-        <span>{state === "loading" ? "Connecting…" : "Continue with Google"}</span>
+        <span>{enabled === null ? "Checking Google sign-in…" : providerUnavailable ? "Google sign-in unavailable" : state === "loading" ? "Connecting…" : "Continue with Google"}</span>
       </button>
       {action === "register" && !legalAccepted && <p className="google-auth-hint" role="status">Accept the Service Agreement to continue with Google.</p>}
       {state === "error" && <p className="google-auth-error" role="alert">Google authentication could not be started. Please try again.</p>}
+      {enabled === false && <p className="google-auth-hint" role="status">Google authentication is not configured for this staging environment.</p>}
     </div>
   );
 }
