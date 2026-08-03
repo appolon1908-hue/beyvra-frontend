@@ -48,7 +48,7 @@ const RequireAuth = () => {
       console.error("error refreshing the token", error?.refresh);
       removeCookie("access_token", { path: "/" });
       removeCookie("refresh_token", { path: "/" });
-      navigate("/signIn", { replace: true, state: { from: location } });
+      navigate("/session-expired", { replace: true, state: { from: location } });
     },
   });
 
@@ -75,6 +75,7 @@ const RequireAuth = () => {
     dispatch(setWallets([]));
     removeCookie("access_token", { path: "/" });
     removeCookie("refresh_token", { path: "/" });
+    localStorage.setItem("codestra:last-logout", Date.now().toString());
     setIsIdle(false);
     navigate("/signIn", { replace: true });
   };
@@ -146,6 +147,19 @@ const RequireAuth = () => {
       return () => clearInterval(intervalId);
     }
   }, [cookies?.access_token, cookies.refresh_token, mutate, setCookie]);
+
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== "codestra:last-logout") return;
+      dispatch(setUser(null));
+      dispatch(setWallets([]));
+      removeCookie("access_token", { path: "/" });
+      removeCookie("refresh_token", { path: "/" });
+      navigate("/signIn?tab=login", { replace: true });
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [dispatch, navigate, removeCookie]);
 
   if (!cookies.access_token) {
     return <Navigate to="/signIn" state={{ from: location }} />;

@@ -80,6 +80,7 @@ const ProfileMenu: React.FunctionComponent<ProfileMenuProps> = ({
     dispatch(setWallets([]));
     removeCookie('access_token', { path: '/' });
     removeCookie('refresh_token', { path: '/' });
+    localStorage.setItem('codestra:last-logout', Date.now().toString());
     navigate("/signIn", { replace: true });
   };
 

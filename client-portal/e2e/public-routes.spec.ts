@@ -40,3 +40,9 @@ test("sign-in is a dedicated route with a safe demo alternative", async ({ page 
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
   await expect(page.getByRole("tab", { name: "Log In" })).toHaveAttribute("aria-selected", "true");
 });
+
+test("session-expired route provides a safe recovery path", async ({ page }) => {
+  await page.goto("/session-expired");
+  await expect(page.getByRole("heading", { name: "Your session has expired" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in again" })).toHaveAttribute("href", "/signIn?tab=login");
+});

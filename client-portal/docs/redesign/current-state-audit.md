@@ -82,6 +82,10 @@ are in scope.
   are not promoted from the homepage.
 - Mobile navigation now uses semantic menu buttons and working Markets/Trading
   links. Focus-visible and reduced-motion rules are global.
+- Added compatibility routes for `/login`, `/register`, `/forgot-password`,
+  `/verify-email`, `/session-expired`, and `/logout`; refresh failure now has a
+  dedicated session-expired recovery screen. Existing server logout remains
+  POST-based and cross-tab logout broadcasts through a storage marker.
 
 Verification from the local frontend worktree:
 
@@ -91,6 +95,7 @@ npm run typecheck=PASS
 npm run i18n:check=PASS (339 keys across 7 catalogs)
 npm run build=PASS (Vite warning: existing large chunks)
 Playwright public-routes=3/3 PASS
+Session-expired recovery route=PASS
 ```
 
 Remaining release blockers are intentional: legal/entity approval, ownership

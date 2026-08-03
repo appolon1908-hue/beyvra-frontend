@@ -55,6 +55,8 @@ const LandingPage = lazy(() => import("./pages/public/landing/landingPage"));
 const Download = lazy(() => import("./pages/public/downloads/Download"));
 const Transactions = lazy(() => import("./pages/private/transactions/Transactions"));
 const ResetPassword = lazy(() => import("pages/public/resetPassword/ResetPassword"));
+const EmailVerification = lazy(() => import("pages/public/emailVerification/EmailVerification"));
+const SessionExpired = lazy(() => import("pages/public/sessionExpired/SessionExpired"));
 const Home = lazy(() => import("pages/public/home/main/Home"));
 const StatusDetails = lazy(() => import("./pages/public/statusDetails/StatusDetails"));
 const IntegrationsAdmin = lazy(() => import("./pages/private/integrations/IntegrationsAdmin"));
@@ -129,7 +131,13 @@ const App: React.FunctionComponent = () => {
             <Route path="/trading" element={<Trading />} />
             <Route path="/downloads" element={<Download />} />
             <Route path="/signIn" element={<SignIn />} />
+            <Route path="/login" element={<SignIn />} />
+            <Route path="/register" element={<SignIn />} />
             <Route path="/password-reset" element={<ResetPassword />} />
+            <Route path="/forgot-password" element={<SignIn />} />
+            <Route path="/verify-email" element={<EmailVerification />} />
+            <Route path="/session-expired" element={<SessionExpired />} />
+            <Route path="/logout" element={<SignIn />} />
             <Route path="*" element={<NotFoundPage />} />
             
             
