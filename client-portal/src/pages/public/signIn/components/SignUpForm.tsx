@@ -1,6 +1,5 @@
 import { Form, Button } from "antd";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useCookies } from "react-cookie";
 
 import { toast } from "react-toastify";
 import { useState } from "react";
@@ -8,7 +7,6 @@ import CountryCode from "../../../../helpers/CountryCode.json";
 import Select, { type StylesConfig } from "react-select";
 //import WalkThrough from "./WalkThrough";
 import { useNavigate } from "react-router-dom";
-import { GlobalLoginMaxAge } from "App";
 import { getApiUrl } from "utils/env";
 import GoogleAuthButton from "./GoogleAuthButton";
 
@@ -68,7 +66,6 @@ const SignUpForm = () => {
   const { handleSubmit, register, setError, watch, formState: { errors } } = useForm<SignUpFormData>();
   const acceptedTerms = watch("accepted_terms", false);
   const navigate = useNavigate();
-  const [, setCookie] = useCookies(["access_token", "refresh_token", "step"]);
   const password = watch("password", "");
   const strength = evaluatePasswordStrength(password);
   //const [showWalkThrough, setShowWalkThrough] = useState(false);
@@ -135,9 +132,7 @@ const SignUpForm = () => {
         const response = await fetch(getApiUrl("v1/auth/email-verification/verify"), { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ registrationId: pendingRegistration.id, code: otp }) });
         const result = await response.json();
         if (!response.ok) throw new Error("The verification code is invalid or expired.");
-        const cookieOptions = { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict" as const, path: "/" };
-        setCookie("access_token", result.access, cookieOptions); setCookie("refresh_token", result.refresh, cookieOptions); setCookie("step", "", cookieOptions);
-        toast.success("Your account is ready."); navigate("/walkThrough", { replace: true });
+        toast.success("Your demo account is ready."); navigate("/platform", { replace: true });
       } catch (error) { toast.error(error instanceof Error ? error.message : "Verification failed."); }
       finally { setOtpPending(false); }
     };
