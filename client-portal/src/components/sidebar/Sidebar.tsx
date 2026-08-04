@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from "@store/hooks";
 import { setPortfolioWindow } from "@store/slices/app";
 import { CurrentDrawerType } from "pages/private/platform/types";
 import { featureEnabled, PlatformFeatureFlags, stagingPlatformFeatures } from "config/platformFeatures";
+import { usePlatformOverlay } from "pages/private/platform/PlatformOverlayContext";
 
 type DrawerType =
   | "trades"
@@ -46,8 +47,9 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
   const { togglePortfolioWindow } = useAppSelector(state => state.app)
   const onlineTraders = useAppSelector(state => state.socketStockCrypto.onlinetraders)
   const dispatch = useAppDispatch()
+  const { openOverlay } = usePlatformOverlay();
   const onSelect = (activeDrawer: CurrentDrawerType) => {
-    window.dispatchEvent(new Event("platform-market-open"));
+    openOverlay("market");
     if (isLeftSubDrawerOpen) {
       setIsLeftSubDrawerOpen(false);
     }

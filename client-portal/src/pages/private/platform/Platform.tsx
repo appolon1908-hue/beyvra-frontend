@@ -36,10 +36,12 @@ import { setWSTicket } from "@store/slices/user";
 import { useCookies } from "react-cookie";
 import { usePlatformConfig } from "api/platform/usePlatformConfig";
 import { stagingPlatformFeatures } from "config/platformFeatures";
+import { PlatformOverlayProvider, usePlatformOverlay } from "./PlatformOverlayContext";
 
 interface PlatformProps { }
 
-const Platform: React.FunctionComponent<PlatformProps> = () => {
+const PlatformContent: React.FunctionComponent<PlatformProps> = () => {
+  const { overlay } = usePlatformOverlay();
   const [windowDrawer, setWindowDrawer] = useState<WindowDrawer>(null)
   const [isWindowDrawerOpen, setIsWindowDrawerOen] = useState<boolean>(true)
 
@@ -89,6 +91,14 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
     }
   }, [cookies.access_token, webSocketTicketMutate]);
 
+  useEffect(() => {
+    if (overlay.type === "trade") {
+      setIsDrawerOpen(false);
+      setIsLeftSubDrawerOpen(false);
+      setCurrentDrawer(null);
+    }
+  }, [overlay.type]);
+
   useLayoutEffect(() => {
     const topbarElement = document.getElementById("topbarContainer");
     const tradeFormElement = document.getElementById("tradeForm");
@@ -123,16 +133,6 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
-
-  useEffect(() => {
-    const closeMarketDrawerForTrade = () => {
-      setIsDrawerOpen(false);
-      setIsLeftSubDrawerOpen(false);
-      setCurrentDrawer(null);
-    };
-    window.addEventListener("platform-trade-open", closeMarketDrawerForTrade);
-    return () => window.removeEventListener("platform-trade-open", closeMarketDrawerForTrade);
   }, []);
 
   useEffect(() => {
@@ -316,5 +316,11 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
     </main>
   );
 };
+
+const Platform: React.FunctionComponent<PlatformProps> = () => (
+  <PlatformOverlayProvider>
+    <PlatformContent />
+  </PlatformOverlayProvider>
+);
 
 export default Platform;

@@ -1,12 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "./platform.scss";
 import {
-  MainChartChangeIcon,
-  ZoomInChartIcon,
-  ZoomOutChartIcon,
-} from "../../../assets/icons";
-import DropdownMenu from "components/dropdownMenu/DropdownMenu";
-import {
   CandlestickData,
   ColorType,
   createChart,
@@ -14,12 +8,14 @@ import {
   ISeriesApi,
   LineStyle,
   Time,
-  SeriesMarker,
 } from "lightweight-charts";
 import { useCookies } from "react-cookie";
 import { useAppSelector } from "@store/hooks";
 import { getApiUrl, getSocketUrl } from "utils/env";
 import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
+import { usePlatformOverlay } from "./PlatformOverlayContext";
+import { DemoOrderRequest, DemoTrade } from "api/demo/types";
+import { ChartToolbar, MarketStatus, TradeMarkers, TradeTicket } from "./PlatformChartParts";
 
 interface PlatformProps {
   themeSelect: string;
@@ -46,20 +42,25 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const userInteractedRef = useRef(false);
   const [connectionState, setConnectionState] = useState<"loading" | "connected" | "disconnected" | "error">("loading");
   const [chartError, setChartError] = useState("");
-  const [isTicketOpen, setIsTicketOpen] = useState(false);
   const ticketTriggerRef = useRef<HTMLButtonElement>(null);
+  const { overlay, openOverlay, closeOverlay } = usePlatformOverlay();
+  const isTicketOpen = overlay.type === "trade";
   const [amount, setAmount] = useState(100);
   const [duration, setDuration] = useState(15);
   const [orderState, setOrderState] = useState<"idle" | "submitting" | "accepted" | "rejected">("idle");
   const [orderError, setOrderError] = useState("");
-  const [openTrades, setOpenTrades] = useState<Array<Record<string, unknown>>>([]);
+  const [openTrades, setOpenTrades] = useState<DemoTrade[]>([]);
   const [cookies] = useCookies(["access_token"]);
   const quote = chartData.at(-1)?.close;
 
   const loadDemoTrades = async () => {
     if (!cookies.access_token) return;
     const response = await fetch(getApiUrl("v1/demo/trades"), { headers: { Authorization: `Bearer ${cookies.access_token}` } });
-    if (response.ok) setOpenTrades((await response.json()) as Array<Record<string, unknown>>);
+    if (response.ok) {
+      const payload = await response.json();
+      const trades = Array.isArray(payload) ? payload : payload.results;
+      if (Array.isArray(trades)) setOpenTrades(trades as DemoTrade[]);
+    }
   };
   // Poll server state so refresh/reconnect never relies on browser-local trades.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,7 +70,8 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     if (orderState === "submitting" || !quote || connectionState !== "connected") return;
     setOrderState("submitting"); setOrderError("");
     try {
-      const response = await fetch(getApiUrl("v1/demo/orders"), { method: "POST", credentials: "include", headers: { Authorization: `Bearer ${cookies.access_token}`, "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify({ symbol: tradingPair, amount, duration, direction }) });
+      const order: DemoOrderRequest = { symbol: tradingPair, amount, duration, direction };
+      const response = await fetch(getApiUrl("v1/demo/orders"), { method: "POST", credentials: "include", headers: { Authorization: `Bearer ${cookies.access_token}`, "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify(order) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || "Demo order was rejected.");
       setOrderState("accepted"); await loadDemoTrades(); window.setTimeout(() => setOrderState("idle"), 1800);
@@ -77,21 +79,16 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   };
 
   useEffect(() => {
-    const closeTicket = () => {
-      setIsTicketOpen(false);
-      window.setTimeout(() => ticketTriggerRef.current?.focus(), 0);
-    };
+    if (!isTicketOpen) return;
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isTicketOpen) closeTicket();
+      if (event.key === "Escape") {
+        closeOverlay();
+        window.setTimeout(() => ticketTriggerRef.current?.focus(), 0);
+      }
     };
-    const closeForMarket = () => { if (isTicketOpen) closeTicket(); };
     window.addEventListener("keydown", closeOnEscape);
-    window.addEventListener("platform-market-open", closeForMarket);
-    return () => {
-      window.removeEventListener("keydown", closeOnEscape);
-      window.removeEventListener("platform-market-open", closeForMarket);
-    };
-  }, [isTicketOpen]);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isTicketOpen, closeOverlay]);
   useEffect(() => { chartDataRef.current = chartData; }, [chartData]);
 
   // ------------------------------------------------------------------
@@ -301,34 +298,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   // makes polling/reconnects idempotent and replaces OPEN with the settled result.
   useEffect(() => {
     if (!seriesRef.current) return;
-    const markers: SeriesMarker<Time>[] = [];
-    openTrades.forEach((trade) => {
-      const openedAt = Date.parse(String(trade.openedAt));
-      if (!Number.isFinite(openedAt)) return;
-      const direction = String(trade.direction).toLowerCase();
-      const result = String(trade.result || trade.state || "OPEN").toUpperCase();
-      const settled = ["WON", "LOST", "DRAW"].includes(result);
-      const label = `#${String(trade.id)} ${direction === "up" ? "UP" : "DOWN"} $${String(trade.amount)}`;
-      markers.push({
-        time: Math.floor(openedAt / 1000) as Time,
-        position: direction === "up" ? "belowBar" : "aboveBar",
-        color: settled ? (result === "LOST" ? "#ff5c68" : "#34d27b") : "#12e6d0",
-        shape: direction === "up" ? "arrowUp" : "arrowDown",
-        text: settled ? `${label} · ${result}` : `${label} · OPEN`,
-      });
-      if (settled && trade.closingPrice && trade.expiresAt) {
-        const expiresAt = Date.parse(String(trade.expiresAt));
-        if (Number.isFinite(expiresAt)) markers.push({
-          time: Math.floor(expiresAt / 1000) as Time,
-          position: direction === "up" ? "aboveBar" : "belowBar",
-          color: result === "LOST" ? "#ff5c68" : "#34d27b",
-          shape: "circle",
-          text: `${result} ${String(trade.closingPrice)}`,
-        });
-      }
-    });
-    markers.sort((a, b) => Number(a.time) - Number(b.time));
-    seriesRef.current.setMarkers(markers);
+    seriesRef.current.setMarkers(TradeMarkers({ trades: openTrades }));
   }, [openTrades]);
 
   // ------------------------------------------------------------------
@@ -366,54 +336,8 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
       <div className="trade-graph">
         {/* Chart Container */}
         <div ref={chartContainerRef} className="chart-container" aria-label={`${tradingPair} market chart`}>
-          {connectionState !== "connected" && (
-            <div className={`market-data-state market-data-state--${connectionState}`} role="status" aria-live="polite">
-              {connectionState === "loading" && "Loading market history…"}
-              {connectionState === "disconnected" && "Live market feed disconnected. Reconnecting…"}
-              {connectionState === "error" && chartError}
-            </div>
-          )}
-          <div className="chart-status-bar" role="status" aria-live="polite">
-            <span>{tradingPair}</span>
-            <span className={`quote-state quote-state--${connectionState}`}>{connectionState === "connected" ? "Demo feed connected" : connectionState}</span>
-            <span>Interval: {candleInterval}</span>
-          </div>
-          {/* Chart Controls */}
-          <div className="chart-controls">
-            {/* Chart Type Dropdown */}
-            <DropdownMenu
-              menuItems={[
-                { text: "Candlesticks", onclick: () => setSelectedChart("candlesticks") },
-                { text: "Area", onclick: () => setSelectedChart("area") },
-                { text: "Bars", onclick: () => setSelectedChart("bar") },
-              ]}
-            >
-              <button type="button" className="chart-type-button" aria-label="Select chart type">
-                <MainChartChangeIcon />
-              </button>
-            </DropdownMenu>
-
-            {/* Zoom Buttons */}
-            <div className="zoom-controls">
-              <button type="button" onClick={() => handleZoom(true)} aria-label="Zoom chart in">
-                <ZoomInChartIcon />
-              </button>
-              <button type="button" onClick={() => handleZoom(false)} aria-label="Zoom chart out">
-                <ZoomOutChartIcon />
-              </button>
-            </div>
-            <div className="timeframe-controls" aria-label="Chart timeframe">
-              {["1m", "5m", "15m"].map((interval) => (
-                <button
-                  key={interval}
-                  type="button"
-                  className={candleInterval === interval ? "selected" : ""}
-                  onClick={() => { userInteractedRef.current = false; setUserInteracted(false); setCandleInterval(interval); }}
-                  aria-pressed={candleInterval === interval}
-                >{interval}</button>
-              ))}
-            </div>
-          </div>
+          <MarketStatus symbol={tradingPair} interval={candleInterval} state={connectionState} error={chartError} />
+          <ChartToolbar selectedChart={selectedChart} setSelectedChart={setSelectedChart} candleInterval={candleInterval} setCandleInterval={(interval) => { userInteractedRef.current = false; setUserInteracted(false); setCandleInterval(interval); }} handleZoom={handleZoom} />
         </div>
       </div>
 
@@ -421,48 +345,15 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
         type="button"
         className="ticket-trigger"
         ref={ticketTriggerRef}
-        onClick={() => { window.dispatchEvent(new Event("platform-trade-open")); setIsTicketOpen(true); }}
+        onClick={() => openOverlay("trade")}
         aria-controls="platform-order-ticket"
         aria-expanded={isTicketOpen}
       >
         Open Demo Trade
       </button>
-      {isTicketOpen && <button type="button" className="ticket-backdrop" onClick={() => { setIsTicketOpen(false); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); }} aria-label="Close demo trade ticket" />}
-      <div
-        id="platform-order-ticket"
-        className={`trade-ticket-shell${isTicketOpen ? " is-open" : ""}`}
-        data-open={isTicketOpen}
-      >
-        <div className="trade-ticket-header">
-          <span>Demo order</span>
-          <button type="button" onClick={() => { setIsTicketOpen(false); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); }} aria-label="Close demo trade ticket">×</button>
-        </div>
-        <div className="demo-order-form" aria-label="Demo order ticket">
-          <div className="demo-ticket-account"><span>DEMO Account</span><strong>Virtual funds only</strong></div>
-          <p className="demo-ticket-disclosure">{tradingPair} · Quote {quote ? quote.toFixed(2) : "unavailable"}</p>
-          <div className="demo-control">
-            <label htmlFor="demo-order-amount">Amount, Virtual USD</label>
-            <div className="demo-control-row">
-              <button type="button" aria-label="Decrease demo amount" onClick={() => setAmount(Math.max(1, amount - 10))}>−</button>
-              <input id="demo-order-amount" type="number" min={1} step={1} value={amount} onChange={(e) => setAmount(Math.max(1, Number(e.target.value) || 1))} />
-              <button type="button" aria-label="Increase demo amount" onClick={() => setAmount(amount + 10)}>+</button>
-            </div>
-          </div>
-          <div className="demo-control">
-            <label htmlFor="demo-order-duration">Duration</label>
-            <div className="demo-control-row">
-              <button type="button" aria-label="Decrease demo duration" onClick={() => setDuration((current) => [5, 15, 30, 60][Math.max(0, [5, 15, 30, 60].indexOf(current) - 1)])}>−</button>
-              <select id="demo-order-duration" value={duration} onChange={(e) => setDuration(Number(e.target.value))}>{[5, 15, 30, 60].map((value) => <option key={value} value={value}>{value} seconds</option>)}</select>
-              <button type="button" aria-label="Increase demo duration" onClick={() => setDuration((current) => [5, 15, 30, 60][Math.min(3, [5, 15, 30, 60].indexOf(current) + 1)])}>+</button>
-            </div>
-          </div>
-          <p className="demo-estimate">Estimated demo return is calculated from the active simulated-market rules.</p>
-          <div className="demo-direction-actions"><button type="button" className="demo-up" disabled={orderState === "submitting" || connectionState !== "connected" || !quote} onClick={() => void submitDemoOrder("up")}>↑ Up</button><button type="button" className="demo-down" disabled={orderState === "submitting" || connectionState !== "connected" || !quote} onClick={() => void submitDemoOrder("down")}>↓ Down</button></div>
-          <p className="demo-quote">Quote: {quote ? quote.toFixed(2) : "Unavailable"}</p>
-          <p role="status" aria-live="polite">{orderState === "submitting" ? "Submitting…" : orderState === "accepted" ? "Demo trade accepted." : orderError}</p>
-          <button type="button" className="demo-how-it-works">ⓘ How it works</button>
-          <details className="open-demo-trades" open><summary>Open Trades ({openTrades.filter((trade) => trade.state === "OPEN").length})</summary>{openTrades.filter((trade) => trade.state === "OPEN").map((trade) => <p key={String(trade.id)}>{String(trade.symbol)} · {String(trade.direction).toUpperCase()} · {String(trade.amount)} · expires {new Date(String(trade.expiresAt)).toLocaleTimeString()}</p>)}{openTrades.every((trade) => trade.state !== "OPEN") && <p>No open demo trades.</p>}</details>
-        </div>
+      {isTicketOpen && <button type="button" className="ticket-backdrop" onClick={() => { closeOverlay(); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); }} aria-label="Close demo trade ticket" />}
+      <div id="platform-order-ticket" hidden={!isTicketOpen}>
+        <TradeTicket open={isTicketOpen} symbol={tradingPair} quote={quote} amount={amount} setAmount={setAmount} duration={duration} setDuration={setDuration} orderState={orderState} orderError={orderError} connectionState={connectionState} submitDemoOrder={(direction) => void submitDemoOrder(direction)} trades={openTrades} close={() => { closeOverlay(); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); }} />
       </div>
     </div>
   );
