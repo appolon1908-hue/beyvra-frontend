@@ -311,6 +311,10 @@ body{
 .google-auth-mark { width:24px; height:24px; border-radius:50%; background:#fff; color:#4285f4; display:inline-flex; align-items:center; justify-content:center; font-weight:800; }
 .google-auth-hint, .google-auth-error { font-size:12px; margin:8px 0 0; color:var(--color-text-muted); }
 .google-auth-error { color:var(--color-negative); }
+.try-demo-button { width:100%; min-height:48px; margin-top:12px; border:1px solid var(--color-border-strong); border-radius:12px; background:transparent; color:var(--color-text); font-weight:600; cursor:pointer; }
+.try-demo-button:hover:not(:disabled) { background:var(--color-surface-2); }
+.try-demo-button:focus-visible { outline:none; box-shadow:var(--focus-ring); }
+.try-demo-button:disabled { opacity:.55; cursor:not-allowed; }
 .otp-verification-form { width:100%; }
 .otp-input { text-align:center; letter-spacing:.5em; font-size:1.5rem; font-variant-numeric:tabular-nums; }
 .otp-help { color:var(--color-text-secondary); font-size:.8rem; line-height:1.5; }

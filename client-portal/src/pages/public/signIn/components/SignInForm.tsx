@@ -8,6 +8,8 @@ import { useState } from "react";
 import use2FAVerify from "api/user/use2FAVerify";
 import { GlobalLoginMaxAge } from "App";
 import GoogleAuthButton from "./GoogleAuthButton";
+import { getApiUrl } from "utils/env";
+import { toast } from "react-toastify";
 // import { useEffect } from "react";
 
 interface SignInFormProps {
@@ -24,6 +26,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
   const [show, setShow] = useState(false);
   const [otp, setOTP] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [guestPending, setGuestPending] = useState(false);
   const [, setCookie] = useCookies(["step", "access_token", "refresh_token",]);
 
   const { handleSubmit, register, formState: { errors } } = useForm<ISignInForm>();
@@ -59,6 +62,33 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
   });
 
   const onSubmit = handleSubmit((data) => mutate(data));
+
+  const beginGuestDemo = async () => {
+    if (guestPending) return;
+    setGuestPending(true);
+    try {
+      const response = await fetch(getApiUrl("user/guest-demo/"), {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.access) throw new Error("GUEST_DEMO_UNAVAILABLE");
+      setCookie("access_token", result.access, {
+        maxAge: Number(result.expiresIn) || 1800,
+        secure: window.location.protocol === "https:",
+        sameSite: "strict",
+        path: "/",
+      });
+      setCookie("refresh_token", "", { maxAge: 0, path: "/" });
+      navigate(destination || "/platform", { replace: true });
+    } catch {
+      toast.error("Demo access is temporarily unavailable. Please try again.");
+    } finally {
+      setGuestPending(false);
+    }
+  };
 
   return showOtp ?
     (
@@ -153,6 +183,10 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
 
         <div className="auth-divider" aria-hidden="true"><span>Or continue with</span></div>
         <GoogleAuthButton action="login" />
+
+        <button type="button" className="try-demo-button" onClick={beginGuestDemo} disabled={guestPending}>
+          {guestPending ? "Starting demo…" : "Try Demo"}
+        </button>
 
         
       </Form>
