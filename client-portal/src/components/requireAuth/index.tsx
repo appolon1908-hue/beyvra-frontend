@@ -30,9 +30,39 @@ const RequireAuth = () => {
   ]);
   const [show, setShow] = useState(false);
   const [isIdle, setIsIdle] = useState(false);
+  const [bootstrap, setBootstrap] = useState<"BOOTING" | "ANONYMOUS" | "GUEST_READY" | "USER_READY" | "EXPIRED" | "ERROR">("BOOTING");
+  const [bootstrapError, setBootstrapError] = useState("");
   const isGuestDemo = Boolean(cookies.access_token && (() => {
     try { return JSON.parse(atob(cookies.access_token.split(".")[1])).guest_demo === true; } catch { return false; }
   })());
+
+  useEffect(() => {
+    let disposed = false;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 8_000);
+    if (!cookies.access_token) {
+      setBootstrap("ANONYMOUS");
+      window.clearTimeout(timeout);
+      return () => controller.abort();
+    }
+    setBootstrap("BOOTING");
+    fetch("/api/v1/session", { credentials: "include", headers: { Authorization: `Bearer ${cookies.access_token}` }, signal: controller.signal })
+      .then(async (response) => {
+        if (disposed) return;
+        if (response.status === 401 || response.status === 403) { setBootstrap("EXPIRED"); return; }
+        if (!response.ok) throw new Error(`Session bootstrap failed (${response.status})`);
+        const payload = await response.json();
+        setBootstrap(payload.state === "guest.ready" ? "GUEST_READY" : "USER_READY");
+      })
+      .catch((error: unknown) => {
+        if (disposed) return;
+        setBootstrap(error instanceof DOMException && error.name === "AbortError" ? "ERROR" : "ERROR");
+        setBootstrapError("Codestra could not resolve this session.");
+        console.warn("session_bootstrap_failed", { reason: error instanceof Error ? error.message : "unknown" });
+      })
+      .finally(() => window.clearTimeout(timeout));
+    return () => { disposed = true; controller.abort(); window.clearTimeout(timeout); };
+  }, [cookies.access_token]);
 
   const { mutate: mutateKYC } = useKyc({
     onSuccess: (data) => {
@@ -163,7 +193,10 @@ const RequireAuth = () => {
     return () => window.removeEventListener("storage", onStorage);
   }, [dispatch, navigate, removeCookie]);
 
-  if (!cookies.access_token) {
+  if (bootstrap === "BOOTING") return <div className="route-bootstrap" role="status" aria-live="polite">Loading your Codestra session…</div>;
+  if (bootstrap === "ERROR") return <main className="route-bootstrap route-bootstrap--error"><h1>Session unavailable</h1><p>{bootstrapError}</p><button type="button" onClick={() => window.location.reload()}>Try Again</button><button type="button" onClick={() => navigate("/login", { replace: true })}>Back to Login</button></main>;
+  if (bootstrap === "EXPIRED") return <main className="route-bootstrap route-bootstrap--error"><h1>Session expired</h1><p>Log in to continue.</p><button type="button" onClick={() => navigate("/login", { replace: true, state: { from: location } })}>Log In</button></main>;
+  if (bootstrap === "ANONYMOUS" || !cookies.access_token) {
     const destination = `${location.pathname}${location.search}`;
     return <Navigate to={`/login?redirect=${encodeURIComponent(destination)}`} replace state={{ from: location }} />;
   }

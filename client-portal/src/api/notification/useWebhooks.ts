@@ -41,7 +41,10 @@ export function useCreateWebhook(token?: string) {
   return useMutation({
     mutationFn: (payload: { url: string; secret: string; categories: string[] }) =>
       authenticatedRequest<WebhookSubscription>(apiEndpoints.notifications.webhooks, token!, { method: "POST", body: JSON.stringify(payload) }),
-    onSuccess: () => client.invalidateQueries({ queryKey: key }),
+    onSuccess: (created) => {
+      client.setQueryData<WebhookSubscription[]>(key, (current = []) => [created, ...current.filter((item) => String(item.id) !== String(created.id))]);
+      void client.invalidateQueries({ queryKey: key });
+    },
   });
 }
 

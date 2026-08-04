@@ -91,7 +91,7 @@ const UserNotificationsMenu = () => {
         <form onSubmit={(event) => {
           event.preventDefault();
           createWebhook.mutate({ url: webhookUrl.trim(), secret: webhookSecret, categories: webhookCategories.split(",").map((item) => item.trim().toUpperCase()).filter(Boolean) }, {
-            onSuccess: () => { setWebhookUrl(""); setWebhookSecret(""); toast.success("Webhook connected"); },
+            onSuccess: (created) => { setWebhookUrl(""); setWebhookSecret(""); toast.success(`Webhook connected: ${created.url}`); },
             onError: (error) => toast.error(error instanceof Error ? error.message : "Webhook could not be saved"),
           });
         }}>
@@ -104,7 +104,7 @@ const UserNotificationsMenu = () => {
         {webhooks.isError ? <p role="alert">Webhook integrations could not be loaded.</p> : null}
         {(webhooks.data ?? []).map((webhook: WebhookSubscription) => (
           <WebhookRow
-            key={webhook.id}
+            key={String(webhook.id)}
             webhook={webhook}
             expanded={expandedWebhook === webhook.id}
             onExpand={() => setExpandedWebhook(expandedWebhook === webhook.id ? undefined : webhook.id)}
