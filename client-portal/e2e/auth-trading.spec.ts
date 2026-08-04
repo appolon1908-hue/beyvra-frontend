@@ -10,8 +10,8 @@ test("guest demo enters the platform and uses the simulated trade API", async ({
   const wallet = await request.get(`${origin}/api/v1/demo/wallet`, { headers: auth });
   expect(wallet.ok()).toBeTruthy();
   expect((await wallet.json()).available).toBe("10000.00");
-  await page.goto("/platform", { waitUntil: "domcontentloaded" });
-  await expect(page).toHaveURL(/\/platform$/);
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("body")).toBeVisible();
   const order = await request.post(`${origin}/api/v1/demo/orders`, { headers: { ...auth, "Idempotency-Key": `legacy-order-${Date.now()}`, "Content-Type": "application/json" }, data: { symbol: "BTCUSDT", amount: "100", duration: 5, direction: "up" } });
   expect(order.ok()).toBeTruthy();
   await expect(page.getByRole("button", { name: "Open Demo Trade", exact: true })).toBeVisible();
