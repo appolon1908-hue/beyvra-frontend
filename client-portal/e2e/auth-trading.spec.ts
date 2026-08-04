@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-test("guest demo enters the platform and uses the simulated trade API", async ({ page, request, baseURL }) => {
+test("guest demo enters the platform and uses the simulated trade API", async ({ page, request, context, baseURL }) => {
   const origin = baseURL ?? "http://127.0.0.1:8080";
   const session = await request.post(`${origin}/api/v1/demo/sessions`, { headers: { "Idempotency-Key": `legacy-guest-${Date.now()}` }, data: {} });
   expect(session.ok()).toBeTruthy();
   const { access } = await session.json();
+  await context.addCookies([{ name: "access_token", value: access, url: origin }]);
   const auth = { Authorization: `Bearer ${access}` };
   const wallet = await request.get(`${origin}/api/v1/demo/wallet`, { headers: auth });
   expect(wallet.ok()).toBeTruthy();

@@ -12,5 +12,5 @@ test("registration enters the server-authoritative OTP state", async ({ page, re
   expect(payload.registrationId).toBeTruthy();
   await page.goto("/signIn?tab=registration");
   await expect(page.getByRole("tab", { name: "Registration" })).toBeVisible();
-  await expect(page.getByText("Create your demo account")).toBeVisible();
+  await expect(page.getByText(/Create an account/i).first()).toBeVisible();
 });
