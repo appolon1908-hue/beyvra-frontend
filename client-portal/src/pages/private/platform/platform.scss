@@ -50,7 +50,7 @@
 }
 
 /* Codestra/Tradi platform parity shell: fixed rail, flexible chart and ticket. */
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .platformWrapper {
     .sidebar {
       width: 64px;
@@ -84,7 +84,7 @@
   }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1279px) {
   .platformWrapper {
     .sidebar { width: 64px; }
     .trade-section { margin-left: 64px; width: calc(100% - 64px); min-width: 0; }
