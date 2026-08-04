@@ -68,7 +68,6 @@ import EducationMenu from "./platformMenus/educationMenu/EducationMenu";
 import JoinLeagues from "./platformMenus/joinLeagues/JoinLeagues";
 import TradingTutorials from "./platformMenus/tradingTutorials/TradingTutorials";
 import EventsSignalsClub from "./platformMenus/eventsSignalsClub/EventsSignalsClub";
-import PortfolioMenu from "./platformMenus/Portfolio/PortfolioMenu";
 
 // Left Drawer Handlers
 export function leftDarwerTitleHandler(
@@ -98,7 +97,7 @@ export const windowBodyHandler = (
   setIsDrawerOpen: Dispatch<SetStateAction<boolean>>,
   setIsLeftSubDrawerOpen: Dispatch<SetStateAction<boolean>>
 ) => {
-  return <PortfolioMenu />;
+  return null;
 };
 
 export function leftDrawerBodyHandler(
