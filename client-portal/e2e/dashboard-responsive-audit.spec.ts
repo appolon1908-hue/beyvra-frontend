@@ -15,6 +15,7 @@ async function authenticate(
   const session = await sessionResponse.json();
   await context.addCookies([
     { name: "access_token", value: session.access, url: origin },
+    { name: "codestra_guest_session", value: session.access, url: origin },
   ]);
   await page.goto("/platform", { waitUntil: "domcontentloaded" });
   await expect(page.locator(".platformWrapper")).toBeVisible();
