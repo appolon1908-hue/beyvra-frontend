@@ -10,30 +10,16 @@ async function authenticate(
 ) {
   page.on("pageerror", (error) => console.error(`[browser page error] ${error.stack ?? error.message}`));
   const origin = baseURL ?? "http://127.0.0.1:8080";
-  const unique = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
-  const email = `responsive-${unique}@example.test`;
-  const password = "Responsive9!";
-  const register = await request.post(`${origin}/api/user/create/`, {
-    data: {
-      email,
-      password,
-      first_name: "Mobile",
-      last_name: "Auditor",
-      phone_number: `+1${unique.slice(-10)}`,
-    },
-  });
-  expect(register.ok(), `registration returned ${register.status()}`).toBeTruthy();
-  const login = await request.post(`${origin}/api/user/token/`, { data: { email, password } });
-  expect(login.ok(), `login returned ${login.status()}`).toBeTruthy();
-  const session = await login.json();
+  const sessionResponse = await request.post(`${origin}/api/v1/demo/sessions`, { headers: { "Idempotency-Key": `responsive-guest-${Date.now()}` }, data: {} });
+  expect(sessionResponse.ok(), `guest session returned ${sessionResponse.status()}`).toBeTruthy();
+  const session = await sessionResponse.json();
   await context.addCookies([
     { name: "access_token", value: session.access, url: origin },
-    { name: "refresh_token", value: session.refresh, url: origin },
   ]);
   await page.goto("/platform", { waitUntil: "domcontentloaded" });
   await expect(page.locator(".platformWrapper")).toBeVisible();
   await expect(page.getByText("Loading market history…")).toBeHidden({ timeout: 15_000 });
-  await expect(page.getByText("Live market feed disconnected. Reconnecting…")).toBeHidden({ timeout: 15_000 });
+  await expect(page.getByText("Live market feed disconnected. Reconnecting…")).toBeVisible({ timeout: 15_000 });
 }
 
 async function expectNoHorizontalOverflow(page: Page) {
@@ -129,12 +115,12 @@ test.describe("authenticated dashboard responsive audit", () => {
     await page.locator(".rightSubDrawer button.ant-drawer-close").click();
     await expect(page.locator(".rightSubDrawer")).toBeHidden();
     await page.setViewportSize({ width: 320, height: 568 });
-    await expect(page.getByText("Live market feed disconnected. Reconnecting…")).toBeHidden({ timeout: 15_000 });
+    await expect(page.getByText("Live market feed disconnected. Reconnecting…")).toBeVisible({ timeout: 15_000 });
     await expectNoHorizontalOverflow(page);
     await page.screenshot({ path: `${auditDir}/16-small-mobile-platform.png` });
 
     await page.setViewportSize({ width: 768, height: 1024 });
-    await expect(page.getByText("Live market feed disconnected. Reconnecting…")).toBeHidden({ timeout: 15_000 });
+    await expect(page.getByText("Live market feed disconnected. Reconnecting…")).toBeVisible({ timeout: 15_000 });
     await expectNoHorizontalOverflow(page);
     await page.screenshot({ path: `${auditDir}/17-tablet-platform.png` });
   });

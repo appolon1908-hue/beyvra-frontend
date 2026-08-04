@@ -39,10 +39,12 @@ test.describe("public route and CTA audit", () => {
   });
 
   test("primary marketing CTAs lead to a real route", async ({ page }) => {
-    await page.goto("/trading/cfdTrading", { waitUntil: "networkidle" });
-    const cta = page.locator(".cfdTradingContainer button").first();
+    await page.goto("/platform-overview", { waitUntil: "networkidle" });
+    await expect(page.getByText(/simulated controls/i)).toBeVisible();
+    await expect(page.locator("body")).not.toContainText(/Markets\.com|TradX|Tradex|fund your account|live trading/i);
+    const cta = page.getByRole("link", { name: /Try the demo/i }).first();
     await expect(cta).toBeVisible();
     await cta.click();
-    await expect(page).toHaveURL(/\/signIn$/);
+    await expect(page).toHaveURL(/\/platform|\/login/);
   });
 });

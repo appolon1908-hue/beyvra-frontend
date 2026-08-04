@@ -6,8 +6,16 @@ test("authenticated users can create, test, inspect, disable, and delete a webho
   const email = `webhook-ui-${unique}@example.test`;
   const password = "WebhookUi9!";
   const receiverSecret = process.env.STAGING_WEBHOOK_TEST_SECRET ?? "local-webhook-secret-2053";
-  const registration = await request.post(`${origin}/api/user/create/`, { data: { email, password, first_name: "Webhook", last_name: "UI", phone_number: `+1${unique.slice(-10)}` } });
-  expect(registration.ok()).toBeTruthy();
+  const registration = await request.post(`${origin}/api/v1/auth/register`, { data: { email, password, displayName: "Webhook UI", legalAccepted: true, locale: "en" } });
+  expect(registration.status()).toBe(202);
+  const registrationPayload = await registration.json();
+  const otpSecret = process.env.STAGING_TEST_OTP_SECRET;
+  expect(otpSecret, "STAGING_TEST_OTP_SECRET must be set for verified-account E2E").toBeTruthy();
+  const otpResponse = await request.get(`${origin}/api/v1/auth/test/otp?registrationId=${encodeURIComponent(registrationPayload.registrationId)}`, { headers: { "X-Staging-Test-OTP": otpSecret ?? "" } });
+  expect(otpResponse.ok()).toBeTruthy();
+  const otp = await otpResponse.json();
+  const verified = await request.post(`${origin}/api/v1/auth/email-verification/verify`, { data: { registrationId: registrationPayload.registrationId, code: otp.code } });
+  expect(verified.ok()).toBeTruthy();
   const login = await request.post(`${origin}/api/user/token/`, { data: { email, password } });
   expect(login.ok()).toBeTruthy();
   const session = await login.json();
