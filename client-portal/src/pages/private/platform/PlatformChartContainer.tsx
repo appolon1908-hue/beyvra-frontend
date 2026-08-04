@@ -83,8 +83,6 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [isTicketOpen]);
-  const hasChartData = chartData.length > 0;
-
   useEffect(() => { chartDataRef.current = chartData; }, [chartData]);
 
   // ------------------------------------------------------------------
@@ -165,7 +163,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
         userInteractedRef.current = false;
         setUserInteracted(false);
         const response = await fetch(
-          getApiUrl(`trades/market/history/?symbol=${tradingPair}&interval=${candleInterval}&limit=500`),
+          getApiUrl(`trades/market/history/?symbol=${tradingPair}&interval=${candleInterval}&limit=200`),
           { headers: { Authorization: `Bearer ${cookies.access_token}` } },
         );
         if (!response.ok) throw new Error("Market history is unavailable");
@@ -195,7 +193,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   // 2) Initialize / update the chart
   // ------------------------------------------------------------------
   useEffect(() => {
-    if (!chartContainerRef.current || !hasChartData) return;
+    if (!chartContainerRef.current) return;
 
     // Create or re-create the chart
     const chart = createChart(chartContainerRef.current, {
@@ -246,8 +244,10 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     }
 
     // Set data and fit
-    series.setData(chartDataRef.current);
-    chart.timeScale().fitContent();
+    if (chartDataRef.current.length > 0) {
+      series.setData(chartDataRef.current);
+      chart.timeScale().fitContent();
+    }
 
     // Auto-scroll until user interacts
     const syncHandler = () => {
@@ -280,7 +280,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
       chart.timeScale().unsubscribeVisibleTimeRangeChange(syncHandler);
       chart.remove();
     };
-  }, [selectedChart, themeSelect, hasChartData]);
+  }, [selectedChart, themeSelect]);
 
   useEffect(() => {
     if (!seriesRef.current || chartData.length === 0) return;
