@@ -5,17 +5,18 @@ is unchanged and activation remains blocked.
 
 ## Current staging images
 
-- Backend: `codestra-backend:staging-guest-demo-20260804e`
+- Backend: `codestra-backend:staging-demo-entry-20260804a`
 - Frontend: `codestra-frontend:staging-google-570f908`
 - Staging URL: `https://staging.codestra.cloud/`
 - Google provider response: `GET /api/v1/auth/providers` returns HTTP 200 with
   Google disabled until approved OAuth credentials and legal versions exist.
 - The sign-in bundle contains the truthful disabled Google control; no live
   provider or financial capability was enabled.
-- Frontend: `codestra-frontend:staging-guest-demo-20260804d`.
-- `POST /api/user/guest-demo/` issues a server-created, 30-minute,
-  non-refreshable guest Demo token. It accepts no PII and creates only a
-  virtual wallet while `PAPER_TRADING_ONLY=true`.
+- Frontend: `codestra-frontend:staging-demo-entry-20260804a`.
+- `POST /api/v1/demo/sessions` issues a server-created, 30-minute,
+  non-refreshable guest Demo token and an HttpOnly `codestra_guest_session`
+  cookie. It accepts no PII, is idempotent with `Idempotency-Key`, and creates
+  one 10,000-unit virtual wallet while `PAPER_TRADING_ONLY=true`.
 - Unauthenticated `/platform` and nested routes now redirect to `/login` with
   an encoded local `redirect` destination.
 - `/platform-overview` is an original demo-workspace overview; legacy trading
