@@ -2,7 +2,6 @@ import { CSSProperties, useEffect, useState } from "react";
 
 import { useAppDispatch, useAppSelector } from "@store/hooks";
 import { UserSliceState } from "@store/slices/user";
-import { WalletSliceState } from "@store/slices/wallet";
 import ArrowsSlider from "../../components/arrowsSlider/ArrowsSlider";
 
 import Loading from "components/loading";
@@ -68,10 +67,6 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
     (state: { user: UserSliceState }) => state.user
   );
 
-  const { selectedWallet } = useAppSelector(
-    (state: { wallet: WalletSliceState }) => state.wallet
-  );
-
   const { assetPairs } = useAppSelector(
     (state: { assetPair: AssetPairSliceState }) => state.assetPair
 
@@ -107,7 +102,6 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
     >
       {
         !loading ? (
-          selectedWallet?.name ? (
             <>
               <div className="dem">
                 <span>DEMO Account</span>
@@ -116,14 +110,11 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
               </div>
               <div className="amount">
                 <p className="value">
-                  ${Number(demoWallet?.available ?? selectedWallet?.balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ${Number(demoWallet?.available ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
                 <small>Virtual USD</small>
               </div>
             </>
-          ) : (
-            <h1 style={{ color: 'white' }}>No Account</h1>
-          )
         ) :
           (
             <Spin />
