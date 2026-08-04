@@ -1,6 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { codestraProfileApi } from "api/generated/codestraDemo";
 
 type ChangePassResponse = {
   detail: string;
@@ -28,28 +27,8 @@ type ChangePasswordVariables = {
 };
 
 export async function fetchChangePassword(data: ChangePasswordVariables) {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
-    const response = await fetch(`${BASE_URL}/user/password_change/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${data.token}`,
-      },
-      body: JSON.stringify(data.formData),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      Object.keys(result).forEach((field) => {
-        const errors = result[field];
-        errors.forEach((errorMessage: string) => {
-          toast.error(`${field}: ${errorMessage}`);
-        });
-      });
-      throw new Error(`${result}`);
-    }
-    return result;
+    return await codestraProfileApi.changePassword(data.token, data.formData);
   } catch (error) {
     throw new Error(error as string);
   }

@@ -1,23 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { IUser } from "@interfaces";
-import getEnv from "utils/env";
+import { codestraProfileApi } from "api/generated/codestraDemo";
 
 export async function fethProfile(token: string): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
-    const response = await fetch(`${BASE_URL}/user/me/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-
-    return result;
+    return await codestraProfileApi.profile(token) as boolean;
   } catch (error) {
     throw new Error(error as string);
   }

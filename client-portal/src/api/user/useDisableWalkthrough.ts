@@ -1,24 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import {  IUser } from "@interfaces";
-import getEnv from "utils/env";
+import { codestraProfileApi } from "api/generated/codestraDemo";
 
 export async function disableUserWalkThrough(token: string): Promise<IUser> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
-    const response = await fetch(`${BASE_URL}/user/disable_walkthrough/`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json' 
-      },
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
+    return await codestraProfileApi.disableWalkthrough(token) as IUser;
   } catch (error) {
     throw new Error(error as string);
   }

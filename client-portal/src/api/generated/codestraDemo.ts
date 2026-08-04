@@ -48,7 +48,7 @@ export async function codestraRequest<T>(path: string, options: RequestOptions =
       signal: controller.signal,
       headers: {
         Accept: "application/json",
-        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...(options.body && !(options.body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
         ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
         ...(options.idempotencyKey ? { "Idempotency-Key": options.idempotencyKey } : {}),
         "X-Request-ID": requestId,
@@ -97,4 +97,11 @@ export const codestraAuthApi = {
   login: <T>(body: unknown) => codestraRequest<T>("user/token/", { method: "POST", body: JSON.stringify(body) }),
   register: <T>(body: unknown) => codestraRequest<T>("user/create/", { method: "POST", body: JSON.stringify(body) }),
   logout: (token: string, refresh: string) => codestraRequest<void>("user/token/logout/", { method: "POST", token, body: JSON.stringify({ refresh }) }),
+};
+
+export const codestraProfileApi = {
+  profile: (token: string) => codestraRequest("user/me/", { token }),
+  update: (token: string, body: FormData | Record<string, unknown>) => codestraRequest("user/me/", { method: "PATCH", token, body: body instanceof FormData ? body : JSON.stringify(body) }),
+  changePassword: (token: string, body: unknown) => codestraRequest("user/password_change/", { method: "POST", token, body: JSON.stringify(body) }),
+  disableWalkthrough: (token: string) => codestraRequest("user/disable_walkthrough/", { method: "PUT", token }),
 };
