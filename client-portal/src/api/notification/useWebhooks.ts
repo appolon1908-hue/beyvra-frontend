@@ -38,11 +38,11 @@ export function useWebhooks(token?: string) {
 
 export function useCreateWebhook(token?: string) {
   const client = useQueryClient();
-  return useMutation({
+  return useMutation<WebhookSubscription, Error, { url: string; secret: string; categories: string[] }>({
     mutationFn: (payload: { url: string; secret: string; categories: string[] }) =>
       authenticatedRequest<WebhookSubscription>(apiEndpoints.notifications.webhooks, token!, { method: "POST", body: JSON.stringify(payload) }),
     onSuccess: (created) => {
-      client.setQueryData<WebhookSubscription[]>(key, (current = []) => [created, ...current.filter((item) => String(item.id) !== String(created.id))]);
+      client.setQueryData<WebhookSubscription[]>(key, (current: WebhookSubscription[] = []) => [created, ...current.filter((item) => String(item.id) !== String(created.id))]);
       void client.invalidateQueries({ queryKey: key });
     },
   });
