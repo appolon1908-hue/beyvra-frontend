@@ -282,33 +282,28 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
             color="#28bd66"
             open={amountTooltip}
           >
-            <div className="amount">
+            <div className="amount amount-control">
               <label htmlFor="amount">Amount, Đ</label>
-              <input
-                type="number"
-                name="amount"
-                value={amount}
-                min="1"
-                id="amounts"
-                onChange={(e) => dispatch(setAmount(parseInt(e.target.value)))}
-                disabled={disabled}
-                defaultValue={defaultAmount}
-              />
+              <div className="stepper-row">
+                <button type="button" aria-label="Decrease demo amount" disabled={amount == 1 || disabled} onClick={handleDecreaseAmount}>
+                  <SubtractIcon />
+                </button>
+                <input
+                  type="number"
+                  name="amount"
+                  value={amount}
+                  min="1"
+                  id="amounts"
+                  onChange={(e) => dispatch(setAmount(parseInt(e.target.value)))}
+                  disabled={disabled}
+                  defaultValue={defaultAmount}
+                />
+                <button type="button" aria-label="Increase demo amount" disabled={hintPlus ? false : disabled} onClick={handleIncreaseAmount}>
+                  <PlusIcon />
+                </button>
+              </div>
             </div>
           </Tooltip>
-
-          <div className="mathButtons">
-            <button disabled={amount == 1} onClick={handleDecreaseAmount}>
-              <SubtractIcon />
-            </button>
-            <button
-              disabled={hintPlus ? false : disabled}
-              className={`${hintPlus ? "hint" : ""}`}
-              onClick={handleIncreaseAmount}
-            >
-              <PlusIcon />
-            </button>
-          </div>
         </div>
 
         <div className="amountContainer">
@@ -320,7 +315,7 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
             open={durationTooltip}
           >
             <div
-              className="amount duration "
+              className="amount amount-control duration "
               onClick={(e) => {
                 setToggleTimeSelector(true);
                 e.stopPropagation();
@@ -333,30 +328,26 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
                 />
               )}
               <label htmlFor="duration">Duration</label>
-              <input
-                type={disabled ? "text" : "text"}
-                name="duration"
-                id="duration"
-                value={`${duration} sec`}
-                // onChange={(e)=>SetDuration(e.target.value)}
-                disabled={disabled}
-                defaultValue={defaultDuration}
-              />
+              <div className="stepper-row">
+                <button type="button" aria-label="Decrease demo duration" disabled={duration == 5 || disabled} onClick={(e) => { e.stopPropagation(); handleDecreaseDuration(); }}>
+                  <SubtractIcon />
+                </button>
+                <input
+                  type="text"
+                  name="duration"
+                  id="duration"
+                  value={`${duration} sec`}
+                  readOnly
+                  disabled={disabled}
+                  defaultValue={defaultDuration}
+                  aria-label="Demo duration"
+                />
+                <button type="button" aria-label="Increase demo duration" disabled={disabled} onClick={(e) => { e.stopPropagation(); handleIncreaseDuration(); }}>
+                  <PlusIcon />
+                </button>
+              </div>
             </div>
           </Tooltip>
-
-          <div className="mathButtons">
-            <button
-              disabled={duration == 5}
-              className={`${hintDuration ? "hint" : ""}`}
-              onClick={handleDecreaseDuration}
-            >
-              <SubtractIcon />
-            </button>
-            <button disabled={disabled} onClick={handleIncreaseDuration}>
-              <PlusIcon />
-            </button>
-          </div>
         </div>
       </div>
 

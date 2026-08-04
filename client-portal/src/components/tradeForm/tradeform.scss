@@ -360,6 +360,65 @@
   .profit { color: var(--color-text-secondary); }
 }
 
+/* Compact Codestra ticket steppers: one bounded control per value. */
+.trade-form .amount-control {
+  height: 70px;
+  min-height: 70px;
+  padding: 8px 10px;
+  border: 1px solid var(--platform-border, #313840);
+  border-radius: 10px;
+  background: var(--platform-control, #22272d);
+  justify-content: center;
+  gap: 3px;
+}
+.trade-form .amount-control > label {
+  display: block;
+  color: var(--platform-muted, #8d9792);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.1;
+  text-align: center;
+}
+.trade-form .amount-control .stepper-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+}
+.trade-form .amount-control .stepper-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--platform-text, #f3f6f4);
+  background: transparent;
+}
+.trade-form .amount-control .stepper-row button:hover:not(:disabled) { background: var(--platform-control-hover, #2a3037); }
+.trade-form .amount-control .stepper-row button:active:not(:disabled) { transform: scale(.98); }
+.trade-form .amount-control .stepper-row button:focus-visible { outline: 2px solid var(--platform-accent, #00e65c); outline-offset: 1px; }
+.trade-form .amount-control .stepper-row button:disabled { color: var(--platform-muted, #8d9792); opacity: .55; }
+.trade-form .amount-control .stepper-row input {
+  width: 100%;
+  min-width: 0;
+  padding: 0 4px;
+  color: var(--platform-text, #f3f6f4);
+  font-size: 19px;
+  font-weight: 650;
+  line-height: 1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.trade-form .amount-control.duration .stepper-row input { font-size: 17px; }
+@media (max-width: 767px) {
+  .trade-form .amount-control { height: 70px; min-height: 70px; }
+  .trade-form .amount-control .stepper-row { grid-template-columns: 48px minmax(0, 1fr) 48px; }
+  .trade-form .amount-control .stepper-row button { width: 48px; height: 48px; }
+}
+
 .smallLiveVideo {
   position: absolute;
   top: 0;
