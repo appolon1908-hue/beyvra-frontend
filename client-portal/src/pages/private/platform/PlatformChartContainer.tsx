@@ -14,6 +14,7 @@ import {
   ISeriesApi,
   LineStyle,
   Time,
+  SeriesMarker,
 } from "lightweight-charts";
 import { useCookies } from "react-cookie";
 import { useAppSelector } from "@store/hooks";
@@ -286,6 +287,40 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     seriesRef.current.setData(chartData as never);
     if (!userInteracted) chartRef.current?.timeScale().scrollToRealTime();
   }, [chartData, userInteracted]);
+
+  // Trade markers are derived only from the server response. Mapping by trade id
+  // makes polling/reconnects idempotent and replaces OPEN with the settled result.
+  useEffect(() => {
+    if (!seriesRef.current) return;
+    const markers: SeriesMarker<Time>[] = [];
+    openTrades.forEach((trade) => {
+      const openedAt = Date.parse(String(trade.openedAt));
+      if (!Number.isFinite(openedAt)) return;
+      const direction = String(trade.direction).toLowerCase();
+      const result = String(trade.result || trade.state || "OPEN").toUpperCase();
+      const settled = ["WON", "LOST", "DRAW"].includes(result);
+      const label = `#${String(trade.id)} ${direction === "up" ? "UP" : "DOWN"} $${String(trade.amount)}`;
+      markers.push({
+        time: Math.floor(openedAt / 1000) as Time,
+        position: direction === "up" ? "belowBar" : "aboveBar",
+        color: settled ? (result === "LOST" ? "#ff5c68" : "#34d27b") : "#12e6d0",
+        shape: direction === "up" ? "arrowUp" : "arrowDown",
+        text: settled ? `${label} · ${result}` : `${label} · OPEN`,
+      });
+      if (settled && trade.closingPrice && trade.expiresAt) {
+        const expiresAt = Date.parse(String(trade.expiresAt));
+        if (Number.isFinite(expiresAt)) markers.push({
+          time: Math.floor(expiresAt / 1000) as Time,
+          position: direction === "up" ? "aboveBar" : "belowBar",
+          color: result === "LOST" ? "#ff5c68" : "#34d27b",
+          shape: "circle",
+          text: `${result} ${String(trade.closingPrice)}`,
+        });
+      }
+    });
+    markers.sort((a, b) => Number(a.time) - Number(b.time));
+    seriesRef.current.setMarkers(markers);
+  }, [openTrades]);
 
   // ------------------------------------------------------------------
   // 3) Handle window resize

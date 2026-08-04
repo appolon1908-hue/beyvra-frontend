@@ -218,3 +218,10 @@
   .payProfileTab .profile { min-width: 48px; min-height: 48px; }
   button:focus-visible { outline: 2px solid var(--platform-accent, #00e65c); outline-offset: 2px; }
 }
+.demo-account-control { position: relative; }
+.demo-account-popover { position: absolute; z-index: 100; top: calc(100% + 8px); right: 0; width: 260px; padding: 16px; background: #171c22; border: 1px solid #29313a; border-radius: 10px; color: #f4f7f9; box-shadow: 0 12px 32px rgba(0,0,0,.35); }
+.demo-account-popover p { margin: 8px 0; font-variant-numeric: tabular-nums; }
+.demo-account-popover button { min-height: 44px; margin-top: 8px; padding: 0 12px; border: 1px solid #343b44; border-radius: 8px; background: #20252b; color: #eef2f5; cursor: pointer; }
+.demo-account-popover button:hover { background: #2a3037; }
+.demo-account-popover small { display: block; color: #9aa6b2; margin-top: 8px; }
+.demo-refill-confirm { margin-top: 12px; padding-top: 10px; border-top: 1px solid #29313a; }
