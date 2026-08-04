@@ -267,7 +267,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
         Open Demo Trade
       </button>
       {isTicketOpen && <button type="button" className="ticket-backdrop" onClick={() => { closeOverlay(); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); }} aria-label="Close demo trade ticket" />}
-      <div id="platform-order-ticket" hidden={!isTicketOpen}>
+      <div id="platform-order-ticket">
         <TradeTicket open={isTicketOpen} symbol={tradingPair} quote={quote} amount={amount} setAmount={setAmount} duration={duration} setDuration={setDuration} orderState={orderState} orderError={orderError} connectionState={connectionState} submitDemoOrder={(direction) => void submitDemoOrder(direction)} trades={openTrades} durations={demoConfig.durations} minAmount={demoConfig.minAmount} maxAmount={demoConfig.maxAmount} amountStep={demoConfig.amountStep} payoutRate={demoConfig.payoutRate} close={() => { closeOverlay(); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); }} />
       </div>
     </div>
