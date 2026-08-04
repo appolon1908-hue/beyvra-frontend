@@ -105,3 +105,13 @@ export const codestraProfileApi = {
   changePassword: (token: string, body: unknown) => codestraRequest("user/password_change/", { method: "POST", token, body: JSON.stringify(body) }),
   disableWalkthrough: (token: string) => codestraRequest("user/disable_walkthrough/", { method: "PUT", token }),
 };
+
+export const codestraMarketApi = {
+  assets: <T = unknown>(token: string, query: Record<string, string | undefined> = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(query).forEach(([key, value]) => value != null && params.set(key, value));
+    const suffix = params.toString() ? `?${params.toString()}` : "";
+    return codestraRequest<T>(`assets/${suffix}`, { token });
+  },
+  clock: <T = unknown>(token: string) => codestraRequest<T>("get-clock/", { token }),
+};

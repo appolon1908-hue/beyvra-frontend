@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import getEnv from "utils/env";
+import { codestraMarketApi } from "api/generated/codestraDemo";
 
 type FetcherDataOptions = {
   token: string;
@@ -20,33 +20,7 @@ export async function assetsListFetcher({
     asset_class: "crypto",
   },
 }: FetcherDataOptions) {
-  const searchParams = new URLSearchParams();
-  Object.keys(data).forEach((key) => {
-    if (data[key]) {
-      return searchParams.set(key, data[key]!);
-    }
-  });
-
-  try {
-    const response = await fetch(
-      `${getEnv("VITE_API_BASE_URL")}/assets/?${searchParams}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return codestraMarketApi.assets(token, data);
 }
 
 type UseMarketAssetsProps = {
