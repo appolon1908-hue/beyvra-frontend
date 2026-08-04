@@ -47,9 +47,10 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
   const { togglePortfolioWindow } = useAppSelector(state => state.app)
   const onlineTraders = useAppSelector(state => state.socketStockCrypto.onlinetraders)
   const dispatch = useAppDispatch()
-  const { openOverlay } = usePlatformOverlay();
+  const { openOverlay, closeOverlay } = usePlatformOverlay();
   const onSelect = (activeDrawer: CurrentDrawerType) => {
-    openOverlay("market");
+    if (activeDrawer === "market" || activeDrawer === "assets") openOverlay("market");
+    else closeOverlay();
     if (isLeftSubDrawerOpen) {
       setIsLeftSubDrawerOpen(false);
     }
