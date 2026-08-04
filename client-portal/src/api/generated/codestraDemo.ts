@@ -115,3 +115,13 @@ export const codestraMarketApi = {
   },
   clock: <T = unknown>(token: string) => codestraRequest<T>("get-clock/", { token }),
 };
+
+export const codestraNewsApi = {
+  list: <T = unknown>(token: string, query: Record<string, string | undefined> = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(query).forEach(([key, value]) => value != null && params.set(key, value));
+    const suffix = params.toString() ? `?${params.toString()}` : "";
+    return codestraRequest<T>(`news/${suffix}`, { token });
+  },
+  article: <T = unknown>(token: string, id: string | number) => codestraRequest<T>(`news/${id}/`, { token }),
+};

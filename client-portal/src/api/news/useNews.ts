@@ -1,6 +1,6 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
 import { INews } from "@interfaces";
-import getEnv from "utils/env";
+import { codestraNewsApi } from "api/generated/codestraDemo";
 
 interface DataTabNewsResponse{ 
   title?: string;
@@ -54,30 +54,7 @@ export async function fetchNews(data: {
   token: string;
   queryParams?: NewsQueryParams;
 }): Promise<NewsResponse> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const queryParams = data.queryParams
-      ? new URLSearchParams(
-          Object.entries(data.queryParams)
-            .filter(([, value]) => value !== undefined)
-            .map(([key, value]) => [key, String(value)])
-        ).toString()
-      : "";
-    const response = await fetch(`${BASE_URL}/news/${queryParams ? `?${queryParams}` : ""}`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${data.token}` },
-    });
-    const result = await response.json();
-  
-    
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return codestraNewsApi.list<NewsResponse>(data.token, data.queryParams);
 }
 
 export const useNews = (
