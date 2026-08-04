@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { recordPlatformEvent } from "../../../observability/platformTelemetry";
 
 export type PlatformOverlay =
   | { type: "none" }
@@ -18,8 +19,12 @@ export function PlatformOverlayProvider({ children }: { children: React.ReactNod
   const [overlay, setOverlay] = useState<PlatformOverlay>({ type: "none" });
   const openOverlay = useCallback((type: Exclude<PlatformOverlay["type"], "none">) => {
     setOverlay({ type });
+    recordPlatformEvent("overlay_transition", { overlay: type });
   }, []);
-  const closeOverlay = useCallback(() => setOverlay({ type: "none" }), []);
+  const closeOverlay = useCallback(() => {
+    setOverlay({ type: "none" });
+    recordPlatformEvent("overlay_transition", { overlay: "none" });
+  }, []);
   const value = useMemo(() => ({ overlay, openOverlay, closeOverlay }), [overlay, openOverlay, closeOverlay]);
   return <PlatformOverlayContext.Provider value={value}>{children}</PlatformOverlayContext.Provider>;
 }

@@ -1,15 +1,6 @@
+@import "./platform-tokens";
+
 .platformWrapper {
-  --header-height: 64px;
-  --platform-bg: #121316;
-  --platform-surface: #181a1f;
-  --platform-rail: #181a1f;
-  --platform-surface-raised: #2a2d35;
-  --platform-border: #313840;
-  --platform-text: #f3f6f4;
-  --platform-muted: #8e9299;
-  --platform-accent: #00e65c;
-  --platform-positive: #26d477;
-  --platform-negative: #ff4d4d;
   box-sizing: border-box;
   display: flex;
   background: var(--platform-bg);

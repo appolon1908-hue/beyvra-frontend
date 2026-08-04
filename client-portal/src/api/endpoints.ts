@@ -35,6 +35,12 @@ export const apiEndpoints = {
     snapshot: "v1/market/snapshot",
     candles: "v1/market/candles",
   },
+  demo: {
+    config: "v1/demo/config",
+    orders: "v1/demo/orders",
+    trades: "v1/demo/trades",
+    wallet: "v1/demo/wallet",
+  },
   realtime: {
     news: "v1/news",
     economicCalendar: "v1/economic-calendar",

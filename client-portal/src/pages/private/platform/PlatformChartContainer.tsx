@@ -11,11 +11,14 @@ import {
 } from "lightweight-charts";
 import { useCookies } from "react-cookie";
 import { useAppSelector } from "@store/hooks";
-import { getApiUrl, getSocketUrl } from "utils/env";
-import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
+import { ApiError, authenticatedRequest } from "api/client";
 import { usePlatformOverlay } from "./PlatformOverlayContext";
 import { DemoOrderRequest, DemoTrade } from "api/demo/types";
 import { ChartToolbar, MarketStatus, TradeMarkers, TradeTicket } from "./PlatformChartParts";
+import { useDemoConfig, demoConfigFallback } from "api/demo/useDemoConfig";
+import { useMarketHistory } from "./hooks/useMarketHistory";
+import { useMarketFeed } from "./hooks/useMarketFeed";
+import { recordPlatformEvent } from "../../../observability/platformTelemetry";
 
 interface PlatformProps {
   themeSelect: string;
@@ -44,8 +47,9 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const [chartError, setChartError] = useState("");
   const ticketTriggerRef = useRef<HTMLButtonElement>(null);
   const { overlay, openOverlay, closeOverlay } = usePlatformOverlay();
+  const { data: demoConfig = demoConfigFallback } = useDemoConfig();
   const isTicketOpen = overlay.type === "trade";
-  const [amount, setAmount] = useState(100);
+  const [amount, setAmount] = useState(demoConfigFallback.minAmount * 100);
   const [duration, setDuration] = useState(15);
   const [orderState, setOrderState] = useState<"idle" | "submitting" | "accepted" | "rejected">("idle");
   const [orderError, setOrderError] = useState("");
@@ -53,13 +57,19 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const [cookies] = useCookies(["access_token"]);
   const quote = chartData.at(-1)?.close;
 
+  useEffect(() => {
+    setAmount((current) => Math.min(demoConfig.maxAmount, Math.max(demoConfig.minAmount, current)));
+    if (!demoConfig.durations.includes(duration)) setDuration(demoConfig.durations[0] ?? 15);
+  }, [demoConfig, duration]);
+
   const loadDemoTrades = async () => {
     if (!cookies.access_token) return;
-    const response = await fetch(getApiUrl("v1/demo/trades"), { headers: { Authorization: `Bearer ${cookies.access_token}` } });
-    if (response.ok) {
-      const payload = await response.json();
+    try {
+      const payload = await authenticatedRequest<DemoTrade[] | { results: DemoTrade[] }>("v1/demo/trades", cookies.access_token);
       const trades = Array.isArray(payload) ? payload : payload.results;
-      if (Array.isArray(trades)) setOpenTrades(trades as DemoTrade[]);
+      if (Array.isArray(trades)) setOpenTrades(trades);
+    } catch {
+      // A transient poll failure must not clear the last server-authoritative state.
     }
   };
   // Poll server state so refresh/reconnect never relies on browser-local trades.
@@ -71,11 +81,9 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     setOrderState("submitting"); setOrderError("");
     try {
       const order: DemoOrderRequest = { symbol: tradingPair, amount, duration, direction };
-      const response = await fetch(getApiUrl("v1/demo/orders"), { method: "POST", credentials: "include", headers: { Authorization: `Bearer ${cookies.access_token}`, "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify(order) });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || "Demo order was rejected.");
+      await authenticatedRequest<DemoTrade>("v1/demo/orders", cookies.access_token, { method: "POST", headers: { "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify(order) });
       setOrderState("accepted"); await loadDemoTrades(); window.setTimeout(() => setOrderState("idle"), 1800);
-    } catch (error) { setOrderError(error instanceof Error ? error.message : "Demo order was rejected."); setOrderState("rejected"); }
+    } catch (error) { recordPlatformEvent("order_rejected", { code: error instanceof ApiError ? error.code || `HTTP_${error.status}` : "UNKNOWN" }); setOrderError(error instanceof Error ? error.message : "Demo order was rejected."); setOrderState("rejected"); }
   };
 
   useEffect(() => {
@@ -91,109 +99,16 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   }, [isTicketOpen, closeOverlay]);
   useEffect(() => { chartDataRef.current = chartData; }, [chartData]);
 
-  // ------------------------------------------------------------------
-  // 1) Fetch historical data + initialize WebSocket
-  // ------------------------------------------------------------------
+  const history = useMarketHistory({ token: cookies.access_token, symbol: tradingPair, interval: candleInterval, onState: setConnectionState, onError: setChartError });
   useEffect(() => {
-    let ws: WebSocket | undefined;
-    let retryTimer: ReturnType<typeof setTimeout> | undefined;
-    let disposed = false;
-    let retryCount = 0;
-    let connecting = false;
-
-    const connect = async () => {
-      if (disposed || connecting || !cookies.access_token || ws?.readyState === WebSocket.OPEN || ws?.readyState === WebSocket.CONNECTING) return;
-      connecting = true;
-      try {
-        const { ws_ticket } = await webSocketTicketFetcher(cookies.access_token);
-        if (disposed) return;
-        ws = new WebSocket(getSocketUrl("ws/market-data/", {
-          ws_ticket,
-          symbol: tradingPair,
-          interval: candleInterval,
-        }));
-      } catch (error) {
-        if (disposed) return;
-        setConnectionState("error");
-        setChartError(error instanceof Error ? error.message : "Live market access is unavailable");
-        retryCount += 1;
-        retryTimer = setTimeout(() => void connect(), Math.min(1000 * 2 ** retryCount, 30000));
-        return;
-      } finally {
-        connecting = false;
-      }
-      if (!ws) return;
-      ws.onopen = () => {
-        retryCount = 0;
-        setConnectionState("connected");
-        setChartError("");
-      };
-      ws.onclose = () => {
-        if (disposed) return;
-        setConnectionState("disconnected");
-        retryCount += 1;
-        retryTimer = setTimeout(() => void connect(), Math.min(1000 * 2 ** retryCount, 30000));
-      };
-      ws.onerror = () => setConnectionState("disconnected");
-      ws.onmessage = (event) => {
-        let message: Record<string, unknown>;
-        try {
-          message = JSON.parse(event.data) as Record<string, unknown>;
-        } catch {
-          setChartError("The market feed returned an invalid response");
-          setConnectionState("error");
-          return;
-        }
-        if (message.type === "status") {
-          setConnectionState(message.status === "connected" ? "connected" : "disconnected");
-          return;
-        }
-        if (message.type !== "candle") return;
-        const newCandle = {
-          time: message.time as Time,
-          open: Number(message.open), high: Number(message.high),
-          low: Number(message.low), close: Number(message.close),
-        };
-        setChartData((current) => {
-          const lastCandle = current[current.length - 1];
-          return lastCandle?.time === newCandle.time
-            ? [...current.slice(0, -1), newCandle]
-            : [...current, newCandle].slice(-1000);
-        });
-      };
-    };
-
-    const initializeChartData = async () => {
-      try {
-        setConnectionState("loading");
-        userInteractedRef.current = false;
-        setUserInteracted(false);
-        const response = await fetch(
-          getApiUrl(`trades/market/history/?symbol=${tradingPair}&interval=${candleInterval}&limit=200`),
-          { headers: { Authorization: `Bearer ${cookies.access_token}` } },
-        );
-        if (!response.ok) throw new Error("Market history is unavailable");
-        const payload = await response.json();
-        if (!disposed) {
-          const results = Array.isArray(payload.results) ? payload.results : [];
-          setChartData(results);
-          if (results.length === 0) setChartError("No market history is available for this asset");
-        }
-        void connect();
-      } catch (error) {
-        if (disposed) return;
-        setChartError(error instanceof Error ? error.message : "Market data is unavailable");
-        setConnectionState("error");
-      }
-    };
-
-    if (cookies.access_token) void initializeChartData();
-    return () => {
-      disposed = true;
-      if (retryTimer) clearTimeout(retryTimer);
-      ws?.close();
-    };
-  }, [cookies.access_token, tradingPair, candleInterval]);
+    setChartData(history);
+    userInteractedRef.current = false;
+    setUserInteracted(false);
+  }, [history]);
+  useMarketFeed({ token: cookies.access_token, symbol: tradingPair, interval: candleInterval, enabled: history.length > 0, onState: setConnectionState, onError: setChartError, onCandle: (newCandle) => setChartData((current) => {
+    const lastCandle = current[current.length - 1];
+    return lastCandle?.time === newCandle.time ? [...current.slice(0, -1), newCandle] : [...current, newCandle].slice(-1000);
+  }) });
 
   // ------------------------------------------------------------------
   // 2) Initialize / update the chart
@@ -353,7 +268,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
       </button>
       {isTicketOpen && <button type="button" className="ticket-backdrop" onClick={() => { closeOverlay(); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); }} aria-label="Close demo trade ticket" />}
       <div id="platform-order-ticket" hidden={!isTicketOpen}>
-        <TradeTicket open={isTicketOpen} symbol={tradingPair} quote={quote} amount={amount} setAmount={setAmount} duration={duration} setDuration={setDuration} orderState={orderState} orderError={orderError} connectionState={connectionState} submitDemoOrder={(direction) => void submitDemoOrder(direction)} trades={openTrades} close={() => { closeOverlay(); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); }} />
+        <TradeTicket open={isTicketOpen} symbol={tradingPair} quote={quote} amount={amount} setAmount={setAmount} duration={duration} setDuration={setDuration} orderState={orderState} orderError={orderError} connectionState={connectionState} submitDemoOrder={(direction) => void submitDemoOrder(direction)} trades={openTrades} durations={demoConfig.durations} minAmount={demoConfig.minAmount} maxAmount={demoConfig.maxAmount} amountStep={demoConfig.amountStep} payoutRate={demoConfig.payoutRate} close={() => { closeOverlay(); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); }} />
       </div>
     </div>
   );
