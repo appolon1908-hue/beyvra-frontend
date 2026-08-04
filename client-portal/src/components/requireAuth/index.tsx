@@ -30,6 +30,9 @@ const RequireAuth = () => {
   ]);
   const [show, setShow] = useState(false);
   const [isIdle, setIsIdle] = useState(false);
+  const isGuestDemo = Boolean(cookies.access_token && (() => {
+    try { return JSON.parse(atob(cookies.access_token.split(".")[1])).guest_demo === true; } catch { return false; }
+  })());
 
   const { mutate: mutateKYC } = useKyc({
     onSuccess: (data) => {
@@ -96,9 +99,7 @@ const RequireAuth = () => {
 
   useEffect(() => {
     if (!cookies.access_token) return;
-    mutateKYC({
-      token: cookies.access_token
-    });
+    if (!isGuestDemo) mutateKYC({ token: cookies.access_token });
     // Set up event listeners for user activity
     window.addEventListener('mousemove', resetTimer);
     window.addEventListener('keydown', resetTimer);
@@ -112,10 +113,10 @@ const RequireAuth = () => {
       window.removeEventListener('mousemove', resetTimer);
       window.removeEventListener('keydown', resetTimer);
     };
-  }, [cookies.access_token, mutateKYC]);
+  }, [cookies.access_token, mutateKYC, isGuestDemo]);
 
   useEffect(() => {
-    if (cookies?.access_token) {
+    if (cookies?.access_token && !isGuestDemo && cookies.refresh_token) {
       const refreshInterval = 4 * 60 * 1000;
 
       const refresh = () => {
@@ -147,7 +148,7 @@ const RequireAuth = () => {
 
       return () => clearInterval(intervalId);
     }
-  }, [cookies?.access_token, cookies.refresh_token, mutate, setCookie]);
+  }, [cookies?.access_token, cookies.refresh_token, mutate, setCookie, isGuestDemo]);
 
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
