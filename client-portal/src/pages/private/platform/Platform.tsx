@@ -148,7 +148,8 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
   };
 
   return (
-    <div className="platformWrapper" data-theme={themeSelect}>
+    <main className="platformWrapper" data-theme={themeSelect} aria-labelledby="platform-page-title">
+      <h1 id="platform-page-title" className="platform-visually-hidden">Codestra Demo Platform</h1>
       {/* <CustomModal/> */}
       {windowWidth >= 768 ? (
         <MainSidebar id="main_sidebar" />
@@ -302,7 +303,7 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
           bottomSidebarHeight={bottomSidebarHeight}
         />
       </div>
-    </div>
+    </main>
   );
 };
 
