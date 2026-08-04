@@ -48,6 +48,7 @@ export const apiEndpoints = {
     platformConfig: "platform/config",
   },
   integrations: {
+    tenantContext: "v1/tenant/context",
     users: "v1/users",
     imports: "v1/users/imports",
     importTemplate: "v1/users/imports/template",
