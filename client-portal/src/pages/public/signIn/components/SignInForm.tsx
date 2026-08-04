@@ -74,14 +74,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
         body: "{}",
       });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.access) throw new Error("GUEST_DEMO_UNAVAILABLE");
-      setCookie("access_token", result.access, {
-        maxAge: Number(result.expiresIn) || 1800,
-        secure: window.location.protocol === "https:",
-        sameSite: "strict",
-        path: "/",
-      });
-      setCookie("refresh_token", "", { maxAge: 0, path: "/" });
+      if (!response.ok) throw new Error("GUEST_DEMO_UNAVAILABLE");
       navigate(destination || "/platform", { replace: true });
     } catch {
       toast.error("Demo access is temporarily unavailable. Please try again.");
