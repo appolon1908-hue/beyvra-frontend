@@ -283,7 +283,7 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
             open={amountTooltip}
           >
             <div className="amount amount-control">
-              <label htmlFor="amount">Amount, Đ</label>
+              <label htmlFor="amount">Amount, Demo</label>
               <div className="stepper-row">
                 <button type="button" aria-label="Decrease demo amount" disabled={amount == 1 || disabled} onClick={handleDecreaseAmount}>
                   <SubtractIcon />
@@ -404,8 +404,6 @@ const TradeForm: React.FunctionComponent<TradeFormProps> = ({
           </div>
         </Tooltip>
       </div>
-      {showProfit ? <p className="profit">Profit: + Đ0.82</p> : null}
-      
     </div>
   );
 };

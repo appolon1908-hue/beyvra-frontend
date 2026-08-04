@@ -62,7 +62,7 @@
     }
     .trade-content {
       display: grid !important;
-      grid-template-columns: minmax(560px, minmax(0, 1fr)) 320px;
+      grid-template-columns: minmax(560px, 1fr) 320px;
       grid-template-rows: minmax(0, 1fr);
       height: calc(100dvh - var(--header-height));
       min-width: 0;
