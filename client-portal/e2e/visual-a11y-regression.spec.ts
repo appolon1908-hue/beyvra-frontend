@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import type { APIRequestContext, BrowserContext, Page } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 const viewports = [
   { width: 375, height: 812 },
@@ -25,6 +26,10 @@ test.describe("deterministic staging visual and accessibility coverage", () => {
       await page.setViewportSize(viewport);
       const session = await guest(page, request, context, baseURL);
       await expect(page.locator("body")).not.toContainText(/TradX|Tradex|Markets\.com|fund your account|live trading/i);
+      const axe = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+        .analyze();
+      expect(axe.violations, axe.violations.map((item) => `${item.id}: ${item.help}`).join("\n")).toEqual([]);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
       expect(overflow).toBe(false);
       await page.screenshot({ path: `test-results/visual/${viewport.width}x${viewport.height}-platform.png`, fullPage: false });
@@ -50,8 +55,11 @@ test.describe("deterministic staging visual and accessibility coverage", () => {
         await page.reload({ waitUntil: "domcontentloaded" });
         await page.screenshot({ path: `test-results/visual/${viewport.width}x${viewport.height}-SETTLED-marker.png`, fullPage: false });
       }
+      const firstControl = page.getByRole("button").first();
+      await firstControl.focus();
+      await expect(firstControl).toBeFocused();
       await page.keyboard.press("Tab");
-      await expect(page.locator(":focus")).not.toHaveCount(0);
+      await expect(page.evaluate(() => document.activeElement?.tagName)).resolves.not.toBe("BODY");
     });
   }
 });

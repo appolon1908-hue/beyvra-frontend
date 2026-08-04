@@ -54,7 +54,9 @@
 .demo-account-page label { display: grid; gap: 6px; color: #9aa6b2; }
 .demo-account-page input, .demo-account-page select { min-height: 48px; padding: 0 12px; border: 1px solid #29333d; border-radius: 8px; background: #11161b; color: #f4f7fa; }
 .demo-account-page button { min-height: 48px; border: 0; border-radius: 10px; background: linear-gradient(90deg,#12e6d0,#32f34f); color: #07100a; font-weight: 700; }
-.platformWrapper .demo-order-form select { background: #20252b; color: #f3f6f4; border: 1px solid #343b44; color-scheme: dark; }
+.platformWrapper .demo-order-form select,
+.platformWrapper .demo-order-form option,
+.platformWrapper .demo-order-form input { background-color: #20252b !important; color: #f3f6f4 !important; border: 1px solid #343b44; color-scheme: dark; }
 
 /* Codestra/Tradi platform parity shell: fixed rail, flexible chart and ticket. */
 @media (min-width: 1280px) {
