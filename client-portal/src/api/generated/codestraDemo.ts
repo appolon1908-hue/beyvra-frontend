@@ -37,7 +37,7 @@ type RequestOptions = Omit<RequestInit, "headers"> & {
   timeoutMs?: number;
 };
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+export async function codestraRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), options.timeoutMs ?? 15_000);
   const requestId = crypto.randomUUID();
@@ -75,8 +75,20 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 }
 
 export const codestraDemoApi = {
-  wallet: (token: string) => request<DemoWallet>("v1/demo/wallet", { token }),
-  config: (token: string) => request<DemoConfig>("v1/demo/config", { token }),
+  wallet: (token: string) => codestraRequest<DemoWallet>("v1/demo/wallet", { token }),
+  config: (token: string) => codestraRequest<DemoConfig>("v1/demo/config", { token }),
   refill: (token: string, idempotencyKey = crypto.randomUUID()) =>
-    request<DemoWallet>("v1/demo/wallet/refill", { method: "POST", token, idempotencyKey }),
+    codestraRequest<DemoWallet>("v1/demo/wallet/refill", { method: "POST", token, idempotencyKey }),
+};
+
+export const codestraUserApi = {
+  notifications: (token: string) => codestraRequest("notification/notifications/", { token }),
+  toggleNotification: (token: string, body: unknown) =>
+    codestraRequest("notification/toggle_notification/", { method: "PUT", token, body: JSON.stringify(body) }),
+};
+
+export const codestraWalletApi = {
+  wallets: (token: string) => codestraRequest("wallet/wallets/", { token }),
+  transaction: (token: string, id: string) => codestraRequest(`wallet/transactions/${id}/`, { token }),
+  refillLegacy: (token: string, id: string | number) => codestraRequest(`wallet/wallets/${id}/refill/`, { token }),
 };

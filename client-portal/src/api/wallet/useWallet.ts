@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { IWallet } from "@interfaces";
-import getEnv from "utils/env";
+import { codestraWalletApi } from "api/generated/codestraDemo";
 
 type WalletsResponse = {
   count: number;
@@ -16,19 +16,8 @@ type useWalletProps = {
 };
 
 export async function fethWallet(token: string): Promise<WalletsResponse> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-    try {
-    const response = await fetch(`${BASE_URL}/wallet/wallets/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
+  try {
+    const result = await codestraWalletApi.wallets(token) as any;
     return {
       count: result.count || 0,
       next: result.next || null,
