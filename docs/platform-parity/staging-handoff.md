@@ -12,7 +12,7 @@ Status: staging-only implementation, demo-first. Deployed to staging on
   Google disabled until approved OAuth credentials and legal versions exist.
 - The sign-in bundle contains the truthful disabled Google control; no live
   provider or financial capability was enabled.
-- Route-repair image: `codestra-frontend:staging-platform-ui-20260803a`.
+- Route-repair image: `codestra-frontend:staging-demo-ticket-20260804a`.
 - Unauthenticated `/platform` and nested routes now redirect to `/login` with
   an encoded local `redirect` destination.
 - `/platform-overview` is an original demo-workspace overview; legacy trading
@@ -61,6 +61,9 @@ Status: staging-only implementation, demo-first. Deployed to staging on
   56px rail targets, dark slate surfaces, muted labels, tabular balances, green
   primary demo actions, and red directional Down actions. Unsupported Payments,
   Rewards, InZone and shop controls remain hidden by feature policy.
+- Replaced the ticket's separate oversized amount/duration button rows with
+  bounded 70px combined steppers. Each has an accessible minus/value/plus
+  control and preserves the existing server-authoritative demo order path.
 
 ## Button/action matrix (implemented surfaces)
 
@@ -111,6 +114,9 @@ real session because no authorized staging credentials were available in this
 workspace. Source-level layout checks and production build checks passed; chart,
 ticket, websocket and order behavior remain explicitly unproven until that
 account is supplied.
+
+No server-issued guest-demo session endpoint is currently present in the
+repository, so guest access was not invented or enabled during this repair.
 
 ## Rollback
 
