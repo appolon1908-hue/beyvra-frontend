@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import TradeForm from "../../../components/tradeForm/TradeForm";
 import "./platform.scss";
 import {
   MainChartChangeIcon,
@@ -47,6 +46,31 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const [connectionState, setConnectionState] = useState<"loading" | "connected" | "disconnected" | "error">("loading");
   const [chartError, setChartError] = useState("");
   const [isTicketOpen, setIsTicketOpen] = useState(false);
+  const [amount, setAmount] = useState(100);
+  const [duration, setDuration] = useState(15);
+  const [orderState, setOrderState] = useState<"idle" | "submitting" | "accepted" | "rejected">("idle");
+  const [orderError, setOrderError] = useState("");
+  const [openTrades, setOpenTrades] = useState<Array<Record<string, unknown>>>([]);
+  const [cookies] = useCookies(["access_token"]);
+  const quote = chartData.at(-1)?.close;
+
+  const loadDemoTrades = async () => {
+    if (!cookies.access_token) return;
+    const response = await fetch(getApiUrl("v1/demo/trades"), { headers: { Authorization: `Bearer ${cookies.access_token}` } });
+    if (response.ok) setOpenTrades((await response.json()) as Array<Record<string, unknown>>);
+  };
+  useEffect(() => { void loadDemoTrades(); const timer = window.setInterval(() => void loadDemoTrades(), 5000); return () => window.clearInterval(timer); }, [cookies.access_token]);
+
+  const submitDemoOrder = async (direction: "up" | "down") => {
+    if (orderState === "submitting" || !quote || connectionState !== "connected") return;
+    setOrderState("submitting"); setOrderError("");
+    try {
+      const response = await fetch(getApiUrl("v1/demo/orders"), { method: "POST", credentials: "include", headers: { Authorization: `Bearer ${cookies.access_token}`, "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify({ symbol: tradingPair, amount, duration, direction }) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Demo order was rejected.");
+      setOrderState("accepted"); await loadDemoTrades(); window.setTimeout(() => setOrderState("idle"), 1800);
+    } catch (error) { setOrderError(error instanceof Error ? error.message : "Demo order was rejected."); setOrderState("rejected"); }
+  };
 
   useEffect(() => {
     if (!isTicketOpen) return;
@@ -56,7 +80,6 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [isTicketOpen]);
-  const [cookies] = useCookies(["access_token"]);
   const hasChartData = chartData.length > 0;
 
   useEffect(() => { chartDataRef.current = chartData; }, [chartData]);
@@ -367,12 +390,16 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
           <span>Demo order</span>
           <button type="button" onClick={() => setIsTicketOpen(false)} aria-label="Close demo trade ticket">×</button>
         </div>
-        <TradeForm
-          bottomSidebarHeight={bottomSidebarHeight}
-          disabled={connectionState !== "connected" || chartData.length === 0}
-          showSetupOrder={false}
-          showProfit={false}
-        />
+        <div className="demo-order-form" aria-label="Demo order ticket">
+          <p className="demo-ticket-disclosure">BTCUSDT · Virtual funds only</p>
+          <label>Amount, Demo<input type="number" min={1} step={1} value={amount} onChange={(e) => setAmount(Math.max(1, Number(e.target.value) || 1))} /></label>
+          <div className="demo-stepper"><button type="button" aria-label="Decrease demo amount" onClick={() => setAmount(Math.max(1, amount - 10))}>−</button><strong>{amount}</strong><button type="button" aria-label="Increase demo amount" onClick={() => setAmount(amount + 10)}>+</button></div>
+          <label>Duration<select value={duration} onChange={(e) => setDuration(Number(e.target.value))}>{[5, 15, 30, 60].map((value) => <option key={value} value={value}>{value} seconds</option>)}</select></label>
+          <div className="demo-direction-actions"><button type="button" className="demo-up" disabled={orderState === "submitting" || connectionState !== "connected" || !quote} onClick={() => void submitDemoOrder("up")}>↑ Up</button><button type="button" className="demo-down" disabled={orderState === "submitting" || connectionState !== "connected" || !quote} onClick={() => void submitDemoOrder("down")}>↓ Down</button></div>
+          <p className="demo-quote">Quote: {quote ? quote.toFixed(2) : "Unavailable"}</p>
+          <p role="status" aria-live="polite">{orderState === "submitting" ? "Submitting…" : orderState === "accepted" ? "Demo trade accepted." : orderError}</p>
+          <section className="open-demo-trades" aria-label="Open demo trades"><h3>Open Trades</h3>{openTrades.filter((trade) => trade.state === "OPEN").map((trade) => <p key={String(trade.id)}>{String(trade.symbol)} · {String(trade.direction).toUpperCase()} · {String(trade.amount)} · expires {new Date(String(trade.expiresAt)).toLocaleTimeString()}</p>)}{openTrades.every((trade) => trade.state !== "OPEN") && <p>No open demo trades.</p>}</section>
+        </div>
       </div>
     </div>
   );
