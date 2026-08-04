@@ -2,7 +2,6 @@ import { Modal } from 'antd'
 import React, { useEffect, useState } from 'react'
 import './portfolioModal.scss'
 import ProfileModal from 'components/profileModal';
-import PortfolioPage from 'pages/private/platform/platformMenus/portfolioSection/PortfolioPage';
 import Trading from './trading/Trading';
 import VerificationPage from './verification/VerificationPage';
 import Settings from './settings/Settings';
@@ -100,7 +99,6 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ isModalOpen, setModalOp
 
   const sideItems = [
     { name: "personal_info", label: "Personal", component: <ProfileModal userKyc={kycInfo} /> },
-    { name: "portfolio", label: "Portfolio", component: <PortfolioPage /> },
     { name: "trading", label: "Trading", component: <Trading /> },
     { name: "setting", label: "Settings", component: <Settings /> },
   ]

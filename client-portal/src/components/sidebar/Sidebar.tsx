@@ -3,7 +3,6 @@ import {
   LogoIcon,
   MarketIcon,
   NewsIcon,
-  Portfolio,
   TradesIcon,
 } from "../../assets/icons";
 import "./sidebar.scss";
@@ -20,7 +19,6 @@ type DrawerType =
   | "help"
   | "news"
   | "assets"
-  | "portfolio"
   | "ai"
   | null;
 
@@ -115,18 +113,6 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
             <MarketIcon />
           </div>
           <p className="text">Assets</p>
-        </button>
-
-        <button
-          aria-label="Portfolio"
-          onClick={() => handlePortfolioNavigation("portfolio")}
-          className={isDrawerOpen && currentDrawer === "events" ? "active" : ""}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
-        >
-          <div className="icon flex justify-center whiteIcons">
-            <Portfolio />
-          </div>
-          <p className="text">Portfolio</p>
         </button>
 
         <button

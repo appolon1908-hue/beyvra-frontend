@@ -5,7 +5,6 @@ import {
   LogoIcon,
   MarketIcon,
   NewsIcon,
-  Portfolio,
   TradesIcon,
 } from "../../assets/icons";
 import "./sidebar.scss";
@@ -22,7 +21,6 @@ type DrawerType =
   | "news"
   | "ai"
   | "assets"
-  | "portfolio"
   | null;
 
 interface SidebarProps {
@@ -120,16 +118,6 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
             <EventsIcon />
           </div>
           <p className="text">Events</p>
-        </button>
-        <button
-          onClick={() => handlePortfolioNavigation("portfolio")}
-          className={isDrawerOpen && currentDrawer === "events" ? "active" : ""}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16, marginBottom: '1.9rem' }}
-        >
-          <div className="icon flex justify-center whiteIcons">
-            <Portfolio />
-          </div>
-          <p className="text">Portfolio</p>
         </button>
         <button
           onClick={() => onSelect("help")}
