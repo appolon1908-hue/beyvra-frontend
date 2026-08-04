@@ -25,6 +25,7 @@ test.describe("deterministic staging visual and accessibility coverage", () => {
     test(`platform shell ${viewport.width}x${viewport.height}`, async ({ page, request, context, baseURL }) => {
       await page.setViewportSize(viewport);
       const session = await guest(page, request, context, baseURL);
+      await expect(page.getByText("Loading market history…")).toHaveCount(0, { timeout: 15_000 });
       await expect(page.locator("body")).not.toContainText(/TradX|Tradex|Markets\.com|fund your account|live trading/i);
       const axe = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
@@ -53,6 +54,7 @@ test.describe("deterministic staging visual and accessibility coverage", () => {
         await page.screenshot({ path: `test-results/visual/${viewport.width}x${viewport.height}-OPEN-marker.png`, fullPage: false });
         await page.waitForTimeout(6500);
         await page.reload({ waitUntil: "domcontentloaded" });
+        await expect(page.getByText("Loading market history…")).toHaveCount(0, { timeout: 15_000 });
         await page.screenshot({ path: `test-results/visual/${viewport.width}x${viewport.height}-SETTLED-marker.png`, fullPage: false });
       }
       const firstControl = page.getByRole("button").first();
