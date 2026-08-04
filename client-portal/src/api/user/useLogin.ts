@@ -1,27 +1,17 @@
 import { ISignInForm, IUser } from "@interfaces";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import getEnv from "utils/env";
 import { ApiError, getApiErrorMessage } from "api/errors";
+import { codestraAuthApi } from "api/generated/codestraDemo";
 
 export async function fetchLogin(data: ISignInForm): Promise<LoginSuccess> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  const response = await fetch(`${BASE_URL}/user/token/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      referrerPolicy: "no-referrer",
-      body: JSON.stringify(data),
-  });
-  const result: unknown = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    const message = getApiErrorMessage(result, "Unable to sign in. Please try again.");
+  try {
+    return await codestraAuthApi.login<LoginSuccess>(data);
+  } catch (error) {
+    const message = getApiErrorMessage(error, "Unable to sign in. Please try again.");
     toast.error(message);
-    throw new ApiError(message, response.status);
+    throw error instanceof ApiError ? error : new ApiError(message, 500);
   }
-  return result as LoginSuccess;
 }
 
 /** @deprecated Use fetchLogin. */

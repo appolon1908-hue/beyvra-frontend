@@ -92,3 +92,9 @@ export const codestraWalletApi = {
   transaction: (token: string, id: string) => codestraRequest(`wallet/transactions/${id}/`, { token }),
   refillLegacy: (token: string, id: string | number) => codestraRequest(`wallet/wallets/${id}/refill/`, { token }),
 };
+
+export const codestraAuthApi = {
+  login: <T>(body: unknown) => codestraRequest<T>("user/token/", { method: "POST", body: JSON.stringify(body) }),
+  register: <T>(body: unknown) => codestraRequest<T>("user/create/", { method: "POST", body: JSON.stringify(body) }),
+  logout: (token: string, refresh: string) => codestraRequest<void>("user/token/logout/", { method: "POST", token, body: JSON.stringify({ refresh }) }),
+};
