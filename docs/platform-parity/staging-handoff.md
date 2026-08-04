@@ -1,18 +1,21 @@
 # Codestra/Tradi platform parity staging handoff
 
-Status: staging-only implementation, demo-first. Deployed to staging on
-2026-08-03. Production is unchanged and activation remains blocked.
+Status: staging-only implementation, demo-first. Updated 2026-08-04. Production
+is unchanged and activation remains blocked.
 
 ## Current staging images
 
-- Backend: `codestra-backend:staging-google-52989b3`
+- Backend: `codestra-backend:staging-guest-demo-20260804e`
 - Frontend: `codestra-frontend:staging-google-570f908`
 - Staging URL: `https://staging.codestra.cloud/`
 - Google provider response: `GET /api/v1/auth/providers` returns HTTP 200 with
   Google disabled until approved OAuth credentials and legal versions exist.
 - The sign-in bundle contains the truthful disabled Google control; no live
   provider or financial capability was enabled.
-- Route-repair image: `codestra-frontend:staging-demo-ticket-20260804a`.
+- Frontend: `codestra-frontend:staging-guest-demo-20260804d`.
+- `POST /api/user/guest-demo/` issues a server-created, 30-minute,
+  non-refreshable guest Demo token. It accepts no PII and creates only a
+  virtual wallet while `PAPER_TRADING_ONLY=true`.
 - Unauthenticated `/platform` and nested routes now redirect to `/login` with
   an encoded local `redirect` destination.
 - `/platform-overview` is an original demo-workspace overview; legacy trading
@@ -104,22 +107,20 @@ The targeted Playwright smoke check also passed for `/platform`, all required
 platform subroutes, `/platform-overview`, `/trading/tradingPlatform`, `/prv`,
 homepage CTA destinations, and the preserved local login redirect.
 
-Responsive smoke evidence (staging, unauthenticated) passed with no horizontal
+Responsive smoke evidence (staging, guest Demo) passed with no horizontal
 overflow at `360x800`, `768x1024`, `1363x936`, and `3840x2160`. Screenshots were
-captured under `/tmp/codestra-final-*.png` during the deployment check. The
-authenticated chart/order flow still requires an authorized staging account.
+captured under `/tmp/codestra-final-*.png` during the deployment check.
 
-The requested authenticated platform geometry could not be captured against a
-real session because no authorized staging credentials were available in this
-workspace. Source-level layout checks and production build checks passed; chart,
-ticket, websocket and order behavior remain explicitly unproven until that
-account is supplied.
-
-No server-issued guest-demo session endpoint is currently present in the
-repository, so guest access was not invented or enabled during this repair.
+The platform geometry was captured through the staging guest Demo session at
+1899x908, 1280x800, 1024x768, 768x1024, and 390x844. The endpoint returned HTTP
+201 with `guestDemo=true`, `demoOnly=true`, `expiresIn=1800`, and JWT claims
+`guest_demo=true` and `demo_only=true`; an authenticated market-history request
+returned HTTP 200. Market data itself may still show the truthful unavailable
+state when the authorized snapshot provider is unhealthy.
 
 ## Rollback
 
-Revert the frontend commit and the additive backend platform-config commit in
-staging, rebuild the existing images, and restart only staging services. No
-database migration or production setting was changed by this pass.
+Rollback staging only by restoring the prior frontend image and
+`codestra-backend:staging-otp-20260803b`, then restart only the `front` and
+`backend` compose projects. The additive `users.0031` migration is reversible
+only with an approved database rollback; production was not touched.
