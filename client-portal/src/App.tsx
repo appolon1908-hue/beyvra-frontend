@@ -9,6 +9,7 @@ import useInitializeData from "hooks/useInitializeData";
 import PrivateRoute from "utils/ProtectedRoute ";
 import Platform from "pages/private/platform/Platform";
 import DemoTradesPage from "pages/private/platform/DemoTradesPage";
+import DemoAccountPage from "pages/private/platform/DemoAccountPage";
 import Loading from "components/loading";
 import NotFoundPage from "pages/private/platform/platformMenus/notFound/NotFoundPage";
 import PlatformOverview from "pages/public/platformOverview/PlatformOverview";
@@ -97,8 +98,8 @@ const App: React.FunctionComponent = () => {
               <Route path="/platform/analytics" element={<Platform />} />
               <Route path="/platform/learn" element={<Platform />} />
               <Route path="/platform/help" element={<Platform />} />
-              <Route path="/platform/profile" element={<Platform />} />
-              <Route path="/platform/settings" element={<Platform />} />
+              <Route path="/platform/profile" element={<DemoAccountPage section="profile" />} />
+              <Route path="/platform/settings" element={<DemoAccountPage section="settings" />} />
               <Route path="/platform/settings/security" element={<Platform />} />
               <Route path="/platform/settings/sessions" element={<Platform />} />
               <Route path="/home" element={<Platform />} />
