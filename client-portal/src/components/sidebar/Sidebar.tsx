@@ -47,6 +47,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
   const onlineTraders = useAppSelector(state => state.socketStockCrypto.onlinetraders)
   const dispatch = useAppDispatch()
   const onSelect = (activeDrawer: CurrentDrawerType) => {
+    window.dispatchEvent(new Event("platform-market-open"));
     if (isLeftSubDrawerOpen) {
       setIsLeftSubDrawerOpen(false);
     }

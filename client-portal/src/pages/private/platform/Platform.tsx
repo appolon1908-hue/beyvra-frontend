@@ -126,6 +126,16 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
   }, []);
 
   useEffect(() => {
+    const closeMarketDrawerForTrade = () => {
+      setIsDrawerOpen(false);
+      setIsLeftSubDrawerOpen(false);
+      setCurrentDrawer(null);
+    };
+    window.addEventListener("platform-trade-open", closeMarketDrawerForTrade);
+    return () => window.removeEventListener("platform-trade-open", closeMarketDrawerForTrade);
+  }, []);
+
+  useEffect(() => {
     const storedImageId = localStorage.getItem("selectedBackgroundImage");
     if (storedImageId) {
       setAppearanceBackground(storedImageId);

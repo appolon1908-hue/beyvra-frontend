@@ -474,6 +474,28 @@
 .platformWrapper .ticket-trigger { display: none; }
 .platformWrapper .ticket-backdrop { z-index: var(--platform-z-backdrop); background: rgba(0,0,0,.64); }
 .platformWrapper .leftMainDrawer { z-index: var(--platform-z-drawer); }
+.platformWrapper .trade-assets-main-container .asset-drawer-backdrop {
+  position: fixed;
+  inset: 94px 0 0 100px;
+  z-index: var(--z-backdrop, 40);
+  border: 0;
+  background: rgba(0,0,0,.45);
+}
+.platformWrapper .trade-assets-main-container .trade-assets-dropdown-container {
+  position: fixed;
+  top: 94px;
+  left: 100px;
+  z-index: var(--z-drawer, 50);
+  width: 340px;
+  max-width: calc(100vw - 100px);
+  height: calc(100dvh - 94px);
+  max-height: none;
+  border-radius: 0;
+  border: 1px solid #343a3f;
+  background: #111417;
+  box-shadow: 16px 0 40px rgba(0,0,0,.35);
+}
+.platformWrapper .trade-assets-main-container .asset-list-scrollable { overflow-y: auto; min-height: 0; flex: 1 1 auto; }
 
 @media (min-width: 1440px) {
   .platformWrapper .sidebar { width: 100px; min-width: 100px; }
@@ -505,6 +527,8 @@
   .platformWrapper .trade-ticket-shell.is-open { transform: translateX(0); }
   .platformWrapper .ticket-trigger { display: inline-flex; }
   .platformWrapper .ticket-backdrop { display: block; position: fixed; inset: 64px 0 0 64px; border: 0; }
+  .platformWrapper .trade-assets-main-container .asset-drawer-backdrop { inset: 64px 0 0 64px; }
+  .platformWrapper .trade-assets-main-container .trade-assets-dropdown-container { top: 64px; left: 64px; width: min(340px, calc(100vw - 64px)); height: calc(100dvh - 64px); }
 }
 
 @media (max-width: 767px) {
@@ -517,6 +541,8 @@
   .platformWrapper .trade-ticket-shell.is-open { transform: translateY(0); }
   .platformWrapper .ticket-trigger { display: inline-flex; bottom: 76px; }
   .platformWrapper .ticket-backdrop { display: block; position: fixed; inset: 56px 0 64px; border: 0; }
+  .platformWrapper .trade-assets-main-container .asset-drawer-backdrop { inset: 56px 0 64px; }
+  .platformWrapper .trade-assets-main-container .trade-assets-dropdown-container { top: 0; left: 0; width: 100%; max-width: none; height: 100dvh; }
   .platformWrapper .leftMainDrawer { top: 0 !important; left: 0 !important; width: 100% !important; height: 100dvh !important; margin-left: 0 !important; }
 }
 // default mode-night

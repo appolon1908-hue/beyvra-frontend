@@ -47,6 +47,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const [connectionState, setConnectionState] = useState<"loading" | "connected" | "disconnected" | "error">("loading");
   const [chartError, setChartError] = useState("");
   const [isTicketOpen, setIsTicketOpen] = useState(false);
+  const ticketTriggerRef = useRef<HTMLButtonElement>(null);
   const [amount, setAmount] = useState(100);
   const [duration, setDuration] = useState(15);
   const [orderState, setOrderState] = useState<"idle" | "submitting" | "accepted" | "rejected">("idle");
@@ -76,12 +77,20 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   };
 
   useEffect(() => {
-    if (!isTicketOpen) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsTicketOpen(false);
+    const closeTicket = () => {
+      setIsTicketOpen(false);
+      window.setTimeout(() => ticketTriggerRef.current?.focus(), 0);
     };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isTicketOpen) closeTicket();
+    };
+    const closeForMarket = () => { if (isTicketOpen) closeTicket(); };
     window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    window.addEventListener("platform-market-open", closeForMarket);
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("platform-market-open", closeForMarket);
+    };
   }, [isTicketOpen]);
   useEffect(() => { chartDataRef.current = chartData; }, [chartData]);
 
@@ -411,13 +420,14 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
       <button
         type="button"
         className="ticket-trigger"
-        onClick={() => setIsTicketOpen(true)}
+        ref={ticketTriggerRef}
+        onClick={() => { window.dispatchEvent(new Event("platform-trade-open")); setIsTicketOpen(true); }}
         aria-controls="platform-order-ticket"
         aria-expanded={isTicketOpen}
       >
         Open Demo Trade
       </button>
-      {isTicketOpen && <button type="button" className="ticket-backdrop" onClick={() => setIsTicketOpen(false)} aria-label="Close demo trade ticket" />}
+      {isTicketOpen && <button type="button" className="ticket-backdrop" onClick={() => { setIsTicketOpen(false); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); }} aria-label="Close demo trade ticket" />}
       <div
         id="platform-order-ticket"
         className={`trade-ticket-shell${isTicketOpen ? " is-open" : ""}`}
@@ -425,7 +435,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
       >
         <div className="trade-ticket-header">
           <span>Demo order</span>
-          <button type="button" onClick={() => setIsTicketOpen(false)} aria-label="Close demo trade ticket">×</button>
+          <button type="button" onClick={() => { setIsTicketOpen(false); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); }} aria-label="Close demo trade ticket">×</button>
         </div>
         <div className="demo-order-form" aria-label="Demo order ticket">
           <div className="demo-ticket-account"><span>DEMO Account</span><strong>Virtual funds only</strong></div>

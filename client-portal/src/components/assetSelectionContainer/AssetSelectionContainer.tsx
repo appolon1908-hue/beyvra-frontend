@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useCookies } from "react-cookie";
 import { useAppDispatch, useAppSelector } from "@store/hooks";
@@ -23,6 +23,7 @@ const AssetSelectionContainer: React.FunctionComponent = () => {
   const dispatch = useAppDispatch();
   const [cookies] = useCookies(["access_token"]);
   const [isOpen, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const [search, setSearch] = useState("");
   const chartSymbol = useAppSelector((state) => state.socketStockCrypto.chartSymbol) || "BTC";
   const assets = useQuery({
@@ -49,14 +50,40 @@ const AssetSelectionContainer: React.FunctionComponent = () => {
     setOpen(false);
   };
 
+  useEffect(() => {
+    const closeForTrade = () => {
+      setOpen(false);
+      window.setTimeout(() => triggerRef.current?.focus(), 0);
+    };
+    window.addEventListener("platform-trade-open", closeForTrade);
+    return () => window.removeEventListener("platform-trade-open", closeForTrade);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        window.setTimeout(() => triggerRef.current?.focus(), 0);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen]);
+
   return (
     <div className="trade-assets-main-container">
       <button
         type="button"
+        ref={triggerRef}
         className={isOpen ? "close-svg" : "plus-svg"}
         aria-label={isOpen ? "Close asset selector" : "Add or change asset"}
         aria-expanded={isOpen}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          const next = !isOpen;
+          if (next) window.dispatchEvent(new Event("platform-market-open"));
+          setOpen(next);
+        }}
       >
         <PlusIcon2 />
       </button>
@@ -70,7 +97,9 @@ const AssetSelectionContainer: React.FunctionComponent = () => {
       </div>
 
       {isOpen && (
-        <div className="trade-assets-dropdown-container" role="dialog" aria-label="Choose trading asset">
+        <>
+          <button type="button" className="asset-drawer-backdrop" aria-label="Close market drawer" onClick={() => { setOpen(false); window.setTimeout(() => triggerRef.current?.focus(), 0); }} />
+          <div className="trade-assets-dropdown-container" role="dialog" aria-label="Choose trading asset">
           <label className="search-container">
             <span className="sr-only">Search assets</span>
             <span className="search-box">
@@ -100,7 +129,8 @@ const AssetSelectionContainer: React.FunctionComponent = () => {
               </button>
             ))}
           </div>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
