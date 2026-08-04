@@ -18,6 +18,8 @@ import { ChartToolbar, MarketStatus, TradeMarkers, TradeTicket } from "./Platfor
 import { useDemoConfig, demoConfigFallback } from "api/demo/useDemoConfig";
 import { useMarketHistory } from "./hooks/useMarketHistory";
 import { useMarketFeed } from "./hooks/useMarketFeed";
+import { useDemoTrades } from "./hooks/useDemoTrades";
+import { useChartResize } from "./hooks/useChartResize";
 import { recordPlatformEvent } from "../../../observability/platformTelemetry";
 
 interface PlatformProps {
@@ -33,6 +35,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
+  const [chartApi, setChartApi] = useState<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick" | "Area" | "Bar", Time> | null>(null);
 
   const [selectedChart, setSelectedChart] = useState<"area" | "candlesticks" | "bar">("candlesticks");
@@ -53,8 +56,8 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const [duration, setDuration] = useState(15);
   const [orderState, setOrderState] = useState<"idle" | "submitting" | "accepted" | "rejected">("idle");
   const [orderError, setOrderError] = useState("");
-  const [openTrades, setOpenTrades] = useState<DemoTrade[]>([]);
   const [cookies] = useCookies(["access_token"]);
+  const { trades: openTrades, refresh: refreshTrades } = useDemoTrades(cookies.access_token);
   const quote = chartData.at(-1)?.close;
 
   useEffect(() => {
@@ -62,27 +65,13 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     if (!demoConfig.durations.includes(duration)) setDuration(demoConfig.durations[0] ?? 15);
   }, [demoConfig, duration]);
 
-  const loadDemoTrades = async () => {
-    if (!cookies.access_token) return;
-    try {
-      const payload = await authenticatedRequest<DemoTrade[] | { results: DemoTrade[] }>("v1/demo/trades", cookies.access_token);
-      const trades = Array.isArray(payload) ? payload : payload.results;
-      if (Array.isArray(trades)) setOpenTrades(trades);
-    } catch {
-      // A transient poll failure must not clear the last server-authoritative state.
-    }
-  };
-  // Poll server state so refresh/reconnect never relies on browser-local trades.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { void loadDemoTrades(); const timer = window.setInterval(() => void loadDemoTrades(), 5000); return () => window.clearInterval(timer); }, [cookies.access_token]);
-
   const submitDemoOrder = async (direction: "up" | "down") => {
     if (orderState === "submitting" || !quote || connectionState !== "connected") return;
     setOrderState("submitting"); setOrderError("");
     try {
       const order: DemoOrderRequest = { symbol: tradingPair, amount, duration, direction };
       await authenticatedRequest<DemoTrade>("v1/demo/orders", cookies.access_token, { method: "POST", headers: { "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify(order) });
-      setOrderState("accepted"); await loadDemoTrades(); window.setTimeout(() => setOrderState("idle"), 1800);
+      setOrderState("accepted"); await refreshTrades(); window.setTimeout(() => setOrderState("idle"), 1800);
     } catch (error) { recordPlatformEvent("order_rejected", { code: error instanceof ApiError ? error.code || `HTTP_${error.status}` : "UNKNOWN" }); setOrderError(error instanceof Error ? error.message : "Demo order was rejected."); setOrderState("rejected"); }
   };
 
@@ -186,22 +175,17 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     chartRef.current = chart;
     seriesRef.current = series;
 
-    const resizeObserver = typeof ResizeObserver !== "undefined"
-      ? new ResizeObserver(([entry]) => {
-          const { width, height } = entry.contentRect;
-          if (width < 1 || height < 1) return;
-          chart.applyOptions({ width: Math.floor(width), height: Math.floor(height) });
-        })
-      : undefined;
-    resizeObserver?.observe(chartContainerRef.current);
+    setChartApi(chart);
 
     return () => {
-      resizeObserver?.disconnect();
+      setChartApi(null);
       chart.unsubscribeCrosshairMove(interactionHandler);
       chart.timeScale().unsubscribeVisibleTimeRangeChange(syncHandler);
       chart.remove();
     };
   }, [selectedChart, themeSelect]);
+
+  useChartResize(chartContainerRef, chartApi);
 
   useEffect(() => {
     if (!seriesRef.current || chartData.length === 0) return;
@@ -215,20 +199,6 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     if (!seriesRef.current) return;
     seriesRef.current.setMarkers(TradeMarkers({ trades: openTrades }));
   }, [openTrades]);
-
-  // ------------------------------------------------------------------
-  // 3) Handle window resize
-  // ------------------------------------------------------------------
-  useEffect(() => {
-    const handleResize = () => {
-      if (!chartRef.current || !chartContainerRef.current) return;
-      chartRef.current.applyOptions({
-        width: chartContainerRef.current.clientWidth,
-      });
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   // ------------------------------------------------------------------
   // 4) Zoom controls
