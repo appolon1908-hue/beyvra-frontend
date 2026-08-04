@@ -14,5 +14,5 @@ test("guest demo enters the platform and uses the simulated trade API", async ({
   await expect(page).toHaveURL(/\/platform$/);
   const order = await request.post(`${origin}/api/v1/demo/orders`, { headers: { ...auth, "Idempotency-Key": `legacy-order-${Date.now()}`, "Content-Type": "application/json" }, data: { symbol: "BTCUSDT", amount: "100", duration: 5, direction: "up" } });
   expect(order.ok()).toBeTruthy();
-  await expect(page.getByText("Open Demo Trade")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Open Demo Trade", exact: true })).toBeVisible();
 });
