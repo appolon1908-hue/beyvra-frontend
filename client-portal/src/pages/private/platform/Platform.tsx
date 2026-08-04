@@ -165,9 +165,9 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
         }}
         open={isDrawerOpen}
         className={`${themeSelect} ml-106 leftMainDrawer`}
-        style={{ marginLeft: `${mainSidebarWidth}px` }}
+        style={{ marginLeft: `${mainSidebarWidth}px`, top: "64px", height: "calc(100dvh - 64px)" }}
         closeIcon={<CloseIcon />}
-        mask={false}
+        mask
         width={
           windowWidth <= 768 ? `calc(100% - ${mainSidebarWidth}px)` : `20.25rem`
         }
@@ -195,9 +195,9 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
         }}
         open={isLeftSubDrawerOpen}
         className={`ml-106 leftSubDrawer ${themeSelect}`}
-        style={{ marginLeft: `${mainSidebarWidth}px` }}
+        style={{ marginLeft: `${mainSidebarWidth}px`, top: "64px", height: "calc(100dvh - 64px)" }}
         closeIcon={<CloseIcon />}
-        mask={false}
+        mask
         width={
           windowWidth <= 768 ? `calc(100% - ${mainSidebarWidth}px)` : `20.25rem`
         }

@@ -382,6 +382,122 @@
 .platformWrapper .ticket-trigger { background: var(--platform-surface-raised); border-color: var(--platform-border); }
 .platformWrapper .trade-form .upNdown button.up { background: var(--platform-positive); }
 .platformWrapper .trade-form .upNdown button.down { background: var(--platform-negative); }
+
+/* Reference-aligned trading workspace. Layout ownership stays with the
+   existing platform components; these rules only establish the shell and
+   responsive regions. */
+.platformWrapper {
+  --platform-z-chart: 1;
+  --platform-z-rail: 20;
+  --platform-z-backdrop: 30;
+  --platform-z-drawer: 40;
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  grid-template-rows: 100dvh;
+  min-height: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+.platformWrapper .sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: var(--platform-z-rail);
+  width: 80px;
+  min-width: 80px;
+  height: 100dvh;
+  background: #171a1f;
+  border-right: 1px solid #313840;
+}
+.platformWrapper .trade-section {
+  grid-column: 2;
+  display: grid;
+  grid-template-rows: 64px minmax(0, 1fr);
+  width: auto;
+  height: 100dvh;
+  min-width: 0;
+  min-height: 0;
+  margin-left: 0;
+}
+.platformWrapper .topbarContainer { grid-row: 1; min-width: 0; height: 64px; }
+.platformWrapper .trade-content {
+  grid-row: 2;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  grid-template-rows: minmax(0, 1fr);
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.platformWrapper .trade-graph,
+.platformWrapper .chart-container { min-width: 0; min-height: 0; width: 100% !important; height: 100% !important; }
+.platformWrapper .trade-graph { grid-column: 1; position: relative; overflow: hidden; background: #101214; }
+.platformWrapper .chart-container { float: none; margin: 0 !important; }
+.platformWrapper .trade-ticket-shell {
+  grid-column: 2;
+  position: relative;
+  inset: auto;
+  z-index: var(--platform-z-drawer);
+  width: 300px;
+  min-width: 300px;
+  height: 100%;
+  overflow-y: auto;
+  background: #171a1f;
+  border-left: 1px solid #313840;
+}
+.platformWrapper .demo-order-form {
+  display: grid;
+  gap: 14px;
+  padding: 18px 16px 24px;
+  color: #f3f6f4;
+  font-variant-numeric: tabular-nums;
+}
+.platformWrapper .demo-ticket-account { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid #313840; font-weight: 700; }
+.platformWrapper .demo-ticket-account strong { color: #00e65c; font-size: 11px; text-transform: uppercase; }
+.platformWrapper .demo-ticket-disclosure, .platformWrapper .demo-estimate, .platformWrapper .demo-quote { margin: 0; color: #9aa6b2; font-size: 12px; }
+.platformWrapper .demo-control { display: grid; gap: 7px; }
+.platformWrapper .demo-control > label { color: #9aa6b2; font-size: 12px; font-weight: 650; }
+.platformWrapper .demo-control-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; min-height: 68px; border: 1px solid #39424c; border-radius: 10px; background: #20252b; overflow: hidden; }
+.platformWrapper .demo-control-row button { min-width: 44px; min-height: 100%; border: 0; background: transparent; color: #f3f6f4; font-size: 22px; cursor: pointer; }
+.platformWrapper .demo-control-row button:hover { background: #2a3037; }
+.platformWrapper .demo-control-row input, .platformWrapper .demo-control-row select { width: 100%; min-width: 0; height: 66px; border: 0; outline: 0; background: #20252b !important; color: #f3f6f4 !important; text-align: center; font-size: 18px; font-weight: 650; }
+.platformWrapper .demo-direction-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.platformWrapper .demo-direction-actions button { min-height: 58px; border: 1px solid transparent; border-radius: 10px; color: #07100a; font-size: 16px; font-weight: 750; cursor: pointer; }
+.platformWrapper .demo-direction-actions button:disabled { opacity: .45; cursor: not-allowed; }
+.platformWrapper .demo-direction-actions .demo-up { background: #26d477; }
+.platformWrapper .demo-direction-actions .demo-down { background: #ff4d4d; color: #fff; }
+.platformWrapper .demo-how-it-works { min-height: 44px; border: 0; background: transparent; color: #9aa6b2; text-align: left; cursor: pointer; }
+.platformWrapper .open-demo-trades { padding-top: 12px; border-top: 1px solid #313840; color: #dfe5e9; }
+.platformWrapper .open-demo-trades summary { min-height: 44px; padding: 10px 0; cursor: pointer; font-weight: 700; }
+.platformWrapper .open-demo-trades p { color: #9aa6b2; font-size: 12px; }
+.platformWrapper .ticket-trigger { display: none; }
+.platformWrapper .ticket-backdrop { z-index: var(--platform-z-backdrop); background: rgba(0,0,0,.64); }
+.platformWrapper .leftMainDrawer { z-index: var(--platform-z-drawer); }
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .platformWrapper { grid-template-columns: 64px minmax(0, 1fr); }
+  .platformWrapper .sidebar { width: 64px; min-width: 64px; }
+  .platformWrapper .trade-section { grid-column: 2; }
+  .platformWrapper .trade-content { grid-template-columns: minmax(0, 1fr); }
+  .platformWrapper .trade-ticket-shell { position: fixed; top: 64px; right: 0; bottom: 0; width: min(320px, calc(100vw - 64px)); height: auto; transform: translateX(100%); transition: transform 180ms ease-out; }
+  .platformWrapper .trade-ticket-shell.is-open { transform: translateX(0); }
+  .platformWrapper .ticket-trigger { display: inline-flex; }
+  .platformWrapper .ticket-backdrop { display: block; position: fixed; inset: 64px 0 0 64px; border: 0; }
+}
+
+@media (max-width: 767px) {
+  .platformWrapper { display: flex; flex-direction: column; grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) 64px; }
+  .platformWrapper .sidebar { position: fixed; inset: auto 0 0; z-index: var(--platform-z-rail); width: 100%; min-width: 0; height: 64px; }
+  .platformWrapper .trade-section { display: grid; grid-template-rows: 56px minmax(0, 1fr); width: 100%; height: calc(100dvh - 64px); margin: 0; }
+  .platformWrapper .topbarContainer { height: 56px; }
+  .platformWrapper .trade-content { grid-template-columns: 1fr; height: 100%; }
+  .platformWrapper .trade-ticket-shell { position: fixed; left: 0; right: 0; bottom: 64px; width: 100%; min-width: 0; height: min(72dvh, 560px); transform: translateY(110%); transition: transform 180ms ease-out; border-radius: 16px 16px 0 0; }
+  .platformWrapper .trade-ticket-shell.is-open { transform: translateY(0); }
+  .platformWrapper .ticket-trigger { display: inline-flex; bottom: 76px; }
+  .platformWrapper .ticket-backdrop { display: block; position: fixed; inset: 56px 0 64px; border: 0; }
+  .platformWrapper .leftMainDrawer { top: 0 !important; left: 0 !important; width: 100% !important; height: 100dvh !important; margin-left: 0 !important; }
+}
 // default mode-night
 .ml-106 {
   &.leftSubDrawer {

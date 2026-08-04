@@ -428,14 +428,30 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
           <button type="button" onClick={() => setIsTicketOpen(false)} aria-label="Close demo trade ticket">×</button>
         </div>
         <div className="demo-order-form" aria-label="Demo order ticket">
-          <p className="demo-ticket-disclosure">BTCUSDT · Virtual funds only</p>
-          <label>Amount, Demo<input type="number" min={1} step={1} value={amount} onChange={(e) => setAmount(Math.max(1, Number(e.target.value) || 1))} /></label>
-          <div className="demo-stepper"><button type="button" aria-label="Decrease demo amount" onClick={() => setAmount(Math.max(1, amount - 10))}>−</button><strong>{amount}</strong><button type="button" aria-label="Increase demo amount" onClick={() => setAmount(amount + 10)}>+</button></div>
-          <label>Duration<select value={duration} onChange={(e) => setDuration(Number(e.target.value))}>{[5, 15, 30, 60].map((value) => <option key={value} value={value}>{value} seconds</option>)}</select></label>
+          <div className="demo-ticket-account"><span>DEMO Account</span><strong>Virtual funds only</strong></div>
+          <p className="demo-ticket-disclosure">{tradingPair} · Quote {quote ? quote.toFixed(2) : "unavailable"}</p>
+          <div className="demo-control">
+            <label htmlFor="demo-order-amount">Amount, Virtual USD</label>
+            <div className="demo-control-row">
+              <button type="button" aria-label="Decrease demo amount" onClick={() => setAmount(Math.max(1, amount - 10))}>−</button>
+              <input id="demo-order-amount" type="number" min={1} step={1} value={amount} onChange={(e) => setAmount(Math.max(1, Number(e.target.value) || 1))} />
+              <button type="button" aria-label="Increase demo amount" onClick={() => setAmount(amount + 10)}>+</button>
+            </div>
+          </div>
+          <div className="demo-control">
+            <label htmlFor="demo-order-duration">Duration</label>
+            <div className="demo-control-row">
+              <button type="button" aria-label="Decrease demo duration" onClick={() => setDuration((current) => [5, 15, 30, 60][Math.max(0, [5, 15, 30, 60].indexOf(current) - 1)])}>−</button>
+              <select id="demo-order-duration" value={duration} onChange={(e) => setDuration(Number(e.target.value))}>{[5, 15, 30, 60].map((value) => <option key={value} value={value}>{value} seconds</option>)}</select>
+              <button type="button" aria-label="Increase demo duration" onClick={() => setDuration((current) => [5, 15, 30, 60][Math.min(3, [5, 15, 30, 60].indexOf(current) + 1)])}>+</button>
+            </div>
+          </div>
+          <p className="demo-estimate">Estimated demo return is calculated from the active simulated-market rules.</p>
           <div className="demo-direction-actions"><button type="button" className="demo-up" disabled={orderState === "submitting" || connectionState !== "connected" || !quote} onClick={() => void submitDemoOrder("up")}>↑ Up</button><button type="button" className="demo-down" disabled={orderState === "submitting" || connectionState !== "connected" || !quote} onClick={() => void submitDemoOrder("down")}>↓ Down</button></div>
           <p className="demo-quote">Quote: {quote ? quote.toFixed(2) : "Unavailable"}</p>
           <p role="status" aria-live="polite">{orderState === "submitting" ? "Submitting…" : orderState === "accepted" ? "Demo trade accepted." : orderError}</p>
-          <section className="open-demo-trades" aria-label="Open demo trades"><h3>Open Trades</h3>{openTrades.filter((trade) => trade.state === "OPEN").map((trade) => <p key={String(trade.id)}>{String(trade.symbol)} · {String(trade.direction).toUpperCase()} · {String(trade.amount)} · expires {new Date(String(trade.expiresAt)).toLocaleTimeString()}</p>)}{openTrades.every((trade) => trade.state !== "OPEN") && <p>No open demo trades.</p>}</section>
+          <button type="button" className="demo-how-it-works">ⓘ How it works</button>
+          <details className="open-demo-trades" open><summary>Open Trades ({openTrades.filter((trade) => trade.state === "OPEN").length})</summary>{openTrades.filter((trade) => trade.state === "OPEN").map((trade) => <p key={String(trade.id)}>{String(trade.symbol)} · {String(trade.direction).toUpperCase()} · {String(trade.amount)} · expires {new Date(String(trade.expiresAt)).toLocaleTimeString()}</p>)}{openTrades.every((trade) => trade.state !== "OPEN") && <p>No open demo trades.</p>}</details>
         </div>
       </div>
     </div>
