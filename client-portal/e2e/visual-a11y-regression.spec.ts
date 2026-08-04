@@ -15,6 +15,7 @@ async function guest(page: Page, request: APIRequestContext, context: BrowserCon
   await context.addCookies([{ name: "access_token", value: access, url: origin }, { name: "codestra_guest_session", value: access, url: origin }]);
   await page.goto("/platform", { waitUntil: "domcontentloaded" });
   await expect(page.locator(".platformWrapper")).toBeVisible();
+  return { origin, access };
 }
 
 test.describe("deterministic staging visual and accessibility coverage", () => {
@@ -22,7 +23,7 @@ test.describe("deterministic staging visual and accessibility coverage", () => {
   for (const viewport of viewports) {
     test(`platform shell ${viewport.width}x${viewport.height}`, async ({ page, request, context, baseURL }) => {
       await page.setViewportSize(viewport);
-      await guest(page, request, context, baseURL);
+      const session = await guest(page, request, context, baseURL);
       await expect(page.locator("body")).not.toContainText(/TradX|Tradex|Markets\.com|fund your account|live trading/i);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
       expect(overflow).toBe(false);
@@ -39,6 +40,15 @@ test.describe("deterministic staging visual and accessibility coverage", () => {
         await trigger.click();
         await expect(page.locator("#platform-order-ticket")).toBeVisible();
         await page.keyboard.press("Escape");
+      }
+      if (viewport.width >= 1440) {
+        const order = await request.post(`${session.origin}/api/v1/demo/orders`, { headers: { Authorization: `Bearer ${session.access}`, "Content-Type": "application/json", "Idempotency-Key": `visual-order-${Date.now()}` }, data: { symbol: "BTCUSDT", amount: "100", duration: 5, direction: "up" } });
+        expect(order.ok()).toBeTruthy();
+        await page.waitForTimeout(500);
+        await page.screenshot({ path: `test-results/visual/${viewport.width}x${viewport.height}-OPEN-marker.png`, fullPage: false });
+        await page.waitForTimeout(6500);
+        await page.reload({ waitUntil: "domcontentloaded" });
+        await page.screenshot({ path: `test-results/visual/${viewport.width}x${viewport.height}-SETTLED-marker.png`, fullPage: false });
       }
       await page.keyboard.press("Tab");
       await expect(page.locator(":focus")).not.toHaveCount(0);
