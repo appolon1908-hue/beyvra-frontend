@@ -17,6 +17,7 @@ export default function DemoTradesPage() {
     catch (e) { setError(e instanceof Error ? e.message : "Unable to load demo trades."); }
     finally { setLoading(false); }
   };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { void load(); }, [cookies.access_token]);
   const visible = trades.filter((trade) => tab === "open" ? trade.state === "OPEN" : trade.state !== "OPEN");
   return <main className="demo-trades-page" aria-labelledby="demo-trades-title"><h1 id="demo-trades-title">Demo Trades</h1><p>All results use virtual funds and have no monetary value.</p><div role="tablist"><button role="tab" aria-selected={tab === "open"} onClick={() => setTab("open")}>Open Trades</button><button role="tab" aria-selected={tab === "closed"} onClick={() => setTab("closed")}>Closed Trades</button></div>{loading ? <p role="status">Loading trades…</p> : error ? <div role="alert">{error} <button onClick={() => void load()}>Retry</button></div> : visible.length === 0 ? <p>No {tab} demo trades.</p> : <div className="demo-trades-list">{visible.map((trade) => <article key={trade.id}><h2>{trade.symbol} · {trade.direction.toUpperCase()}</h2><p>Trade #{trade.id} · Virtual amount ${trade.amount}</p><p>Opening quote: {trade.openingPrice}{trade.closingPrice ? ` · Closing quote: ${trade.closingPrice}` : ""}</p><p>{trade.state}{trade.result ? ` · ${trade.result}` : ""} · Expires {new Date(trade.expiresAt).toLocaleString()}</p></article>)}</div>}</main>;

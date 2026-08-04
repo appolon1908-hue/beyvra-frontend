@@ -55,6 +55,8 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
     const response = await fetch(getApiUrl("v1/demo/wallet"), { headers: { Authorization: `Bearer ${cookies.access_token}` } });
     if (response.ok) setDemoWallet(await response.json());
   };
+  // Wallet loader intentionally tracks only the authoritative session cookie.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { void loadDemoWallet(); }, [cookies.access_token]);
   const refillDemo = async () => {
     if (!cookies.access_token) return;
