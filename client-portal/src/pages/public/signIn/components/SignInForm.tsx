@@ -67,10 +67,10 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
     if (guestPending) return;
     setGuestPending(true);
     try {
-      const response = await fetch(getApiUrl("user/guest-demo/"), {
+      const response = await fetch(getApiUrl("v1/demo/sessions"), {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() },
         body: "{}",
       });
       const result = await response.json().catch(() => ({}));
