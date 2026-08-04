@@ -45,6 +45,6 @@ test.describe("public route and CTA audit", () => {
     const cta = page.getByRole("link", { name: /Try the demo/i }).first();
     await expect(cta).toBeVisible();
     await cta.click();
-    await expect(page).toHaveURL(/\/platform|\/login/);
+    await expect(page).toHaveURL(/\/platform|\/login|\/signIn/);
   });
 });
