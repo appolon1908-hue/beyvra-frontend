@@ -48,6 +48,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const userInteractedRef = useRef(false);
   const [connectionState, setConnectionState] = useState<"loading" | "connected" | "disconnected" | "error">("loading");
   const [chartError, setChartError] = useState("");
+  const [lastUpdate, setLastUpdate] = useState<number>();
   const ticketTriggerRef = useRef<HTMLButtonElement>(null);
   const { overlay, openOverlay, closeOverlay } = usePlatformOverlay();
   const { data: demoConfig = demoConfigFallback } = useDemoConfig();
@@ -88,16 +89,17 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   }, [isTicketOpen, closeOverlay]);
   useEffect(() => { chartDataRef.current = chartData; }, [chartData]);
 
-  const history = useMarketHistory({ token: cookies.access_token, symbol: tradingPair, interval: candleInterval, onState: setConnectionState, onError: setChartError });
+  const { history, retry: retryHistory } = useMarketHistory({ token: cookies.access_token, symbol: tradingPair, interval: candleInterval, onState: setConnectionState, onError: setChartError });
   useEffect(() => {
     setChartData(history);
+    if (history.length) setLastUpdate(Date.now());
     userInteractedRef.current = false;
     setUserInteracted(false);
   }, [history]);
-  useMarketFeed({ token: cookies.access_token, symbol: tradingPair, interval: candleInterval, enabled: history.length > 0, onState: setConnectionState, onError: setChartError, onCandle: (newCandle) => setChartData((current) => {
+  useMarketFeed({ token: cookies.access_token, symbol: tradingPair, interval: candleInterval, enabled: history.length > 0, onState: setConnectionState, onError: setChartError, onCandle: (newCandle) => { setLastUpdate(Date.now()); setChartData((current) => {
     const lastCandle = current[current.length - 1];
     return lastCandle?.time === newCandle.time ? [...current.slice(0, -1), newCandle] : [...current, newCandle].slice(-1000);
-  }) });
+  }); } });
 
   // ------------------------------------------------------------------
   // 2) Initialize / update the chart
@@ -221,7 +223,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
       <div className="trade-graph">
         {/* Chart Container */}
         <div ref={chartContainerRef} className="chart-container" aria-label={`${tradingPair} market chart`}>
-          <MarketStatus symbol={tradingPair} interval={candleInterval} state={connectionState} error={chartError} />
+          <MarketStatus symbol={tradingPair} interval={candleInterval} state={connectionState} error={chartError} lastUpdate={lastUpdate} onRetry={retryHistory} />
           <ChartToolbar selectedChart={selectedChart} setSelectedChart={setSelectedChart} candleInterval={candleInterval} setCandleInterval={(interval) => { userInteractedRef.current = false; setUserInteracted(false); setCandleInterval(interval); }} handleZoom={handleZoom} />
         </div>
       </div>

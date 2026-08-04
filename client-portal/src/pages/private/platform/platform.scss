@@ -152,6 +152,9 @@
 .market-data-state--error {
   border-color: #ef5350;
 }
+.market-data-state button { margin-left: 8px; min-height: 28px; padding: 0 8px; border: 1px solid currentColor; border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
+.market-data-last-update { margin-left: 8px; color: #9aa6b2; }
+.demo-safety-state { margin: 0; color: #f6b73c; font-size: 12px; line-height: 1.35; }
 
 .chart-status-bar {
   position: absolute;
@@ -920,4 +923,11 @@
   button:hover {
     background-color: #4f5a6852;
   }
+}
+
+/* Final lifecycle/status layout safeguards. */
+@media (max-width: 767px) {
+  .platformWrapper .market-data-state { top: 54px; right: 8px; max-width: 280px; font-size: 11px; }
+  .platformWrapper .chart-controls { top: 8px; right: 8px; left: 8px; max-width: calc(100% - 16px); }
+  .platformWrapper .demo-direction-actions button:disabled::after { content: "Waiting for a trusted quote"; display: block; margin-top: 2px; font-size: 9px; font-weight: 500; }
 }
