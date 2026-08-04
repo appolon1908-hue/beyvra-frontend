@@ -475,6 +475,27 @@
 .platformWrapper .ticket-backdrop { z-index: var(--platform-z-backdrop); background: rgba(0,0,0,.64); }
 .platformWrapper .leftMainDrawer { z-index: var(--platform-z-drawer); }
 
+@media (min-width: 1440px) {
+  .platformWrapper .sidebar { width: 100px; min-width: 100px; }
+  .platformWrapper { grid-template-columns: 100px minmax(0, 1fr); }
+  .platformWrapper .trade-section { grid-template-rows: 94px minmax(0, 1fr); }
+  .platformWrapper .topbarContainer { height: 94px; min-height: 94px; padding: 12px 20px; }
+}
+
+@media (min-width: 1200px) and (max-width: 1439px) {
+  .platformWrapper .sidebar { width: 72px; min-width: 72px; }
+  .platformWrapper { grid-template-columns: 72px minmax(0, 1fr); }
+  .platformWrapper .trade-section { grid-template-rows: 94px minmax(0, 1fr); }
+  .platformWrapper .topbarContainer { height: 94px; min-height: 94px; padding: 12px; }
+}
+
+@media (min-width: 1200px) {
+  .leftMainDrawer, .leftSubDrawer { top: 94px !important; height: calc(100dvh - 94px) !important; }
+  .platformWrapper .sidebar .top { margin-top: 16px; gap: 4px; }
+  .platformWrapper .sidebar .top button { width: 100%; min-height: 88px; padding: 10px 8px; flex-direction: column; gap: 7px; }
+  .platformWrapper .sidebar .top button .text { display: block; font-size: 14px; }
+}
+
 @media (min-width: 768px) and (max-width: 1199px) {
   .platformWrapper { grid-template-columns: 64px minmax(0, 1fr); }
   .platformWrapper .sidebar { width: 64px; min-width: 64px; }
