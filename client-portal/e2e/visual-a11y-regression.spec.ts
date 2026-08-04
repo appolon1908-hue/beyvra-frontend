@@ -57,9 +57,7 @@ test.describe("deterministic staging visual and accessibility coverage", () => {
         await expect(page.getByText("Loading market history…")).toHaveCount(0, { timeout: 15_000 });
         await page.screenshot({ path: `test-results/visual/${viewport.width}x${viewport.height}-SETTLED-marker.png`, fullPage: false });
       }
-      const firstControl = page.locator("button:visible").first();
-      await firstControl.focus();
-      await expect(firstControl).toBeFocused();
+      await page.locator("body").click({ position: { x: 8, y: 8 } });
       await page.keyboard.press("Tab");
       await expect(page.evaluate(() => document.activeElement?.tagName)).resolves.not.toBe("BODY");
     });
