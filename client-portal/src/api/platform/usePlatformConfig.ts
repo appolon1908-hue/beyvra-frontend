@@ -1,19 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { getApiUrl } from "utils/env";
+import { useCookies } from "react-cookie";
 import { PlatformFeatureFlags, stagingPlatformFeatures } from "config/platformFeatures";
+import { codestraDemoApi } from "api/generated/codestraDemo";
 
-export async function fetchPlatformConfig(): Promise<PlatformFeatureFlags> {
-  const response = await fetch(getApiUrl("platform/config"), {
-    headers: { Accept: "application/json" },
-  });
-  if (!response.ok) throw new Error("Platform configuration is unavailable");
-  return { ...stagingPlatformFeatures, ...(await response.json()) } as PlatformFeatureFlags;
+export async function fetchPlatformConfig(token: string): Promise<PlatformFeatureFlags> {
+  const payload = await codestraDemoApi.config(token);
+  return { ...stagingPlatformFeatures, ...payload } as PlatformFeatureFlags;
 }
 
 export function usePlatformConfig() {
+  const [cookies] = useCookies(["access_token"]);
   return useQuery({
-    queryKey: ["platform-config"],
-    queryFn: fetchPlatformConfig,
+    queryKey: ["platform-config", cookies.access_token ?? "anonymous"],
+    queryFn: () => fetchPlatformConfig(cookies.access_token ?? ""),
+    enabled: Boolean(cookies.access_token),
     staleTime: 5 * 60_000,
     retry: 1,
     placeholderData: stagingPlatformFeatures,

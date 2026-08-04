@@ -23,7 +23,7 @@ import { ITradeAssets } from "@interfaces";
 import DropdownMenu from "components/dropdownMenu/DropdownMenu";
 import { Spin } from "antd";
 import { useCookies } from "react-cookie";
-import { getApiUrl } from "utils/env";
+import { codestraDemoApi } from "api/generated/codestraDemo";
 
 interface TopbarProps {
   isDrawerOpen: boolean;
@@ -52,8 +52,11 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
   const [refillState, setRefillState] = useState<"idle" | "confirm" | "pending" | "success" | "error">("idle");
   const loadDemoWallet = async () => {
     if (!cookies.access_token) return;
-    const response = await fetch(getApiUrl("v1/demo/wallet"), { headers: { Authorization: `Bearer ${cookies.access_token}` } });
-    if (response.ok) setDemoWallet(await response.json());
+    try {
+      setDemoWallet(await codestraDemoApi.wallet(cookies.access_token));
+    } catch {
+      setDemoWallet(null);
+    }
   };
   // Wallet loader intentionally tracks only the authoritative session cookie.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -61,9 +64,14 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
   const refillDemo = async () => {
     if (!cookies.access_token) return;
     setRefillState("pending");
-    const response = await fetch(getApiUrl("v1/demo/wallet/refill"), { method: "POST", headers: { Authorization: `Bearer ${cookies.access_token}`, "Idempotency-Key": crypto.randomUUID() } });
-    if (response.ok) { await loadDemoWallet(); setRefillState("success"); window.setTimeout(() => setRefillState("idle"), 1800); }
-    else setRefillState("error");
+    try {
+      await codestraDemoApi.refill(cookies.access_token);
+      await loadDemoWallet();
+      setRefillState("success");
+      window.setTimeout(() => setRefillState("idle"), 1800);
+    } catch {
+      setRefillState("error");
+    }
   };
   const { user, loading } = useAppSelector(
     (state: { user: UserSliceState }) => state.user
