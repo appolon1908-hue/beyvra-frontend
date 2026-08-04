@@ -59,6 +59,8 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     const response = await fetch(getApiUrl("v1/demo/trades"), { headers: { Authorization: `Bearer ${cookies.access_token}` } });
     if (response.ok) setOpenTrades((await response.json()) as Array<Record<string, unknown>>);
   };
+  // Poll server state so refresh/reconnect never relies on browser-local trades.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { void loadDemoTrades(); const timer = window.setInterval(() => void loadDemoTrades(), 5000); return () => window.clearInterval(timer); }, [cookies.access_token]);
 
   const submitDemoOrder = async (direction: "up" | "down") => {
