@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import { getApiUrl } from "utils/env";
+import { codestraDemoApi } from "api/generated/codestraDemo";
 
 type DemoTrade = { id: number; state: string; result?: string | null; symbol: string; direction: string; amount: string; openingPrice: string; closingPrice?: string | null; openedAt: string; expiresAt: string };
 
@@ -13,7 +13,7 @@ export default function DemoTradesPage() {
   const load = async () => {
     if (!cookies.access_token) return;
     setLoading(true); setError("");
-    try { const response = await fetch(getApiUrl("v1/demo/trades"), { headers: { Authorization: `Bearer ${cookies.access_token}` } }); if (!response.ok) throw new Error("Unable to load demo trades."); setTrades(await response.json()); }
+    try { setTrades(await codestraDemoApi.trades<DemoTrade[]>(cookies.access_token)); }
     catch (e) { setError(e instanceof Error ? e.message : "Unable to load demo trades."); }
     finally { setLoading(false); }
   };
