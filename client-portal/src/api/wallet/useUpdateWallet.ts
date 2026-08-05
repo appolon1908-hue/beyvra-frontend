@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 
-import getEnv from "utils/env";
+import { codestraWalletApi } from "api/generated/codestraDemo";
 import { WalletData } from "@store/slices/wallet";
 
 type useUpdateWalletProps = {
@@ -20,34 +20,7 @@ export async function fetchUpdateWallet(
   token: string,
   archive = false
 ): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    let url = archive
-      ? `${BASE_URL}/wallet/${id}/archive/`
-      : `${BASE_URL}/wallet/wallets/${id}/`;
-    const response = await fetch(url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      Object.keys(result).forEach((field) => {
-        const errors = result[field];
-        errors.forEach((errorMessage: string) => {
-          toast.error(`${field}: ${errorMessage}`);
-        });
-      });
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return (archive ? codestraWalletApi.archive(token, id) : codestraWalletApi.update(token, id, data)) as Promise<boolean>;
 }
 
 export const useUpdateWallet = (props: useUpdateWalletProps) => {
