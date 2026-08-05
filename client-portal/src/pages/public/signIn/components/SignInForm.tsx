@@ -1,5 +1,6 @@
 import { Checkbox, Form, Button } from "antd";
 import { useCookies } from "react-cookie";
+import { codestraAuthApi } from "api/generated/codestraDemo";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ISignInForm } from "@interfaces";
@@ -67,14 +68,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
     if (guestPending) return;
     setGuestPending(true);
     try {
-      const response = await fetch(getApiUrl("v1/demo/sessions"), {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() },
-        body: "{}",
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error("GUEST_DEMO_UNAVAILABLE");
+      await codestraAuthApi.guestDemo(crypto.randomUUID());
       navigate(destination || "/platform", { replace: true });
     } catch {
       toast.error("Demo access is temporarily unavailable. Please try again.");

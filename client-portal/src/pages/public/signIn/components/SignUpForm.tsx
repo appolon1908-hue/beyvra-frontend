@@ -8,6 +8,7 @@ import Select, { type StylesConfig } from "react-select";
 //import WalkThrough from "./WalkThrough";
 import { useNavigate } from "react-router-dom";
 import { getApiUrl } from "utils/env";
+import { codestraAuthApi } from "api/generated/codestraDemo";
 import GoogleAuthButton from "./GoogleAuthButton";
 
 
@@ -88,8 +89,7 @@ const SignUpForm = () => {
       phone_number: `${countryCode.value}${localPhone}`,
     };
     setIsPending(true);
-    fetch(getApiUrl("v1/auth/register"), { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, displayName: `${payload.first_name} ${payload.last_name}`, legalAccepted: data.accepted_terms, locale: "en" }) })
-      .then(async (response) => { const result = await response.json(); if (!response.ok && response.status !== 202) throw new Error(result.message || "Registration failed"); return result; })
+    codestraAuthApi.registerDemo<{ registrationId?: string; maskedEmail?: string }>({ ...payload, displayName: `${payload.first_name} ${payload.last_name}`, legalAccepted: data.accepted_terms, locale: "en" })
       .then((result) => { if (result.registrationId) { setPendingRegistration({ id: result.registrationId, email: result.maskedEmail || payload.email }); toast.success("Check your email for a verification code."); } })
       .catch((error) => toast.error(error.message || "Registration failed."))
       .finally(() => setIsPending(false));
@@ -129,9 +129,7 @@ const SignUpForm = () => {
       if (!/^\d{6}$/.test(otp) || otpPending) return;
       setOtpPending(true);
       try {
-        const response = await fetch(getApiUrl("v1/auth/email-verification/verify"), { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ registrationId: pendingRegistration.id, code: otp }) });
-        const result = await response.json();
-        if (!response.ok) throw new Error("The verification code is invalid or expired.");
+        await codestraAuthApi.verifyRegistration({ registrationId: pendingRegistration.id, code: otp });
         toast.success("Your demo account is ready."); navigate("/platform", { replace: true });
       } catch (error) { toast.error(error instanceof Error ? error.message : "Verification failed."); }
       finally { setOtpPending(false); }

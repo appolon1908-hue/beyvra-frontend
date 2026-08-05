@@ -121,6 +121,9 @@ export const codestraAuthApi = {
   verifyPhone: <T>(token: string, body: unknown) => codestraRequest<T>("user/verify_phone/", { method: "POST", token, body: JSON.stringify(body) }),
   mfaQr: <T>(token: string) => codestraRequest<T>("user/generate_mfa_code/", { token }),
   verifyMfa: <T>(body: unknown, token?: string) => codestraRequest<T>("user/verify_mfa_code/", { method: "POST", token, body: JSON.stringify(body) }),
+  guestDemo: <T>(idempotencyKey?: string) => codestraRequest<T>("v1/demo/sessions", { method: "POST", idempotencyKey, body: "{}" }),
+  registerDemo: <T>(body: unknown) => codestraRequest<T>("v1/auth/register", { method: "POST", body: JSON.stringify(body) }),
+  verifyRegistration: <T>(body: unknown) => codestraRequest<T>("v1/auth/email-verification/verify", { method: "POST", body: JSON.stringify(body) }),
 };
 
 export const codestraProfileApi = {
