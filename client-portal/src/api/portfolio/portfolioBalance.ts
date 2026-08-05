@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import getEnv from "utils/env";
+import { codestraPortfolioApi } from "api/generated/codestraDemo";
 import IKYC from "@interfaces/IKYC";
 
 interface PortfolioResponse {
@@ -25,31 +25,7 @@ type UsePortfolioProps = {
 export async function fetchPortfolioBalance(data: {
   token: string;
 }): Promise<PortfolioResponse> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-
-  console.log("fetchPortfolioBalance function started", data.token);
-
-  try {
-    const response = await fetch(`${BASE_URL}/portfolio/total-balance/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${data.token}`,
-      },
-    });
-
-    const result = await response.json();
-    console.log("API response", response, result);
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-
-    console.log(result)
-
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return codestraPortfolioApi.balance<PortfolioResponse>(data.token);
 }
 
 const usePortfolioBalance = (

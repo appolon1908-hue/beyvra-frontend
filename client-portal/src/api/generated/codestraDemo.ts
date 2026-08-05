@@ -134,3 +134,10 @@ export const codestraNewsApi = {
   },
   article: <T = unknown>(token: string, id: string | number) => codestraRequest<T>(`news/${id}/`, { token }),
 };
+
+export const codestraPortfolioApi = {
+  balance: <T>(token: string) => codestraRequest<T>("portfolio/total-balance/", { token }),
+  profitLoss: <T>(token: string) => codestraRequest<T>("portfolio/total-profit-loss/", { token }),
+  stockMarket: <T>(token: string) => codestraRequest<T>("portfolio/stock-market-data/", { token }),
+  cryptoMarket: <T>(token: string) => codestraRequest<T>("portfolio/crypto-market-data/", { token }),
+};

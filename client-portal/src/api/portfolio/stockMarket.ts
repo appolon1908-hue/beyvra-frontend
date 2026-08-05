@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import getEnv from "utils/env";
+import { codestraPortfolioApi } from "api/generated/codestraDemo";
 import IKYC from "@interfaces/IKYC";
 
 interface PortfolioResponse {
@@ -25,35 +25,9 @@ type UsePortfolioProps = {
 export async function fetchMarket(data: {
   token: string;
 }): Promise<PortfolioResponse> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
   const MAX_ITEMS = 1000
-
-  // console.log("fetch stock market data function started", data.token);
-
-  try {
-    const response = await fetch(`${BASE_URL}/portfolio/stock-market-data/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${data.token}`,
-      },
-    });
-
-    const result = await response.json();
-    console.log("stock API response", response, result);
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-
-    const limitedResults = {
-      ...result,
-      results: result.results.slice(0, MAX_ITEMS),
-    };
-
-    return limitedResults;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  const result = await codestraPortfolioApi.stockMarket<PortfolioResponse>(data.token);
+  return { ...result, results: result.results.slice(0, MAX_ITEMS) };
 }
 
 const useStockMarketData = (
