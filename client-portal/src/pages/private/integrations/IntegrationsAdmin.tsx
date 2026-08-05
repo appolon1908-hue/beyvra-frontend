@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { authenticatedRequest } from "api/client";
 import { apiEndpoints } from "api/endpoints";
 import { getApiUrl } from "utils/env";
+import { codestraIntegrationsApi } from "api/generated/codestraDemo";
 import { useCookies } from "react-cookie";
 
 type ImportJob = { id: string; status: string; file_name: string; row_count: number; valid_count: number; invalid_count: number };
@@ -22,9 +23,7 @@ export default function IntegrationsAdmin() {
   useEffect(() => { if (token) void load(); }, [load, token]);
   const upload = async (file: File) => {
     const body = new FormData(); body.append("file", file);
-    const response = await fetch(getApiUrl(apiEndpoints.integrations.imports), { method: "POST", body, headers: { Authorization: `Bearer ${token}`, "Idempotency-Key": crypto.randomUUID() } });
-    const payload = await response.json();
-    if (!response.ok) throw new Error(payload.detail || "Upload failed");
+    const payload = await codestraIntegrationsApi.importUsers<ImportJob>(token, body, crypto.randomUUID());
     setImports((current) => [payload, ...current]); setMessage("CSV uploaded. Review the preview before committing.");
   };
   const act = async (id: string, action: "commit" | "cancel") => {
