@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CandlestickData, Time } from "lightweight-charts";
 import { authenticatedRequest } from "api/client";
+import { apiEndpoints } from "api/endpoints";
 import { recordPlatformEvent } from "../../../../observability/platformTelemetry";
 
 export function useMarketHistory({ token, symbol, interval, onState, onError }: { token?: string; symbol: string; interval: string; onState: (state: "loading" | "connected" | "error") => void; onError: (message: string) => void }) {
@@ -16,7 +17,8 @@ export function useMarketHistory({ token, symbol, interval, onState, onError }: 
       stateRef.current("loading");
       const started = performance.now();
       try {
-        const payload = await authenticatedRequest<{ results?: CandlestickData[] }>(`trades/market/history/?symbol=${symbol}&interval=${interval}&limit=200`, token, { timeoutMs: 15_000 });
+        const params = new URLSearchParams({ symbol, interval, limit: "200" });
+        const payload = await authenticatedRequest<{ results?: CandlestickData[] }>(`${apiEndpoints.market.snapshot}?${params.toString()}`, token, { timeoutMs: 15_000 });
         if (disposed) return;
         const results = Array.isArray(payload.results) ? payload.results : [];
         recordPlatformEvent("market_snapshot", { symbol, interval, durationMs: Math.round(performance.now() - started), status: "ok" });

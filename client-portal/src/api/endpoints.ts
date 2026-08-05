@@ -1,4 +1,7 @@
 export const apiEndpoints = {
+  workspace: {
+    bootstrap: "v1/workspace/bootstrap",
+  },
   portfolio: {
     summary: "portfolio/summary/",
   },
@@ -32,6 +35,8 @@ export const apiEndpoints = {
   },
   market: {
     history: "trades/market/history/",
+    snapshot: "trades/market/history/",
+    candles: "trades/market/history/",
   },
   demo: {
     config: "v1/demo/config",
@@ -57,6 +62,8 @@ export const apiEndpoints = {
 } as const;
 
 export const socketEndpoints = {
+  // The backend currently exposes this legacy route. Keep its path in one
+  // registry entry until the canonical multiplexed gateway is deployed.
   market: "ws/market-data/",
   trades: "ws/trades/",
   users: "ws/users/",

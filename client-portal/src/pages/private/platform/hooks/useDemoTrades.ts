@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { authenticatedRequest } from "api/client";
+import { apiEndpoints } from "api/endpoints";
 import { DemoTrade } from "api/demo/types";
 
 export function useDemoTrades(token?: string) {
@@ -7,7 +8,7 @@ export function useDemoTrades(token?: string) {
   const refresh = useCallback(async () => {
     if (!token) return;
     try {
-      const payload = await authenticatedRequest<DemoTrade[] | { results: DemoTrade[] }>("v1/demo/trades", token, { timeoutMs: 10_000 });
+      const payload = await authenticatedRequest<DemoTrade[] | { results: DemoTrade[] }>(apiEndpoints.demo.trades, token, { timeoutMs: 10_000 });
       const next = Array.isArray(payload) ? payload : payload.results;
       if (Array.isArray(next)) setTrades(next);
     } catch {

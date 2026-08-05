@@ -12,10 +12,12 @@ import {
 import { useCookies } from "react-cookie";
 import { useAppSelector } from "@store/hooks";
 import { ApiError, authenticatedRequest } from "api/client";
+import { apiEndpoints } from "api/endpoints";
 import { usePlatformOverlay } from "./PlatformOverlayContext";
 import { DemoOrderRequest, DemoTrade } from "api/demo/types";
 import { ChartToolbar, MarketStatus, TradeMarkers, TradeTicket } from "./PlatformChartParts";
-import { useDemoConfig, demoConfigFallback } from "api/demo/useDemoConfig";
+import { demoConfigFallback } from "api/demo/useDemoConfig";
+import { useWorkspaceBootstrap } from "api/workspace/useWorkspaceBootstrap";
 import { useMarketHistory } from "./hooks/useMarketHistory";
 import { useMarketFeed } from "./hooks/useMarketFeed";
 import { useDemoTrades } from "./hooks/useDemoTrades";
@@ -51,7 +53,8 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
   const [lastUpdate, setLastUpdate] = useState<number>();
   const ticketTriggerRef = useRef<HTMLButtonElement>(null);
   const { overlay, openOverlay, closeOverlay } = usePlatformOverlay();
-  const { data: demoConfig = demoConfigFallback } = useDemoConfig();
+  const { data: workspaceBootstrap } = useWorkspaceBootstrap();
+  const demoConfig = workspaceBootstrap?.rules ?? demoConfigFallback;
   const isTicketOpen = overlay.type === "trade";
   const [amount, setAmount] = useState(demoConfigFallback.minAmount * 100);
   const [duration, setDuration] = useState(15);
@@ -71,7 +74,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     setOrderState("submitting"); setOrderError("");
     try {
       const order: DemoOrderRequest = { symbol: tradingPair, amount, duration, direction };
-      await authenticatedRequest<DemoTrade>("v1/demo/orders", cookies.access_token, { method: "POST", headers: { "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify(order) });
+      await authenticatedRequest<DemoTrade>(apiEndpoints.demo.orders, cookies.access_token, { method: "POST", headers: { "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify(order) });
       setOrderState("accepted"); await refreshTrades(); window.setTimeout(() => setOrderState("idle"), 1800);
     } catch (error) { recordPlatformEvent("order_rejected", { code: error instanceof ApiError ? error.code || `HTTP_${error.status}` : "UNKNOWN" }); setOrderError(error instanceof Error ? error.message : "Demo order was rejected."); setOrderState("rejected"); }
   };
