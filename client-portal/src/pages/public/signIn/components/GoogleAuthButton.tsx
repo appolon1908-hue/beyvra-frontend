@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getApiUrl } from "utils/env";
+import { codestraAuthApi } from "api/generated/codestraDemo";
 
 type GoogleAuthButtonProps = {
   action: "login" | "register";
@@ -11,8 +11,7 @@ export default function GoogleAuthButton({ action, legalAccepted = false }: Goog
   const [enabled, setEnabled] = useState<boolean | null>(null);
   useEffect(() => {
     let active = true;
-    fetch(getApiUrl("v1/auth/providers"), { credentials: "include" })
-      .then((response) => response.ok ? response.json() : null)
+    codestraAuthApi.providers<{ google?: { enabled?: boolean } }>()
       .then((result) => { if (active) setEnabled(result?.google?.enabled === true); })
       .catch(() => { if (active) setEnabled(false); });
     return () => { active = false; };
@@ -24,14 +23,8 @@ export default function GoogleAuthButton({ action, legalAccepted = false }: Goog
     if (disabled || providerUnavailable) return;
     setState("loading");
     try {
-      const response = await fetch(getApiUrl("v1/auth/google/start"), {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, legalConfirmed: action === "register" ? legalAccepted : false, returnPath: "/platform" }),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.authorizationUrl) throw new Error(result.code || "GOOGLE_AUTH_FAILED");
+      const result = await codestraAuthApi.googleStart<{ authorizationUrl?: string; code?: string }>({ action, legalConfirmed: action === "register" ? legalAccepted : false, returnPath: "/platform" });
+      if (!result.authorizationUrl) throw new Error(result.code || "GOOGLE_AUTH_FAILED");
       window.location.assign(result.authorizationUrl);
     } catch {
       setState("error");

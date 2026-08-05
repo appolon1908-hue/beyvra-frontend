@@ -124,6 +124,10 @@ export const codestraAuthApi = {
   guestDemo: <T>(idempotencyKey?: string) => codestraRequest<T>("v1/demo/sessions", { method: "POST", idempotencyKey, body: "{}" }),
   registerDemo: <T>(body: unknown) => codestraRequest<T>("v1/auth/register", { method: "POST", body: JSON.stringify(body) }),
   verifyRegistration: <T>(body: unknown) => codestraRequest<T>("v1/auth/email-verification/verify", { method: "POST", body: JSON.stringify(body) }),
+  providers: <T>() => codestraRequest<T>("v1/auth/providers"),
+  googleStart: <T>(body: unknown) => codestraRequest<T>("v1/auth/google/start", { method: "POST", body: JSON.stringify(body) }),
+  googleCredential: <T>(ticket: string) => codestraRequest<T>("v1/auth/google/credential", { method: "POST", body: JSON.stringify({ ticket }) }),
+  session: <T>(token?: string) => codestraRequest<T>("v1/session", { token }),
 };
 
 export const codestraProfileApi = {

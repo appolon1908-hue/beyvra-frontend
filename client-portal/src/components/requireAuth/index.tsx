@@ -14,6 +14,7 @@ import "./styles.scss";
 import { GlobalLoginMaxAge } from "App";
 import useKyc from "api/kyc/useKycInfo";
 import { revokeSession } from "api/user/logout";
+import { codestraAuthApi } from "api/generated/codestraDemo";
 
 
 const idleTimeLimit = 15 * 60 * 1000; // 15 minutes in milliseconds
@@ -46,12 +47,9 @@ const RequireAuth = () => {
       return () => controller.abort();
     }
     setBootstrap("BOOTING");
-    fetch("/api/v1/session", { credentials: "include", headers: { Authorization: `Bearer ${cookies.access_token}` }, signal: controller.signal })
-      .then(async (response) => {
+    codestraAuthApi.session<{ state?: string }>(cookies.access_token)
+      .then(async (payload) => {
         if (disposed) return;
-        if (response.status === 401 || response.status === 403) { setBootstrap("EXPIRED"); return; }
-        if (!response.ok) throw new Error(`Session bootstrap failed (${response.status})`);
-        const payload = await response.json();
         setBootstrap(payload.state === "guest.ready" ? "GUEST_READY" : "USER_READY");
       })
       .catch((error: unknown) => {

@@ -12,7 +12,7 @@ import { useAppSelector } from "@store/hooks";
 import { GlobalStates, setSignInTab } from "@store/slices/global";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-import { getApiUrl } from "utils/env";
+import { codestraAuthApi } from "api/generated/codestraDemo";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
 import { GlobalLoginMaxAge } from "App";
@@ -49,14 +49,8 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
     let cancelled = false;
     (async () => {
       try {
-        const response = await fetch(getApiUrl("v1/auth/google/credential"), {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ticket }),
-        });
-        const result = await response.json();
-        if (!response.ok || !result.access || !result.refresh) throw new Error("GOOGLE_TICKET_INVALID");
+        const result = await codestraAuthApi.googleCredential<{ access?: string; refresh?: string; user?: { is_walkthrough?: boolean } }>(ticket);
+        if (!result.access || !result.refresh) throw new Error("GOOGLE_TICKET_INVALID");
         if (cancelled) return;
         const cookieOptions = { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict" as const, path: "/" };
         setCookie("access_token", result.access, cookieOptions);
