@@ -1,33 +1,10 @@
 import { ISignInForm, IUser } from "@interfaces";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { codestraAuthApi } from "api/generated/codestraDemo";
 
-export async function fethLogin(data: ISignInForm): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  console.log(getEnv("VITE_API_BASE_URL"), BASE_URL, 'Here');
-  try {
-    console.log(data)
-    const response = await fetch(`${BASE_URL}/user/token/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      referrerPolicy: "no-referrer",
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-
-    console.log(result);
-
-    if (!response.ok) {
-      toast.error(result.detail);
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+export async function fethLogin(data: ISignInForm): Promise<LoginSuccess> {
+  return codestraAuthApi.login<LoginSuccess>(data);
 }
 
 interface LoginSuccess {

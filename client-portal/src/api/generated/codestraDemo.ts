@@ -99,6 +99,11 @@ export const codestraWalletApi = {
   paymentMethods: <T>(token: string) => codestraRequest<T>("payment/methods/", { token }),
 };
 
+export const codestraBankApi = {
+  details: <T>(token: string) => codestraRequest<T>("bank_account/tradxio/", { token }),
+  save: <T>(token: string, body: unknown) => codestraRequest<T>("bank_account/", { method: "POST", token, body: JSON.stringify(body) }),
+};
+
 export const codestraAuthApi = {
   login: <T>(body: unknown) => codestraRequest<T>("user/token/", { method: "POST", body: JSON.stringify(body) }),
   register: <T>(body: unknown) => codestraRequest<T>("user/create/", { method: "POST", body: JSON.stringify(body) }),
