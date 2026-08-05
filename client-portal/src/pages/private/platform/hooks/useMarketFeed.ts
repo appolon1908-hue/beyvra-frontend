@@ -17,7 +17,7 @@ export function useMarketFeed({ token, symbol, interval, enabled = true, onCandl
       try {
         const { ws_ticket } = await webSocketTicketFetcher(token);
         if (disposed) return;
-        socket = new WebSocket(getSocketUrl("ws/market-data/", { ws_ticket, symbol, interval }));
+        socket = new WebSocket(getSocketUrl("ws/v1/", { ws_ticket }));
       } catch (error) {
         if (disposed) return;
         connecting = false; retries += 1; recordPlatformEvent("market_feed_reconnect", { symbol, interval, retryCount: retries, status: "ticket_error" }); stateRef.current("error"); errorRef.current(error instanceof Error ? error.message : "Live market access is unavailable");
@@ -25,15 +25,24 @@ export function useMarketFeed({ token, symbol, interval, enabled = true, onCandl
       }
       connecting = false;
       if (!socket) return;
-      socket.onopen = () => { retries = 0; stateRef.current("connected"); };
+      socket.onopen = () => {
+        retries = 0;
+        stateRef.current("connected");
+        socket?.send(JSON.stringify({ action: "subscribe", request_id: crypto.randomUUID(), channels: [`market.candle:${symbol}:${interval}`] }));
+      };
       socket.onclose = () => { if (!disposed) { retries += 1; recordPlatformEvent("market_feed_reconnect", { symbol, interval, retryCount: retries, status: "closed" }); stateRef.current("disconnected"); retryTimer = setTimeout(() => void connect(), Math.min(1000 * 2 ** retries, 30_000)); } };
       socket.onerror = () => stateRef.current("disconnected");
       socket.onmessage = (event) => {
         let message: Record<string, unknown>;
         try { message = JSON.parse(event.data) as Record<string, unknown>; } catch { stateRef.current("error"); errorRef.current("The market feed returned an invalid response"); return; }
-        if (message.type === "status") { stateRef.current(message.status === "connected" ? "connected" : "disconnected"); return; }
-        if (message.type !== "candle") return;
-        candleRef.current({ time: message.time as Time, open: Number(message.open), high: Number(message.high), low: Number(message.low), close: Number(message.close) });
+        if (message.type === "market.status.changed") {
+          const status = (message.data as Record<string, unknown> | undefined)?.status;
+          stateRef.current(status === "connected" ? "connected" : "disconnected");
+          return;
+        }
+        if (message.type !== "market.candle.updated") return;
+        const data = message.data as Record<string, unknown>;
+        candleRef.current({ time: data.time as Time, open: Number(data.open), high: Number(data.high), low: Number(data.low), close: Number(data.close) });
       };
     };
     void connect();
