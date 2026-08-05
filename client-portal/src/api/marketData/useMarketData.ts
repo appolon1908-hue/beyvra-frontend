@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import getEnv from "utils/env";
+import { codestraMarketApi } from "api/generated/codestraDemo";
 
 type FetcherDataOptions = {
   token: string;
@@ -20,24 +20,7 @@ export async function marketDataFetcher({
     const end = options?.end ?? "2024-03-20";
     const symbols = options?.symbols ?? "BTC%2FUSD";
     const timeFrame = options?.timeFrame ?? "minute";
-    const response = await fetch(
-      `${getEnv(
-        "VITE_API_BASE_URL"
-      )}/market-data/alpaca/?start=${start}&end=${end}&symbol_or_symbols=${symbols}&timeframe=${timeFrame}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
+    return codestraMarketApi.alpaca<Record<string, any>>(token, { start, end, symbol_or_symbols: symbols, timeframe: timeFrame });
   } catch (error) {
     throw new Error(error as string);
   }

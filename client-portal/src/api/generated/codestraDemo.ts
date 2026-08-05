@@ -108,6 +108,7 @@ export const codestraAuthApi = {
   resetPassword: <T>(uidb64: string, token: string, body: unknown) => codestraRequest<T>(`user/password_reset_confirm/${uidb64}/${token}/`, { method: "POST", body: JSON.stringify(body) }),
   verifyEmail: <T>(uidb64: string, token: string) => codestraRequest<T>(`user/verify_email/${uidb64}/${token}/`),
   sendEmailVerification: <T>(token: string, email: string) => codestraRequest<T>("user/send_email_verification/", { method: "POST", token, body: JSON.stringify({ email }) }),
+  sendEmailVerificationPublic: <T>(email: string) => codestraRequest<T>("user/send_email_verification/", { method: "POST", body: JSON.stringify(email) }),
   statistics: <T>(token: string) => codestraRequest<T>("user/trading_statistics/", { token }),
   websocketTicket: <T>(token: string) => codestraRequest<T>("user/websocket_ticket", { token }),
   sendPhoneVerification: <T>(token: string) => codestraRequest<T>("user/send_phone_verification/", { method: "POST", token }),
@@ -139,6 +140,10 @@ export const codestraMarketApi = {
     return codestraRequest<T>(`assets/${suffix}`, { token });
   },
   clock: <T = unknown>(token: string) => codestraRequest<T>("get-clock/", { token }),
+  alpaca: <T = unknown>(token: string, query: Record<string, string>) => {
+    const params = new URLSearchParams(query);
+    return codestraRequest<T>(`market-data/alpaca/?${params.toString()}`, { token });
+  },
 };
 
 export const codestraNewsApi = {
