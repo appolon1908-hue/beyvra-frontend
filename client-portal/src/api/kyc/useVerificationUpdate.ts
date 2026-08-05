@@ -1,34 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { codestraKycApi } from "api/generated/codestraDemo";
 
 export async function fetchVerificationUpdate(data: any): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");  
-  try {
-    const response = await fetch(`${BASE_URL}/user/kyc/${data.id}`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${data.token}`,
-
-      },
-      referrerPolicy: "no-referrer",
-      body: data.formData,
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      Object.keys(result).forEach((field) => {
-        const errors = result[field];
-        errors.forEach((errorMessage: string) => {
-          toast.error(`${field}: ${errorMessage}`);
-        });
-      });
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return codestraKycApi.update(data.token, data.id, data.formData);
 }
 
 type useVerificationProps = {

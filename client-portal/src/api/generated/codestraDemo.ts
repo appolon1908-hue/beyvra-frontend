@@ -119,6 +119,14 @@ export const codestraProfileApi = {
   disableWalkthrough: (token: string) => codestraRequest("user/disable_walkthrough/", { method: "PUT", token }),
 };
 
+export const codestraKycApi = {
+  profile: <T>(token: string) => codestraRequest<T>("user/kyc/", { token }),
+  files: <T>(token: string) => codestraRequest<T>("user/kycfiles/", { token }),
+  upload: <T>(token: string, body: FormData) => codestraRequest<T>("user/kycfiles/", { method: "POST", token, body }),
+  submit: <T>(token: string, body: FormData) => codestraRequest<T>("user/kyc/", { method: "POST", token, body }),
+  update: <T>(token: string, id: string | number, body: FormData) => codestraRequest<T>(`user/kyc/${id}`, { method: "PATCH", token, body }),
+};
+
 export const codestraMarketApi = {
   assets: <T = unknown>(token: string, query: Record<string, string | undefined> = {}) => {
     const params = new URLSearchParams();

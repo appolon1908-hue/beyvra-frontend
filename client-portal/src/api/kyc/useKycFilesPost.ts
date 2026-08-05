@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { codestraKycApi } from "api/generated/codestraDemo";
 
 type KycFilesResponse = {
   detail: string;
@@ -28,33 +28,8 @@ type KycFilesPostVariables = {
 };
 
 async function fetchKycFilesPostForm(data: KycFilesPostVariables) {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-
   const uploadFile = async (fileData: FormData, desc: string) => {
-    try {
-      const response = await fetch(`${BASE_URL}/user/kycfiles/`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
-        body: fileData,
-      });
-      
-      const result = await response.json();
-
-      if (!response.ok) {
-        Object.keys(result).forEach((field) => {
-          const errors = result[field];
-          errors.forEach((errorMessage: string) => {
-            toast.error(`${field}: ${errorMessage}`);
-          });
-        });
-        throw new Error(`${result}`);
-      }
-      return result;
-    } catch (error) {
-      throw new Error(error as string);
-    }
+    return codestraKycApi.upload<KycFilesResponse>(data.token, fileData);
   };
 
   // Use Promise.all to send both requests simultaneously

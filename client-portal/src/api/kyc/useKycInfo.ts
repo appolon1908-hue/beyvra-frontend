@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import getEnv from "utils/env";
+import { codestraKycApi } from "api/generated/codestraDemo";
 import IKYC from "@interfaces/IKYC";
 
 export interface KYCResponse {
@@ -37,30 +37,7 @@ export async function fetchKYC(data: {
   token: string;
 
 }): Promise<KYCResponse> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-   
-
-      const response = await fetch(`${BASE_URL}/user/kyc/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${data.token}`,
-      },
-    });
-
-    const result = await response.json();
-    console.log("get kyc", result)
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-
-    console.log("fetched kyc info", result)
-
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return codestraKycApi.profile<KYCResponse>(data.token);
 }
  const useKyc = (
   props: useKYCProps
