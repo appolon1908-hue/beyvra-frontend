@@ -99,7 +99,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({
     userInteractedRef.current = false;
     setUserInteracted(false);
   }, [history]);
-  useMarketFeed({ token: cookies.access_token, symbol: tradingPair, interval: candleInterval, enabled: history.length > 0, onState: setConnectionState, onError: setChartError, onCandle: (newCandle) => { setLastUpdate(Date.now()); setChartData((current) => {
+  useMarketFeed({ token: cookies.access_token, symbol: tradingPair, interval: candleInterval, enabled: history.length > 0, onState: setConnectionState, onError: setChartError, onSequenceGap: retryHistory, onCandle: (newCandle) => { setLastUpdate(Date.now()); setChartData((current) => {
     const lastCandle = current[current.length - 1];
     return lastCandle?.time === newCandle.time ? [...current.slice(0, -1), newCandle] : [...current, newCandle].slice(-1000);
   }); } });

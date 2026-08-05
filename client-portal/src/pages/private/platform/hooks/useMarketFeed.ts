@@ -6,11 +6,11 @@ import { recordPlatformEvent } from "../../../../observability/platformTelemetry
 
 export type FeedCandle = { time: Time; open: number; high: number; low: number; close: number };
 
-export function useMarketFeed({ token, symbol, interval, enabled = true, onCandle, onState, onError }: { token?: string; symbol: string; interval: string; enabled?: boolean; onCandle: (candle: FeedCandle) => void; onState: (state: "connected" | "disconnected" | "error") => void; onError: (message: string) => void }) {
-  const candleRef = useRef(onCandle); const stateRef = useRef(onState); const errorRef = useRef(onError);
-  candleRef.current = onCandle; stateRef.current = onState; errorRef.current = onError;
+export function useMarketFeed({ token, symbol, interval, enabled = true, onCandle, onState, onError, onSequenceGap }: { token?: string; symbol: string; interval: string; enabled?: boolean; onCandle: (candle: FeedCandle) => void; onState: (state: "connected" | "disconnected" | "error") => void; onError: (message: string) => void; onSequenceGap?: () => void }) {
+  const candleRef = useRef(onCandle); const stateRef = useRef(onState); const errorRef = useRef(onError); const sequenceGapRef = useRef(onSequenceGap);
+  candleRef.current = onCandle; stateRef.current = onState; errorRef.current = onError; sequenceGapRef.current = onSequenceGap;
   useEffect(() => {
-    let disposed = false; let socket: WebSocket | undefined; let retryTimer: ReturnType<typeof setTimeout> | undefined; let retries = 0; let connecting = false;
+    let disposed = false; let socket: WebSocket | undefined; let retryTimer: ReturnType<typeof setTimeout> | undefined; let retries = 0; let connecting = false; let lastSequence = 0;
     const connect = async () => {
       if (disposed || connecting || !enabled || !token || socket?.readyState === WebSocket.OPEN || socket?.readyState === WebSocket.CONNECTING) return;
       connecting = true;
@@ -39,6 +39,15 @@ export function useMarketFeed({ token, symbol, interval, enabled = true, onCandl
           const status = (message.data as Record<string, unknown> | undefined)?.status;
           stateRef.current(status === "connected" ? "connected" : "disconnected");
           return;
+        }
+        if (typeof message.sequence === "number") {
+          if (message.sequence <= lastSequence) return;
+          if (lastSequence > 0 && message.sequence > lastSequence + 1) {
+            sequenceGapRef.current?.();
+            stateRef.current("disconnected");
+            errorRef.current("Market data recovery is in progress");
+          }
+          lastSequence = message.sequence;
         }
         if (message.type !== "market.candle.updated") return;
         const data = message.data as Record<string, unknown>;
