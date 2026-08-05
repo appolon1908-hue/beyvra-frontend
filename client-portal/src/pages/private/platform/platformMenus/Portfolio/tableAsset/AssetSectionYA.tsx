@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@store/hooks";
-import { getSocketUrl } from "utils/env";
+import { getUnifiedRealtimeClient } from "realtime/UnifiedRealtimeClient";
+import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
 
 interface CryptoAsset {
   id: string;
@@ -22,69 +23,16 @@ const AssetSection = () => {
   const { wsTicket } = useAppSelector((state) => state.user);
 
   useEffect(() => {
-    let ws: WebSocket | undefined;
-    let retryTimer: ReturnType<typeof setTimeout> | undefined;
-    let disposed = false;
-    const connectWebSocket = () => {
-      if (!wsTicket || disposed || ws?.readyState === WebSocket.OPEN || ws?.readyState === WebSocket.CONNECTING) return;
-      ws = new WebSocket(getSocketUrl("ws/market-data/", {
-        ws_ticket: wsTicket,
-        symbol: "BTCUSDT",
-        interval: "1m",
-      }));
-
-      ws.onopen = () => {
-        console.log("WebSocket connection established.");
+    if (!wsTicket) return;
+    const realtime = getUnifiedRealtimeClient(wsTicket, async () => (await webSocketTicketFetcher(wsTicket)).ws_ticket);
+    const unsubscribe = realtime.subscribe("market.candle:BTCUSDT:1m", (message) => {
+      const incomingData = (message.data || {}) as Record<string, unknown>;
+      if (message.type === "market.candle.updated" && incomingData.type === "candle") {
         setConnectionStatus("Connected");
-
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const incomingData = JSON.parse(event.data);
-
-          if (incomingData.type === "candle") {
-            setCryptoData([{
-              id: incomingData.symbol,
-              symbol: incomingData.symbol,
-              price: String(incomingData.close),
-              change: "0",
-              change_percentage: "0",
-              market_cap: "0",
-              volume: String(incomingData.volume),
-              volume_in_currencies_24h: "0",
-              total_volume_all_currencies_24h: "0",
-              circulating_supply: "0",
-              im: incomingData.symbol,
-            }]);
-          }
-        } catch (error) {
-          console.error("Error parsing WebSocket message:", error);
-        }
-      };
-
-      ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
-        setConnectionStatus("Error connecting");
-      };
-
-      ws.onclose = (event) => {
-        console.log("WebSocket connection closed.", event);
-        setConnectionStatus("Connection closed. Reconnecting...");
-
-        // Attempt to reconnect after a delay
-        if (!disposed) retryTimer = setTimeout(connectWebSocket, 3000);
-      };
-    };
-
-    connectWebSocket();
-
-    // Clean up WebSocket connection on component unmount
-    return () => {
-      disposed = true;
-      if (retryTimer) clearTimeout(retryTimer);
-      ws?.close();
-    };
+        setCryptoData([{ id: String(incomingData.symbol), symbol: String(incomingData.symbol), price: String(incomingData.close), change: "0", change_percentage: "0", market_cap: "0", volume: String(incomingData.volume), volume_in_currencies_24h: "0", total_volume_all_currencies_24h: "0", circulating_supply: "0", im: String(incomingData.symbol) }]);
+      }
+    });
+    return () => { unsubscribe(); setConnectionStatus("Disconnected"); };
   }, [wsTicket]);
   //  // Mapping for crypto images
   //  const cryptoImages: Record<string, string> = {

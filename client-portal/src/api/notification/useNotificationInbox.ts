@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authenticatedRequest } from "api/client";
-import { apiEndpoints, socketEndpoints } from "api/endpoints";
+import { apiEndpoints } from "api/endpoints";
 import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
-import { getSocketUrl } from "utils/env";
+import { getUnifiedRealtimeClient } from "realtime/UnifiedRealtimeClient";
 
 export type NotificationEvent = {
   id: string;
@@ -43,7 +43,7 @@ export function useNotificationInbox(token?: string) {
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
     enabled: Boolean(token),
-    refetchInterval: 30_000,
+    refetchInterval: false,
   });
 }
 
@@ -69,53 +69,19 @@ export function useMarkAllNotificationsRead(token?: string) {
 
 export function useNotificationSocket(token?: string) {
   const client = useQueryClient();
-  const socketRef = useRef<WebSocket | null>(null);
-  const reconnectTimer = useRef<number | null>(null);
-  const attempt = useRef(0);
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
     if (!token) return;
-    let stopped = false;
-
-    const connect = async () => {
-      if (stopped || socketRef.current) return;
-      try {
-        const { ws_ticket } = await webSocketTicketFetcher(token);
-        if (stopped) return;
-        const socket = new WebSocket(getSocketUrl(socketEndpoints.users, { ws_ticket }));
-        socketRef.current = socket;
-        socket.onopen = () => {
-          attempt.current = 0;
-          setConnected(true);
-        };
-        socket.onmessage = () => {
-          client.invalidateQueries({ queryKey: notificationInboxKey });
-        };
-        socket.onclose = () => {
-          socketRef.current = null;
-          setConnected(false);
-          if (!stopped) {
-            const delay = Math.min(1_000 * 2 ** attempt.current++, 30_000);
-            reconnectTimer.current = window.setTimeout(connect, delay);
-          }
-        };
-        socket.onerror = () => socket.close();
-      } catch {
-        if (!stopped) {
-          const delay = Math.min(1_000 * 2 ** attempt.current++, 30_000);
-          reconnectTimer.current = window.setTimeout(connect, delay);
-        }
+    const realtime = getUnifiedRealtimeClient(token, async () => (await webSocketTicketFetcher(token)).ws_ticket);
+    const unsubscribe = realtime.subscribe("notification", (message) => {
+      if (message.type === "system.status") setConnected((message.data as Record<string, unknown>)?.status === "connected");
+      else {
+        setConnected(true);
+        void client.invalidateQueries({ queryKey: notificationInboxKey });
       }
-    };
-
-    connect();
-    return () => {
-      stopped = true;
-      if (reconnectTimer.current) window.clearTimeout(reconnectTimer.current);
-      socketRef.current?.close();
-      socketRef.current = null;
-    };
+    });
+    return () => { unsubscribe(); setConnected(false); };
   }, [client, token]);
 
   return connected;

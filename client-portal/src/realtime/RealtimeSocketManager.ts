@@ -1,20 +1,15 @@
-import { getSocketUrl } from "utils/env";
+import { getUnifiedRealtimeClient, UnifiedRealtimeMessage } from "./UnifiedRealtimeClient";
 
 export type RealtimeKind = "market-data" | "news" | "account" | "platform";
-export type RealtimeMessage = { type?: string; sequence?: number; [key: string]: unknown };
-
+export type RealtimeMessage = UnifiedRealtimeMessage;
 type Listener = (message: RealtimeMessage) => void;
 
+/** Compatibility facade; socket ownership lives in UnifiedRealtimeClient. */
 export class RealtimeSocketManager {
-  private socket: WebSocket | null = null;
-  private retryTimer: number | undefined;
-  private retryAttempt = 0;
-  private closed = false;
-  private sequence = 0;
-  private subscriptions: unknown[] = [];
+  private unsubscribeHandler?: () => void;
   private readonly listeners = new Set<Listener>();
 
-  constructor(private readonly kind: RealtimeKind, private readonly ticket: () => Promise<string>) {}
+  constructor(private readonly kind: RealtimeKind, private readonly ticket: () => Promise<string>, private readonly token = "compatibility") {}
 
   onMessage(listener: Listener): () => void {
     this.listeners.add(listener);
@@ -22,59 +17,23 @@ export class RealtimeSocketManager {
   }
 
   async connect(): Promise<void> {
-    this.closed = false;
-    await this.open();
+    const channel = this.kind === "market-data" ? "market.status" : `compat.${this.kind}`;
+    const client = getUnifiedRealtimeClient(this.token, this.ticket);
+    this.unsubscribeHandler = client.subscribe(channel, (message) => this.listeners.forEach((listener) => listener(message)));
   }
 
   close(): void {
-    this.closed = true;
-    if (this.retryTimer !== undefined) window.clearTimeout(this.retryTimer);
-    this.retryTimer = undefined;
-    this.socket?.close(1000, "client_closed");
-    this.socket = null;
+    this.unsubscribeHandler?.();
+    this.unsubscribeHandler = undefined;
   }
 
   subscribe(channels: unknown[]): void {
-    this.subscriptions = channels;
-    this.send({ type: "subscribe", requestId: crypto.randomUUID(), channels });
+    // The unified client owns the subscription registry. This compatibility
+    // facade intentionally ignores legacy opaque channel payloads.
+    void channels;
   }
 
   unsubscribe(): void {
-    this.subscriptions = [];
-    this.send({ type: "unsubscribe", requestId: crypto.randomUUID() });
-  }
-
-  private async open(): Promise<void> {
-    if (this.closed || this.socket?.readyState === WebSocket.OPEN || this.socket?.readyState === WebSocket.CONNECTING) return;
-    const wsTicket = await this.ticket();
-    if (this.closed) return;
-    const socket = new WebSocket(getSocketUrl(`/ws/v1/${this.kind}`, { ws_ticket: wsTicket }));
-    this.socket = socket;
-    socket.onopen = () => {
-      this.retryAttempt = 0;
-      if (this.subscriptions.length) this.subscribe(this.subscriptions);
-    };
-    socket.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data) as RealtimeMessage;
-        if (typeof message.sequence === "number" && message.sequence <= this.sequence) return;
-        if (typeof message.sequence === "number") this.sequence = message.sequence;
-        this.listeners.forEach((listener) => listener(message));
-      } catch {
-        this.listeners.forEach((listener) => listener({ type: "error", code: "invalid_message" }));
-      }
-    };
-    socket.onerror = () => socket.close();
-    socket.onclose = () => {
-      if (this.socket === socket) this.socket = null;
-      if (this.closed) return;
-      const delay = Math.min(30_000, 1_000 * 2 ** this.retryAttempt) + Math.floor(Math.random() * 500);
-      this.retryAttempt += 1;
-      this.retryTimer = window.setTimeout(() => void this.open(), delay);
-    };
-  }
-
-  private send(payload: unknown): void {
-    if (this.socket?.readyState === WebSocket.OPEN) this.socket.send(JSON.stringify(payload));
+    this.close();
   }
 }

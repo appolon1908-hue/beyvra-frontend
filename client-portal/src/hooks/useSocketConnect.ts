@@ -1,205 +1,50 @@
 import { useAppSelector } from "@store/hooks";
 import { setOnlinetraders } from "@store/slices/socketStockCrypto";
 import { setTradeResult, setTradeTransaction } from "@store/slices/trade";
-import {
-  setSelectedWallet,
-  setWallets,
-  WalletSliceState,
-} from "@store/slices/wallet";
-import { useEffect, useRef, useState } from "react";
+import { setSelectedWallet, setWallets, WalletSliceState } from "@store/slices/wallet";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { getSocketUrl } from "utils/env";
+import { getUnifiedRealtimeClient } from "realtime/UnifiedRealtimeClient";
+import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
 
-export type CryptoChartDataType = {
-  id: number;
-  p: number;
-  p24h: number;
-  p7d: number;
-  p30d: number;
-  p3m: number;
-  p1y: number;
-  pytd: number;
-  pall: number;
-  as: number;
-  mc: number;
-  fmc24hpc: number;
-  t: string;
-  symbol: string;
-  change_percentage?: number;
-};
+export type ChartDataType = { open: number; high: number; low: number; close: number; timestamp: number; time: number; value: number };
+interface SocketConnectReturn { oldData: ChartDataType[]; data: ChartDataType | null }
 
-export type ChartDataType = {
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  timestamp: number;
-  time: number;
-  value: number;
-};
-
-interface OnlineTradersData {
-  count?: number;
-  // Add other relevant fields
-}
-
-interface SocketConnectReturn {
-  oldData: ChartDataType[];
-  data: ChartDataType | null;
-}
-let isFirstTime = true;
-
-let timestampStart = null;
-let openPrice: number = 0;
-let highPrice: number = 0;
-let lowPrice: number = 0;
-let closePrice: number = 0;
-
+/** Legacy facade backed by the shared gateway. Kept until old consumers are removed. */
 const useSocketConnect = (wsTicket: string): SocketConnectReturn => {
   const [oldData, setOldData] = useState<ChartDataType[]>([]);
   const [data, setData] = useState<ChartDataType | null>(null);
-  const chartSocket = useRef<WebSocket | undefined>(undefined);
-
   const dispatch = useDispatch();
-  const { wallets } = useAppSelector(
-    (state: { wallet: WalletSliceState }) => state.wallet
-  );
+  const { wallets } = useAppSelector((state: { wallet: WalletSliceState }) => state.wallet);
   const { chartSymbol } = useAppSelector((state) => state.socketStockCrypto);
 
   useEffect(() => {
-    let webSocket: WebSocket | undefined;
-    if (wsTicket) {
-      webSocket = new WebSocket(getSocketUrl("ws/external-api/", { ws_ticket: wsTicket }));
-
-      webSocket.onerror = function (event) {
-        throw Error("Websocket connection error");
-      };
-
-      webSocket.onopen = () => {
-        webSocket?.send(
-          JSON.stringify({
-            group_name: "BTC",
-            type: "join_group",
-          })
-        );
-        webSocket?.send(
-          JSON.stringify({
-            type: "join_group",
-            group_name: "o_c",
-          })
-        );
-      };
-
-      webSocket.onmessage = (event) => {
-        const receivedData = JSON.parse(event.data);
-        if (receivedData.m === "o_c") {
-          const onlineTradersData: OnlineTradersData = {
-            count: receivedData.d,
-          };
-          onlineTradersData?.count &&
-            dispatch(setOnlinetraders(onlineTradersData.count));
-        } else if (receivedData.m === "wt") {
-          console.log(receivedData);
-          const updatedWallets = wallets.map((item) => {
-            if (item.id == receivedData.d[0].id) {
-              return { ...item, balance: receivedData.d[0].balance };
-            }
-            return item;
-          });
-          dispatch(setWallets(updatedWallets));
-          dispatch(setSelectedWallet(receivedData.d[0]));
-        } else if (receivedData.m === "td") {
-          if (receivedData.a === "u") {
-            console.log("update trading data ", receivedData);
-            dispatch(setTradeResult(receivedData.d));
-          } else if (receivedData.a === "c") {
-            console.log("create trading data", receivedData);
-            dispatch(setTradeTransaction(receivedData.d[0]));
-          }
-        }
-      };
-    }
-
-    return () => {
-      webSocket?.close();
-    };
+    if (!wsTicket) return;
+    const client = getUnifiedRealtimeClient(wsTicket, async () => (await webSocketTicketFetcher(wsTicket)).ws_ticket);
+    return client.subscribe("compat.platform", (message) => {
+      const received = (message.data || message.payload || message) as Record<string, any>;
+      if (received.m === "o_c" && received.d) dispatch(setOnlinetraders(Number(received.d)));
+      if (received.m === "wt" && Array.isArray(received.d)) {
+        const updated = wallets.map((wallet) => wallet.id === received.d[0]?.id ? { ...wallet, balance: received.d[0].balance } : wallet);
+        dispatch(setWallets(updated)); dispatch(setSelectedWallet(received.d[0]));
+      }
+      if (received.m === "td") received.a === "u" ? dispatch(setTradeResult(received.d)) : dispatch(setTradeTransaction(received.d?.[0]));
+    });
   }, [dispatch, wallets, wsTicket]);
 
   useEffect(() => {
-    let webSocket: WebSocket;
-
-    let chartSymbol = "BTC";
-    if (wsTicket && chartSymbol) {
-      if (chartSocket.current) {
-        setOldData([]);
-        setData(null);
-        chartSocket.current?.close();
-        isFirstTime = true;
-      }
-      webSocket = new WebSocket(getSocketUrl("ws/market-data/", {
-        ws_ticket: wsTicket,
-        symbol: `${chartSymbol || "BTC"}USDT`,
-        interval: "1m",
-      }));
-
-      webSocket.onerror = function (event) {
-        throw Error("Websocket connection error");
-      };
-
-      webSocket.onopen = () => {
-        return (chartSocket.current = webSocket);
-      };
-
-      webSocket.onmessage = (event) => {
-
-        const receivedData = JSON.parse(event.data) as CryptoChartDataType;
-
-        if (isFirstTime) {
-          isFirstTime = false;
-          timestampStart = Number(receivedData.t);
-          openPrice = receivedData.p;
-          highPrice = receivedData.p;
-          lowPrice = receivedData.p;
-          closePrice = receivedData.p;
-          setOldData([
-            {
-              open: receivedData.p,
-              high: receivedData.p,
-              low: receivedData.p,
-              close: receivedData.p,
-              timestamp: Number(receivedData.t),
-              time: Number(receivedData.t),
-              value: receivedData.p,
-            },
-          ]);
-        } else {
-          highPrice = Math.max(highPrice, receivedData.p);
-          lowPrice = Math.min(lowPrice, receivedData.p);
-          closePrice = receivedData.p;
-          setData({
-            open: openPrice,
-            high: highPrice,
-            low: lowPrice,
-            close: closePrice,
-            timestamp: Number(receivedData.t),
-            time: Number(receivedData.t),
-            value: receivedData.p,
-          });
-        }
-        // setData((prev) => [...prev, receivedData]);
-      };
-    }
-
-    return () => {
-      if (chartSocket.current) {
-        chartSocket.current?.close();
-      }
-      if (webSocket) {
-        webSocket.close();
-      }
-    };
-  }, [wsTicket, chartSymbol]);
-
+    if (!wsTicket) return;
+    const symbol = `${chartSymbol || "BTC"}USDT`;
+    const client = getUnifiedRealtimeClient(wsTicket, async () => (await webSocketTicketFetcher(wsTicket)).ws_ticket);
+    let first = true; let open = 0; let high = 0; let low = 0;
+    return client.subscribe(`market.candle:${symbol}:1m`, (message) => {
+      const candle = (message.data || {}) as Record<string, any>;
+      if (candle.type !== "candle") return;
+      const price = Number(candle.close); const time = Number(candle.time);
+      if (first) { first = false; open = Number(candle.open); high = Number(candle.high); low = Number(candle.low); setOldData([{ open, high, low, close: price, timestamp: time, time, value: price }]); }
+      else { high = Math.max(high, Number(candle.high)); low = Math.min(low, Number(candle.low)); setData({ open, high, low, close: price, timestamp: time, time, value: price }); }
+    });
+  }, [chartSymbol, wsTicket]);
   return { data, oldData };
 };
 

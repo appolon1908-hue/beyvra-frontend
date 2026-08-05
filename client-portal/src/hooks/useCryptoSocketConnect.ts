@@ -6,10 +6,12 @@ import {
   setStockData,
 } from "@store/slices/socketStockCrypto";
 import { setWalletTypes } from "@store/slices/wallet";
+import type { CryptoStockDataType } from "@store/slices/socketStockCrypto";
 import useWalletTypes from "api/wallet/useWalletTypes";
 import { useEffect } from "react";
 import { useCookies } from "react-cookie";
-import { getSocketUrl } from "utils/env";
+import { getUnifiedRealtimeClient } from "realtime/UnifiedRealtimeClient";
+import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
 
 const useCryptoSocketConnect = (wsTicket: string, id: string) => {
   const dispatch = useAppDispatch();
@@ -28,91 +30,39 @@ const useCryptoSocketConnect = (wsTicket: string, id: string) => {
   }, [cookies.access_token, getCurrency]);
 
   useEffect(() => {
-    let webSocket: WebSocket | undefined;
-    if (wsTicket) {
-      webSocket = new WebSocket(getSocketUrl(`ws/current-balance/${id}/`, { ws_ticket: wsTicket }));
-
-      webSocket.onerror = function (event) {
-        throw Error("Websocket connection error");
-      };
-
-      webSocket.onmessage = (event) => {
-        if (event && event.data) {
-          const localData = JSON.parse(event.data);
-          dispatch(setCurrentBalance(localData?.current_balance || 0));
-        }
-      };
-    }
-    return () => {
-      webSocket?.close();
-    };
+    if (!wsTicket) return;
+    const realtime = getUnifiedRealtimeClient(wsTicket, async () => (await webSocketTicketFetcher(wsTicket)).ws_ticket);
+    return realtime.subscribe(`portfolio.balance:${id}`, (message) => {
+      const data = (message.data || message.payload || {}) as Record<string, unknown>;
+      if (data.current_balance !== undefined) dispatch(setCurrentBalance(Number(data.current_balance) || 0));
+    });
   }, [wsTicket, id, dispatch]);
 
   useEffect(() => {
-    let webSocket: WebSocket | undefined;
-    if (wsTicket) {
-      webSocket = new WebSocket(getSocketUrl(`ws/profit-loss/${id}/`, { ws_ticket: wsTicket }));
-
-      webSocket.onerror = function (event) {
-        throw Error("Websocket connection error");
-      };
-
-      webSocket.onmessage = (event) => {
-        if (event && event.data) {
-          const localData = JSON.parse(event.data);
-          dispatch(setProfitLoss(localData?.profit_loss || 0));
-        }
-      };
-    }
-    return () => {
-      webSocket?.close();
-    };
+    if (!wsTicket) return;
+    const realtime = getUnifiedRealtimeClient(wsTicket, async () => (await webSocketTicketFetcher(wsTicket)).ws_ticket);
+    return realtime.subscribe(`portfolio.profit_loss:${id}`, (message) => {
+      const data = (message.data || message.payload || {}) as Record<string, unknown>;
+      if (data.profit_loss !== undefined) dispatch(setProfitLoss(Number(data.profit_loss) || 0));
+    });
   }, [wsTicket, id, dispatch]);
 
   useEffect(() => {
-    let webSocket: WebSocket | undefined;
-    if (wsTicket) {
-      webSocket = new WebSocket(getSocketUrl("ws/crypto-market-data/", { ws_ticket: wsTicket }));
-
-      webSocket.onerror = function (event) {
-        throw Error("Websocket connection error");
-      };
-
-      webSocket.onmessage = (event) => {
-        if (event && event.data) {
-          try {
-            const localData = JSON.parse(event.data);
-            localData?.results && dispatch(setCryptoData(localData?.results));
-          } catch (error) {}
-        }
-      };
-    }
-    return () => {
-      webSocket?.close();
-    };
+    if (!wsTicket) return;
+    const realtime = getUnifiedRealtimeClient(wsTicket, async () => (await webSocketTicketFetcher(wsTicket)).ws_ticket);
+    return realtime.subscribe("market.compat.crypto", (message) => {
+      const data = (message.data || message.payload) as { results?: unknown[] } | undefined;
+      if (data?.results) dispatch(setCryptoData(data.results as CryptoStockDataType[]));
+    });
   }, [dispatch, wsTicket]);
 
   useEffect(() => {
-    let webSocket: WebSocket | undefined;
-    if (wsTicket) {
-      webSocket = new WebSocket(getSocketUrl("ws/stock-market-data/", { ws_ticket: wsTicket }));
-
-      webSocket.onerror = function (event) {
-        throw Error("Websocket connection error");
-      };
-
-      webSocket.onmessage = (event) => {
-        if (event && event.data) {
-          try {
-            const localData = JSON.parse(event.data);
-            localData?.results && dispatch(setStockData(localData?.results));
-          } catch (error) {}
-        }
-      };
-    }
-    return () => {
-      webSocket?.close();
-    };
+    if (!wsTicket) return;
+    const realtime = getUnifiedRealtimeClient(wsTicket, async () => (await webSocketTicketFetcher(wsTicket)).ws_ticket);
+    return realtime.subscribe("market.compat.stocks", (message) => {
+      const data = (message.data || message.payload) as { results?: unknown[] } | undefined;
+      if (data?.results) dispatch(setStockData(data.results as CryptoStockDataType[]));
+    });
   }, [dispatch, wsTicket]);
 };
 
