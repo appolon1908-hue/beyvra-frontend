@@ -4,9 +4,15 @@ const base = process.env.LOAD_BASE_URL || "https://staging.codestra.cloud";
 const count = Number(process.env.LOAD_CONNECTIONS || 1);
 const durationMs = Number(process.env.LOAD_DURATION_MS || 5000);
 const timeoutMs = Number(process.env.LOAD_TIMEOUT_MS || 15000);
-const channels = ["market.status", "notification", "demo.order"];
+const requestedSubscriptions = Math.max(1, Number(process.env.LOAD_SUBSCRIPTIONS || 3));
+const availableChannels = [
+  "market.status", "notification", "demo.order", "demo.execution", "demo.position",
+  "compat.market-data", "compat.news", "compat.account", "compat.platform",
+  "market.compat.crypto", "market.compat.stocks",
+];
+const channels = availableChannels.slice(0, requestedSubscriptions);
 const started = Date.now();
-const metrics = { requested: count, connected: 0, failed: 0, acknowledged: 0, duplicateAcks: 0, errors: 0, ticketFailures: 0, errorMessages: {}, connectMs: [], ackMs: [] };
+const metrics = { requested: count, subscriptions: channels.length, connected: 0, failed: 0, acknowledged: 0, duplicateAcks: 0, errors: 0, ticketFailures: 0, errorMessages: {}, connectMs: [], ackMs: [] };
 
 const sessionCount = Math.max(1, Number(process.env.LOAD_SESSION_COUNT || 1));
 const accesses = await Promise.all(Array.from({ length: sessionCount }, async (_, index) => {
