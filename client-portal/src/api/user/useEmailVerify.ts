@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-import getEnv from "utils/env";
+import { codestraAuthApi } from "api/generated/codestraDemo";
 
 type EmailVerificationVariables = {
   uidb64?: string;
@@ -24,23 +24,8 @@ type useEmailVerifyProps = {
 };
 
 export async function fetchEmailVerify(data: EmailVerificationVariables) {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(
-      `${BASE_URL}/user/verify_email/${data.uidb64}/${data.token}/`,
-      {
-        method: "GET",
-      }
-    );
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  if (!data.uidb64 || !data.token) throw new Error("Verification link is incomplete.");
+  return codestraAuthApi.verifyEmail<VerificationReponse>(data.uidb64, data.token);
 }
 
 export const useEmailVerify = (props: useEmailVerifyProps) => {

@@ -97,6 +97,11 @@ export const codestraAuthApi = {
   login: <T>(body: unknown) => codestraRequest<T>("user/token/", { method: "POST", body: JSON.stringify(body) }),
   register: <T>(body: unknown) => codestraRequest<T>("user/create/", { method: "POST", body: JSON.stringify(body) }),
   logout: (token: string, refresh: string) => codestraRequest<void>("user/token/logout/", { method: "POST", token, body: JSON.stringify({ refresh }) }),
+  refresh: <T>(body: unknown) => codestraRequest<T>("user/token/refresh/", { method: "POST", body: JSON.stringify(body) }),
+  forgotPassword: <T>(body: unknown) => codestraRequest<T>("user/password_reset/", { method: "POST", body: JSON.stringify(body) }),
+  resetPassword: <T>(uidb64: string, token: string, body: unknown) => codestraRequest<T>(`user/password_reset_confirm/${uidb64}/${token}/`, { method: "POST", body: JSON.stringify(body) }),
+  verifyEmail: <T>(uidb64: string, token: string) => codestraRequest<T>(`user/verify_email/${uidb64}/${token}/`),
+  sendEmailVerification: <T>(token: string, email: string) => codestraRequest<T>("user/send_email_verification/", { method: "POST", token, body: JSON.stringify({ email }) }),
 };
 
 export const codestraProfileApi = {

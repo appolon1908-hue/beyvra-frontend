@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { codestraAuthApi } from "api/generated/codestraDemo";
 import { ApiError, getApiErrorMessage } from "api/errors";
 
 type ForgotPassResponse = {
@@ -26,23 +26,8 @@ type ForgotPasswordVariables = {
 };
 
 export async function fetchForgotPassword(data: ForgotPasswordVariables): Promise<ForgotPassResponse> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  const response = await fetch(`${BASE_URL}/user/password_reset/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      referrerPolicy: "no-referrer",
-      body: JSON.stringify(data),
-  });
-  const result: unknown = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    const message = getApiErrorMessage(result, "Unable to request a password reset. Please try again.");
-    toast.error(message);
-    throw new ApiError(message, response.status);
-  }
-  return result as ForgotPassResponse;
+  try { return await codestraAuthApi.forgotPassword<ForgotPassResponse>(data); }
+  catch (error) { const message = getApiErrorMessage(error, "Unable to request a password reset. Please try again."); toast.error(message); throw error instanceof ApiError ? error : new ApiError(message, 500); }
 }
 
 export const useFrogotPassowrd = (props: useFrogotPassowrdProps) => {

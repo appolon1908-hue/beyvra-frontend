@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { codestraAuthApi } from "api/generated/codestraDemo";
 
 type SendEmailResponse = {
   detail: string;
@@ -23,27 +23,7 @@ export async function fetchEmailVerification({
   token: string;
   email: string;
 }) {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/user/send_email_verification/`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: email }),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      toast.error(result.detail);
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return codestraAuthApi.sendEmailVerification<SendEmailResponse>(token, email);
 }
 
 export const useSendEmailVerification = (
