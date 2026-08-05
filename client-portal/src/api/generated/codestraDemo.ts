@@ -82,6 +82,19 @@ export const codestraDemoApi = {
     codestraRequest<DemoWallet>("v1/demo/wallet/refill", { method: "POST", token, idempotencyKey }),
 };
 
+export type RealtimeV2Token = { token: string; channel?: string; expires_in: number; gateway?: string };
+
+export const codestraRealtimeV2Api = {
+  connectionToken: (token: string) =>
+    codestraRequest<RealtimeV2Token>("v1/realtime/v2/connection-token", { method: "POST", token }),
+  subscriptionToken: (token: string, channel: string) =>
+    codestraRequest<RealtimeV2Token>("v1/realtime/v2/subscription-token", {
+      method: "POST", token, body: JSON.stringify({ channel }),
+    }),
+  revoke: (token: string) =>
+    codestraRequest<{ revoked: boolean }>("v1/realtime/v2/revoke", { method: "POST", token }),
+};
+
 export const codestraUserApi = {
   notifications: (token: string) => codestraRequest("notification/notifications/", { token }),
   toggleNotification: (token: string, body: unknown) =>
