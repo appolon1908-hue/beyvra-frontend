@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import getEnv from "utils/env";
+import { codestraWalletApi } from "api/generated/codestraDemo";
 import IPaymentType from "@interfaces/IPaymentType";
 
 type Props = {
@@ -13,23 +13,7 @@ type Props = {
 };
 
 export async function fetchTradeList(token: string) {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/payment/methods/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return codestraWalletApi.paymentMethods(token);
 }
 
 export const useQRCodeList = (props: Props) => {

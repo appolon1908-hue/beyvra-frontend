@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { codestraAuthApi } from "api/generated/codestraDemo";
 
 type Props = {
   onSuccess?: (
@@ -13,24 +13,7 @@ type Props = {
 };
 
 export async function fetchQRCode(token: string) {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/user/generate_mfa_code/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      toast.error(result.detail);
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return codestraAuthApi.mfaQr(token);
 }
 
 export const use2FAQR = (props: Props) => {

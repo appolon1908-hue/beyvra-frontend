@@ -95,6 +95,8 @@ export const codestraWalletApi = {
   transaction: (token: string, id: string) => codestraRequest(`wallet/transactions/${id}/`, { token }),
   refillLegacy: (token: string, id: string | number) => codestraRequest(`wallet/wallets/${id}/refill/`, { method: "POST", token }),
   tradeAssets: <T>(token: string) => codestraRequest<T>("trades/assets/", { token }),
+  currencies: <T>(token: string) => codestraRequest<T>("wallet/currencies/", { token }),
+  paymentMethods: <T>(token: string) => codestraRequest<T>("payment/methods/", { token }),
 };
 
 export const codestraAuthApi = {
@@ -110,6 +112,8 @@ export const codestraAuthApi = {
   websocketTicket: <T>(token: string) => codestraRequest<T>("user/websocket_ticket", { token }),
   sendPhoneVerification: <T>(token: string) => codestraRequest<T>("user/send_phone_verification/", { method: "POST", token }),
   verifyPhone: <T>(token: string, body: unknown) => codestraRequest<T>("user/verify_phone/", { method: "POST", token, body: JSON.stringify(body) }),
+  mfaQr: <T>(token: string) => codestraRequest<T>("user/generate_mfa_code/", { token }),
+  verifyMfa: <T>(body: unknown, token?: string) => codestraRequest<T>("user/verify_mfa_code/", { method: "POST", token, body: JSON.stringify(body) }),
 };
 
 export const codestraProfileApi = {
