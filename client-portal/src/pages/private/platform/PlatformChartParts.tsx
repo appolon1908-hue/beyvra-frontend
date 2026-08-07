@@ -1,7 +1,8 @@
-import { SeriesMarker, Time } from "lightweight-charts";
 import DropdownMenu from "components/dropdownMenu/DropdownMenu";
 import { MainChartChangeIcon, ZoomInChartIcon, ZoomOutChartIcon } from "../../../assets/icons";
 import { DemoTrade } from "api/demo/types";
+import { ChartType } from "./chart/EChartsAdapter";
+import { ChartInterval, TimeframeCapability } from "./chart/chartTypes";
 
 export function MarketStatus({ symbol, interval, state, error, lastUpdate, onRetry }: { symbol: string; interval: string; state: string; error: string; lastUpdate?: number; onRetry: () => void }) {
   return <>
@@ -16,43 +17,34 @@ export function MarketStatus({ symbol, interval, state, error, lastUpdate, onRet
   </>;
 }
 
-export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, setCandleInterval, handleZoom }: {
-  selectedChart: "area" | "candlesticks" | "bar";
-  setSelectedChart: (value: "area" | "candlesticks" | "bar") => void;
-  candleInterval: string;
-  setCandleInterval: (value: string) => void;
+export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, capabilities, setCandleInterval, handleZoom, resetView, centerLive }: {
+  selectedChart: ChartType;
+  setSelectedChart: (value: ChartType) => void;
+  candleInterval: ChartInterval;
+  capabilities: TimeframeCapability[];
+  setCandleInterval: (value: ChartInterval) => void;
   handleZoom: (zoomIn: boolean) => void;
+  resetView: () => void;
+  centerLive: () => void;
 }) {
   return <div className="chart-controls">
-    <DropdownMenu menuItems={[{ text: "Candlesticks", onclick: () => setSelectedChart("candlesticks") }, { text: "Area", onclick: () => setSelectedChart("area") }, { text: "Bars", onclick: () => setSelectedChart("bar") }]}>
+    <DropdownMenu menuItems={[{ text: "Candlesticks", onclick: () => setSelectedChart("candlesticks") }, { text: "Heikin-Ashi", onclick: () => setSelectedChart("heikin-ashi") }, { text: "Area", onclick: () => setSelectedChart("area") }, { text: "Line", onclick: () => setSelectedChart("line") }, { text: "Bars", onclick: () => setSelectedChart("bar") }]}>
       <button type="button" className="chart-type-button" aria-label="Select chart type"><MainChartChangeIcon /></button>
     </DropdownMenu>
     <div className="zoom-controls">
       <button type="button" onClick={() => handleZoom(true)} aria-label="Zoom chart in"><ZoomInChartIcon /></button>
       <button type="button" onClick={() => handleZoom(false)} aria-label="Zoom chart out"><ZoomOutChartIcon /></button>
+      <button type="button" onClick={resetView}>Reset</button>
+      <button type="button" onClick={centerLive}>Live</button>
     </div>
     <div className="timeframe-controls" aria-label="Chart timeframe">
-      {["1m", "5m", "15m"].map((interval) => <button key={interval} type="button" className={candleInterval === interval ? "selected" : ""} onClick={() => setCandleInterval(interval)} aria-pressed={candleInterval === interval}>{interval}</button>)}
+      {(["5s", "1m", "5m", "15m"] as ChartInterval[]).map((interval) => {
+        const capability = capabilities.find((item) => item.interval === interval);
+        const disabled = !capability?.available;
+        return <button key={interval} type="button" disabled={disabled} title={disabled ? capability?.reason || "Market-data capability unavailable" : undefined} className={candleInterval === interval ? "selected" : ""} onClick={() => setCandleInterval(interval)} aria-pressed={candleInterval === interval}>{interval}</button>;
+      })}
     </div>
   </div>;
-}
-
-export function TradeMarkers({ trades }: { trades: DemoTrade[] }): SeriesMarker<Time>[] {
-  const markers: SeriesMarker<Time>[] = [];
-  trades.forEach((trade) => {
-    const openedAt = Date.parse(trade.openedAt);
-    if (!Number.isFinite(openedAt)) return;
-    const settled = ["WON", "LOST", "DRAW"].includes(String(trade.result || trade.state).toUpperCase());
-    const result = String(trade.result || trade.state || "OPEN").toUpperCase();
-    const direction = trade.direction.toLowerCase();
-    const label = `#${String(trade.id)} ${direction === "up" ? "UP" : "DOWN"} $${String(trade.amount)}`;
-    markers.push({ time: Math.floor(openedAt / 1000) as Time, position: direction === "up" ? "belowBar" : "aboveBar", color: settled ? (result === "LOST" ? "#ff5c68" : "#34d27b") : "#12e6d0", shape: direction === "up" ? "arrowUp" : "arrowDown", text: settled ? `${label} · ${result}` : `${label} · OPEN` });
-    if (settled && trade.closingPrice != null && trade.expiresAt) {
-      const expiresAt = Date.parse(trade.expiresAt);
-      if (Number.isFinite(expiresAt)) markers.push({ time: Math.floor(expiresAt / 1000) as Time, position: direction === "up" ? "aboveBar" : "belowBar", color: result === "LOST" ? "#ff5c68" : "#34d27b", shape: "circle", text: `${result} ${String(trade.closingPrice)}` });
-    }
-  });
-  return markers.sort((a, b) => Number(a.time) - Number(b.time));
 }
 
 export function OpenTrades({ trades }: { trades: DemoTrade[] }) {

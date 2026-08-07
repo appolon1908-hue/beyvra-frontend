@@ -1,0 +1,135 @@
+import { authenticatedRequest } from "api/client";
+import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
+import { getUnifiedRealtimeClient, UnifiedRealtimeMessage } from "realtime/UnifiedRealtimeClient";
+import { applyLiveCandle, normalizeCandle, normalizeCandles, prependHistory } from "./candles";
+import { CanonicalCandle, ChartDataState, ChartInterval, MarketCapabilities, MarketSnapshot } from "./chartTypes";
+
+type Listener = () => void;
+type CandlePage = Pick<MarketSnapshot, "instrument_id" | "interval" | "sequence" | "server_time" | "candles"> & { history_cursor?: string };
+
+export class ChartDataController {
+  private state: ChartDataState = { instrumentId: "BTC-USD", interval: "1m", candles: [], marketStatus: "UNKNOWN", connectionState: "loading", capabilities: [], historyLoading: false };
+  private listeners = new Set<Listener>();
+  private generation = 0;
+  private snapshotAbort?: AbortController;
+  private historyAbort?: AbortController;
+  private unsubscribers: Array<() => void> = [];
+  private sequences = new Map<string, number>();
+  private recovery?: Promise<void>;
+
+  constructor(private readonly token: string) {}
+  getSnapshot = () => this.state;
+  subscribe = (listener: Listener) => { this.listeners.add(listener); return () => this.listeners.delete(listener); };
+
+  async selectInstrument(instrumentId: string, interval: ChartInterval = "1m") {
+    const generation = ++this.generation;
+    this.snapshotAbort?.abort(); this.historyAbort?.abort(); this.unsubscribeAll(); this.sequences.clear();
+    this.update({ ...this.state, instrumentId, interval, candles: [], quote: undefined, connectionState: "loading", error: undefined, historyCursor: undefined });
+    const abort = new AbortController(); this.snapshotAbort = abort;
+    try {
+      const capabilities = await authenticatedRequest<MarketCapabilities>(`v1/instruments/${encodeURIComponent(instrumentId)}/market-data-capabilities`, this.token, { signal: abort.signal });
+      if (!this.current(generation, instrumentId, abort)) return;
+      const selected = capabilities.timeframes.find((item) => item.interval === interval);
+      if (!selected?.available) { this.update({ ...this.state, capabilities: capabilities.timeframes, connectionState: "error", error: selected?.reason || "TIMEFRAME_UNAVAILABLE" }); return; }
+      const snapshot = await this.fetchSnapshot(instrumentId, interval, abort.signal);
+      if (!this.current(generation, instrumentId, abort)) return;
+      this.applySnapshot(snapshot, capabilities.timeframes);
+      this.subscribeRealtime(instrumentId, interval);
+    } catch (error) { if (!abort.signal.aborted && generation === this.generation) this.fail(error); }
+  }
+
+  async selectInterval(interval: ChartInterval) {
+    if (interval === this.state.interval) return;
+    const capability = this.state.capabilities.find((item) => item.interval === interval);
+    if (!capability?.available) { this.update({ ...this.state, error: capability?.reason || "TIMEFRAME_UNAVAILABLE" }); return; }
+    const generation = this.generation; const instrumentId = this.state.instrumentId;
+    this.snapshotAbort?.abort(); this.historyAbort?.abort(); this.unsubscribeCandle();
+    const abort = new AbortController(); this.snapshotAbort = abort;
+    this.update({ ...this.state, interval, connectionState: "loading", error: undefined, historyCursor: undefined });
+    try {
+      const page = await this.fetchCandles(instrumentId, interval, undefined, abort.signal);
+      if (!this.current(generation, instrumentId, abort)) return;
+      this.sequences.set(this.candleChannel(instrumentId, interval), page.sequence);
+      this.update({ ...this.state, candles: normalizeCandles(page.candles), historyCursor: page.history_cursor, connectionState: "connected" });
+      this.subscribeCandle(instrumentId, interval);
+    } catch (error) { if (!abort.signal.aborted && generation === this.generation) this.fail(error); }
+  }
+
+  async loadOlder() {
+    if (this.state.historyLoading || !this.state.historyCursor) return;
+    const generation = this.generation; const { instrumentId, interval, historyCursor } = this.state;
+    const abort = new AbortController(); this.historyAbort = abort; this.update({ ...this.state, historyLoading: true });
+    try {
+      const page = await this.fetchCandles(instrumentId, interval, historyCursor, abort.signal);
+      if (!this.current(generation, instrumentId, abort)) return;
+      this.update({ ...this.state, candles: prependHistory(this.state.candles, normalizeCandles(page.candles)), historyCursor: page.history_cursor, historyLoading: false });
+    } catch (error) { if (!abort.signal.aborted) this.update({ ...this.state, historyLoading: false, error: error instanceof Error ? error.message : "HISTORY_UNAVAILABLE" }); }
+  }
+
+  stop() { ++this.generation; this.snapshotAbort?.abort(); this.historyAbort?.abort(); this.unsubscribeAll(); this.update({ ...this.state, connectionState: "disconnected" }); }
+  refreshQuoteAge(now = Date.now(), staleAfterMs = 15_000) {
+    if (!this.state.quote || ["loading", "recovering", "disconnected", "error"].includes(this.state.connectionState)) return;
+    const quoteAgeMs = Math.max(0, now - Date.parse(this.state.quote.occurredAt));
+    this.update({ ...this.state, quoteAgeMs, connectionState: quoteAgeMs > staleAfterMs ? "stale" : "connected" });
+  }
+
+  private async fetchSnapshot(instrumentId: string, interval: ChartInterval, signal: AbortSignal) {
+    return authenticatedRequest<MarketSnapshot>(`v1/market-data/snapshot?${new URLSearchParams({ instrument_id: instrumentId, interval, limit: "500" })}`, this.token, { signal });
+  }
+  private async fetchCandles(instrumentId: string, interval: ChartInterval, before: string | undefined, signal: AbortSignal) {
+    const params = new URLSearchParams({ instrument_id: instrumentId, interval, limit: "500" }); if (before) params.set("before", before);
+    return authenticatedRequest<CandlePage>(`v1/market-data/candles?${params}`, this.token, { signal });
+  }
+  private applySnapshot(snapshot: MarketSnapshot, capabilities = this.state.capabilities) {
+    const quoteChannel = this.quoteChannel(snapshot.instrument_id); const candleChannel = this.candleChannel(snapshot.instrument_id, snapshot.interval);
+    this.sequences.set(quoteChannel, snapshot.sequence); this.sequences.set(candleChannel, snapshot.sequence);
+    this.update({ instrumentId: snapshot.instrument_id, interval: snapshot.interval, candles: normalizeCandles(snapshot.candles), quote: { bid: snapshot.quote.bid, ask: snapshot.quote.ask, mid: snapshot.quote.mid, occurredAt: snapshot.quote.occurred_at }, quoteAgeMs: Date.now() - Date.parse(snapshot.quote.occurred_at), marketStatus: snapshot.market_status, connectionState: "connected", capabilities, historyCursor: snapshot.candles[0]?.open_time, historyLoading: false });
+  }
+  private subscribeRealtime(instrumentId: string, interval: ChartInterval) {
+    const client = getUnifiedRealtimeClient(this.token, async () => (await webSocketTicketFetcher(this.token)).ws_ticket);
+    this.unsubscribers.push(client.subscribe(this.quoteChannel(instrumentId), (event) => this.onEvent(event)));
+    this.subscribeCandle(instrumentId, interval);
+  }
+  private subscribeCandle(instrumentId: string, interval: ChartInterval) {
+    const client = getUnifiedRealtimeClient(this.token, async () => (await webSocketTicketFetcher(this.token)).ws_ticket);
+    this.unsubscribers.push(client.subscribe(this.candleChannel(instrumentId, interval), (event) => this.onEvent(event)));
+  }
+  private onEvent(event: UnifiedRealtimeMessage) {
+    const channel = String(event.channel || "");
+    if (!channel || !this.channelMatchesCurrent(channel) || typeof event.sequence !== "number") return;
+    const previous = this.sequences.get(channel);
+    if (previous !== undefined && event.sequence <= previous) return;
+    if (previous !== undefined && event.sequence > previous + 1) { void this.recover(); return; }
+    this.sequences.set(channel, event.sequence);
+    const data = (event.data || {}) as Record<string, unknown>;
+    if (channel.startsWith("market.quote:")) {
+      const occurredAt = String(event.occurred_at || event.server_time || new Date().toISOString());
+      const mid = String(data.mid ?? data.close ?? ""); if (!mid) return;
+      this.update({ ...this.state, quote: { bid: String(data.bid ?? mid), ask: String(data.ask ?? mid), mid, occurredAt }, quoteAgeMs: 0, connectionState: "connected" });
+    } else if (channel.startsWith("market.candle:")) {
+      const candle = this.eventCandle(data, event.sequence); if (!candle) return;
+      this.update({ ...this.state, candles: applyLiveCandle(this.state.candles, candle), connectionState: "connected" });
+    }
+  }
+  private eventCandle(data: Record<string, unknown>, sequence: number): CanonicalCandle | undefined {
+    const seconds = Number(data.time); if (!Number.isFinite(seconds)) return undefined;
+    const openTime = new Date(seconds * 1000).toISOString(); const duration = this.state.interval === "1m" ? 60 : this.state.interval === "5s" ? 5 : 60;
+    return normalizeCandle({ open_time: openTime, close_time: new Date((seconds + duration) * 1000).toISOString(), open: String(data.open), high: String(data.high), low: String(data.low), close: String(data.close), volume: String(data.volume ?? "0"), complete: Boolean(data.closed), sequence });
+  }
+  private recover() {
+    if (this.recovery) return this.recovery;
+    const generation = this.generation; const { instrumentId, interval } = this.state;
+    this.update({ ...this.state, connectionState: "recovering" });
+    const abort = new AbortController();
+    this.recovery = this.fetchSnapshot(instrumentId, interval, abort.signal).then((snapshot) => { if (generation === this.generation && snapshot.instrument_id === instrumentId) this.applySnapshot(snapshot); }).catch((error) => this.fail(error)).finally(() => { this.recovery = undefined; });
+    return this.recovery;
+  }
+  private current(generation: number, instrumentId: string, abort: AbortController) { return generation === this.generation && instrumentId === this.state.instrumentId && !abort.signal.aborted; }
+  private channelMatchesCurrent(channel: string) { return channel === this.quoteChannel(this.state.instrumentId) || channel === this.candleChannel(this.state.instrumentId, this.state.interval); }
+  private quoteChannel(instrumentId: string) { return `market.quote:${instrumentId}`; }
+  private candleChannel(instrumentId: string, interval: ChartInterval) { return `market.candle:${instrumentId}:${interval}`; }
+  private unsubscribeCandle() { this.unsubscribers.pop()?.(); }
+  private unsubscribeAll() { for (const unsubscribe of this.unsubscribers.splice(0)) unsubscribe(); }
+  private fail(error: unknown) { this.update({ ...this.state, connectionState: "error", error: error instanceof Error ? error.message : "MARKET_DATA_UNAVAILABLE" }); }
+  private update(state: ChartDataState) { this.state = state; this.listeners.forEach((listener) => listener()); }
+}
