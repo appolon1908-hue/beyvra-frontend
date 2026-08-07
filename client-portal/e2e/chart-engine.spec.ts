@@ -4,7 +4,7 @@ const candle = (minute: number) => ({ open_time: `2026-08-07T00:${String(minute)
 
 test("ECharts workspace, indicators, and drawings remain local and long-lived", async ({ page, request, context, baseURL }) => {
   const pageErrors: string[] = []; page.on("pageerror", (error) => pageErrors.push(error.stack || error.message));
-  let snapshotRequests = 0; let capabilityRequests = 0;
+  let snapshotRequests = 0; let capabilityRequests = 0; let newsRequests = 0;
   const origin = baseURL ?? "http://127.0.0.1:8080";
   await page.setViewportSize({ width: 1024, height: 768 });
   const session = await request.post(`${origin}/api/v1/demo/sessions`, { headers: { "Idempotency-Key": `chart-${Date.now()}` }, data: {} });
@@ -18,6 +18,7 @@ test("ECharts workspace, indicators, and drawings remain local and long-lived", 
     { id: "won", symbol: "BTCUSDT", direction: "up", amount: "25", state: "WON", result: "WON", openingPrice: "100.00", closingPrice: "102.00", openedAt: "2026-08-07T00:02:00Z", expiresAt: "2026-08-07T00:03:00Z", settledAt: "2026-08-07T00:03:01Z" },
     { id: "lost", symbol: "BTCUSDT", direction: "down", amount: "25", state: "LOST", result: "LOST", openingPrice: "100.00", closingPrice: "102.00", openedAt: "2026-08-07T00:03:00Z", expiresAt: "2026-08-07T00:04:00Z", settledAt: "2026-08-07T00:04:01Z" },
   ] }));
+  await page.route("**/api/v1/news?**", (route) => { newsRequests += 1; return route.fulfill({ status: 503, json: { code: "PROVIDER_NOT_AVAILABLE" } }); });
   await page.goto("/platform", { waitUntil: "domcontentloaded" });
   const chart = page.locator(".chart-surface canvas").first(); await expect(chart).toBeVisible();
   await page.waitForTimeout(500); if (pageErrors.length) throw new Error(`Browser errors: ${pageErrors.join(" | ")}`);
@@ -26,6 +27,9 @@ test("ECharts workspace, indicators, and drawings remain local and long-lived", 
   await expect(page.locator('[data-trade-id="up-active"]')).toContainText("▲ UP · ACTIVE"); await expect(page.locator('[data-trade-id="down-active"]')).toContainText("▼ DOWN · ACTIVE");
   await expect(page.locator('[data-trade-id="won"]')).toContainText("✓ WON"); await expect(page.locator('[data-trade-id="lost"]')).toContainText("✕ LOST");
   const initialRequests = { snapshotRequests, capabilityRequests };
+  expect(newsRequests).toBe(0);
+  await page.getByRole("button", { name: "News & events" }).click(); await expect(page.getByText("News feed unavailable — provider approval pending.")).toBeVisible(); expect(newsRequests).toBe(1); expect({ snapshotRequests, capabilityRequests }).toEqual(initialRequests); expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
+  await page.getByRole("button", { name: "Close market events" }).click();
   await page.locator(".indicator-controls > summary").click();
   await page.getByLabel("SMA", { exact: true }).check(); await page.getByLabel("RSI", { exact: true }).check(); await page.getByLabel("MACD", { exact: true }).check();
   await page.getByLabel("SMA period").fill("25"); await page.getByLabel("SMA period").press("Enter");
