@@ -188,6 +188,15 @@
 .indicator-menu fieldset { display: flex; align-items: center; gap: 10px; min-width: 0; margin: 0; padding: 8px 4px; border: 0; border-bottom: 1px solid var(--color-border); }
 .indicator-menu label { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; }
 .indicator-menu input[type="number"] { width: 62px; min-height: 30px; padding: 2px 5px; color: var(--color-text); background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 5px; }
+.drawing-controls { position: relative; margin-top: 8px; color: var(--color-text); }
+.drawing-controls > summary { min-height: 36px; padding: 8px 12px; border-radius: 8px; background: var(--color-surface-2); cursor: pointer; list-style: none; }
+.drawing-menu { position: absolute; z-index: 12; top: calc(100% + 6px); left: 0; width: min(460px, calc(100vw - 32px)); padding: 10px; border: 1px solid var(--color-border); border-radius: 10px; background: var(--color-surface-1); box-shadow: 0 14px 36px rgba(0,0,0,.3); }
+.drawing-tools, .drawing-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.drawing-actions { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--color-border); }
+.drawing-menu button { min-height: 34px; padding: 5px 9px; color: var(--color-text-secondary); background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 6px; }
+.drawing-menu button.selected { color: var(--color-brand-contrast); background: var(--color-brand); }
+.drawing-menu label { display: grid; gap: 4px; margin-top: 10px; font-size: 12px; }
+.drawing-menu input { min-height: 34px; padding: 5px 8px; color: var(--color-text); background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 6px; }
 
 /* Responsive safety rails. Keep the shell inside the viewport at phone,
    tablet and headset-sized widths; never let a fixed rail or ticket add a

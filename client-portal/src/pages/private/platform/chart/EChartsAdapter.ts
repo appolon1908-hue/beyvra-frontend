@@ -2,6 +2,8 @@ import * as echarts from "echarts";
 import { CanonicalCandle, ChartConnectionState } from "./chartTypes";
 import { IndicatorEngine } from "./indicators/IndicatorEngine";
 import { IndicatorConfig, IndicatorResult } from "./indicators/types";
+import { DrawingLayer, DrawingLayerCallbacks } from "./drawings/DrawingLayer";
+import { ChartDrawing, DrawingType } from "./drawings/types";
 
 export type ChartType = "candlesticks" | "heikin-ashi" | "bar" | "line" | "area";
 
@@ -25,8 +27,9 @@ export class EChartsAdapter {
   private readonly indicatorEngine = new IndicatorEngine();
   private currentPrice?: string;
   private currentPriceState: ChartConnectionState = "disconnected";
+  private readonly drawingLayer = new DrawingLayer();
 
-  mount(container: HTMLElement, theme: string, onHistoryBoundary: () => void) {
+  mount(container: HTMLElement, theme: string, onHistoryBoundary: () => void, drawingCallbacks?: DrawingLayerCallbacks) {
     if (this.chart) return;
     this.chart = echarts.init(container, undefined, { renderer: "canvas" });
     this.historyHandler = onHistoryBoundary;
@@ -34,7 +37,9 @@ export class EChartsAdapter {
       const option = this.chart?.getOption(); const zoom = (option?.dataZoom as Array<{ start?: number }> | undefined)?.[0];
       if ((zoom?.start ?? 100) <= 3) this.historyHandler?.();
       this.followLive = false;
+      this.drawingLayer.render();
     });
+    this.drawingLayer.mount(this.chart, drawingCallbacks ?? { onCreate: () => undefined, onSelect: () => undefined, onMove: () => undefined });
     this.setTheme(theme);
   }
 
@@ -44,10 +49,12 @@ export class EChartsAdapter {
 
   setChartType(type: ChartType) { this.chartType = type; this.renderSeries(); }
   setIndicators(configs: readonly IndicatorConfig[]) { this.indicatorConfigs = configs.map((config) => ({ ...config })); this.renderSeries(); }
+  setDrawings(drawings: readonly ChartDrawing[], selectedId: string | undefined, visible: boolean) { this.drawingLayer.setDrawings(drawings, selectedId, visible); }
+  setDrawingTool(tool: DrawingType) { this.drawingLayer.setTool(tool); }
   setCandles(candles: CanonicalCandle[]) {
     const previousCount = this.candles.length;
     const prepended = previousCount > 0 && candles.length > previousCount && candles.at(-(previousCount))?.openTime === this.candles[0]?.openTime ? candles.length - previousCount : 0;
-    this.candles = candles; this.renderSeries(previousCount, prepended); if (this.followLive) this.centerLive();
+    this.candles = candles; this.renderSeries(previousCount, prepended); this.drawingLayer.setCandles(candles); if (this.followLive) this.centerLive();
   }
 
   setCurrentPrice(price: string | undefined, state: ChartConnectionState) {
@@ -63,8 +70,8 @@ export class EChartsAdapter {
   }
   resetView() { this.followLive = true; this.chart?.dispatchAction({ type: "dataZoom", start: 70, end: 100 }); }
   centerLive() { this.followLive = true; this.chart?.dispatchAction({ type: "dataZoom", start: Math.max(0, 100 - Math.min(100, 3000 / Math.max(1, this.candles.length))), end: 100 }); }
-  resize() { this.chart?.resize(); }
-  dispose() { this.chart?.dispose(); this.chart = undefined; }
+  resize() { this.chart?.resize(); this.drawingLayer.render(); }
+  dispose() { this.drawingLayer.dispose(); this.chart?.dispose(); this.chart = undefined; }
 
   private renderSeries(previousCount = this.candles.length, prepended = 0) {
     if (!this.chart) return;
@@ -92,6 +99,7 @@ export class EChartsAdapter {
     const indicatorSeries = results.flatMap((result) => this.indicatorSeries(result, panes.indexOf(result.pane) + 1));
     const xAxisIndex = grids.map((_, index) => index);
     this.chart.setOption({ animation: false, axisPointer: { link: [{ xAxisIndex: "all" }] }, tooltip: { trigger: "axis" }, grid: grids, xAxis: xAxes, yAxis: yAxes, dataZoom: [{ type: "inside", xAxisIndex, start, end, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { type: "slider", xAxisIndex, height: 18, bottom: 8, start, end, showDetail: false }], series: [priceSeries, ...indicatorSeries] }, { notMerge: true, lazyUpdate: true });
+    this.drawingLayer.render();
   }
 
   private indicatorSeries(result: IndicatorResult, paneIndex: number): object[] {

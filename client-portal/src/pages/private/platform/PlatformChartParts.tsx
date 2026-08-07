@@ -4,6 +4,7 @@ import { DemoTrade } from "api/demo/types";
 import { ChartType } from "./chart/EChartsAdapter";
 import { ChartInterval, TimeframeCapability } from "./chart/chartTypes";
 import { IndicatorConfig } from "./chart/indicators/types";
+import { DrawingState, DrawingType } from "./chart/drawings/types";
 
 export function MarketStatus({ symbol, interval, state, error, lastUpdate, onRetry }: { symbol: string; interval: string; state: string; error: string; lastUpdate?: number; onRetry: () => void }) {
   return <>
@@ -18,7 +19,7 @@ export function MarketStatus({ symbol, interval, state, error, lastUpdate, onRet
   </>;
 }
 
-export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, capabilities, setCandleInterval, handleZoom, resetView, centerLive, indicators, updateIndicator }: {
+export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, capabilities, setCandleInterval, handleZoom, resetView, centerLive, indicators, updateIndicator, drawingTool, setDrawingTool, drawingState, drawingActions }: {
   selectedChart: ChartType;
   setSelectedChart: (value: ChartType) => void;
   candleInterval: ChartInterval;
@@ -29,6 +30,10 @@ export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, 
   centerLive: () => void;
   indicators: IndicatorConfig[];
   updateIndicator: (id: string, patch: Record<string, number | boolean | string>) => void;
+  drawingTool: DrawingType;
+  setDrawingTool: (tool: DrawingType) => void;
+  drawingState: DrawingState;
+  drawingActions: { remove: () => void; clear: () => void; lock: () => void; visibility: () => void; allVisibility: () => void; undo: () => void; redo: () => void; updateText: (id: string, text: string) => void };
 }) {
   return <div className="chart-controls">
     <DropdownMenu menuItems={[{ text: "Candlesticks", onclick: () => setSelectedChart("candlesticks") }, { text: "Heikin-Ashi", onclick: () => setSelectedChart("heikin-ashi") }, { text: "Area", onclick: () => setSelectedChart("area") }, { text: "Line", onclick: () => setSelectedChart("line") }, { text: "Bars", onclick: () => setSelectedChart("bar") }]}>
@@ -53,6 +58,11 @@ export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, 
           : <label>Period<input aria-label={`${indicator.type.toUpperCase()} period`} type="number" min="2" max={indicator.type === "rsi" ? 200 : 500} value={indicator.period} onChange={(event) => updateIndicator(indicator.id, { period: Number(event.target.value) })} /></label>}
         {indicator.type === "bollinger" && <label>Deviation<input aria-label="Bollinger deviation" type="number" min="0.1" max="10" step="0.1" value={indicator.deviation} onChange={(event) => updateIndicator(indicator.id, { deviation: Number(event.target.value) })} /></label>}
       </fieldset>)}
+    </div></details>
+    <details className="drawing-controls"><summary>Drawings</summary><div className="drawing-menu" aria-label="Drawing tools">
+      <div className="drawing-tools">{(["select", "trendline", "horizontal", "vertical", "fibonacci", "measurement", "text"] as DrawingType[]).map((tool) => <button key={tool} type="button" className={drawingTool === tool ? "selected" : ""} aria-pressed={drawingTool === tool} onClick={() => setDrawingTool(tool)}>{tool === "horizontal" ? "Support / resistance" : tool === "measurement" ? "Measure" : tool[0].toUpperCase() + tool.slice(1)}</button>)}</div>
+      <div className="drawing-actions"><button type="button" disabled={!drawingState.selectedId} onClick={drawingActions.remove}>Delete</button><button type="button" disabled={!drawingState.drawings.length} onClick={drawingActions.clear}>Clear all</button><button type="button" disabled={!drawingState.selectedId} onClick={drawingActions.lock}>{drawingState.drawings.find((item) => item.id === drawingState.selectedId)?.locked ? "Unlock" : "Lock"}</button><button type="button" disabled={!drawingState.selectedId} onClick={drawingActions.visibility}>Hide/show selected</button><button type="button" onClick={drawingActions.allVisibility}>{drawingState.visible ? "Hide all" : "Show all"}</button><button type="button" disabled={!drawingState.canUndo} onClick={drawingActions.undo}>Undo</button><button type="button" disabled={!drawingState.canRedo} onClick={drawingActions.redo}>Redo</button></div>
+      {drawingState.drawings.find((item) => item.id === drawingState.selectedId)?.type === "text" && <label>Annotation<input aria-label="Annotation text" maxLength={500} value={drawingState.drawings.find((item) => item.id === drawingState.selectedId)?.text || ""} onChange={(event) => drawingActions.updateText(drawingState.selectedId!, event.target.value)} /></label>}
     </div></details>
   </div>;
 }

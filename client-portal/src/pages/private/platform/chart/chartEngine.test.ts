@@ -26,7 +26,8 @@ describe("canonical candles", () => {
 
 const request = vi.fn(); const subscribe = vi.fn();
 const setOption = vi.fn(); const dispatchAction = vi.fn(); const chartOn = vi.fn(); const dispose = vi.fn();
-const chart = { on: chartOn, setOption, dispatchAction, getOption: () => ({ dataZoom: [{ start: 70, end: 100 }] }), resize: vi.fn(), dispose };
+const zrOn = vi.fn(); const zrOff = vi.fn();
+const chart = { on: chartOn, setOption, dispatchAction, getOption: () => ({ dataZoom: [{ start: 70, end: 100 }] }), getZr: () => ({ on: zrOn, off: zrOff }), convertToPixel: (_finder: unknown, value: [string, number]) => [100, value[1]], convertFromPixel: (_finder: unknown, value: [number, number]) => [0, value[1]], getWidth: () => 800, getHeight: () => 500, resize: vi.fn(), dispose };
 const init = vi.fn(() => chart);
 vi.mock("echarts", () => ({ init }));
 vi.mock("api/client", () => ({ authenticatedRequest: (...args: unknown[]) => request(...args) }));
@@ -62,7 +63,7 @@ describe("ChartDataController request budgets", () => {
 });
 
 describe("ECharts lifecycle and local controls", () => {
-  beforeEach(() => { request.mockClear(); subscribe.mockClear(); init.mockClear(); setOption.mockClear(); dispatchAction.mockClear(); dispose.mockClear(); chartOn.mockClear(); });
+  beforeEach(() => { request.mockClear(); subscribe.mockClear(); init.mockClear(); setOption.mockClear(); dispatchAction.mockClear(); dispose.mockClear(); chartOn.mockClear(); zrOn.mockClear(); zrOff.mockClear(); });
   it("creates one instance and chart changes stay local", async () => {
     const { EChartsAdapter } = await import("./EChartsAdapter"); const adapter = new EChartsAdapter(); const container = {} as HTMLElement;
     adapter.mount(container, "night", vi.fn()); adapter.mount(container, "night", vi.fn());
@@ -71,12 +72,20 @@ describe("ECharts lifecycle and local controls", () => {
     expect(subscribe).not.toHaveBeenCalled();
     adapter.dispose(); expect(dispose).toHaveBeenCalledTimes(1);
   });
+  it("renders drawings locally and keeps canonical candle objects unchanged", async () => {
+    const { EChartsAdapter } = await import("./EChartsAdapter"); const adapter = new EChartsAdapter(); const source = [candle("2026-08-07T00:00:00.000Z")]; const before = structuredClone(source);
+    adapter.mount({} as HTMLElement, "night", vi.fn()); adapter.setCandles(source);
+    adapter.setDrawings([{ id: "drawing-1", type: "horizontal", instrumentId: "BTC-USD", interval: "1m", points: [{ time: Date.parse(source[0].openTime) / 1000, price: "2" }], style: { color: "#fff", width: 2 }, locked: false, visible: true, createdAt: source[0].openTime, updatedAt: source[0].openTime }], "drawing-1", true);
+    adapter.setDrawingTool("trendline"); adapter.zoom(-10); adapter.resize();
+    expect(source).toEqual(before); expect(request).not.toHaveBeenCalled(); expect(subscribe).not.toHaveBeenCalled();
+    expect(setOption.mock.calls.some((call) => Array.isArray(call[0].graphic))).toBe(true);
+  });
   it("synchronizes price, RSI, and MACD panes through one dataZoom action", async () => {
     const { EChartsAdapter } = await import("./EChartsAdapter"); const adapter = new EChartsAdapter();
     adapter.mount({} as HTMLElement, "night", vi.fn());
     const configs = DEFAULT_INDICATORS.map((config) => ({ ...config, enabled: config.type === "rsi" || config.type === "macd" })) as IndicatorConfig[];
     adapter.setIndicators(configs); adapter.setCandles(Array.from({ length: 40 }, (_, index) => candle(new Date(Date.UTC(2026, 7, 1) + index * 60_000).toISOString(), String(index + 2))));
-    const option = setOption.mock.calls.at(-1)?.[0];
+    const option = [...setOption.mock.calls].reverse().find((call) => Array.isArray(call[0].grid))?.[0];
     expect(option.grid).toHaveLength(3); expect(option.xAxis).toHaveLength(3); expect(option.dataZoom[0].xAxisIndex).toEqual([0, 1, 2]);
     const callsBefore = request.mock.calls.length; adapter.zoom(-10); expect(request).toHaveBeenCalledTimes(callsBefore);
   });

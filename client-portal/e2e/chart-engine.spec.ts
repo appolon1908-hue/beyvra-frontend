@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 const candle = (minute: number) => ({ open_time: `2026-08-07T00:${String(minute).padStart(2, "0")}:00Z`, close_time: `2026-08-07T00:${String(minute + 1).padStart(2, "0")}:00Z`, open: "100.00", high: "102.00", low: "99.00", close: "101.00", volume: "4.00", complete: true, sequence: 184200 + minute });
 
-test("ECharts workspace is long-lived and uncertified 5s remains disabled", async ({ page, request, context, baseURL }) => {
+test("ECharts workspace, indicators, and drawings remain local and long-lived", async ({ page, request, context, baseURL }) => {
   const pageErrors: string[] = []; page.on("pageerror", (error) => pageErrors.push(error.message));
   let snapshotRequests = 0; let capabilityRequests = 0;
   const origin = baseURL ?? "http://127.0.0.1:8080";
@@ -21,6 +21,21 @@ test("ECharts workspace is long-lived and uncertified 5s remains disabled", asyn
   await page.locator(".indicator-controls > summary").click();
   await page.getByLabel("SMA", { exact: true }).check(); await page.getByLabel("RSI", { exact: true }).check(); await page.getByLabel("MACD", { exact: true }).check();
   await page.getByLabel("SMA period").fill("25"); await page.getByLabel("SMA period").press("Enter");
+  expect({ snapshotRequests, capabilityRequests }).toEqual(initialRequests);
+  expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
+  await page.locator(".indicator-controls > summary").click();
+  await page.locator(".drawing-controls > summary").click();
+  const clickChart = async (x: number, y: number) => chart.click({ position: { x, y } });
+  await page.getByRole("button", { name: "Trendline", exact: true }).click(); await clickChart(180, 180); await clickChart(320, 130);
+  await expect(page.getByRole("button", { name: "Delete", exact: true })).toBeEnabled();
+  await page.getByRole("button", { name: "Lock", exact: true }).click(); await expect(page.getByRole("button", { name: "Unlock", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Support / resistance", exact: true }).click(); await clickChart(250, 160);
+  await page.getByRole("button", { name: "Vertical", exact: true }).click(); await clickChart(280, 170);
+  await page.getByRole("button", { name: "Fibonacci", exact: true }).click(); await clickChart(190, 190); await clickChart(350, 110);
+  await page.getByRole("button", { name: "Measure", exact: true }).click(); await clickChart(210, 200); await clickChart(360, 140);
+  await page.getByRole("button", { name: "Text", exact: true }).click(); await clickChart(300, 120); await page.getByLabel("Annotation text").fill("Staging display note");
+  await page.getByRole("button", { name: "Hide/show selected", exact: true }).click(); await page.getByRole("button", { name: "Hide/show selected", exact: true }).click();
+  await page.getByRole("button", { name: "Clear all", exact: true }).click(); await page.getByRole("button", { name: "Undo", exact: true }).click(); await page.getByRole("button", { name: "Redo", exact: true }).click();
   expect({ snapshotRequests, capabilityRequests }).toEqual(initialRequests);
   expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
   await page.locator('.zoom-controls button[aria-label="Zoom chart in"]').click({ force: true });
