@@ -44,6 +44,11 @@ export const apiEndpoints = {
     trades: "v1/demo/trades",
     wallet: "v1/demo/wallet",
   },
+  news: {
+    list: "v1/news",
+    detail: (articleId: string) => `v1/news/${encodeURIComponent(articleId)}`,
+    calendar: "v1/economic-calendar",
+  },
   // These capabilities are intentionally not advertised until a matching
   // backend contract exists. Demo configuration is served by demo.config.
   realtime: {},

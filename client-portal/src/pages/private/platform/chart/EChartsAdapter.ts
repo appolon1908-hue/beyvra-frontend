@@ -6,6 +6,8 @@ import { DrawingLayer, DrawingLayerCallbacks } from "./drawings/DrawingLayer";
 import { ChartDrawing, DrawingType } from "./drawings/types";
 import { TradeMarkerLayer } from "./trades/TradeMarkerLayer";
 import { TradeChartMarker } from "./trades/types";
+import { NewsCalendarMarkerLayer } from "./events/NewsCalendarMarkerLayer";
+import { OverlayMarker } from "./events/types";
 
 export type ChartType = "candlesticks" | "heikin-ashi" | "bar" | "line" | "area";
 
@@ -32,7 +34,9 @@ export class EChartsAdapter {
   private readonly drawingLayer = new DrawingLayer();
   private drawingGraphics: object[] = [];
   private tradeGraphics: object[] = [];
+  private eventGraphics: object[] = [];
   private readonly tradeMarkerLayer = new TradeMarkerLayer((graphics) => { this.tradeGraphics = graphics; this.renderGraphics(); });
+  private readonly newsCalendarLayer = new NewsCalendarMarkerLayer((graphics) => { this.eventGraphics = graphics; this.renderGraphics(); });
 
   mount(container: HTMLElement, theme: string, onHistoryBoundary: () => void, drawingCallbacks?: DrawingLayerCallbacks) {
     if (this.chart) return;
@@ -46,6 +50,7 @@ export class EChartsAdapter {
     });
     this.drawingLayer.mount(this.chart, drawingCallbacks ?? { onCreate: () => undefined, onSelect: () => undefined, onMove: () => undefined }, (graphics) => { this.drawingGraphics = graphics; this.renderGraphics(); });
     this.tradeMarkerLayer.mount(this.chart);
+    this.newsCalendarLayer.mount(this.chart);
     this.setTheme(theme);
   }
 
@@ -58,10 +63,11 @@ export class EChartsAdapter {
   setDrawings(drawings: readonly ChartDrawing[], selectedId: string | undefined, visible: boolean) { this.drawingLayer.setDrawings(drawings, selectedId, visible); }
   setDrawingTool(tool: DrawingType) { this.drawingLayer.setTool(tool); }
   setTradeMarkers(markers: readonly TradeChartMarker[], estimatedServerNow: number) { this.tradeMarkerLayer.setMarkers(markers, estimatedServerNow); }
+  setNewsCalendarMarkers(markers: readonly OverlayMarker[]) { this.newsCalendarLayer.setMarkers(markers); }
   setCandles(candles: CanonicalCandle[]) {
     const previousCount = this.candles.length;
     const prepended = previousCount > 0 && candles.length > previousCount && candles.at(-(previousCount))?.openTime === this.candles[0]?.openTime ? candles.length - previousCount : 0;
-    this.candles = candles; this.renderSeries(previousCount, prepended); this.drawingLayer.setCandles(candles); this.tradeMarkerLayer.setCandles(candles); if (this.followLive) this.centerLive();
+    this.candles = candles; this.renderSeries(previousCount, prepended); this.drawingLayer.setCandles(candles); this.tradeMarkerLayer.setCandles(candles); this.newsCalendarLayer.setCandles(candles); if (this.followLive) this.centerLive();
   }
 
   setCurrentPrice(price: string | undefined, state: ChartConnectionState) {
@@ -77,8 +83,8 @@ export class EChartsAdapter {
   }
   resetView() { this.followLive = true; this.chart?.dispatchAction({ type: "dataZoom", start: 70, end: 100 }); }
   centerLive() { this.followLive = true; this.chart?.dispatchAction({ type: "dataZoom", start: Math.max(0, 100 - Math.min(100, 3000 / Math.max(1, this.candles.length))), end: 100 }); }
-  resize() { this.chart?.resize(); this.drawingLayer.render(); this.tradeMarkerLayer.render(); }
-  dispose() { this.drawingLayer.dispose(); this.tradeMarkerLayer.dispose(); this.chart?.dispose(); this.chart = undefined; }
+  resize() { this.chart?.resize(); this.drawingLayer.render(); this.tradeMarkerLayer.render(); this.newsCalendarLayer.render(); }
+  dispose() { this.drawingLayer.dispose(); this.tradeMarkerLayer.dispose(); this.newsCalendarLayer.dispose(); this.chart?.dispose(); this.chart = undefined; }
 
   private renderSeries(previousCount = this.candles.length, prepended = 0) {
     if (!this.chart) return;
@@ -121,5 +127,5 @@ export class EChartsAdapter {
     const guide = result.type === "rsi" ? { silent: true, symbol: "none", data: [{ yAxis: 30 }, { yAxis: 70 }], lineStyle: { color: "#64748b", type: "dashed" }, label: { show: false } } : undefined;
     return [{ ...base, id: result.id, name: result.type.toUpperCase(), type: "line", data: result.values.value, lineStyle: { color: config.color, width: 1.5 }, markLine: guide }];
   }
-  private renderGraphics() { this.chart?.setOption({ graphic: [...this.drawingGraphics, ...this.tradeGraphics] }, { replaceMerge: ["graphic"], lazyUpdate: true }); }
+  private renderGraphics() { this.chart?.setOption({ graphic: [...this.drawingGraphics, ...this.tradeGraphics, ...this.eventGraphics] }, { replaceMerge: ["graphic"], lazyUpdate: true }); }
 }

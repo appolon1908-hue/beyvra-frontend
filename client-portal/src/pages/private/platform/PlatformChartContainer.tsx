@@ -20,6 +20,9 @@ import { validateIndicatorConfig } from "./chart/indicators/IndicatorEngine";
 import { DrawingStore } from "./chart/drawings/DrawingStore";
 import { DrawingType } from "./chart/drawings/types";
 import { TradeMarkerStore } from "./chart/trades/TradeMarkerStore";
+import { NewsCalendarOverlayStore } from "./chart/events/NewsCalendarOverlayStore";
+import { NewsCalendarDrawer } from "./chart/events/NewsCalendarDrawer";
+import { useNewsCalendarOverlay } from "./hooks/useNewsCalendarOverlay";
 
 interface PlatformProps { themeSelect: string; tradeFormHeight: number; bottomSidebarHeight: number }
 const instrumentIdFor = (value: string) => `${value.replace(/USDT$|\/USD$/i, "").toUpperCase()}-USD`;
@@ -39,9 +42,12 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   const controller = useMemo(() => new ChartDataController(cookies.access_token || ""), [cookies.access_token]);
   const drawingStore = useMemo(() => new DrawingStore(), []);
   const tradeMarkerStore = useMemo(() => new TradeMarkerStore(), []);
+  const newsCalendarStore = useMemo(() => new NewsCalendarOverlayStore(), []);
+  const [eventsOpen, setEventsOpen] = useState(false);
   const chartState = useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getSnapshot);
   const drawingState = useSyncExternalStore(drawingStore.subscribe, drawingStore.getSnapshot, drawingStore.getSnapshot);
   const tradeMarkerState = useSyncExternalStore(tradeMarkerStore.subscribe, tradeMarkerStore.getSnapshot, tradeMarkerStore.getSnapshot);
+  const eventOverlayState = useSyncExternalStore(newsCalendarStore.subscribe, newsCalendarStore.getSnapshot, newsCalendarStore.getSnapshot);
   const { overlay, openOverlay, closeOverlay } = usePlatformOverlay();
   const { data: workspaceBootstrap } = useWorkspaceBootstrap();
   const demoAccountId = workspaceBootstrap?.payload.account.id;
@@ -53,6 +59,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   const [orderError, setOrderError] = useState("");
   const ticketTriggerRef = useRef<HTMLButtonElement>(null);
   const { trades: openTrades, refresh: refreshTrades, lastEvent: demoTradeEvent } = useDemoTrades(cookies.access_token, demoAccountId, workspaceBootstrap?.payload.realtime);
+  const eventOverlay = useNewsCalendarOverlay(newsCalendarStore, cookies.access_token, instrumentId, eventsOpen);
   const quote = chartState.quote ? Number(chartState.quote.mid) : undefined;
 
   useEffect(() => { void controller.selectInstrument(instrumentId, "1m"); return () => controller.stop(); }, [controller, instrumentId]);
@@ -77,6 +84,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   useEffect(() => tradeMarkerStore.replaceInitial(openTrades, demoAccountId || accountScope), [tradeMarkerStore, openTrades, demoAccountId, accountScope]);
   useEffect(() => { if (demoTradeEvent) tradeMarkerStore.applyRealtime(demoTradeEvent, demoAccountId || accountScope); }, [tradeMarkerStore, demoTradeEvent, demoAccountId, accountScope]);
   useEffect(() => adapterRef.current?.setTradeMarkers(tradeMarkerStore.markersFor(instrumentId), tradeMarkerState.estimatedServerNow), [tradeMarkerStore, tradeMarkerState, instrumentId]);
+  useEffect(() => adapterRef.current?.setNewsCalendarMarkers(newsCalendarStore.markersFor(instrumentId)), [newsCalendarStore, eventOverlayState, instrumentId]);
   useEffect(() => { setAmount((current) => Math.min(demoConfig.maxAmount, Math.max(demoConfig.minAmount, current))); if (!demoConfig.durations.includes(duration)) setDuration(demoConfig.durations[0] ?? 15); }, [demoConfig, duration]);
 
   const submitDemoOrder = async (direction: "up" | "down") => {
@@ -96,6 +104,8 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
     <MarketStatus symbol={tradingPair} interval={chartState.interval} state={chartState.connectionState} error={chartState.error || ""} lastUpdate={chartState.quote ? Date.parse(chartState.quote.occurredAt) : undefined} onRetry={() => void controller.selectInstrument(instrumentId, chartState.interval)} />
     <ChartToolbar selectedChart={selectedChart} setSelectedChart={setSelectedChart} candleInterval={chartState.interval} capabilities={chartState.capabilities} setCandleInterval={(interval) => void controller.selectInterval(interval)} handleZoom={(zoomIn) => adapterRef.current?.zoom(zoomIn ? -10 : 10)} resetView={() => adapterRef.current?.resetView()} centerLive={() => adapterRef.current?.centerLive()} indicators={indicators} updateIndicator={updateIndicator} drawingTool={drawingTool} setDrawingTool={setDrawingTool} drawingState={drawingState} drawingActions={{ remove: () => drawingStore.remove(), clear: () => drawingStore.clear(), lock: () => drawingStore.toggleLock(), visibility: () => drawingStore.toggleDrawingVisibility(), allVisibility: () => drawingStore.toggleAllVisibility(), undo: () => drawingStore.undo(), redo: () => drawingStore.redo(), updateText: (id, text) => drawingStore.updateText(id, text) }} />
     <TradeMarkerSummary markers={tradeMarkerStore.markersFor(instrumentId)} serverNow={tradeMarkerState.estimatedServerNow} />
+    <button type="button" className="event-overlay-trigger" aria-expanded={eventsOpen} onClick={() => { const next = !eventsOpen; setEventsOpen(next); newsCalendarStore.setVisible(next); }}>News &amp; events</button>
+    {eventsOpen && <NewsCalendarDrawer state={eventOverlayState} message={eventOverlay.message} close={() => { setEventsOpen(false); newsCalendarStore.setVisible(false); }} setFilter={(filter) => newsCalendarStore.setFilter(filter)} loadCalendar={() => void eventOverlay.loadCalendar()} />}
   </div></div>
   <button type="button" className="ticket-trigger" ref={ticketTriggerRef} onClick={() => openOverlay("trade")} aria-controls="platform-order-ticket" aria-expanded={isTicketOpen}>Open Demo Trade</button>
   {isTicketOpen && <button type="button" className="ticket-backdrop" onClick={closeTicket} aria-label="Close demo trade ticket" />}
