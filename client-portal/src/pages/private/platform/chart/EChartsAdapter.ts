@@ -1,5 +1,7 @@
 import * as echarts from "echarts";
 import { CanonicalCandle, ChartConnectionState } from "./chartTypes";
+import { IndicatorEngine } from "./indicators/IndicatorEngine";
+import { IndicatorConfig, IndicatorResult } from "./indicators/types";
 
 export type ChartType = "candlesticks" | "heikin-ashi" | "bar" | "line" | "area";
 
@@ -19,6 +21,10 @@ export class EChartsAdapter {
   private chartType: ChartType = "candlesticks";
   private followLive = true;
   private historyHandler?: () => void;
+  private indicatorConfigs: IndicatorConfig[] = [];
+  private readonly indicatorEngine = new IndicatorEngine();
+  private currentPrice?: string;
+  private currentPriceState: ChartConnectionState = "disconnected";
 
   mount(container: HTMLElement, theme: string, onHistoryBoundary: () => void) {
     if (this.chart) return;
@@ -37,6 +43,7 @@ export class EChartsAdapter {
   }
 
   setChartType(type: ChartType) { this.chartType = type; this.renderSeries(); }
+  setIndicators(configs: readonly IndicatorConfig[]) { this.indicatorConfigs = configs.map((config) => ({ ...config })); this.renderSeries(); }
   setCandles(candles: CanonicalCandle[]) {
     const previousCount = this.candles.length;
     const prepended = previousCount > 0 && candles.length > previousCount && candles.at(-(previousCount))?.openTime === this.candles[0]?.openTime ? candles.length - previousCount : 0;
@@ -44,6 +51,7 @@ export class EChartsAdapter {
   }
 
   setCurrentPrice(price: string | undefined, state: ChartConnectionState) {
+    this.currentPrice = price; this.currentPriceState = state;
     const value = Number(price); const visible = Number.isFinite(value) && !["disconnected", "error"].includes(state);
     this.chart?.setOption({ series: [{ id: "price", markLine: { silent: true, symbol: "none", data: visible ? [{ yAxis: value, label: { show: true, formatter: value.toFixed(2), color: state === "stale" ? "#f59e0b" : "#12e6d0" }, lineStyle: { color: state === "stale" ? "#f59e0b" : "#12e6d0", type: state === "stale" ? "dashed" : "solid" } }] : [] } }] });
   }
@@ -64,7 +72,7 @@ export class EChartsAdapter {
     const ohlc = this.chartType === "heikin-ashi" ? heikinAshi(this.candles) : this.candles.map((candle) => [Number(candle.open), Number(candle.close), Number(candle.low), Number(candle.high)]);
     const closes = this.candles.map((candle) => Number(candle.close));
     const isCandle = this.chartType === "candlesticks" || this.chartType === "heikin-ashi";
-    const series = isCandle
+    const priceSeries = isCandle
       ? { id: "price", type: "candlestick", data: ohlc, itemStyle: { color: "#26a69a", color0: "#ef5350", borderColor: "#26a69a", borderColor0: "#ef5350" } }
       : this.chartType === "bar"
         ? { id: "price", type: "bar", data: closes, itemStyle: { color: (params: { dataIndex: number }) => Number(this.candles[params.dataIndex]?.close) >= Number(this.candles[params.dataIndex]?.open) ? "#26a69a" : "#ef5350" } }
@@ -72,6 +80,30 @@ export class EChartsAdapter {
     const currentZoom = ((this.chart.getOption().dataZoom as Array<{ start?: number; end?: number }> | undefined)?.[0]) || {};
     let start = currentZoom.start ?? 70; let end = currentZoom.end ?? 100;
     if (prepended && previousCount) { start = ((start / 100 * previousCount) + prepended) / this.candles.length * 100; end = ((end / 100 * previousCount) + prepended) / this.candles.length * 100; }
-    this.chart.setOption({ animation: false, tooltip: { trigger: "axis" }, grid: { left: 12, right: 74, top: 48, bottom: 45, containLabel: true }, xAxis: { type: "category", data: labels, boundaryGap: true }, yAxis: { type: "value", scale: true }, dataZoom: [{ type: "inside", start, end, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { type: "slider", height: 18, bottom: 8, start, end, showDetail: false }], series: [series] }, { notMerge: false, lazyUpdate: true });
+    const priceValue = Number(this.currentPrice); const priceVisible = Number.isFinite(priceValue) && !["disconnected", "error"].includes(this.currentPriceState);
+    Object.assign(priceSeries, { markLine: { silent: true, symbol: "none", data: priceVisible ? [{ yAxis: priceValue, label: { show: true, formatter: priceValue.toFixed(2), color: this.currentPriceState === "stale" ? "#f59e0b" : "#12e6d0" }, lineStyle: { color: this.currentPriceState === "stale" ? "#f59e0b" : "#12e6d0", type: this.currentPriceState === "stale" ? "dashed" : "solid" } }] : [] } });
+    const results = this.indicatorEngine.calculate(this.candles, this.indicatorConfigs);
+    const panes = [...new Set(results.map((result) => result.pane).filter((pane) => pane !== "price"))];
+    const priceBottom = panes.length === 0 ? 45 : panes.length === 1 ? "35%" : "52%";
+    const grids: object[] = [{ left: 12, right: 74, top: 48, bottom: priceBottom, containLabel: true }];
+    panes.forEach((_, index) => grids.push({ left: 12, right: 74, top: panes.length === 1 ? "70%" : `${55 + index * 21}%`, height: panes.length === 1 ? "20%" : "16%", containLabel: true }));
+    const xAxes = grids.map((_, index) => ({ type: "category", gridIndex: index, data: labels, boundaryGap: true, axisLabel: { show: index === grids.length - 1 }, axisPointer: { show: true, snap: true } }));
+    const yAxes = grids.map((_, index) => ({ type: "value", gridIndex: index, scale: index === 0, min: panes[index - 1] === "rsi" ? 0 : undefined, max: panes[index - 1] === "rsi" ? 100 : undefined, position: "right" }));
+    const indicatorSeries = results.flatMap((result) => this.indicatorSeries(result, panes.indexOf(result.pane) + 1));
+    const xAxisIndex = grids.map((_, index) => index);
+    this.chart.setOption({ animation: false, axisPointer: { link: [{ xAxisIndex: "all" }] }, tooltip: { trigger: "axis" }, grid: grids, xAxis: xAxes, yAxis: yAxes, dataZoom: [{ type: "inside", xAxisIndex, start, end, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { type: "slider", xAxisIndex, height: 18, bottom: 8, start, end, showDetail: false }], series: [priceSeries, ...indicatorSeries] }, { notMerge: true, lazyUpdate: true });
+  }
+
+  private indicatorSeries(result: IndicatorResult, paneIndex: number): object[] {
+    const config = this.indicatorConfigs.find((item) => item.id === result.id)!;
+    const base = { xAxisIndex: result.pane === "price" ? 0 : paneIndex, yAxisIndex: result.pane === "price" ? 0 : paneIndex, showSymbol: false, connectNulls: false, animation: false };
+    if (result.type === "macd") return [
+      { ...base, id: `${result.id}-histogram`, name: "MACD histogram", type: "bar", data: result.values.histogram, itemStyle: { color: (params: { value: number }) => params.value >= 0 ? "#26a69a" : "#ef5350" } },
+      { ...base, id: `${result.id}-line`, name: "MACD", type: "line", data: result.values.macd, lineStyle: { color: config.color, width: 1.5 } },
+      { ...base, id: `${result.id}-signal`, name: "Signal", type: "line", data: result.values.signal, lineStyle: { color: "#f6b73c", width: 1.5 } },
+    ];
+    if (result.type === "bollinger") return ["upper", "middle", "lower"].map((key) => ({ ...base, id: `${result.id}-${key}`, name: `Bollinger ${key}`, type: "line", data: result.values[key], lineStyle: { color: config.color, width: key === "middle" ? 1.5 : 1, type: key === "middle" ? "solid" : "dashed" } }));
+    const guide = result.type === "rsi" ? { silent: true, symbol: "none", data: [{ yAxis: 30 }, { yAxis: 70 }], lineStyle: { color: "#64748b", type: "dashed" }, label: { show: false } } : undefined;
+    return [{ ...base, id: result.id, name: result.type.toUpperCase(), type: "line", data: result.values.value, lineStyle: { color: config.color, width: 1.5 }, markLine: guide }];
   }
 }

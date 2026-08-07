@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { applyLiveCandle, normalizeCandles, prependHistory } from "./candles";
 import { CanonicalCandle, MarketSnapshot } from "./chartTypes";
+import { DEFAULT_INDICATORS, IndicatorConfig } from "./indicators/types";
 
 const candle = (time: string, close = "2"): CanonicalCandle => ({ openTime: time, closeTime: new Date(Date.parse(time) + 60_000).toISOString(), open: "1", high: "3", low: "0.5", close, volume: "4", complete: true, sequence: Date.parse(time) / 1000 });
 const raw = (time: string, close = "2"): MarketSnapshot["candles"][number] => ({ open_time: time, close_time: new Date(Date.parse(time) + 60_000).toISOString(), open: "1", high: "3", low: "0.5", close, volume: "4", complete: true, sequence: Date.parse(time) / 1000 });
@@ -61,13 +62,23 @@ describe("ChartDataController request budgets", () => {
 });
 
 describe("ECharts lifecycle and local controls", () => {
-  beforeEach(() => { request.mockClear(); init.mockClear(); setOption.mockClear(); dispatchAction.mockClear(); dispose.mockClear(); chartOn.mockClear(); });
+  beforeEach(() => { request.mockClear(); subscribe.mockClear(); init.mockClear(); setOption.mockClear(); dispatchAction.mockClear(); dispose.mockClear(); chartOn.mockClear(); });
   it("creates one instance and chart changes stay local", async () => {
     const { EChartsAdapter } = await import("./EChartsAdapter"); const adapter = new EChartsAdapter(); const container = {} as HTMLElement;
     adapter.mount(container, "night", vi.fn()); adapter.mount(container, "night", vi.fn());
-    adapter.setCandles([candle("2026-08-07T00:00:00.000Z")]); adapter.setChartType("area"); adapter.zoom(-10); adapter.resetView(); adapter.centerLive();
+    adapter.setCandles([candle("2026-08-07T00:00:00.000Z")]); adapter.setChartType("area"); adapter.setIndicators([{ ...DEFAULT_INDICATORS[0], enabled: true } as IndicatorConfig]); adapter.zoom(-10); adapter.resetView(); adapter.centerLive();
     expect(init).toHaveBeenCalledTimes(1); expect(dispatchAction).toHaveBeenCalledTimes(4); expect(request).not.toHaveBeenCalled();
+    expect(subscribe).not.toHaveBeenCalled();
     adapter.dispose(); expect(dispose).toHaveBeenCalledTimes(1);
+  });
+  it("synchronizes price, RSI, and MACD panes through one dataZoom action", async () => {
+    const { EChartsAdapter } = await import("./EChartsAdapter"); const adapter = new EChartsAdapter();
+    adapter.mount({} as HTMLElement, "night", vi.fn());
+    const configs = DEFAULT_INDICATORS.map((config) => ({ ...config, enabled: config.type === "rsi" || config.type === "macd" })) as IndicatorConfig[];
+    adapter.setIndicators(configs); adapter.setCandles(Array.from({ length: 40 }, (_, index) => candle(new Date(Date.UTC(2026, 7, 1) + index * 60_000).toISOString(), String(index + 2))));
+    const option = setOption.mock.calls.at(-1)?.[0];
+    expect(option.grid).toHaveLength(3); expect(option.xAxis).toHaveLength(3); expect(option.dataZoom[0].xAxisIndex).toEqual([0, 1, 2]);
+    const callsBefore = request.mock.calls.length; adapter.zoom(-10); expect(request).toHaveBeenCalledTimes(callsBefore);
   });
 });
 

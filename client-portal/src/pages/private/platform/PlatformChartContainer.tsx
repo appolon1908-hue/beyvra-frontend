@@ -14,6 +14,9 @@ import { recordPlatformEvent } from "../../../observability/platformTelemetry";
 import { ChartDataController } from "./chart/ChartDataController";
 import { EChartsAdapter, ChartType } from "./chart/EChartsAdapter";
 import { ChartInterval } from "./chart/chartTypes";
+import { IndicatorConfig } from "./chart/indicators/types";
+import { loadIndicatorPreferences, saveIndicatorPreferences } from "./chart/indicators/preferences";
+import { validateIndicatorConfig } from "./chart/indicators/IndicatorEngine";
 
 interface PlatformProps { themeSelect: string; tradeFormHeight: number; bottomSidebarHeight: number }
 const instrumentIdFor = (value: string) => `${value.replace(/USDT$|\/USD$/i, "").toUpperCase()}-USD`;
@@ -23,6 +26,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   const adapterRef = useRef<EChartsAdapter | undefined>(undefined);
   const initialThemeRef = useRef(themeSelect);
   const [selectedChart, setSelectedChart] = useState<ChartType>("candlesticks");
+  const [indicators, setIndicators] = useState<IndicatorConfig[]>(loadIndicatorPreferences);
   const chartSymbol = useAppSelector((state) => state.socketStockCrypto.chartSymbol) || "BTC";
   const tradingPair = `${chartSymbol.replace(/USDT$|\/USD$/i, "").toUpperCase()}USDT`;
   const instrumentId = instrumentIdFor(tradingPair);
@@ -51,6 +55,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   }, [controller]);
   useEffect(() => adapterRef.current?.setTheme(themeSelect), [themeSelect]);
   useEffect(() => adapterRef.current?.setChartType(selectedChart), [selectedChart]);
+  useEffect(() => { adapterRef.current?.setIndicators(indicators); saveIndicatorPreferences(indicators); }, [indicators]);
   useEffect(() => adapterRef.current?.setCandles(chartState.candles), [chartState.candles]);
   useEffect(() => adapterRef.current?.setCurrentPrice(chartState.quote?.mid, chartState.connectionState), [chartState.quote?.mid, chartState.connectionState]);
   useEffect(() => { setAmount((current) => Math.min(demoConfig.maxAmount, Math.max(demoConfig.minAmount, current))); if (!demoConfig.durations.includes(duration)) setDuration(demoConfig.durations[0] ?? 15); }, [demoConfig, duration]);
@@ -63,9 +68,14 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   };
 
   const closeTicket = () => { closeOverlay(); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); };
+  const updateIndicator = (id: string, patch: Record<string, number | boolean | string>) => setIndicators((current) => current.map((indicator) => {
+    if (indicator.id !== id) return indicator;
+    const candidate = { ...indicator, ...patch } as IndicatorConfig;
+    try { validateIndicatorConfig(candidate); return candidate; } catch { return indicator; }
+  }));
   return <div className="trade-content"><div className="trade-graph"><div className="chart-container" aria-label={`${tradingPair} market chart`}><div ref={chartContainerRef} className="chart-surface" />
     <MarketStatus symbol={tradingPair} interval={chartState.interval} state={chartState.connectionState} error={chartState.error || ""} lastUpdate={chartState.quote ? Date.parse(chartState.quote.occurredAt) : undefined} onRetry={() => void controller.selectInstrument(instrumentId, chartState.interval)} />
-    <ChartToolbar selectedChart={selectedChart} setSelectedChart={setSelectedChart} candleInterval={chartState.interval} capabilities={chartState.capabilities} setCandleInterval={(interval) => void controller.selectInterval(interval)} handleZoom={(zoomIn) => adapterRef.current?.zoom(zoomIn ? -10 : 10)} resetView={() => adapterRef.current?.resetView()} centerLive={() => adapterRef.current?.centerLive()} />
+    <ChartToolbar selectedChart={selectedChart} setSelectedChart={setSelectedChart} candleInterval={chartState.interval} capabilities={chartState.capabilities} setCandleInterval={(interval) => void controller.selectInterval(interval)} handleZoom={(zoomIn) => adapterRef.current?.zoom(zoomIn ? -10 : 10)} resetView={() => adapterRef.current?.resetView()} centerLive={() => adapterRef.current?.centerLive()} indicators={indicators} updateIndicator={updateIndicator} />
   </div></div>
   <button type="button" className="ticket-trigger" ref={ticketTriggerRef} onClick={() => openOverlay("trade")} aria-controls="platform-order-ticket" aria-expanded={isTicketOpen}>Open Demo Trade</button>
   {isTicketOpen && <button type="button" className="ticket-backdrop" onClick={closeTicket} aria-label="Close demo trade ticket" />}

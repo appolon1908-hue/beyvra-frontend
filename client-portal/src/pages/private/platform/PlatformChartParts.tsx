@@ -3,6 +3,7 @@ import { MainChartChangeIcon, ZoomInChartIcon, ZoomOutChartIcon } from "../../..
 import { DemoTrade } from "api/demo/types";
 import { ChartType } from "./chart/EChartsAdapter";
 import { ChartInterval, TimeframeCapability } from "./chart/chartTypes";
+import { IndicatorConfig } from "./chart/indicators/types";
 
 export function MarketStatus({ symbol, interval, state, error, lastUpdate, onRetry }: { symbol: string; interval: string; state: string; error: string; lastUpdate?: number; onRetry: () => void }) {
   return <>
@@ -17,7 +18,7 @@ export function MarketStatus({ symbol, interval, state, error, lastUpdate, onRet
   </>;
 }
 
-export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, capabilities, setCandleInterval, handleZoom, resetView, centerLive }: {
+export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, capabilities, setCandleInterval, handleZoom, resetView, centerLive, indicators, updateIndicator }: {
   selectedChart: ChartType;
   setSelectedChart: (value: ChartType) => void;
   candleInterval: ChartInterval;
@@ -26,6 +27,8 @@ export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, 
   handleZoom: (zoomIn: boolean) => void;
   resetView: () => void;
   centerLive: () => void;
+  indicators: IndicatorConfig[];
+  updateIndicator: (id: string, patch: Record<string, number | boolean | string>) => void;
 }) {
   return <div className="chart-controls">
     <DropdownMenu menuItems={[{ text: "Candlesticks", onclick: () => setSelectedChart("candlesticks") }, { text: "Heikin-Ashi", onclick: () => setSelectedChart("heikin-ashi") }, { text: "Area", onclick: () => setSelectedChart("area") }, { text: "Line", onclick: () => setSelectedChart("line") }, { text: "Bars", onclick: () => setSelectedChart("bar") }]}>
@@ -44,6 +47,13 @@ export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, 
         return <button key={interval} type="button" disabled={disabled} title={disabled ? capability?.reason || "Market-data capability unavailable" : undefined} className={candleInterval === interval ? "selected" : ""} onClick={() => setCandleInterval(interval)} aria-pressed={candleInterval === interval}>{interval}</button>;
       })}
     </div>
+    <details className="indicator-controls"><summary>Indicators</summary><div className="indicator-menu">
+      {indicators.map((indicator) => <fieldset key={indicator.id}><label><input type="checkbox" checked={indicator.enabled} onChange={(event) => updateIndicator(indicator.id, { enabled: event.target.checked })} /> {indicator.type === "bollinger" ? "Bollinger Bands" : indicator.type.toUpperCase()}</label>
+        {indicator.type === "macd" ? <><label>Fast<input aria-label="MACD fast period" type="number" min="2" max="200" value={indicator.fast} onChange={(event) => updateIndicator(indicator.id, { fast: Number(event.target.value) })} /></label><label>Slow<input aria-label="MACD slow period" type="number" min="3" max="500" value={indicator.slow} onChange={(event) => updateIndicator(indicator.id, { slow: Number(event.target.value) })} /></label><label>Signal<input aria-label="MACD signal period" type="number" min="2" max="200" value={indicator.signal} onChange={(event) => updateIndicator(indicator.id, { signal: Number(event.target.value) })} /></label></>
+          : <label>Period<input aria-label={`${indicator.type.toUpperCase()} period`} type="number" min="2" max={indicator.type === "rsi" ? 200 : 500} value={indicator.period} onChange={(event) => updateIndicator(indicator.id, { period: Number(event.target.value) })} /></label>}
+        {indicator.type === "bollinger" && <label>Deviation<input aria-label="Bollinger deviation" type="number" min="0.1" max="10" step="0.1" value={indicator.deviation} onChange={(event) => updateIndicator(indicator.id, { deviation: Number(event.target.value) })} /></label>}
+      </fieldset>)}
+    </div></details>
   </div>;
 }
 
