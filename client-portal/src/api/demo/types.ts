@@ -20,6 +20,7 @@ export interface DemoTrade {
   openedAt: string;
   expiresAt: string;
   settledAt?: string | null;
+  payoutPercent?: string | number | null;
 }
 
 export interface DemoWallet {

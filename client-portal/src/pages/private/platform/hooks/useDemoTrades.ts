@@ -1,10 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { authenticatedRequest } from "api/client";
 import { apiEndpoints } from "api/endpoints";
 import { DemoTrade } from "api/demo/types";
+import { getUnifiedRealtimeClient, UnifiedRealtimeMessage } from "realtime/UnifiedRealtimeClient";
+import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
+import { demoTradeFromRealtime, tradeEventVersion } from "../chart/trades/TradeMarkerStore";
 
 export function useDemoTrades(token?: string) {
   const [trades, setTrades] = useState<DemoTrade[]>([]);
+  const [lastEvent, setLastEvent] = useState<UnifiedRealtimeMessage>();
+  const versions = useRef(new Map<string, number>());
   const refresh = useCallback(async () => {
     if (!token) return;
     try {
@@ -17,8 +22,18 @@ export function useDemoTrades(token?: string) {
   }, [token]);
   useEffect(() => {
     void refresh();
-    const timer = window.setInterval(() => void refresh(), 5_000);
-    return () => window.clearInterval(timer);
   }, [refresh]);
-  return { trades, refresh };
+  useEffect(() => {
+    if (!token) return;
+    const client = getUnifiedRealtimeClient(token, async () => (await webSocketTicketFetcher(token)).ws_ticket);
+    const receive = (event: UnifiedRealtimeMessage) => {
+      const trade = demoTradeFromRealtime(event); const version = tradeEventVersion(event);
+      if (!trade || !Number.isFinite(version)) return;
+      const id = String(trade.id); if ((versions.current.get(id) ?? -1) >= version) { setLastEvent({ ...event }); return; }
+      versions.current.set(id, version); setTrades((current) => current.some((item) => String(item.id) === id) ? current.map((item) => String(item.id) === id ? trade : item) : [trade, ...current]); setLastEvent({ ...event });
+    };
+    const order = client.subscribe("demo.order", receive); const execution = client.subscribe("demo.execution", receive);
+    return () => { order(); execution(); };
+  }, [token]);
+  return { trades, refresh, lastEvent };
 }

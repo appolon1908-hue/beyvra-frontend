@@ -27,7 +27,7 @@ describe("canonical candles", () => {
 const request = vi.fn(); const subscribe = vi.fn();
 const setOption = vi.fn(); const dispatchAction = vi.fn(); const chartOn = vi.fn(); const dispose = vi.fn();
 const zrOn = vi.fn(); const zrOff = vi.fn();
-const chart = { on: chartOn, setOption, dispatchAction, getOption: () => ({ dataZoom: [{ start: 70, end: 100 }] }), getZr: () => ({ on: zrOn, off: zrOff }), convertToPixel: (_finder: unknown, value: [string, number]) => [100, value[1]], convertFromPixel: (_finder: unknown, value: [number, number]) => [0, value[1]], getWidth: () => 800, getHeight: () => 500, resize: vi.fn(), dispose };
+const chart = { on: chartOn, setOption, dispatchAction, getOption: () => ({ dataZoom: [{ start: 70, end: 100 }] }), getZr: () => ({ on: zrOn, off: zrOff }), convertToPixel: (_finder: unknown, value: string | [string, number]) => Array.isArray(value) ? [100, value[1]] : 100, convertFromPixel: (_finder: unknown, value: [number, number]) => [0, value[1]], getWidth: () => 800, getHeight: () => 500, resize: vi.fn(), dispose };
 const init = vi.fn(() => chart);
 vi.mock("echarts", () => ({ init }));
 vi.mock("api/client", () => ({ authenticatedRequest: (...args: unknown[]) => request(...args) }));
@@ -79,6 +79,16 @@ describe("ECharts lifecycle and local controls", () => {
     adapter.setDrawingTool("trendline"); adapter.zoom(-10); adapter.resize();
     expect(source).toEqual(before); expect(request).not.toHaveBeenCalled(); expect(subscribe).not.toHaveBeenCalled();
     expect(setOption.mock.calls.some((call) => Array.isArray(call[0].graphic))).toBe(true);
+  });
+  it("renders trade markers locally without order, market, drawing, or indicator mutations", async () => {
+    const { EChartsAdapter } = await import("./EChartsAdapter"); const adapter = new EChartsAdapter(); const source = [candle("2026-08-07T00:00:00.000Z"), candle("2026-08-07T00:01:00.000Z")]; const before = structuredClone(source);
+    adapter.mount({} as HTMLElement, "night", vi.fn()); adapter.setCandles(source); setOption.mockClear();
+    adapter.setTradeMarkers([{ id: "trade-marker-1", tradeId: "1", accountId: "demo", instrumentId: "BTC-USD", direction: "UP", status: "ACTIVE", version: 1, openTime: Date.parse(source[0].openTime) / 1000, openPrice: "2", expiryTime: Date.parse(source[1].openTime) / 1000, amount: "100", payoutPercent: "82" }], Date.parse(source[0].openTime));
+    adapter.zoom(-10); adapter.resize(); expect(source).toEqual(before); expect(request).not.toHaveBeenCalled(); expect(subscribe).not.toHaveBeenCalled();
+    const graphics = setOption.mock.calls.find((call) => Array.isArray(call[0].graphic))?.[0].graphic; const group = graphics.find((item: { id: string }) => item.id === "trade-marker-1"); expect(group).toBeTruthy();
+    expect(group.children.map((item: { id: string }) => item.id)).toEqual(expect.arrayContaining(["trade-marker-1-open-price-line", "trade-marker-1-open", "trade-marker-1-expiry", "trade-marker-1-countdown"]));
+    adapter.setTradeMarkers([{ id: "trade-marker-1", tradeId: "1", accountId: "demo", instrumentId: "BTC-USD", direction: "UP", status: "WON", version: 2, openTime: Date.parse(source[0].openTime) / 1000, openPrice: "2", expiryTime: Date.parse(source[1].openTime) / 1000, settlementTime: Date.parse(source[1].openTime) / 1000, settlementPrice: "2.5" }], Date.parse(source[1].openTime));
+    const settledGraphics = setOption.mock.calls.at(-1)?.[0].graphic; const settled = settledGraphics.find((item: { id: string }) => item.id === "trade-marker-1"); expect(settled.children.some((item: { id: string }) => item.id === "trade-marker-1-settlement")).toBe(true);
   });
   it("synchronizes price, RSI, and MACD panes through one dataZoom action", async () => {
     const { EChartsAdapter } = await import("./EChartsAdapter"); const adapter = new EChartsAdapter();

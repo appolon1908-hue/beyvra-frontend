@@ -5,6 +5,7 @@ import { ChartType } from "./chart/EChartsAdapter";
 import { ChartInterval, TimeframeCapability } from "./chart/chartTypes";
 import { IndicatorConfig } from "./chart/indicators/types";
 import { DrawingState, DrawingType } from "./chart/drawings/types";
+import { TradeChartMarker } from "./chart/trades/types";
 
 export function MarketStatus({ symbol, interval, state, error, lastUpdate, onRetry }: { symbol: string; interval: string; state: string; error: string; lastUpdate?: number; onRetry: () => void }) {
   return <>
@@ -70,6 +71,13 @@ export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, 
 export function OpenTrades({ trades }: { trades: DemoTrade[] }) {
   const open = trades.filter((trade) => trade.state === "OPEN");
   return <details className="open-demo-trades" open><summary>Open Trades ({open.length})</summary>{open.map((trade) => <p key={String(trade.id)}>{trade.symbol} · {trade.direction.toUpperCase()} · {String(trade.amount)} · expires {new Date(trade.expiresAt).toLocaleTimeString()}</p>)}{open.length === 0 && <p>No open demo trades.</p>}</details>;
+}
+
+export function TradeMarkerSummary({ markers, serverNow }: { markers: TradeChartMarker[]; serverNow: number }) {
+  return <div className="trade-marker-summary" aria-label="Demo trade chart markers">{markers.slice(0, 4).map((marker) => {
+    const remaining = Math.max(0, Math.ceil(marker.expiryTime - serverNow / 1000)); const result = marker.status === "WON" ? "✓ WON" : marker.status === "LOST" ? "✕ LOST" : marker.status === "DRAW" ? "= DRAW" : marker.status;
+    return <span key={marker.tradeId} data-trade-id={marker.tradeId}>{marker.direction === "UP" ? "▲" : "▼"} {marker.direction} · {result}{marker.status === "ACTIVE" || marker.status === "PENDING" ? ` · ${remaining}s` : ""}</span>;
+  })}{markers.length > 4 && <span>+{markers.length - 4} more</span>}</div>;
 }
 
 export function TradeTicket({ symbol, quote, amount, setAmount, duration, setDuration, orderState, orderError, connectionState, submitDemoOrder, trades, close, open, durations, minAmount, maxAmount, amountStep, payoutRate }: {

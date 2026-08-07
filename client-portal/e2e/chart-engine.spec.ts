@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 const candle = (minute: number) => ({ open_time: `2026-08-07T00:${String(minute).padStart(2, "0")}:00Z`, close_time: `2026-08-07T00:${String(minute + 1).padStart(2, "0")}:00Z`, open: "100.00", high: "102.00", low: "99.00", close: "101.00", volume: "4.00", complete: true, sequence: 184200 + minute });
 
 test("ECharts workspace, indicators, and drawings remain local and long-lived", async ({ page, request, context, baseURL }) => {
-  const pageErrors: string[] = []; page.on("pageerror", (error) => pageErrors.push(error.message));
+  const pageErrors: string[] = []; page.on("pageerror", (error) => pageErrors.push(error.stack || error.message));
   let snapshotRequests = 0; let capabilityRequests = 0;
   const origin = baseURL ?? "http://127.0.0.1:8080";
   await page.setViewportSize({ width: 1024, height: 768 });
@@ -12,11 +12,19 @@ test("ECharts workspace, indicators, and drawings remain local and long-lived", 
   await context.addCookies([{ name: "access_token", value: access, url: origin }]);
   await page.route("**/api/v1/instruments/BTC-USD/market-data-capabilities", (route) => { capabilityRequests += 1; return route.fulfill({ json: { instrument_id: "BTC-USD", timeframes: [{ interval: "5s", available: false, reason: "GENUINE_5S_SOURCE_UNAVAILABLE" }, { interval: "1m", available: true, source: "isolated-test-adapter", mode: "native" }] } }); });
   await page.route("**/api/v1/market-data/snapshot?**", (route) => { snapshotRequests += 1; return route.fulfill({ json: { instrument_id: "BTC-USD", interval: "1m", sequence: 184202, server_time: "2026-08-07T00:03:00Z", market_status: "OPEN", quote: { bid: "100.90", ask: "101.10", mid: "101.00", occurred_at: new Date().toISOString() }, candles: Array.from({ length: 40 }, (_, index) => candle(index)) } }); });
+  await page.route("**/api/v1/demo/trades", (route) => route.fulfill({ json: [
+    { id: "up-active", symbol: "BTCUSDT", direction: "up", amount: "100", state: "OPEN", openingPrice: "101.00", openedAt: "2026-08-07T00:00:00Z", expiresAt: "2026-08-07T00:01:00Z" },
+    { id: "down-active", symbol: "BTCUSDT", direction: "down", amount: "50", state: "OPEN", openingPrice: "101.00", openedAt: "2026-08-07T00:01:00Z", expiresAt: "2026-08-07T00:02:00Z" },
+    { id: "won", symbol: "BTCUSDT", direction: "up", amount: "25", state: "WON", result: "WON", openingPrice: "100.00", closingPrice: "102.00", openedAt: "2026-08-07T00:02:00Z", expiresAt: "2026-08-07T00:03:00Z", settledAt: "2026-08-07T00:03:01Z" },
+    { id: "lost", symbol: "BTCUSDT", direction: "down", amount: "25", state: "LOST", result: "LOST", openingPrice: "100.00", closingPrice: "102.00", openedAt: "2026-08-07T00:03:00Z", expiresAt: "2026-08-07T00:04:00Z", settledAt: "2026-08-07T00:04:01Z" },
+  ] }));
   await page.goto("/platform", { waitUntil: "domcontentloaded" });
   const chart = page.locator(".chart-surface canvas").first(); await expect(chart).toBeVisible();
   await page.waitForTimeout(500); if (pageErrors.length) throw new Error(`Browser errors: ${pageErrors.join(" | ")}`);
   const fiveSeconds = page.locator(".timeframe-controls button", { hasText: "5s" }); await expect(fiveSeconds).toBeDisabled(); await expect(fiveSeconds).toHaveAttribute("title", "GENUINE_5S_SOURCE_UNAVAILABLE");
   const canvas = await chart.elementHandle(); expect(canvas).toBeTruthy();
+  await expect(page.locator('[data-trade-id="up-active"]')).toContainText("▲ UP · ACTIVE"); await expect(page.locator('[data-trade-id="down-active"]')).toContainText("▼ DOWN · ACTIVE");
+  await expect(page.locator('[data-trade-id="won"]')).toContainText("✓ WON"); await expect(page.locator('[data-trade-id="lost"]')).toContainText("✕ LOST");
   const initialRequests = { snapshotRequests, capabilityRequests };
   await page.locator(".indicator-controls > summary").click();
   await page.getByLabel("SMA", { exact: true }).check(); await page.getByLabel("RSI", { exact: true }).check(); await page.getByLabel("MACD", { exact: true }).check();

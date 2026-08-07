@@ -20,9 +20,10 @@ export class DrawingLayer {
   private tool: DrawingType = "select";
   private pending: DrawingPoint[] = [];
   private callbacks?: DrawingLayerCallbacks;
+  private onGraphics?: (graphics: object[]) => void;
   private readonly clickHandler = (event: ZrClick) => this.handleCanvasClick(event);
 
-  mount(chart: echarts.ECharts, callbacks: DrawingLayerCallbacks) { this.chart = chart; this.callbacks = callbacks; chart.getZr().on("click", this.clickHandler); }
+  mount(chart: echarts.ECharts, callbacks: DrawingLayerCallbacks, onGraphics: (graphics: object[]) => void) { this.chart = chart; this.callbacks = callbacks; this.onGraphics = onGraphics; chart.getZr().on("click", this.clickHandler); }
   dispose() { this.chart?.getZr().off("click", this.clickHandler); this.chart = undefined; this.pending = []; }
   setTool(tool: DrawingType) { this.tool = tool; this.pending = []; }
   setCandles(candles: readonly CanonicalCandle[]) { this.candles = [...candles]; this.render(); }
@@ -30,7 +31,7 @@ export class DrawingLayer {
   render() {
     if (!this.chart) return;
     const graphics = this.allVisible ? this.drawings.filter((drawing) => drawing.visible).map((drawing) => this.graphic(drawing)).filter(Boolean) : [];
-    this.chart.setOption({ graphic: graphics }, { replaceMerge: ["graphic"], lazyUpdate: true });
+    this.onGraphics?.(graphics as object[]);
   }
 
   private pixel(point: DrawingPoint): [number, number] | undefined {

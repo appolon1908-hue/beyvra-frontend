@@ -20,7 +20,7 @@
     "test": "npm run typecheck && npm run build:prod",
     "test:contract": "node scripts/check-api-contract.mjs",
     "test:e2e": "playwright test"
-    ,"test:chart": "vitest run src/pages/private/platform/chart/chartEngine.test.ts src/pages/private/platform/chart/indicators/indicators.test.ts src/pages/private/platform/chart/drawings/drawings.test.ts"
+    ,"test:chart": "vitest run src/pages/private/platform/chart/chartEngine.test.ts src/pages/private/platform/chart/indicators/indicators.test.ts src/pages/private/platform/chart/drawings/drawings.test.ts src/pages/private/platform/chart/trades/tradeMarkers.test.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
