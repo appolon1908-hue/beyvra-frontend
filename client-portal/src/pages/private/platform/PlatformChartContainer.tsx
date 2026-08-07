@@ -44,6 +44,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   const tradeMarkerState = useSyncExternalStore(tradeMarkerStore.subscribe, tradeMarkerStore.getSnapshot, tradeMarkerStore.getSnapshot);
   const { overlay, openOverlay, closeOverlay } = usePlatformOverlay();
   const { data: workspaceBootstrap } = useWorkspaceBootstrap();
+  const demoAccountId = workspaceBootstrap?.payload.account.id;
   const demoConfig = workspaceBootstrap?.rules ?? demoConfigFallback;
   const isTicketOpen = overlay.type === "trade";
   const [amount, setAmount] = useState(demoConfigFallback.minAmount * 100);
@@ -51,7 +52,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   const [orderState, setOrderState] = useState<"idle" | "submitting" | "accepted" | "rejected">("idle");
   const [orderError, setOrderError] = useState("");
   const ticketTriggerRef = useRef<HTMLButtonElement>(null);
-  const { trades: openTrades, refresh: refreshTrades, lastEvent: demoTradeEvent } = useDemoTrades(cookies.access_token);
+  const { trades: openTrades, refresh: refreshTrades, lastEvent: demoTradeEvent } = useDemoTrades(cookies.access_token, demoAccountId);
   const quote = chartState.quote ? Number(chartState.quote.mid) : undefined;
 
   useEffect(() => { void controller.selectInstrument(instrumentId, "1m"); return () => controller.stop(); }, [controller, instrumentId]);
@@ -72,8 +73,8 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   useEffect(() => adapterRef.current?.setCandles(chartState.candles), [chartState.candles]);
   useEffect(() => adapterRef.current?.setCurrentPrice(chartState.quote?.mid, chartState.connectionState), [chartState.quote?.mid, chartState.connectionState]);
   useEffect(() => { if (chartState.quote?.occurredAt) tradeMarkerStore.synchronizeServerTime(chartState.quote.occurredAt); }, [tradeMarkerStore, chartState.quote?.occurredAt]);
-  useEffect(() => tradeMarkerStore.replaceInitial(openTrades, workspaceBootstrap?.account?.id || accountScope), [tradeMarkerStore, openTrades, workspaceBootstrap?.account?.id, accountScope]);
-  useEffect(() => { if (demoTradeEvent) tradeMarkerStore.applyRealtime(demoTradeEvent, workspaceBootstrap?.account?.id || accountScope); }, [tradeMarkerStore, demoTradeEvent, workspaceBootstrap?.account?.id, accountScope]);
+  useEffect(() => tradeMarkerStore.replaceInitial(openTrades, demoAccountId || accountScope), [tradeMarkerStore, openTrades, demoAccountId, accountScope]);
+  useEffect(() => { if (demoTradeEvent) tradeMarkerStore.applyRealtime(demoTradeEvent, demoAccountId || accountScope); }, [tradeMarkerStore, demoTradeEvent, demoAccountId, accountScope]);
   useEffect(() => adapterRef.current?.setTradeMarkers(tradeMarkerStore.markersFor(instrumentId), tradeMarkerState.estimatedServerNow), [tradeMarkerStore, tradeMarkerState, instrumentId]);
   useEffect(() => { setAmount((current) => Math.min(demoConfig.maxAmount, Math.max(demoConfig.minAmount, current))); if (!demoConfig.durations.includes(duration)) setDuration(demoConfig.durations[0] ?? 15); }, [demoConfig, duration]);
 
