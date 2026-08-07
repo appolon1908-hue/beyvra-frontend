@@ -30,6 +30,11 @@ export class TradeMarkerStore {
   readonly getSnapshot = () => this.state;
   markersFor(instrumentId: string) { return this.state.markers.filter((marker) => marker.instrumentId === instrumentId); }
   remainingSeconds(marker: TradeChartMarker) { return Math.max(0, Math.ceil(marker.expiryTime - this.state.estimatedServerNow / 1000)); }
+  clearAccountScope() {
+    this.serverOffsetMs = 0;
+    this.state = { markers: [], estimatedServerNow: Date.now(), duplicateEvents: 0, staleEvents: 0 };
+    this.emit();
+  }
 
   replaceInitial(trades: readonly DemoTrade[], accountId: string, receivedAt = Date.now()) {
     const active = trades.filter((trade) => ["DRAFT", "SUBMITTING", "OPEN", "SETTLING"].includes(trade.state));

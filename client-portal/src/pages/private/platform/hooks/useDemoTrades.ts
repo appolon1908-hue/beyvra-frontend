@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { authenticatedRequest } from "api/client";
 import { apiEndpoints } from "api/endpoints";
 import { DemoTrade } from "api/demo/types";
@@ -6,31 +6,38 @@ import { getUnifiedRealtimeClient, UnifiedRealtimeMessage } from "realtime/Unifi
 import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
 import { demoTradeFromRealtime, tradeEventVersion } from "../chart/trades/TradeMarkerStore";
 
-export const demoTradeChannels = (accountId: string) => ({
-  order: `demo.order.${accountId}`,
-  execution: `demo.execution.${accountId}`,
-});
+export type DemoRealtimeScope = { demo_order_channel: string; demo_execution_channel: string };
+export const authorizedDemoChannels = (scope: DemoRealtimeScope) => [scope.demo_order_channel, scope.demo_execution_channel] as const;
 
-export function useDemoTrades(token?: string, accountId?: string) {
+export function useDemoTrades(token?: string, accountId?: string, realtime?: DemoRealtimeScope) {
+  const orderChannel = realtime?.demo_order_channel;
+  const executionChannel = realtime?.demo_execution_channel;
   const [trades, setTrades] = useState<DemoTrade[]>([]);
   const [lastEvent, setLastEvent] = useState<UnifiedRealtimeMessage>();
   const versions = useRef(new Map<string, number>());
+  const requestGeneration = useRef(0);
+  useLayoutEffect(() => {
+    requestGeneration.current += 1;
+    versions.current.clear();
+    setTrades([]);
+    setLastEvent(undefined);
+  }, [accountId, orderChannel, executionChannel]);
   const refresh = useCallback(async () => {
-    if (!token) return;
+    if (!token || !accountId) return;
+    const generation = requestGeneration.current;
     try {
       const payload = await authenticatedRequest<DemoTrade[] | { results: DemoTrade[] }>(apiEndpoints.demo.trades, token, { timeoutMs: 10_000 });
       const next = Array.isArray(payload) ? payload : payload.results;
-      if (Array.isArray(next)) setTrades(next);
+      if (generation === requestGeneration.current && Array.isArray(next)) setTrades(next);
     } catch {
       // Preserve the last server state during transient polling failures.
     }
-  }, [token]);
+  }, [token, accountId]);
   useEffect(() => {
     void refresh();
   }, [refresh]);
   useEffect(() => {
-    if (!token || !accountId) return;
-    versions.current.clear();
+    if (!token || !accountId || !orderChannel || !executionChannel) return;
     const client = getUnifiedRealtimeClient(token, async () => (await webSocketTicketFetcher(token)).ws_ticket);
     const receive = (event: UnifiedRealtimeMessage) => {
       const trade = demoTradeFromRealtime(event); const version = tradeEventVersion(event);
@@ -38,9 +45,9 @@ export function useDemoTrades(token?: string, accountId?: string) {
       const id = String(trade.id); if ((versions.current.get(id) ?? -1) >= version) { setLastEvent({ ...event }); return; }
       versions.current.set(id, version); setTrades((current) => current.some((item) => String(item.id) === id) ? current.map((item) => String(item.id) === id ? trade : item) : [trade, ...current]); setLastEvent({ ...event });
     };
-    const channels = demoTradeChannels(accountId);
-    const order = client.subscribe(channels.order, receive); const execution = client.subscribe(channels.execution, receive);
+    const [authorizedOrder, authorizedExecution] = authorizedDemoChannels({ demo_order_channel: orderChannel, demo_execution_channel: executionChannel });
+    const order = client.subscribe(authorizedOrder, receive); const execution = client.subscribe(authorizedExecution, receive);
     return () => { order(); execution(); };
-  }, [token, accountId]);
+  }, [token, accountId, orderChannel, executionChannel]);
   return { trades, refresh, lastEvent };
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DemoTrade } from "api/demo/types";
 import { TradeMarkerStore } from "./TradeMarkerStore";
-import { demoTradeChannels } from "../../hooks/useDemoTrades";
+import { authorizedDemoChannels } from "../../hooks/useDemoTrades";
 import { TradeMarkerStatus } from "./types";
 
 const opened = "2026-08-07T00:00:00.000Z"; const expiry = "2026-08-07T00:01:00.000Z";
@@ -9,8 +9,14 @@ const trade = (id: string, direction: "up" | "down" = "up", state: DemoTrade["st
 const event = (id: string, status: string, sequence: number, direction = "up", extra: Record<string, unknown> = {}) => ({ channel: sequence % 2 ? "demo.order" : "demo.execution", sequence, server_time: `2026-08-07T00:00:${String(sequence).padStart(2, "0")}.000Z`, data: { trade_id: id, symbol: "BTCUSDT", direction, status, open_time: opened, open_price: "116200.50", expiry_time: expiry, status_version: sequence, ...extra } });
 
 describe("TradeMarkerStore", () => {
-  it("derives account-scoped demo channels from workspace bootstrap identity", () => {
-    expect(demoTradeChannels("19")).toEqual({ order: "demo.order.19", execution: "demo.execution.19" });
+  it("uses server-authoritative private channel identity without reconstruction", () => {
+    const scope = { demo_order_channel: "server-order-scope", demo_execution_channel: "server-execution-scope" };
+    expect(authorizedDemoChannels(scope)).toEqual(["server-order-scope", "server-execution-scope"]);
+  });
+  it("clears all prior-account markers and counters before a scope change", () => {
+    const store = new TradeMarkerStore(); store.replaceInitial([trade("old")], "account-old"); store.applyRealtime(event("old", "ACTIVE", 1), "account-old");
+    store.clearAccountScope();
+    expect(store.getSnapshot()).toMatchObject({ markers: [], duplicateEvents: 0, staleEvents: 0 });
   });
   it("creates active UP and DOWN markers with one open and expiry model", () => {
     const store = new TradeMarkerStore(); store.replaceInitial([trade("up"), trade("down", "down")], "demo-account");

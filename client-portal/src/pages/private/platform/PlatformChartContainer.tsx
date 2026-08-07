@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import "./platform.scss";
 import { useCookies } from "react-cookie";
 import { useAppSelector } from "@store/hooks";
@@ -52,12 +52,13 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   const [orderState, setOrderState] = useState<"idle" | "submitting" | "accepted" | "rejected">("idle");
   const [orderError, setOrderError] = useState("");
   const ticketTriggerRef = useRef<HTMLButtonElement>(null);
-  const { trades: openTrades, refresh: refreshTrades, lastEvent: demoTradeEvent } = useDemoTrades(cookies.access_token, demoAccountId);
+  const { trades: openTrades, refresh: refreshTrades, lastEvent: demoTradeEvent } = useDemoTrades(cookies.access_token, demoAccountId, workspaceBootstrap?.payload.realtime);
   const quote = chartState.quote ? Number(chartState.quote.mid) : undefined;
 
   useEffect(() => { void controller.selectInstrument(instrumentId, "1m"); return () => controller.stop(); }, [controller, instrumentId]);
   useEffect(() => { const timer = window.setInterval(() => controller.refreshQuoteAge(), 1_000); return () => window.clearInterval(timer); }, [controller]);
   useEffect(() => { const timer = window.setInterval(() => tradeMarkerStore.tick(), 1_000); return () => window.clearInterval(timer); }, [tradeMarkerStore]);
+  useLayoutEffect(() => tradeMarkerStore.clearAccountScope(), [tradeMarkerStore, demoAccountId]);
   useEffect(() => {
     if (!chartContainerRef.current) return;
     const adapter = new EChartsAdapter(); adapter.mount(chartContainerRef.current, initialThemeRef.current, () => void controller.loadOlder(), { onCreate: (type, points) => drawingStore.create(type, points), onSelect: (id) => drawingStore.select(id), onMove: (id, points) => drawingStore.move(id, points) }); adapterRef.current = adapter;
