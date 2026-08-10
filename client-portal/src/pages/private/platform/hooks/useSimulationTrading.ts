@@ -19,7 +19,7 @@ export function useSimulationTrading(token?: string, userId?: string | number) {
   useEffect(() => {
     if (!token || !userId) return;
     const client = getUnifiedRealtimeClient(token, async () => (await webSocketTicketFetcher(token)).ws_ticket);
-    const accountRef = `sim:${userId}`;
+    const accountRef = `sim-${userId}`;
     const receive = (event: UnifiedRealtimeMessage) => { setLastEvent(event); void refresh().catch(() => undefined); };
     const recover = async () => { await refresh(); };
     const channels = ["order", "execution", "position"].map((kind) => `simulation.${kind}.${accountRef}`);
