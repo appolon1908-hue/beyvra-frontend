@@ -114,6 +114,7 @@ const App: React.FunctionComponent = () => {
               <Route path="/admin/integrations" element={<IntegrationsAdmin />} />
             </Route>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/markets" element={<Navigate to="/markets/Commodities" replace />} />
             {/* <Route path="/home" element={<Home />} /> */}
             <Route path="/markets/Commodities" element={<Commodities />} />
             <Route path="/markets/shares" element={<Shares />} />

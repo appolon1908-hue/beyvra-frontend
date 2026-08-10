@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { IUser, IUserStat } from "@interfaces";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 export async function fetchUserStat(token: string): Promise<boolean> {
-  return codestraAuthApi.statistics(token);
+  return beyvraAuthApi.statistics(token);
 }
 
 type useProfileProps = {

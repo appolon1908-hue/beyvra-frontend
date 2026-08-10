@@ -5,6 +5,7 @@ import CardInfo from './card/CardInfo'
 import PortfolioHeader from './header/PortfolioHeader'
 import { useCookies } from 'react-cookie'
 import { usePortfolioSummary, type PortfolioSummary } from 'api/portfolio/usePortfolioSummary'
+import { toUserSafeErrorText } from 'errors/userSafeError'
 
 const PortfolioMenu = () => {
     const [cookies] = useCookies(["access_token"])
@@ -13,7 +14,7 @@ const PortfolioMenu = () => {
     if (isPending) return <div className='portfolioMenu text-white' role='status'>Loading portfolio…</div>
     if (isError) return (
         <div className='portfolioMenu text-white' role='alert'>
-            <p>{error instanceof Error ? error.message : 'Unable to load portfolio.'}</p>
+            <p>{toUserSafeErrorText(error, 'wallet')}</p>
             <button type='button' onClick={() => refetch()}>Try again</button>
         </div>
     )

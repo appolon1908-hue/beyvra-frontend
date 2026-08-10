@@ -3,7 +3,7 @@ import "./platformOverview.scss";
 
 export default function PlatformOverview() {
   return <main className="platform-overview" aria-labelledby="platform-overview-title">
-    <p className="platform-overview__eyebrow">Codestra demo workspace</p>
+    <p className="platform-overview__eyebrow">Beyvra demo workspace</p>
     <h1 id="platform-overview-title">Practice with clear, simulated controls.</h1>
     <p className="platform-overview__lead">Explore the chart workspace, asset list, demo order ticket, trade history and learning tools before entering the platform.</p>
     <div className="platform-overview__actions"><Link className="platform-overview__primary" to="/signIn?tab=registration&mode=demo">Try the demo</Link><Link className="platform-overview__secondary" to="/login">Sign in</Link></div>

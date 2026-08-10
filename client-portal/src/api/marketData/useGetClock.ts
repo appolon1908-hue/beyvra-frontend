@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { codestraMarketApi } from "api/generated/codestraDemo";
+import { beyvraMarketApi } from "api/generated/beyvra";
 
 type ClockResponse = {
   timestamp: string;
@@ -19,7 +19,7 @@ type useGetClockProps = {
 };
 
 export async function fetchClock(token: string): Promise<ClockResponse> {
-  return codestraMarketApi.clock<ClockResponse>(token);
+  return beyvraMarketApi.clock<ClockResponse>(token);
 }
 
 export const useGetClock = (props: useGetClockProps) => {

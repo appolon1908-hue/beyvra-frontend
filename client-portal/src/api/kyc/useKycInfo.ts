@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import { codestraKycApi } from "api/generated/codestraDemo";
+import { beyvraKycApi } from "api/generated/beyvra";
 import IKYC from "@interfaces/IKYC";
 
 export interface KYCResponse {
@@ -37,7 +37,7 @@ export async function fetchKYC(data: {
   token: string;
 
 }): Promise<KYCResponse> {
-  return codestraKycApi.profile<KYCResponse>(data.token);
+  return beyvraKycApi.profile<KYCResponse>(data.token);
 }
  const useKyc = (
   props: useKYCProps

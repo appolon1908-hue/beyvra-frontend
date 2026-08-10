@@ -1,16 +1,17 @@
 import { ISignInForm, IUser } from "@interfaces";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { ApiError, getApiErrorMessage } from "api/errors";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { ApiError } from "api/errors";
+import { beyvraAuthApi } from "api/generated/beyvra";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 
 export async function fetchLogin(data: ISignInForm): Promise<LoginSuccess> {
   try {
-    return await codestraAuthApi.login<LoginSuccess>(data);
+    return await beyvraAuthApi.login<LoginSuccess>(data);
   } catch (error) {
-    const message = getApiErrorMessage(error, "Unable to sign in. Please try again.");
-    toast.error(message);
-    throw error instanceof ApiError ? error : new ApiError(message, 500);
+    logInternalError(error, { endpoint: "auth.login" });
+    toast.error(toUserSafeErrorText(error, "auth"));
+    throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN");
   }
 }
 

@@ -47,6 +47,7 @@ const Download = () => {
 
   return (
     <div className="downloads">
+      <div aria-label={t("brandName")}><img src="/logo.svg" alt="" width="180" height="40" /><span>{t("brandName")}</span></div>
       <div onClick={() => navigation(-1)} className="go-back">
         <ArrowLeftIcon />
       </div>

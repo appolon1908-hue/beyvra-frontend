@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { WalletData } from "@store/slices/wallet";
 import { authenticatedRequest } from "api/client";
 import { apiEndpoints } from "api/endpoints";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 
 type useUpdateWalletProps = {
   onSuccess?: (data: {wallet: WalletData}, variables: unknown, context: unknown) => void;
@@ -24,7 +25,8 @@ export async function tradeTransaction(
       body: JSON.stringify(data),
     });
   } catch (error) {
-    toast.error(error instanceof Error ? error.message : "Trade could not be placed");
+    logInternalError(error, { endpoint: "trading.place" });
+    toast.error(toUserSafeErrorText(error, "trading"));
     throw error;
   }
 }

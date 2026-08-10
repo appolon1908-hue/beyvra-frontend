@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { NotificationType } from "@store/slices/notification";
-import { codestraUserApi } from "api/generated/codestraDemo";
+import { beyvraUserApi } from "api/generated/beyvra";
 
 export async function fetchNotificationList(token: string): Promise<boolean> {
   try {
-    return await codestraUserApi.notifications(token) as boolean;
+    return await beyvraUserApi.notifications(token) as boolean;
   } catch (error) {
     throw new Error(error as string);
   }

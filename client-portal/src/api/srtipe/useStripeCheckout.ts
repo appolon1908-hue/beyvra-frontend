@@ -8,7 +8,7 @@ export async function stripeCheckoutFetcher({
   token,
 }: FetcherData): Promise<boolean> {
   void amount; void walletId; void token;
-  throw new Error("Payments are unavailable in the Codestra Demo environment.");
+  throw new Error("Payments are unavailable in the Beyvra Demo environment.");
 }
 
 type Props = {

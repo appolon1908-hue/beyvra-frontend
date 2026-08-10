@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 interface TokenRefreshSuccess {
   access: string;
@@ -27,7 +27,7 @@ type useRefreshTokenProps = {
 export async function fethRefreshToken(
   data: RefreshTokenVariables
 ): Promise<TokenRefreshSuccess> {
-  return codestraAuthApi.refresh<TokenRefreshSuccess>(data);
+  return beyvraAuthApi.refresh<TokenRefreshSuccess>(data);
 }
 
 export const useRefreshToken = (props: useRefreshTokenProps) => {

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 const candle = (minute: number) => ({ open_time: `2026-08-07T00:${String(minute).padStart(2, "0")}:00Z`, close_time: `2026-08-07T00:${String(minute + 1).padStart(2, "0")}:00Z`, open: "100.00", high: "102.00", low: "99.00", close: "101.00", volume: "4.00", complete: true, sequence: 184200 + minute });
 
@@ -28,7 +29,7 @@ test("ECharts workspace, indicators, and drawings remain local and long-lived", 
   await expect(page.locator('[data-trade-id="won"]')).toContainText("✓ WON"); await expect(page.locator('[data-trade-id="lost"]')).toContainText("✕ LOST");
   const initialRequests = { snapshotRequests, capabilityRequests };
   expect(newsRequests).toBe(0);
-  await page.getByRole("button", { name: "News & events" }).click(); await expect(page.getByText("News feed unavailable — provider approval pending.")).toBeVisible(); expect(newsRequests).toBe(1); expect({ snapshotRequests, capabilityRequests }).toEqual(initialRequests); expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
+  await page.getByRole("button", { name: "Open market events" }).click(); await expect(page.getByText("News feed unavailable — provider approval pending.")).toBeVisible(); expect(newsRequests).toBe(1); expect({ snapshotRequests, capabilityRequests }).toEqual(initialRequests); expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true); expect(await page.locator(".chart-surface canvas").count()).toBe(1);
   await page.getByRole("button", { name: "Close market events" }).click();
   await page.locator(".indicator-controls > summary").click();
   await page.getByLabel("SMA", { exact: true }).check(); await page.getByLabel("RSI", { exact: true }).check(); await page.getByLabel("MACD", { exact: true }).check();
@@ -52,6 +53,9 @@ test("ECharts workspace, indicators, and drawings remain local and long-lived", 
   expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true);
   await page.locator('.zoom-controls button[aria-label="Zoom chart in"]').click({ force: true });
   await page.locator(".zoom-controls button", { hasText: "Reset" }).click({ force: true });
+  await page.locator(".chart-workspace").focus(); await page.keyboard.press("+"); await page.keyboard.press("-"); await page.keyboard.press("Home");
   await page.locator(".ticket-trigger").click({ force: true }); await expect(page.getByText("Demo order", { exact: true })).toBeVisible();
-  expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true); expect(await page.locator(".chart-surface canvas").count()).toBeGreaterThan(0);
+  expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true); expect(await page.locator(".chart-surface canvas").count()).toBe(1);
+  const accessibility = await new AxeBuilder({ page }).disableRules(["color-contrast"]).analyze(); expect(accessibility.violations.filter((item) => item.impact === "critical")).toEqual([]);
+  await page.setViewportSize({ width: 390, height: 844 }); await page.getByRole("button", { name: "Open market events" }).click(); await expect(page.locator(".chart-event-drawer")).toHaveCSS("position", "fixed"); await page.keyboard.press("Escape"); await expect(page.locator(".chart-event-drawer")).toHaveCount(0); expect(await page.locator(".chart-surface canvas").count()).toBe(1);
 });

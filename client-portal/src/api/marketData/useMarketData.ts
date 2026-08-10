@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { codestraMarketApi } from "api/generated/codestraDemo";
+import { beyvraMarketApi } from "api/generated/beyvra";
 
 type FetcherDataOptions = {
   token: string;
@@ -20,7 +20,7 @@ export async function marketDataFetcher({
     const end = options?.end ?? "2024-03-20";
     const symbols = options?.symbols ?? "BTC%2FUSD";
     const timeFrame = options?.timeFrame ?? "minute";
-    return codestraMarketApi.alpaca<Record<string, any>>(token, { start, end, symbol_or_symbols: symbols, timeframe: timeFrame });
+    return beyvraMarketApi.alpaca<Record<string, any>>(token, { start, end, symbol_or_symbols: symbols, timeframe: timeFrame });
   } catch (error) {
     throw new Error(error as string);
   }

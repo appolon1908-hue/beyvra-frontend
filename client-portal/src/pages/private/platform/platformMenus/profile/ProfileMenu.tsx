@@ -27,6 +27,7 @@ import { revokeSession } from "api/user/logout";
 import { useAppDispatch } from "@store/hooks";
 import { setUser } from "@store/slices/user";
 import { setWallets } from "@store/slices/wallet";
+import { writeCompatibilityValue } from "compat/storageKeys";
 
 interface ProfileMenuProps {
   setIsRightSubDrawerOpen: Dispatch<SetStateAction<boolean>>;
@@ -80,7 +81,7 @@ const ProfileMenu: React.FunctionComponent<ProfileMenuProps> = ({
     dispatch(setWallets([]));
     removeCookie('access_token', { path: '/' });
     removeCookie('refresh_token', { path: '/' });
-    localStorage.setItem('codestra:last-logout', Date.now().toString());
+    writeCompatibilityValue(localStorage, 'beyvra:last-logout', Date.now().toString(), 'codestra:last-logout');
     navigate("/signIn", { replace: true });
   };
 

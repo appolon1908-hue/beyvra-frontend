@@ -1,11 +1,22 @@
-{$DOMAIN} {
+{$WEB_DOMAIN:beyvra.com}, {$WWW_DOMAIN:www.beyvra.com}, {$PLATFORM_DOMAIN:platform.beyvra.com} {
     encode zstd gzip
     reverse_proxy frontend:80
     header {
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://api.beyvra.com wss://api.beyvra.com https://api.segment.io; frame-src 'self' https://accounts.google.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
         X-Content-Type-Options "nosniff"
         Referrer-Policy "strict-origin-when-cross-origin"
         Permissions-Policy "camera=(), microphone=(), geolocation=()"
         -Server
     }
+}
+
+{$API_DOMAIN:api.beyvra.com} {
+    encode zstd gzip
+    reverse_proxy nginx:80
+}
+
+{$ADMIN_DOMAIN:admin.beyvra.com} {
+    encode zstd gzip
+    reverse_proxy nginx:80
 }

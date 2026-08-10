@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useCookies } from "react-cookie";
 import { type PortfolioSummary, usePortfolioSummary } from "api/portfolio/usePortfolioSummary";
 import { useDemoDeposit, useDemoWithdrawal } from "api/wallet/useDemoFunds";
+import { toUserSafeErrorText } from "errors/userSafeError";
 
 type Props = {
   mode: "deposit" | "withdraw";
@@ -54,7 +55,7 @@ export default function DemoFundsModal({ mode, open, onClose }: Props) {
       {!portfolio.isPending && !demoWallets.length && (
         <Alert type="warning" message="No demo wallet is available." />
       )}
-      {mutation.isError && <Alert type="error" message={mutation.error.message} />}
+      {mutation.isError && <Alert type="error" message={toUserSafeErrorText(mutation.error, "wallet")} />}
       <Button
         type="primary"
         block

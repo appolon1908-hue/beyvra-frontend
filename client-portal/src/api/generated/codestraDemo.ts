@@ -4,6 +4,7 @@
  * contracts/openapi/codestra-demo-v1.yaml when the contract changes.
  */
 import { getApiUrl } from "utils/env";
+import { ApiError } from "api/errors";
 
 export type DemoWallet = {
   available: string;
@@ -18,18 +19,6 @@ export type ApiFailure = {
   code?: string;
   [key: string]: unknown;
 };
-
-export class CodestraApiError extends Error {
-  constructor(
-    message: string,
-    readonly status: number,
-    readonly code?: string,
-    readonly requestId?: string,
-  ) {
-    super(message);
-    this.name = "CodestraApiError";
-  }
-}
 
 type RequestOptions = Omit<RequestInit, "headers"> & {
   token?: string;
@@ -56,17 +45,20 @@ export async function codestraRequest<T>(path: string, options: RequestOptions =
     });
     const payload = (await response.json().catch(() => ({}))) as ApiFailure;
     if (!response.ok) {
-      throw new CodestraApiError(
-        String(payload.detail ?? payload.code ?? "The request could not be completed"),
+      const canonical = payload.error && typeof payload.error === "object" ? payload.error as ApiFailure : payload;
+      throw new ApiError(
         response.status,
-        payload.code,
+        canonical.code,
         response.headers.get("X-Request-ID") ?? requestId,
       );
     }
     return payload as T;
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
-      throw new CodestraApiError("The request timed out. Please try again.", 408, "REQUEST_TIMEOUT", requestId);
+      throw new ApiError(408, "REQUEST_TIMEOUT", requestId);
+    }
+    if (error instanceof TypeError) {
+      throw new ApiError(0, "NETWORK_ERROR", requestId);
     }
     throw error;
   } finally {
@@ -96,9 +88,9 @@ export const codestraRealtimeV2Api = {
 };
 
 export const codestraUserApi = {
-  notifications: (token: string) => codestraRequest("notification/notifications/", { token }),
+  notifications: (token: string) => codestraRequest("v1/notifications/notifications/", { token }),
   toggleNotification: (token: string, body: unknown) =>
-    codestraRequest("notification/toggle_notification/", { method: "PUT", token, body: JSON.stringify(body) }),
+    codestraRequest("v1/notifications/toggle_notification/", { method: "PUT", token, body: JSON.stringify(body) }),
 };
 
 export const codestraWalletApi = {
@@ -119,21 +111,21 @@ export const codestraBankApi = {
 };
 
 export const codestraAuthApi = {
-  login: <T>(body: unknown) => codestraRequest<T>("user/token/", { method: "POST", body: JSON.stringify(body) }),
-  register: <T>(body: unknown) => codestraRequest<T>("user/create/", { method: "POST", body: JSON.stringify(body) }),
-  logout: (token: string, refresh: string) => codestraRequest<void>("user/token/logout/", { method: "POST", token, body: JSON.stringify({ refresh }) }),
-  refresh: <T>(body: unknown) => codestraRequest<T>("user/token/refresh/", { method: "POST", body: JSON.stringify(body) }),
-  forgotPassword: <T>(body: unknown) => codestraRequest<T>("user/password_reset/", { method: "POST", body: JSON.stringify(body) }),
-  resetPassword: <T>(uidb64: string, token: string, body: unknown) => codestraRequest<T>(`user/password_reset_confirm/${uidb64}/${token}/`, { method: "POST", body: JSON.stringify(body) }),
-  verifyEmail: <T>(uidb64: string, token: string) => codestraRequest<T>(`user/verify_email/${uidb64}/${token}/`),
-  sendEmailVerification: <T>(token: string, email: string) => codestraRequest<T>("user/send_email_verification/", { method: "POST", token, body: JSON.stringify({ email }) }),
-  sendEmailVerificationPublic: <T>(email: string) => codestraRequest<T>("user/send_email_verification/", { method: "POST", body: JSON.stringify(email) }),
-  statistics: <T>(token: string) => codestraRequest<T>("user/trading_statistics/", { token }),
-  websocketTicket: <T>(token: string) => codestraRequest<T>("user/websocket_ticket", { token }),
-  sendPhoneVerification: <T>(token: string) => codestraRequest<T>("user/send_phone_verification/", { method: "POST", token }),
-  verifyPhone: <T>(token: string, body: unknown) => codestraRequest<T>("user/verify_phone/", { method: "POST", token, body: JSON.stringify(body) }),
-  mfaQr: <T>(token: string) => codestraRequest<T>("user/generate_mfa_code/", { token }),
-  verifyMfa: <T>(body: unknown, token?: string) => codestraRequest<T>("user/verify_mfa_code/", { method: "POST", token, body: JSON.stringify(body) }),
+  login: <T>(body: unknown) => codestraRequest<T>("v1/auth/token/", { method: "POST", body: JSON.stringify(body) }),
+  register: <T>(body: unknown) => codestraRequest<T>("v1/auth/create/", { method: "POST", body: JSON.stringify(body) }),
+  logout: (token: string, refresh: string) => codestraRequest<void>("v1/auth/token/logout/", { method: "POST", token, body: JSON.stringify({ refresh }) }),
+  refresh: <T>(body: unknown) => codestraRequest<T>("v1/auth/token/refresh/", { method: "POST", body: JSON.stringify(body) }),
+  forgotPassword: <T>(body: unknown) => codestraRequest<T>("v1/auth/password_reset/", { method: "POST", body: JSON.stringify(body) }),
+  resetPassword: <T>(uidb64: string, token: string, body: unknown) => codestraRequest<T>(`v1/auth/password_reset_confirm/${uidb64}/${token}/`, { method: "POST", body: JSON.stringify(body) }),
+  verifyEmail: <T>(uidb64: string, token: string) => codestraRequest<T>(`v1/auth/verify_email/${uidb64}/${token}/`),
+  sendEmailVerification: <T>(token: string, email: string) => codestraRequest<T>("v1/auth/send_email_verification/", { method: "POST", token, body: JSON.stringify({ email }) }),
+  sendEmailVerificationPublic: <T>(email: string) => codestraRequest<T>("v1/auth/send_email_verification/", { method: "POST", body: JSON.stringify(email) }),
+  statistics: <T>(token: string) => codestraRequest<T>("v1/auth/trading_statistics/", { token }),
+  websocketTicket: <T>(token: string) => codestraRequest<T>("v1/auth/websocket_ticket/", { token }),
+  sendPhoneVerification: <T>(token: string) => codestraRequest<T>("v1/auth/send_phone_verification/", { method: "POST", token }),
+  verifyPhone: <T>(token: string, body: unknown) => codestraRequest<T>("v1/auth/verify_phone/", { method: "POST", token, body: JSON.stringify(body) }),
+  mfaQr: <T>(token: string) => codestraRequest<T>("v1/auth/generate_mfa_code/", { token }),
+  verifyMfa: <T>(body: unknown, token?: string) => codestraRequest<T>("v1/auth/verify_mfa_code/", { method: "POST", token, body: JSON.stringify(body) }),
   guestDemo: <T>(idempotencyKey?: string) => codestraRequest<T>("v1/demo/sessions", { method: "POST", idempotencyKey, body: "{}" }),
   registerDemo: <T>(body: unknown) => codestraRequest<T>("v1/auth/register", { method: "POST", body: JSON.stringify(body) }),
   verifyRegistration: <T>(body: unknown) => codestraRequest<T>("v1/auth/email-verification/verify", { method: "POST", body: JSON.stringify(body) }),
@@ -144,11 +136,11 @@ export const codestraAuthApi = {
 };
 
 export const codestraProfileApi = {
-  profile: (token: string) => codestraRequest("user/me/", { token }),
+  profile: (token: string) => codestraRequest("v1/me/", { token }),
   legacyProfile: <T>(token: string) => codestraRequest<T>("user/profile/", { token }),
-  update: (token: string, body: FormData | Record<string, unknown>) => codestraRequest("user/me/", { method: "PATCH", token, body: body instanceof FormData ? body : JSON.stringify(body) }),
-  changePassword: (token: string, body: unknown) => codestraRequest("user/password_change/", { method: "POST", token, body: JSON.stringify(body) }),
-  disableWalkthrough: (token: string) => codestraRequest("user/disable_walkthrough/", { method: "PUT", token }),
+  update: (token: string, body: FormData | Record<string, unknown>) => codestraRequest("v1/me/", { method: "PATCH", token, body: body instanceof FormData ? body : JSON.stringify(body) }),
+  changePassword: (token: string, body: unknown) => codestraRequest("v1/auth/password_change/", { method: "POST", token, body: JSON.stringify(body) }),
+  disableWalkthrough: (token: string) => codestraRequest("v1/auth/disable_walkthrough/", { method: "PUT", token }),
 };
 
 export const codestraIntegrationsApi = {
@@ -183,9 +175,9 @@ export const codestraNewsApi = {
     const params = new URLSearchParams();
     Object.entries(query).forEach(([key, value]) => value != null && params.set(key, value));
     const suffix = params.toString() ? `?${params.toString()}` : "";
-    return codestraRequest<T>(`news/${suffix}`, { token });
+    return codestraRequest<T>(`v1/news${suffix}`, { token });
   },
-  article: <T = unknown>(token: string, id: string | number) => codestraRequest<T>(`news/${id}/`, { token }),
+  article: <T = unknown>(token: string, id: string | number) => codestraRequest<T>(`v1/news/${id}`, { token }),
 };
 
 export const codestraPortfolioApi = {

@@ -14,7 +14,9 @@ import "./styles.scss";
 import { GlobalLoginMaxAge } from "App";
 import useKyc from "api/kyc/useKycInfo";
 import { revokeSession } from "api/user/logout";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
+import { logInternalError } from "errors/userSafeError";
+import { writeCompatibilityValue } from "compat/storageKeys";
 
 
 const idleTimeLimit = 15 * 60 * 1000; // 15 minutes in milliseconds
@@ -47,7 +49,7 @@ const RequireAuth = () => {
       return () => controller.abort();
     }
     setBootstrap("BOOTING");
-    codestraAuthApi.session<{ state?: string }>(cookies.access_token)
+    beyvraAuthApi.session<{ state?: string }>(cookies.access_token)
       .then(async (payload) => {
         if (disposed) return;
         setBootstrap(payload.state === "guest.ready" ? "GUEST_READY" : "USER_READY");
@@ -55,8 +57,8 @@ const RequireAuth = () => {
       .catch((error: unknown) => {
         if (disposed) return;
         setBootstrap(error instanceof DOMException && error.name === "AbortError" ? "ERROR" : "ERROR");
-        setBootstrapError("Codestra could not resolve this session.");
-        console.warn("session_bootstrap_failed", { reason: error instanceof Error ? error.message : "unknown" });
+        setBootstrapError("Beyvra could not resolve this session.");
+        logInternalError(error, { endpoint: "auth.session_bootstrap" });
       })
       .finally(() => window.clearTimeout(timeout));
     return () => { disposed = true; controller.abort(); window.clearTimeout(timeout); };
@@ -106,7 +108,7 @@ const RequireAuth = () => {
     dispatch(setWallets([]));
     removeCookie("access_token", { path: "/" });
     removeCookie("refresh_token", { path: "/" });
-    localStorage.setItem("codestra:last-logout", Date.now().toString());
+    writeCompatibilityValue(localStorage, "beyvra:last-logout", Date.now().toString(), "codestra:last-logout");
     setIsIdle(false);
     navigate("/signIn", { replace: true });
   };
@@ -180,7 +182,7 @@ const RequireAuth = () => {
 
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
-      if (event.key !== "codestra:last-logout") return;
+      if (event.key !== "beyvra:last-logout" && event.key !== "codestra:last-logout") return;
       dispatch(setUser(null));
       dispatch(setWallets([]));
       removeCookie("access_token", { path: "/" });
@@ -191,7 +193,7 @@ const RequireAuth = () => {
     return () => window.removeEventListener("storage", onStorage);
   }, [dispatch, navigate, removeCookie]);
 
-  if (bootstrap === "BOOTING") return <div className="route-bootstrap" role="status" aria-live="polite">Loading your Codestra session…</div>;
+  if (bootstrap === "BOOTING") return <div className="route-bootstrap" role="status" aria-live="polite">Loading your Beyvra session…</div>;
   if (bootstrap === "ERROR") return <main className="route-bootstrap route-bootstrap--error"><h1>Session unavailable</h1><p>{bootstrapError}</p><button type="button" onClick={() => window.location.reload()}>Try Again</button><button type="button" onClick={() => navigate("/login", { replace: true })}>Back to Login</button></main>;
   if (bootstrap === "EXPIRED") return <main className="route-bootstrap route-bootstrap--error"><h1>Session expired</h1><p>Log in to continue.</p><button type="button" onClick={() => navigate("/login", { replace: true, state: { from: location } })}>Log In</button></main>;
   if (bootstrap === "ANONYMOUS" || !cookies.access_token) {

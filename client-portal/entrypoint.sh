@@ -2,7 +2,10 @@
 set -e
 from_string='const CONFIG=""'
 to_string='window.configs = {
-  "VITE_API_BASE_URL":"'"${VITE_API_BASE_URL}"'"
+  "VITE_API_BASE_URL":"'"${VITE_API_BASE_URL}"'",
+  "VITE_SOCKET_BASE_URL":"'"${VITE_SOCKET_BASE_URL}"'",
+  "VITE_PUBLIC_SITE_URL":"'"${VITE_PUBLIC_SITE_URL}"'",
+  "VITE_BRAND_NAME":"'"${VITE_BRAND_NAME}"'"
 }'
 file=/usr/share/nginx/html/index.html
 # Replace string in given file

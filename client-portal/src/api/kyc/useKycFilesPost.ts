@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { codestraKycApi } from "api/generated/codestraDemo";
+import { beyvraKycApi } from "api/generated/beyvra";
 
 type KycFilesResponse = {
   detail: string;
@@ -29,7 +29,7 @@ type KycFilesPostVariables = {
 
 async function fetchKycFilesPostForm(data: KycFilesPostVariables) {
   const uploadFile = async (fileData: FormData, desc: string) => {
-    return codestraKycApi.upload<KycFilesResponse>(data.token, fileData);
+    return beyvraKycApi.upload<KycFilesResponse>(data.token, fileData);
   };
 
   // Use Promise.all to send both requests simultaneously

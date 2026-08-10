@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { codestraKycApi } from "api/generated/codestraDemo";
+import { beyvraKycApi } from "api/generated/beyvra";
 
 export async function fetchVerification(data: any): Promise<boolean> {
-  return codestraKycApi.submit(data.token, data.formData);
+  return beyvraKycApi.submit(data.token, data.formData);
 }
 
 type useVerificationProps = {

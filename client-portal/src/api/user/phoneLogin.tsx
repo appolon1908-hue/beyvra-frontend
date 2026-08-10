@@ -1,10 +1,10 @@
 import { ISignInForm, IUser } from "@interfaces";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 export async function fethLogin(data: ISignInForm): Promise<LoginSuccess> {
-  return codestraAuthApi.login<LoginSuccess>(data);
+  return beyvraAuthApi.login<LoginSuccess>(data);
 }
 
 interface LoginSuccess {

@@ -29,7 +29,7 @@ const CopyTrade = () => {
 
             <h3>What is copy trading?</h3>
             <p>
-            Experience the mix of social interaction and learning with Tradex Social Trading. Follow top traders, replicate their strategies, and gain insights, ideal for both new and seasoned traders. </p>
+            Experience the mix of social interaction and learning with Beyvra Social Trading. Follow top traders, replicate their strategies, and gain insights, ideal for both new and seasoned traders. </p>
            
            
            <p className='extra-note'>*Trading carries a considerable risk of capital loss. Please trade wisely.</p>

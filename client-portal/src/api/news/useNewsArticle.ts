@@ -1,6 +1,6 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
 import { INews } from "@interfaces";
-import { codestraNewsApi } from "api/generated/codestraDemo";
+import { beyvraNewsApi } from "api/generated/beyvra";
 
 // Type for the fetchNews function's parameters
 type FetchNewsParams = {
@@ -25,7 +25,7 @@ type UseNewsProps = {
 // Function to fetch the news article data from the API
 export async function fetchNewsArticle({ token, articleId }: FetchNewsParams): Promise<INews> {
   if (!articleId) throw new Error("A news article id is required.");
-  return codestraNewsApi.article<INews>(token, articleId);
+  return beyvraNewsApi.article<INews>(token, articleId);
 }
 
 // Custom hook to use the fetchNews function with react-query's useMutation

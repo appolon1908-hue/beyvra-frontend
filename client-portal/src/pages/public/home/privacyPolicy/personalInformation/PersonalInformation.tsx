@@ -7,7 +7,7 @@ const PersonalInformation = () => {
             <div className="personalInformatiionHeadingContainer">
 
             <h2>Use of Personal Information and Disclosure (including Overseas) </h2>
-            <p>The information collected is required to enable us to provide a service to you. This information helps us to improve services, establishing and managing your account, reviewing your ongoing needs, enhancing customer service, customize your browsing experience and inform you of additional products, services or promotions relevant to you. If you do not want to receive information of this nature for any reason, please contact us at the following email address: support@tradx.com. </p>
+            <p>The information collected is required to enable us to provide a service to you. This information helps us to improve services, establishing and managing your account, reviewing your ongoing needs, enhancing customer service, customize your browsing experience and inform you of additional products, services or promotions relevant to you. If you do not want to receive information of this nature for any reason, please contact us at the following email address: support@beyvra.com. </p>
             </div>
         <div className="personalInformationDiscloseListContainer">
             <span>We may disclose your personal information to:</span>
@@ -104,7 +104,7 @@ To administer and improve the website, the company may use third parties to trac
                     <Dot color='white' width='20px' height='20px'/>
                     <h2>Contact Us</h2>
                 </div>
-                <p>If you want to make a general enquiry about our privacy policy, change your personal information, access your personal information or make a compliant, please contact us by email: support@tradx.com</p>
+                <p>If you want to make a general enquiry about our privacy policy, change your personal information, access your personal information or make a compliant, please contact us by email: support@beyvra.com</p>
                 </div>
         </div>
   )

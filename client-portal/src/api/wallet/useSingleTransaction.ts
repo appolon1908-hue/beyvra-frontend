@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { ITransaction } from "@interfaces";
 
-import { codestraWalletApi } from "api/generated/codestraDemo";
+import { beyvraWalletApi } from "api/generated/beyvra";
 
 type FetchTransactionVariables = {
   transactionId: string;
@@ -22,7 +22,7 @@ export async function fetchTransaction(
   data: FetchTransactionVariables
 ): Promise<ITransaction> {
   try {
-    return await codestraWalletApi.transaction(data.token, data.transactionId) as ITransaction;
+    return await beyvraWalletApi.transaction(data.token, data.transactionId) as ITransaction;
   } catch (error) {
     throw new Error(error as string);
   }

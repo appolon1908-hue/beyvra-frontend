@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 type PhoneVerificationVariables = {
   code: string;
@@ -27,7 +27,7 @@ export async function fetchPhoneVerify(
   data: PhoneVerificationVariables,
   token: string
 ) {
-  return codestraAuthApi.verifyPhone(token, data);
+  return beyvraAuthApi.verifyPhone(token, data);
 }
 
 export const usePhoneVerify = (props: usePhoneVerifyProps) => {

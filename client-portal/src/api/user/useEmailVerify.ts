@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 type EmailVerificationVariables = {
   uidb64?: string;
@@ -25,7 +25,7 @@ type useEmailVerifyProps = {
 
 export async function fetchEmailVerify(data: EmailVerificationVariables) {
   if (!data.uidb64 || !data.token) throw new Error("Verification link is incomplete.");
-  return codestraAuthApi.verifyEmail<VerificationReponse>(data.uidb64, data.token);
+  return beyvraAuthApi.verifyEmail<VerificationReponse>(data.uidb64, data.token);
 }
 
 export const useEmailVerify = (props: useEmailVerifyProps) => {

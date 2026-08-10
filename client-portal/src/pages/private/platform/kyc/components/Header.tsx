@@ -1,5 +1,4 @@
 import React from 'react'
-//import tradxLogo from 'assets/home/tradxlogo.png';
 
 const KYCHeader = ({step}: {step: number}) => {
   return (
@@ -9,7 +8,7 @@ const KYCHeader = ({step}: {step: number}) => {
 
       </div>
         
-        <img src='/logo.svg' alt="" className='w-10 pt-4 pb-2' />
+        <img src='/logo.svg' alt="Beyvra" className='w-40 pt-4 pb-2' />
         
     </div>
   )

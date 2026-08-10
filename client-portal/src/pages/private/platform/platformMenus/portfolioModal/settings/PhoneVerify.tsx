@@ -6,6 +6,7 @@ import useSendPhoneVerification from 'api/user/useSendPhoneVerification';
 import { useCookies } from 'react-cookie';
 import usePhoneVerify from 'api/user/usePhoneVerify';
 import { toast } from 'react-toastify';
+import { logInternalError, toUserSafeErrorText } from 'errors/userSafeError';
 
 const PhoneVerify = () => {
     const [show, setShow] = useState(false);
@@ -28,7 +29,8 @@ const PhoneVerify = () => {
 
         },
         onError: (error) => {
-            toast.error(error.detail);
+            logInternalError(error, { endpoint: 'profile.phone_verify' });
+            toast.error(toUserSafeErrorText(error, 'auth'));
         }
     });
 

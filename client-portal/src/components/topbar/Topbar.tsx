@@ -23,7 +23,7 @@ import { ITradeAssets } from "@interfaces";
 import DropdownMenu from "components/dropdownMenu/DropdownMenu";
 import { Spin } from "antd";
 import { useCookies } from "react-cookie";
-import { codestraDemoApi } from "api/generated/codestraDemo";
+import { beyvraDemoApi } from "api/generated/beyvra";
 
 interface TopbarProps {
   isDrawerOpen: boolean;
@@ -53,7 +53,7 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
   const loadDemoWallet = async () => {
     if (!cookies.access_token) return;
     try {
-      setDemoWallet(await codestraDemoApi.wallet(cookies.access_token));
+      setDemoWallet(await beyvraDemoApi.wallet(cookies.access_token));
     } catch {
       setDemoWallet(null);
     }
@@ -65,7 +65,7 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
     if (!cookies.access_token) return;
     setRefillState("pending");
     try {
-      await codestraDemoApi.refill(cookies.access_token);
+      await beyvraDemoApi.refill(cookies.access_token);
       await loadDemoWallet();
       setRefillState("success");
       window.setTimeout(() => setRefillState("idle"), 1800);

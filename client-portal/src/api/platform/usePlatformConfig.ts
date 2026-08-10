@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCookies } from "react-cookie";
 import { PlatformFeatureFlags, stagingPlatformFeatures } from "config/platformFeatures";
-import { codestraDemoApi } from "api/generated/codestraDemo";
+import { beyvraDemoApi } from "api/generated/beyvra";
 
 export async function fetchPlatformConfig(token: string): Promise<PlatformFeatureFlags> {
-  const payload = await codestraDemoApi.config(token);
+  const payload = await beyvraDemoApi.config(token);
   return { ...stagingPlatformFeatures, ...payload } as PlatformFeatureFlags;
 }
 

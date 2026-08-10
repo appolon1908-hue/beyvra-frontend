@@ -5,6 +5,7 @@ import { useCancelTrade, useTrades, type TradeRecord } from "api/trades/useTrade
 import type { LeftSubDrawer } from "../../types";
 import type { Dispatch, SetStateAction } from "react";
 import "./tradesMenu.scss";
+import { toUserSafeErrorText } from "errors/userSafeError";
 
 interface TradesMenuProps {
   setLeftSubDrawer: Dispatch<SetStateAction<LeftSubDrawer>>;
@@ -41,7 +42,7 @@ const TradesMenu = (_props: TradesMenuProps) => {
         <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search trades" />
       </label>
       {trades.isPending && <p role="status">Loading trades…</p>}
-      {trades.isError && <div role="alert"><p>{trades.error.message}</p><button type="button" onClick={() => trades.refetch()}>Try again</button></div>}
+      {trades.isError && <div role="alert"><p>{toUserSafeErrorText(trades.error, "trading")}</p><button type="button" onClick={() => trades.refetch()}>Try again</button></div>}
       {!trades.isPending && !trades.isError && filtered.length === 0 && <p>No {status} trades.</p>}
       <div className="trade-lifecycle-list">
         {filtered.map((trade: TradeRecord) => (
@@ -56,7 +57,7 @@ const TradesMenu = (_props: TradesMenuProps) => {
           </article>
         ))}
       </div>
-      {cancelTrade.isError && <p role="alert">{cancelTrade.error.message}</p>}
+      {cancelTrade.isError && <p role="alert">{toUserSafeErrorText(cancelTrade.error, "trading")}</p>}
     </section>
   );
 };

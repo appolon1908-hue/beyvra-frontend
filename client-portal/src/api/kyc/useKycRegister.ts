@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 export async function fethRegister(data: any): Promise<boolean> {
-  return codestraAuthApi.register(data);
+  return beyvraAuthApi.register(data);
 }
 
 type useRegisterProps = {

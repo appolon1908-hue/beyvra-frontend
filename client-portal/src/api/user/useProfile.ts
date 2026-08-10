@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { IUser } from "@interfaces";
-import { codestraProfileApi } from "api/generated/codestraDemo";
+import { beyvraProfileApi } from "api/generated/beyvra";
 
 export async function fethProfile(token: string): Promise<boolean> {
   try {
-    return await codestraProfileApi.profile(token) as boolean;
+    return await beyvraProfileApi.profile(token) as boolean;
   } catch (error) {
     throw new Error(error as string);
   }

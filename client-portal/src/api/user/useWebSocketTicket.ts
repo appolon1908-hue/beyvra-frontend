@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 export async function webSocketTicketFetcher(
   token: string,
 ): Promise<{ ws_ticket: string }> {
-  return codestraAuthApi.websocketTicket<{ ws_ticket: string }>(token);
+  return beyvraAuthApi.websocketTicket<{ ws_ticket: string }>(token);
 }
 
 type UseWebSocketTicketProps = {

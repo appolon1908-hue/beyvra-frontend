@@ -1,12 +1,12 @@
 import { createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { UserSliceState } from ".";
-import { codestraProfileApi } from "api/generated/codestraDemo";
+import { beyvraProfileApi } from "api/generated/beyvra";
 
 // Thunks
 export const fetctUser = createAsyncThunk(
   "users/fetchById",
   async (token: string) => {
-    return { data: await codestraProfileApi.legacyProfile(token) };
+    return { data: await beyvraProfileApi.legacyProfile(token) };
   }
 );
 

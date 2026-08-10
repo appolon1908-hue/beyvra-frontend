@@ -159,7 +159,7 @@ const PlatformContent: React.FunctionComponent<PlatformProps> = () => {
 
   return (
     <main className="platformWrapper" data-theme={themeSelect} aria-labelledby="platform-page-title">
-      <h1 id="platform-page-title" className="platform-visually-hidden">Codestra Demo Platform</h1>
+      <h1 id="platform-page-title" className="platform-visually-hidden">Beyvra Demo Platform</h1>
       {/* <CustomModal/> */}
       {windowWidth >= 768 ? (
         <MainSidebar id="main_sidebar" />

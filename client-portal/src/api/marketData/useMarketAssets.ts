@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { codestraMarketApi } from "api/generated/codestraDemo";
+import { beyvraMarketApi } from "api/generated/beyvra";
 
 type FetcherDataOptions = {
   token: string;
@@ -20,7 +20,7 @@ export async function assetsListFetcher({
     asset_class: "crypto",
   },
 }: FetcherDataOptions) {
-  return codestraMarketApi.assets(token, data);
+  return beyvraMarketApi.assets(token, data);
 }
 
 type UseMarketAssetsProps = {

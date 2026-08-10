@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { codestraWalletApi } from "api/generated/codestraDemo";
+import { beyvraWalletApi } from "api/generated/beyvra";
 import IPaymentType from "@interfaces/IPaymentType";
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
 };
 
 export async function fetchTradeList(token: string) {
-  return codestraWalletApi.paymentMethods(token);
+  return beyvraWalletApi.paymentMethods(token);
 }
 
 export const useQRCodeList = (props: Props) => {

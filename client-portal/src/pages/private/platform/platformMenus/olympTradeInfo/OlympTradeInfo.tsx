@@ -18,7 +18,7 @@ const OlympTradeInfo: React.FunctionComponent<OlympTradeInfoProps> = ({
         Back to User Guide
       </Button>
       <MainItemCard className="olymp-trade-info-about">
-        <h3>Why Should I Choose Tradx?</h3>
+        <h3>Why Should I Choose Beyvra?</h3>
         <p>
           Traders have various reasons for choosing a broker. And here are some
           things that may become most important for you:
@@ -39,7 +39,7 @@ const OlympTradeInfo: React.FunctionComponent<OlympTradeInfoProps> = ({
           commission in the most convenient way.
           <br />
           <br />
-          <span>• Guarantees.</span> Tradx is a certified broker. All
+          <span>• Guarantees.</span> Beyvra is a certified broker. All
           traders’ deposits are insured.
         </p>
       </MainItemCard>

@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import { codestraBankApi } from "api/generated/codestraDemo";
+import { beyvraBankApi } from "api/generated/beyvra";
 
 async function withdrawWireTransferFetcher(token: string): Promise<boolean> {
   try {
-    return codestraBankApi.details(token);
+    return beyvraBankApi.details(token);
   } catch (error) {
     throw new Error(error as string);
   }

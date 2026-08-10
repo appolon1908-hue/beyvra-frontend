@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 
-import { codestraWalletApi } from "api/generated/codestraDemo";
+import { beyvraWalletApi } from "api/generated/beyvra";
 import { WalletData } from "@store/slices/wallet";
 
 type useUpdateWalletProps = {
@@ -20,7 +20,7 @@ export async function fetchUpdateWallet(
   token: string,
   archive = false
 ): Promise<boolean> {
-  return (archive ? codestraWalletApi.archive(token, id) : codestraWalletApi.update(token, id, data)) as Promise<boolean>;
+  return (archive ? beyvraWalletApi.archive(token, id) : beyvraWalletApi.update(token, id, data)) as Promise<boolean>;
 }
 
 export const useUpdateWallet = (props: useUpdateWalletProps) => {

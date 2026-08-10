@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { IWalletType } from "@interfaces";
-import { codestraWalletApi } from "api/generated/codestraDemo";
+import { beyvraWalletApi } from "api/generated/beyvra";
 
 type WalletTypeResponse = {
   
@@ -18,7 +18,7 @@ type useWalletTypesProps = {
 };
 
 export async function fetchTradeList(token: string) {
-  return codestraWalletApi.tradeAssets(token);
+  return beyvraWalletApi.tradeAssets(token);
 }
 
 export const useTradeList = (props: useWalletTypesProps) => {

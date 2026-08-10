@@ -1,4 +1,4 @@
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 export async function revokeSession(
   accessToken?: string,
@@ -6,5 +6,5 @@ export async function revokeSession(
 ): Promise<void> {
   if (!accessToken || !refreshToken) return;
 
-  await codestraAuthApi.logout(accessToken, refreshToken);
+  await beyvraAuthApi.logout(accessToken, refreshToken);
 }

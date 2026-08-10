@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { codestraAuthApi } from "api/generated/codestraDemo";
-import { ApiError, getApiErrorMessage } from "api/errors";
+import { beyvraAuthApi } from "api/generated/beyvra";
+import { ApiError } from "api/errors";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 
 type ForgotPassResponse = {
   detail: string;
@@ -26,8 +27,8 @@ type ForgotPasswordVariables = {
 };
 
 export async function fetchForgotPassword(data: ForgotPasswordVariables): Promise<ForgotPassResponse> {
-  try { return await codestraAuthApi.forgotPassword<ForgotPassResponse>(data); }
-  catch (error) { const message = getApiErrorMessage(error, "Unable to request a password reset. Please try again."); toast.error(message); throw error instanceof ApiError ? error : new ApiError(message, 500); }
+  try { return await beyvraAuthApi.forgotPassword<ForgotPassResponse>(data); }
+  catch (error) { logInternalError(error, { endpoint: "auth.forgot_password" }); toast.error(toUserSafeErrorText(error, "auth")); throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN"); }
 }
 
 export const useFrogotPassowrd = (props: useFrogotPassowrdProps) => {

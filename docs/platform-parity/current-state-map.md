@@ -1,4 +1,4 @@
-# Codestra/Tradi platform parity — current-state map
+# Beyvra platform parity — current-state map
 
 Date: 2026-08-03
 

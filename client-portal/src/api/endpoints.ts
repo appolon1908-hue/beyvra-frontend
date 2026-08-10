@@ -23,7 +23,7 @@ export const apiEndpoints = {
     deposits: "payment/deposits/history/",
   },
   notifications: {
-    list: "notification/notifications/",
+    list: "v1/notifications/notifications/",
     toggle: "notification/toggle_notification/",
     inbox: "notification/inbox/",
     read: (eventId: string) => `notification/inbox/${eventId}/read/`,
@@ -34,9 +34,9 @@ export const apiEndpoints = {
     webhookDeliveries: (webhookId: string) => `notification/webhooks/${webhookId}/deliveries/`,
   },
   market: {
-    history: "trades/market/history/",
-    snapshot: "trades/market/history/",
-    candles: "trades/market/history/",
+    history: "v1/market/trades",
+    snapshot: "v1/market/quotes",
+    candles: "v1/market/candles",
   },
   demo: {
     config: "v1/demo/config",
@@ -67,12 +67,5 @@ export const apiEndpoints = {
 } as const;
 
 export const socketEndpoints = {
-  // The backend currently exposes this legacy route. Keep its path in one
-  // registry entry until the canonical multiplexed gateway is deployed.
-  market: "ws/market-data/",
-  trades: "ws/trades/",
-  users: "ws/users/",
-  external: "ws/external-api/",
-  balance: (userId: number | string) => `ws/current-balance/${userId}/`,
-  profitLoss: (userId: number | string) => `ws/profit-loss/${userId}/`,
+  canonical: "ws/v2/",
 } as const;

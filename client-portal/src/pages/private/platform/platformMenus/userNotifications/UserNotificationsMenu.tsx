@@ -2,6 +2,7 @@ import MainItemCard from "components/mainItemCard/MainItemCard";
 import { useCookies } from "react-cookie";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 import {
   useCreateWebhook,
   useDeleteWebhook,
@@ -92,7 +93,7 @@ const UserNotificationsMenu = () => {
           event.preventDefault();
           createWebhook.mutate({ url: webhookUrl.trim(), secret: webhookSecret, categories: webhookCategories.split(",").map((item) => item.trim().toUpperCase()).filter(Boolean) }, {
             onSuccess: (created) => { setWebhookUrl(""); setWebhookSecret(""); toast.success(`Webhook connected: ${created.url}`); },
-            onError: (error) => toast.error(error instanceof Error ? error.message : "Webhook could not be saved"),
+            onError: (error) => { logInternalError(error, { endpoint: "notifications.webhook.create" }); toast.error(toUserSafeErrorText(error)); },
           });
         }}>
           <input aria-label="Webhook HTTPS URL" type="url" required placeholder="https://your-service.example/webhooks" value={webhookUrl} onChange={(event) => setWebhookUrl(event.target.value)} />
@@ -125,7 +126,7 @@ function WebhookRow({ webhook, expanded, onExpand, onToggle, onDelete, onTest, b
   return <article className="webhook-row">
     <div className="webhook-row__summary"><div><strong>{webhook.url}</strong><span>{webhook.is_active ? "Active" : "Disabled"} · {webhook.categories.length ? webhook.categories.join(", ") : "All events"}</span></div><button type="button" onClick={onExpand}>{expanded ? "Hide history" : "Delivery history"}</button></div>
     <div className="webhook-row__actions"><button type="button" disabled={busy} onClick={onTest}>Send test webhook</button><button type="button" disabled={busy} onClick={onToggle}>{webhook.is_active ? "Disable" : "Enable"}</button><button type="button" disabled={busy} onClick={onDelete}>Delete</button></div>
-    {expanded ? <div className="webhook-deliveries">{deliveries.isPending ? <p>Loading delivery history…</p> : deliveries.isError ? <p role="alert">Delivery history could not be loaded.</p> : !deliveries.data?.length ? <p>No deliveries yet.</p> : deliveries.data.map((delivery: WebhookDelivery) => <div className="webhook-delivery" key={delivery.id}><span className={`delivery-status delivery-status--${delivery.status}`}>{delivery.status === "S" ? "Delivered" : delivery.status === "F" ? "Failed" : "Pending"}</span><span>{delivery.event.category} · {delivery.attempts} attempt{delivery.attempts === 1 ? "" : "s"}</span><span>{delivery.response_code ?? "—"}</span>{delivery.last_error ? <span className="delivery-error">{delivery.last_error}</span> : null}</div>)}</div> : null}
+    {expanded ? <div className="webhook-deliveries">{deliveries.isPending ? <p>Loading delivery history…</p> : deliveries.isError ? <p role="alert">Delivery history could not be loaded.</p> : !deliveries.data?.length ? <p>No deliveries yet.</p> : deliveries.data.map((delivery: WebhookDelivery) => <div className="webhook-delivery" key={delivery.id}><span className={`delivery-status delivery-status--${delivery.status}`}>{delivery.status === "S" ? "Delivered" : delivery.status === "F" ? "Failed" : "Pending"}</span><span>{delivery.event.category} · {delivery.attempts} attempt{delivery.attempts === 1 ? "" : "s"}</span><span>{delivery.response_code ?? "—"}</span>{delivery.last_error ? <span className="delivery-error">Delivery failed. Please try again.</span> : null}</div>)}</div> : null}
   </article>;
 }
 

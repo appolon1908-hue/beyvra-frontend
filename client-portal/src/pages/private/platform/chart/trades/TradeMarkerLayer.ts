@@ -10,12 +10,12 @@ export class TradeMarkerLayer {
   private candles: CanonicalCandle[] = [];
   private markers: TradeChartMarker[] = [];
   private estimatedServerNow = Date.now();
-  constructor(private readonly onGraphics: (graphics: object[]) => void) {}
+  constructor(private readonly onGraphics: (graphics: object[], collisionAnchors: number[]) => void) {}
   mount(chart: echarts.ECharts) { this.chart = chart; }
   dispose() { this.chart = undefined; }
   setCandles(candles: readonly CanonicalCandle[]) { this.candles = [...candles]; this.render(); }
   setMarkers(markers: readonly TradeChartMarker[], estimatedServerNow: number) { this.markers = markers.map((marker) => ({ ...marker })); this.estimatedServerNow = estimatedServerNow; this.render(); }
-  render() { this.onGraphics(this.markers.map((marker) => this.graphic(marker)).filter(Boolean) as object[]); }
+  render() { const collisionAnchors: number[] = []; const graphics = this.markers.map((marker) => { const graphic = this.graphic(marker); const open = this.timePixel(marker.openTime); const expiry = this.timePixel(marker.expiryTime); if (open !== undefined) collisionAnchors.push(open); if (expiry !== undefined) collisionAnchors.push(expiry); return graphic; }).filter(Boolean) as object[]; this.onGraphics(graphics, collisionAnchors); }
 
   private timePixel(timestamp: number): number | undefined {
     if (!this.chart || !this.candles.length) return undefined;
@@ -51,6 +51,6 @@ export class TradeMarkerLayer {
       const settlementX = marker.settlementTime ? this.timePixel(marker.settlementTime) : undefined; const settlementY = marker.settlementPrice ? this.pricePixel(marker.settlementPrice) : undefined;
       children.push({ id: `${marker.id}-settlement`, type: "text", x: settlementX ?? expiryX, y: settlementY ?? openY, style: { text: statusGlyph(marker.status), fill: marker.status === "WON" ? "#26a69a" : marker.status === "LOST" ? "#ef5350" : "#f6b73c", fontWeight: 700, backgroundColor: "rgba(15,23,42,.9)", padding: 5 } });
     }
-    return { type: "group", id: marker.id, silent: true, children, tooltip: { formatter: `${marker.direction} · ${marker.status}${marker.amount ? ` · ${marker.amount}` : ""}${marker.payoutPercent ? ` · ${marker.payoutPercent}%` : ""}` } };
+    return { type: "group", id: marker.id, z: 70, silent: true, children, tooltip: { formatter: `${marker.direction} · ${marker.status}${marker.amount ? ` · ${marker.amount}` : ""}${marker.payoutPercent ? ` · ${marker.payoutPercent}%` : ""}` } };
   }
 }

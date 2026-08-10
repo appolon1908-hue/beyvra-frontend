@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 type SendEmailResponse = {
   detail: string;
@@ -23,7 +23,7 @@ export async function fetchEmailVerification({
   token: string;
   email: string;
 }) {
-  return codestraAuthApi.sendEmailVerification<SendEmailResponse>(token, email);
+  return beyvraAuthApi.sendEmailVerification<SendEmailResponse>(token, email);
 }
 
 export const useSendEmailVerification = (

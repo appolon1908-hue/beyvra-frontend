@@ -1,8 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-import { codestraAuthApi } from "api/generated/codestraDemo";
-import { ApiError, getApiErrorMessage } from "api/errors";
+import { beyvraAuthApi } from "api/generated/beyvra";
+import { ApiError } from "api/errors";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 
 type ResetPasswordVariables = {
   uidb64?: string;
@@ -27,9 +28,9 @@ type useResetPasswordProps = {
 };
 
 export async function fetchResetPassword(data: ResetPasswordVariables) {
-  if (!data.uidb64 || !data.token) throw new ApiError("This password reset link is incomplete.", 400);
-  try { return await codestraAuthApi.resetPassword<VerificationReponse>(data.uidb64, data.token, data.data); }
-  catch (error) { const message = getApiErrorMessage(error, "Unable to reset the password. The link may have expired."); toast.error(message); throw error instanceof ApiError ? error : new ApiError(message, 500); }
+  if (!data.uidb64 || !data.token) throw new ApiError(400, "VALIDATION_ERROR");
+  try { return await beyvraAuthApi.resetPassword<VerificationReponse>(data.uidb64, data.token, data.data); }
+  catch (error) { logInternalError(error, { endpoint: "auth.password_reset" }); toast.error(toUserSafeErrorText(error, "auth")); throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN"); }
 }
 
 export const useResetPassword = (props: useResetPasswordProps) => {

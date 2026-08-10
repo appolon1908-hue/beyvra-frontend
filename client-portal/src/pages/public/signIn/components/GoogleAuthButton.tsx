@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 type GoogleAuthButtonProps = {
   action: "login" | "register";
@@ -11,7 +11,7 @@ export default function GoogleAuthButton({ action, legalAccepted = false }: Goog
   const [enabled, setEnabled] = useState<boolean | null>(null);
   useEffect(() => {
     let active = true;
-    codestraAuthApi.providers<{ google?: { enabled?: boolean } }>()
+    beyvraAuthApi.providers<{ google?: { enabled?: boolean } }>()
       .then((result) => { if (active) setEnabled(result?.google?.enabled === true); })
       .catch(() => { if (active) setEnabled(false); });
     return () => { active = false; };
@@ -23,7 +23,7 @@ export default function GoogleAuthButton({ action, legalAccepted = false }: Goog
     if (disabled || providerUnavailable) return;
     setState("loading");
     try {
-      const result = await codestraAuthApi.googleStart<{ authorizationUrl?: string; code?: string }>({ action, legalConfirmed: action === "register" ? legalAccepted : false, returnPath: "/platform" });
+      const result = await beyvraAuthApi.googleStart<{ authorizationUrl?: string; code?: string }>({ action, legalConfirmed: action === "register" ? legalAccepted : false, returnPath: "/platform" });
       if (!result.authorizationUrl) throw new Error(result.code || "GOOGLE_AUTH_FAILED");
       window.location.assign(result.authorizationUrl);
     } catch {

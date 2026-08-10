@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { IWalletType } from "@interfaces";
-import { codestraWalletApi } from "api/generated/codestraDemo";
+import { beyvraWalletApi } from "api/generated/beyvra";
 
 type WalletTypeResponse = {
   count: number;
@@ -20,7 +20,7 @@ type useWalletTypesProps = {
 };
 
 export async function fetchWalletTypes(token: string): Promise<WalletTypeResponse> {
-  return codestraWalletApi.currencies<WalletTypeResponse>(token);
+  return beyvraWalletApi.currencies<WalletTypeResponse>(token);
 }
 
 export const useWalletTypes = (props: useWalletTypesProps) => {

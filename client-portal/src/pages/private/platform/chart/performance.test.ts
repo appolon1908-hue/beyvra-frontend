@@ -1,0 +1,15 @@
+import { describe, expect, it } from "vitest";
+import { normalizeCandles, applyLiveCandle } from "./candles";
+import { IndicatorEngine } from "./indicators/IndicatorEngine";
+import { DEFAULT_INDICATORS } from "./indicators/types";
+import { NewsCalendarOverlayStore } from "./events/NewsCalendarOverlayStore";
+import { NewsArticle } from "./events/types";
+
+const p95 = (samples: number[]) => [...samples].sort((a, b) => a - b)[Math.ceil(samples.length * .95) - 1];
+const rawCandles = (count: number) => Array.from({ length: count }, (_, index) => { const open = 100 + Math.sin(index / 20); const time = new Date(1_786_060_800_000 + index * 60_000).toISOString(); return { open_time: time, close_time: new Date(Date.parse(time) + 60_000).toISOString(), open: String(open), high: String(open + 2), low: String(open - 2), close: String(open + .5), volume: "10", complete: true, sequence: index + 1 }; });
+const measure = (operation: () => void, iterations = 20) => Array.from({ length: iterations }, () => { const start = performance.now(); operation(); return performance.now() - start; });
+
+describe("Phase 6 reference-runtime performance", () => {
+  it("measures candle normalization plus five-indicator projection", () => { const engine = new IndicatorEngine(); const enabled = DEFAULT_INDICATORS.map((item) => ({ ...item, enabled: true })); const render: Record<string, number> = {}; for (const count of [500, 1_000, 5_000]) { const raw = rawCandles(count); render[String(count)] = p95(measure(() => { const candles = normalizeCandles(raw); engine.calculate(candles, enabled); }, 12)); } console.info("PHASE6_RENDER_P95_MS", JSON.stringify(render)); expect(render["500"]).toBeLessThan(250); expect(render["1000"]).toBeLessThan(250); expect(render["5000"]).toBeLessThan(250); });
+  it("measures realtime candle application and local event filtering", () => { const candles = normalizeCandles(rawCandles(5_000)); const next = { ...candles.at(-1)!, close: "101.25", sequence: 6_000 }; const candleP95 = p95(measure(() => { applyLiveCandle(candles, next); }, 100)); const store = new NewsCalendarOverlayStore(undefined); store.setVisible(true); store.setInstrumentFilter("BTC-USD"); store.replaceNews(Array.from({ length: 100 }, (_, index): NewsArticle => ({ article_id: `n${index}`, provider_id: "deterministic-test-provider", provider_article_id: `p${index}`, headline: `Test fixture ${index}`, published_at: new Date(1_786_060_800_000 + index * 60_000).toISOString(), importance: index % 3 ? "MEDIUM" : "HIGH", affected_instruments: ["BTC-USD"], status: "PUBLISHED" }))); const filterP95 = p95(measure(() => { store.setFilter("high"); store.markersFor(); store.setFilter("all"); store.markersFor(); }, 100)); console.info("PHASE6_INTERACTION_P95_MS", JSON.stringify({ candleUpdate: candleP95, eventFilter: filterP95 })); expect(candleP95).toBeLessThan(75); expect(filterP95).toBeLessThan(50); });
+});

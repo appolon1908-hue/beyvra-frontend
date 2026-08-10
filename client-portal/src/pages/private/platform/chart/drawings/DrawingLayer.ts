@@ -25,12 +25,13 @@ export class DrawingLayer {
 
   mount(chart: echarts.ECharts, callbacks: DrawingLayerCallbacks, onGraphics: (graphics: object[]) => void) { this.chart = chart; this.callbacks = callbacks; this.onGraphics = onGraphics; chart.getZr().on("click", this.clickHandler); }
   dispose() { this.chart?.getZr().off("click", this.clickHandler); this.chart = undefined; this.pending = []; }
-  setTool(tool: DrawingType) { this.tool = tool; this.pending = []; }
+  setTool(tool: DrawingType) { this.tool = tool; this.pending = []; this.chart?.getZr().setCursorStyle?.(tool === "select" ? "default" : "crosshair"); }
+  cancelPending() { this.pending = []; }
   setCandles(candles: readonly CanonicalCandle[]) { this.candles = [...candles]; this.render(); }
   setDrawings(drawings: readonly ChartDrawing[], selectedId: string | undefined, visible: boolean) { this.drawings = drawings.map((drawing) => ({ ...drawing, points: drawing.points.map((point) => ({ ...point })) })); this.selectedId = selectedId; this.allVisible = visible; this.render(); }
   render() {
     if (!this.chart) return;
-    const graphics = this.allVisible ? this.drawings.filter((drawing) => drawing.visible).map((drawing) => this.graphic(drawing)).filter(Boolean) : [];
+    const graphics = this.allVisible ? this.drawings.filter((drawing) => drawing.visible).map((drawing) => { try { return this.graphic(drawing); } catch { return undefined; } }).filter(Boolean) : [];
     this.onGraphics?.(graphics as object[]);
   }
 
@@ -77,7 +78,8 @@ export class DrawingLayer {
         children.push({ type: "text", id: `drawing-${drawing.id}-${level}-label`, x: points[1][0] + 4, y, style: { text: `${(level * 100).toFixed(level === 0 || level === 1 ? 0 : 1)}%`, fill: color, fontSize: 10 } });
       });
     }
-    return { type: "group", id: `drawing-${drawing.id}`, draggable: !drawing.locked, children, onclick: () => this.callbacks?.onSelect(drawing.id), ondragend: (event: { target?: { x?: number; y?: number } }) => {
+    if (selected) points.forEach(([x, y], index) => children.push({ type: "circle", id: `drawing-${drawing.id}-handle-${index}`, z: 90, shape: { cx: x, cy: y, r: 7 }, style: { fill: drawing.locked ? "#64748b" : "#22d3ee", stroke: "#fff", lineWidth: 2 } }));
+    return { type: "group", id: `drawing-${drawing.id}`, z: selected ? 90 : 60, draggable: !drawing.locked, children, onclick: () => this.callbacks?.onSelect(drawing.id), ondragend: (event: { target?: { x?: number; y?: number } }) => {
       const dx = event.target?.x || 0; const dy = event.target?.y || 0;
       const moved = points.map((point) => this.dataPoint([point[0] + dx, point[1] + dy])).filter(Boolean) as DrawingPoint[];
       if (moved.length === drawing.points.length) this.callbacks?.onMove(drawing.id, moved); else this.render();

@@ -1,6 +1,6 @@
 import WebSocket from "ws";
 
-const base = process.env.LOAD_BASE_URL || "https://staging.codestra.cloud";
+const base = process.env.LOAD_BASE_URL || "https://staging.beyvra.com";
 const count = Number(process.env.LOAD_CONNECTIONS || 1);
 const durationMs = Number(process.env.LOAD_DURATION_MS || 5000);
 const timeoutMs = Number(process.env.LOAD_TIMEOUT_MS || 15000);

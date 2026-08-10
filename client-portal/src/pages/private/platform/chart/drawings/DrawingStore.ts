@@ -1,5 +1,6 @@
 import { ChartInterval } from "../chartTypes";
 import { ChartDrawing, DEFAULT_DRAWING_STYLE, DrawingPoint, DrawingState, PersistedDrawingType, validateDrawing } from "./types";
+import { readWithLegacyMigration, writeCompatibilityValue } from "compat/storageKeys";
 
 type DrawingStorage = Pick<Storage, "getItem" | "setItem">;
 const clone = (drawings: readonly ChartDrawing[]) => drawings.map((drawing) => ({ ...drawing, style: { ...drawing.style }, points: drawing.points.map((point) => ({ ...point })) }));
@@ -24,7 +25,7 @@ export class DrawingStore {
     this.undoStack = []; this.redoStack = [];
     let drawings: ChartDrawing[] = [];
     try {
-      const parsed = JSON.parse(this.storage?.getItem(this.key()) || "[]");
+      const parsed = JSON.parse(readWithLegacyMigration(this.storage, this.key(), this.legacyKey()) || "[]");
       if (Array.isArray(parsed)) drawings = parsed.filter((item) => validateDrawing(item, instrumentId, interval)).map((item: ChartDrawing) => ({ ...item, style: { ...item.style }, points: item.points.map((point: DrawingPoint) => ({ ...point })) }));
     } catch { drawings = []; }
     this.state = { drawings, visible: true, canUndo: false, canRedo: false }; this.emit();
@@ -58,9 +59,10 @@ export class DrawingStore {
   private replace(drawings: ChartDrawing[], selectedId?: string) {
     const safeSelected = drawings.some((item) => item.id === (selectedId ?? this.state.selectedId)) ? (selectedId ?? this.state.selectedId) : undefined;
     this.state = { ...this.state, drawings: clone(drawings), selectedId: safeSelected, canUndo: this.undoStack.length > 0, canRedo: this.redoStack.length > 0 };
-    try { this.storage?.setItem(this.key(), JSON.stringify(this.state.drawings)); } catch { /* persistence failure must not break chart state */ }
+    try { writeCompatibilityValue(this.storage, this.key(), JSON.stringify(this.state.drawings)); } catch { /* persistence failure must not break chart state */ }
     this.emit();
   }
-  private key() { return `codestra.chart.drawings.v1:${encodeURIComponent(this.accountScope)}:${encodeURIComponent(this.instrumentId)}:${this.interval}`; }
+  private key() { return `beyvra.chart.drawings.v1:${encodeURIComponent(this.accountScope)}:${encodeURIComponent(this.instrumentId)}:${this.interval}`; }
+  private legacyKey() { return `codestra.chart.drawings.v1:${encodeURIComponent(this.accountScope)}:${encodeURIComponent(this.instrumentId)}:${this.interval}`; }
   private emit() { this.listeners.forEach((listener) => listener()); }
 }

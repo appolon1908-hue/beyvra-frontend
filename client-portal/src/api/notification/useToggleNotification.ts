@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { INotification } from "@interfaces";
-import { codestraUserApi } from "api/generated/codestraDemo";
+import { beyvraUserApi } from "api/generated/beyvra";
 
 export async function toggleSingeNotification(data: any, token: string): Promise<boolean> {
   try {
-    return await codestraUserApi.toggleNotification(token, data) as boolean;
+    return await beyvraUserApi.toggleNotification(token, data) as boolean;
   } catch (error) {
     throw new Error(error as string);
   }

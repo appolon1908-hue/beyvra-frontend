@@ -30,7 +30,7 @@ const TradingPlatformInfo: React.FunctionComponent<
         onClick={() => setLeftSubDrawer("why-coose-us")}
       >
         <ArrowRightIcon width="" height="" color="#0094FF" />
-        <div>Why Should I Choose Tradx?</div>
+        <div>Why Should I Choose Beyvra?</div>
       </div>
     </div>
   );

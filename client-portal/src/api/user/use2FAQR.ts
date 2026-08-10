@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 type Props = {
   onSuccess?: (
@@ -13,7 +13,7 @@ type Props = {
 };
 
 export async function fetchQRCode(token: string) {
-  return codestraAuthApi.mfaQr(token);
+  return beyvraAuthApi.mfaQr(token);
 }
 
 export const use2FAQR = (props: Props) => {

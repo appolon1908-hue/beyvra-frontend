@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { codestraProfileApi } from "api/generated/codestraDemo";
+import { beyvraProfileApi } from "api/generated/beyvra";
 
 type ChangePassResponse = {
   detail: string;
@@ -28,7 +28,7 @@ type ChangePasswordVariables = {
 
 export async function fetchChangePassword(data: ChangePasswordVariables) {
   try {
-    return await codestraProfileApi.changePassword(data.token, data.formData);
+    return await beyvraProfileApi.changePassword(data.token, data.formData);
   } catch (error) {
     throw new Error(error as string);
   }

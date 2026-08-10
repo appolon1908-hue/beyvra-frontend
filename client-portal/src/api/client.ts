@@ -1,11 +1,6 @@
 import { getApiUrl } from "utils/env";
-
-export class ApiError extends Error {
-  constructor(message: string, readonly status: number, readonly code?: string, readonly requestId?: string) {
-    super(message);
-    this.name = "ApiError";
-  }
-}
+import { ApiError } from "api/errors";
+export { ApiError } from "api/errors";
 
 export type AuthenticatedRequestOptions = RequestInit & {
   /** Abort requests that would otherwise leave route loaders pending forever. */
@@ -38,17 +33,20 @@ export async function authenticatedRequest<T>(
     });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
+      const canonical = payload.error && typeof payload.error === "object" ? payload.error : payload;
       throw new ApiError(
-        payload.detail || payload.error || "The request could not be completed",
         response.status,
-        payload.code,
+        canonical.code,
         response.headers.get("X-Request-ID") || requestId,
       );
     }
     return payload as T;
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") {
-      throw new ApiError("The request timed out. Please try again.", 408, "REQUEST_TIMEOUT", requestId);
+      throw new ApiError(408, "REQUEST_TIMEOUT", requestId);
+    }
+    if (error instanceof TypeError) {
+      throw new ApiError(0, "NETWORK_ERROR", requestId);
     }
     throw error;
   } finally {

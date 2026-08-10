@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 8080",
-    "build": "npm run typecheck && npm run i18n:check && vite build --mode prod",
+    "build": "npm run errors:check && npm run brand:check && npm run typecheck && npm run i18n:check && vite build --mode prod",
     "build:dev": "vite build --mode dev",
     "build:prod": "vite build --mode prod",
     "lint": "eslint . --ext ts,tsx",
@@ -17,10 +17,14 @@
     "i18n:check": "node scripts/i18n-catalog.mjs --check",
     "i18n:translate": "node scripts/libretranslate.mjs",
     "audit:gate": "node scripts/audit-gate.mjs",
+    "errors:check": "node scripts/check-user-safe-errors.mjs",
+    "brand:check": "node scripts/check-public-identity.mjs",
+    "test:errors": "vitest run src/errors/userSafeError.test.ts src/compat/storageKeys.test.ts src/api/generated/beyvra.test.ts",
+    "test:realtime": "vitest run src/realtime/UnifiedRealtimeClient.test.ts",
     "test": "npm run typecheck && npm run build:prod",
     "test:contract": "node scripts/check-api-contract.mjs",
     "test:e2e": "playwright test"
-    ,"test:chart": "vitest run src/pages/private/platform/chart/chartEngine.test.ts src/pages/private/platform/chart/indicators/indicators.test.ts src/pages/private/platform/chart/drawings/drawings.test.ts src/pages/private/platform/chart/trades/tradeMarkers.test.ts src/pages/private/platform/chart/events/newsCalendar.test.ts"
+    ,"test:chart": "vitest run src/pages/private/platform/chart/chartEngine.test.ts src/pages/private/platform/chart/workspaceIntegration.test.ts src/pages/private/platform/chart/performance.test.ts src/pages/private/platform/chart/indicators/indicators.test.ts src/pages/private/platform/chart/drawings/drawings.test.ts src/pages/private/platform/chart/trades/tradeMarkers.test.ts src/pages/private/platform/chart/events/newsCalendar.test.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",

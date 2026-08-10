@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import { codestraKycApi } from "api/generated/codestraDemo";
+import { beyvraKycApi } from "api/generated/beyvra";
 import IKYC from "@interfaces/IKYC";
 
 interface PortfolioResponse {
@@ -29,7 +29,7 @@ export async function fetchPortfio(data: {
   token: string;
 
 }): Promise<PortfolioResponse> {
-  return codestraKycApi.profile<PortfolioResponse>(data.token);
+  return beyvraKycApi.profile<PortfolioResponse>(data.token);
 }
  const usePortfolio = (props: usePortfoliorops): UseMutationResult<PortfolioResponse, unknown, { token: string }> => {
   const {

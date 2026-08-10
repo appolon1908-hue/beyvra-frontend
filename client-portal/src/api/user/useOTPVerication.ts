@@ -1,10 +1,10 @@
 // import { IOTPForm, IUser } from "@interfaces";
 import { IOTPInputProps, IUser } from "@interfaces";
 import { useMutation } from "@tanstack/react-query";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 export async function fethOTPVerification(data: IOTPInputProps): Promise<LoginSuccess> {
-  return codestraAuthApi.login<LoginSuccess>(data);
+  return beyvraAuthApi.login<LoginSuccess>(data);
 }
 
 interface LoginSuccess {

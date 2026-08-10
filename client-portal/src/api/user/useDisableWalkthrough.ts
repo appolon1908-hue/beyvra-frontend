@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import {  IUser } from "@interfaces";
-import { codestraProfileApi } from "api/generated/codestraDemo";
+import { beyvraProfileApi } from "api/generated/beyvra";
 
 export async function disableUserWalkThrough(token: string): Promise<IUser> {
   try {
-    return await codestraProfileApi.disableWalkthrough(token) as IUser;
+    return await beyvraProfileApi.disableWalkthrough(token) as IUser;
   } catch (error) {
     throw new Error(error as string);
   }

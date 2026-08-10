@@ -1,5 +1,7 @@
-<svg width="26" height="26" style="background-color:black; border-rad" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12.1652 8.76771L5.99457 1.01452L1 1L9.58078 11.9619L12.1652 8.76771Z" fill="#2dd674" stroke="white" stroke-width="0.217786" stroke-miterlimit="10"/>
-<path d="M19.8766 1H24.2323L3.94922 21.2553L19.8766 1Z" fill="#2dd674" stroke="white" stroke-width="0.217786" stroke-miterlimit="10"/>
-<path d="M19.9046 25.0859L25.0008 25.1004L15.4327 13.0496L21.7775 5.23828L1.72657 24.9553H6.86638L14.3438 14.5305L13.8501 17.3327L19.9046 25.0859Z" fill="#28bd66" stroke="white" stroke-width="0.217786" stroke-miterlimit="10"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="40" viewBox="0 0 180 40" role="img" aria-labelledby="title description">
+  <title id="title">Beyvra</title>
+  <desc id="description">Beyvra brand mark</desc>
+  <rect width="40" height="40" rx="10" fill="#2563eb"/>
+  <path d="M12 9h9.5c6.2 0 9.6 2.6 9.6 7 0 2.6-1.4 4.6-3.8 5.7 3 1 4.7 3.3 4.7 6.3 0 5-3.8 7.5-10.7 7.5H12V9Zm8.9 10.2c3.1 0 4.5-.9 4.5-2.8 0-1.8-1.4-2.7-4.5-2.7h-3.2v5.5h3.2Zm.4 11.6c3.4 0 4.9-1 4.9-3.2 0-2.1-1.5-3.1-4.9-3.1h-3.6v6.3h3.6Z" fill="#fff"/>
+  <text x="50" y="28" fill="#f8fafc" font-family="Inter,Arial,sans-serif" font-size="24" font-weight="700" letter-spacing=".2">Beyvra</text>
 </svg>

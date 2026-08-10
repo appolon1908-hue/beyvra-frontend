@@ -1,6 +1,4 @@
 import "./navbar.scss";
-import TradxLogo from "../../../../../assets/home/tradxlogo.png";
-
 import {
   ArrowDownOS,
   MenuBar,
@@ -62,7 +60,7 @@ const Navbar= () => {
       {/* left side nav */}
       <div className="leftSideNav">
         <Link to="/">
-          <img src={TradxLogo} alt="Tradi home" />
+          <img src="/logo.svg" alt="Beyvra home" />
         </Link>
 
         <div className="navContent">
@@ -234,7 +232,7 @@ const Navbar= () => {
           <MenuCloseIcon />
         </button>
         <div className="mobileNavLogo">
-          <img src={TradxLogo} alt="Tradi home" />
+          <img src="/logo.svg" alt="Beyvra home" />
         </div>
 
         <div className="mobileNavContent">

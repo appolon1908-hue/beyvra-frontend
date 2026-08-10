@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import { codestraPortfolioApi } from "api/generated/codestraDemo";
+import { beyvraPortfolioApi } from "api/generated/beyvra";
 import IKYC from "@interfaces/IKYC";
 
 interface PortfolioResponse {
@@ -26,7 +26,7 @@ export async function fetchCryptoMarket(data: {
   token: string;
 }): Promise<PortfolioResponse> {
   const MAX_ITEMS = 1000
-  const result = await codestraPortfolioApi.cryptoMarket<PortfolioResponse>(data.token);
+  const result = await beyvraPortfolioApi.cryptoMarket<PortfolioResponse>(data.token);
   return { ...result, results: result.results.slice(0, MAX_ITEMS) };
 }
 

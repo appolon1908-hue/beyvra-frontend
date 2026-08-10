@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
 import { LoginSuccess } from "./useLogin";
 
 type Props = {
@@ -13,7 +13,7 @@ type VerifyArgs = { loginToken?: string; token?: string; otp: string };
 type VerifyResponse = Partial<LoginSuccess> & { message?: string };
 
 export async function fetchVerify(data: VerifyArgs): Promise<VerifyResponse> {
-  return codestraAuthApi.verifyMfa({ otp: data.otp, ...(data.loginToken ? { login_token: data.loginToken } : {}) }, data.token);
+  return beyvraAuthApi.verifyMfa({ otp: data.otp, ...(data.loginToken ? { login_token: data.loginToken } : {}) }, data.token);
 }
 
 export const use2FAVerify = (props: Props) => {

@@ -3,12 +3,15 @@ import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
 import { getUnifiedRealtimeClient, UnifiedRealtimeMessage } from "realtime/UnifiedRealtimeClient";
 import { applyLiveCandle, normalizeCandle, normalizeCandles, prependHistory } from "./candles";
 import { CanonicalCandle, ChartDataState, ChartInterval, MarketCapabilities, MarketSnapshot } from "./chartTypes";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
+import { readWithLegacyMigration, writeCompatibilityValue } from "compat/storageKeys";
 
 type Listener = () => void;
 type CandlePage = Pick<MarketSnapshot, "instrument_id" | "interval" | "sequence" | "server_time" | "candles"> & { history_cursor?: string };
+type PreferenceStorage = Pick<Storage, "getItem" | "setItem">; const INTERVAL_KEY = "beyvra.chart.interval.v1"; const LEGACY_INTERVAL_KEY = "codestra.chart.interval.v1"; const intervals = new Set<ChartInterval>(["5s", "1m", "5m", "15m", "1h", "4h", "1d"]);
 
 export class ChartDataController {
-  private state: ChartDataState = { instrumentId: "BTC-USD", interval: "1m", candles: [], marketStatus: "UNKNOWN", connectionState: "loading", capabilities: [], historyLoading: false };
+  private state: ChartDataState;
   private listeners = new Set<Listener>();
   private generation = 0;
   private snapshotAbort?: AbortController;
@@ -17,11 +20,11 @@ export class ChartDataController {
   private sequences = new Map<string, number>();
   private recovery?: Promise<void>;
 
-  constructor(private readonly token: string) {}
+  constructor(private readonly token: string, private readonly storage: PreferenceStorage | undefined = typeof localStorage === "undefined" ? undefined : localStorage) { let interval: ChartInterval = "1m"; try { const saved = readWithLegacyMigration(storage, INTERVAL_KEY, LEGACY_INTERVAL_KEY); if (intervals.has(saved as ChartInterval) && saved !== "5s") interval = saved as ChartInterval; } catch { /* invalid preference is isolated */ } this.state = { instrumentId: "BTC-USD", interval, candles: [], marketStatus: "UNKNOWN", connectionState: "loading", capabilities: [], historyLoading: false }; }
   getSnapshot = () => this.state;
   subscribe = (listener: Listener) => { this.listeners.add(listener); return () => this.listeners.delete(listener); };
 
-  async selectInstrument(instrumentId: string, interval: ChartInterval = "1m") {
+  async selectInstrument(instrumentId: string, interval: ChartInterval = this.state.interval) {
     const generation = ++this.generation;
     this.snapshotAbort?.abort(); this.historyAbort?.abort(); this.unsubscribeAll(); this.sequences.clear();
     this.update({ ...this.state, instrumentId, interval, candles: [], quote: undefined, connectionState: "loading", error: undefined, historyCursor: undefined });
@@ -30,7 +33,7 @@ export class ChartDataController {
       const capabilities = await authenticatedRequest<MarketCapabilities>(`v1/instruments/${encodeURIComponent(instrumentId)}/market-data-capabilities`, this.token, { signal: abort.signal });
       if (!this.current(generation, instrumentId, abort)) return;
       const selected = capabilities.timeframes.find((item) => item.interval === interval);
-      if (!selected?.available) { this.update({ ...this.state, capabilities: capabilities.timeframes, connectionState: "error", error: selected?.reason || "TIMEFRAME_UNAVAILABLE" }); return; }
+      if (!selected?.available) { this.update({ ...this.state, capabilities: capabilities.timeframes, connectionState: "error", error: toUserSafeErrorText({ code: "MARKET_DATA_STALE" }, "market") }); return; }
       const snapshot = await this.fetchSnapshot(instrumentId, interval, abort.signal);
       if (!this.current(generation, instrumentId, abort)) return;
       this.applySnapshot(snapshot, capabilities.timeframes);
@@ -41,7 +44,7 @@ export class ChartDataController {
   async selectInterval(interval: ChartInterval) {
     if (interval === this.state.interval) return;
     const capability = this.state.capabilities.find((item) => item.interval === interval);
-    if (!capability?.available) { this.update({ ...this.state, error: capability?.reason || "TIMEFRAME_UNAVAILABLE" }); return; }
+    if (!capability?.available) { this.update({ ...this.state, error: toUserSafeErrorText({ code: "MARKET_DATA_STALE" }, "market") }); return; }
     const generation = this.generation; const instrumentId = this.state.instrumentId;
     this.snapshotAbort?.abort(); this.historyAbort?.abort(); this.unsubscribeCandle();
     const abort = new AbortController(); this.snapshotAbort = abort;
@@ -51,6 +54,7 @@ export class ChartDataController {
       if (!this.current(generation, instrumentId, abort)) return;
       this.sequences.set(this.candleChannel(instrumentId, interval), page.sequence);
       this.update({ ...this.state, candles: normalizeCandles(page.candles), historyCursor: page.history_cursor, connectionState: "connected" });
+      this.persistInterval(interval);
       this.subscribeCandle(instrumentId, interval);
     } catch (error) { if (!abort.signal.aborted && generation === this.generation) this.fail(error); }
   }
@@ -63,7 +67,7 @@ export class ChartDataController {
       const page = await this.fetchCandles(instrumentId, interval, historyCursor, abort.signal);
       if (!this.current(generation, instrumentId, abort)) return;
       this.update({ ...this.state, candles: prependHistory(this.state.candles, normalizeCandles(page.candles)), historyCursor: page.history_cursor, historyLoading: false });
-    } catch (error) { if (!abort.signal.aborted) this.update({ ...this.state, historyLoading: false, error: error instanceof Error ? error.message : "HISTORY_UNAVAILABLE" }); }
+    } catch (error) { if (!abort.signal.aborted) { logInternalError(error, { endpoint: "market.history" }); this.update({ ...this.state, historyLoading: false, error: toUserSafeErrorText(error, "market") }); } }
   }
 
   stop() { ++this.generation; this.snapshotAbort?.abort(); this.historyAbort?.abort(); this.unsubscribeAll(); this.update({ ...this.state, connectionState: "disconnected" }); }
@@ -84,6 +88,7 @@ export class ChartDataController {
     const quoteChannel = this.quoteChannel(snapshot.instrument_id); const candleChannel = this.candleChannel(snapshot.instrument_id, snapshot.interval);
     this.sequences.set(quoteChannel, snapshot.sequence); this.sequences.set(candleChannel, snapshot.sequence);
     this.update({ instrumentId: snapshot.instrument_id, interval: snapshot.interval, candles: normalizeCandles(snapshot.candles), quote: { bid: snapshot.quote.bid, ask: snapshot.quote.ask, mid: snapshot.quote.mid, occurredAt: snapshot.quote.occurred_at }, quoteAgeMs: Date.now() - Date.parse(snapshot.quote.occurred_at), marketStatus: snapshot.market_status, connectionState: "connected", capabilities, historyCursor: snapshot.candles[0]?.open_time, historyLoading: false });
+    this.persistInterval(snapshot.interval);
   }
   private subscribeRealtime(instrumentId: string, interval: ChartInterval) {
     const client = getUnifiedRealtimeClient(this.token, async () => (await webSocketTicketFetcher(this.token)).ws_ticket);
@@ -130,6 +135,7 @@ export class ChartDataController {
   private candleChannel(instrumentId: string, interval: ChartInterval) { return `market.candle:${instrumentId}:${interval}`; }
   private unsubscribeCandle() { this.unsubscribers.pop()?.(); }
   private unsubscribeAll() { for (const unsubscribe of this.unsubscribers.splice(0)) unsubscribe(); }
-  private fail(error: unknown) { this.update({ ...this.state, connectionState: "error", error: error instanceof Error ? error.message : "MARKET_DATA_UNAVAILABLE" }); }
+  private fail(error: unknown) { logInternalError(error, { endpoint: "market.realtime" }); this.update({ ...this.state, connectionState: "error", error: toUserSafeErrorText(error, "market") }); }
+  private persistInterval(interval: ChartInterval) { if (interval === "5s") return; try { writeCompatibilityValue(this.storage, INTERVAL_KEY, interval); } catch { /* preference failure is non-fatal */ } }
   private update(state: ChartDataState) { this.state = state; this.listeners.forEach((listener) => listener()); }
 }

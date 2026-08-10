@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { IUser } from "@interfaces";
-import { codestraProfileApi } from "api/generated/codestraDemo";
+import { beyvraProfileApi } from "api/generated/beyvra";
 
 type useUpdateUserProps = {
   onSuccess?: (data: IUser, variables: unknown, context: unknown) => void;
@@ -33,7 +33,7 @@ export async function fetcUpdateUser(
       }
     });
 
-    return await codestraProfileApi.update(token, formData) as boolean;
+    return await beyvraProfileApi.update(token, formData) as boolean;
   } catch (error) {
     throw new Error(error as string);
   }

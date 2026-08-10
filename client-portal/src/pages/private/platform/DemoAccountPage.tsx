@@ -4,7 +4,7 @@ export default function DemoAccountPage({ section = "profile" }: { section?: "pr
   const [saved, setSaved] = useState(false);
   return <main className="demo-account-page" aria-labelledby="demo-account-title">
     <h1 id="demo-account-title">{section === "profile" ? "Demo profile" : "Demo settings"}</h1>
-    <p className="demo-account-disclosure">Codestra Demo account · Virtual funds only · No monetary value</p>
+    <p className="demo-account-disclosure">Beyvra Demo account · Virtual funds only · No monetary value</p>
     {section === "profile" ? <section aria-label="Profile details">
       <label>Display name<input name="displayName" placeholder="Optional display name" /></label>
       <label>Email<input name="email" type="email" readOnly placeholder="Your registered email" /></label>

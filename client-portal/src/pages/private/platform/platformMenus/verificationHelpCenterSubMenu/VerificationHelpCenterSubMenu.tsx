@@ -32,7 +32,7 @@ const VerificationHelpCenterSubMenu: React.FunctionComponent<
               <p className="text">
                 Financial services regulators require brokers to verify their
                 clients. Verification helps to ensure that the trader is of
-                legal age, acts as an owner of the Tradx account and that the
+                legal age, acts as an owner of the Beyvra account and that the
                 funds in the account are legal.
                 <br />
                 <br />

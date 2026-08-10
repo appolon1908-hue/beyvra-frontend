@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { ApiError, getApiErrorMessage } from "api/errors";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { ApiError } from "api/errors";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
+import { beyvraAuthApi } from "api/generated/beyvra";
 import type { IUser } from "@interfaces";
 
 export interface RegisterResponse {
@@ -12,11 +13,11 @@ export interface RegisterResponse {
 
 export async function fetchRegister(data: Record<string, string>): Promise<RegisterResponse> {
   try {
-    return await codestraAuthApi.register<RegisterResponse>(data);
+    return await beyvraAuthApi.register<RegisterResponse>(data);
   } catch (error) {
-    const message = getApiErrorMessage(error, "Unable to register. Please try again.");
-    toast.error(message);
-    throw error instanceof ApiError ? error : new ApiError(message, 500);
+    logInternalError(error, { endpoint: "auth.register" });
+    toast.error(toUserSafeErrorText(error, "auth"));
+    throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN");
   }
 }
 

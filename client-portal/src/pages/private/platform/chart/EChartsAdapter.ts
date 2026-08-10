@@ -8,6 +8,7 @@ import { TradeMarkerLayer } from "./trades/TradeMarkerLayer";
 import { TradeChartMarker } from "./trades/types";
 import { NewsCalendarMarkerLayer } from "./events/NewsCalendarMarkerLayer";
 import { OverlayMarker } from "./events/types";
+import { calculatePaneLayout } from "./paneLayout";
 
 export type ChartType = "candlesticks" | "heikin-ashi" | "bar" | "line" | "area";
 
@@ -35,8 +36,9 @@ export class EChartsAdapter {
   private drawingGraphics: object[] = [];
   private tradeGraphics: object[] = [];
   private eventGraphics: object[] = [];
-  private readonly tradeMarkerLayer = new TradeMarkerLayer((graphics) => { this.tradeGraphics = graphics; this.renderGraphics(); });
-  private readonly newsCalendarLayer = new NewsCalendarMarkerLayer((graphics) => { this.eventGraphics = graphics; this.renderGraphics(); });
+  private eventMarkerActivation: (marker: OverlayMarker) => void = () => undefined;
+  private readonly tradeMarkerLayer = new TradeMarkerLayer((graphics, anchors) => { this.tradeGraphics = graphics; this.newsCalendarLayer.setReservedX(anchors); this.renderGraphics(); });
+  private readonly newsCalendarLayer = new NewsCalendarMarkerLayer((graphics) => { this.eventGraphics = graphics; this.renderGraphics(); }, (marker) => this.eventMarkerActivation(marker));
 
   mount(container: HTMLElement, theme: string, onHistoryBoundary: () => void, drawingCallbacks?: DrawingLayerCallbacks) {
     if (this.chart) return;
@@ -47,6 +49,8 @@ export class EChartsAdapter {
       if ((zoom?.start ?? 100) <= 3) this.historyHandler?.();
       this.followLive = false;
       this.drawingLayer.render();
+      this.tradeMarkerLayer.render();
+      this.newsCalendarLayer.render();
     });
     this.drawingLayer.mount(this.chart, drawingCallbacks ?? { onCreate: () => undefined, onSelect: () => undefined, onMove: () => undefined }, (graphics) => { this.drawingGraphics = graphics; this.renderGraphics(); });
     this.tradeMarkerLayer.mount(this.chart);
@@ -61,9 +65,11 @@ export class EChartsAdapter {
   setChartType(type: ChartType) { this.chartType = type; this.renderSeries(); }
   setIndicators(configs: readonly IndicatorConfig[]) { this.indicatorConfigs = configs.map((config) => ({ ...config })); this.renderSeries(); }
   setDrawings(drawings: readonly ChartDrawing[], selectedId: string | undefined, visible: boolean) { this.drawingLayer.setDrawings(drawings, selectedId, visible); }
-  setDrawingTool(tool: DrawingType) { this.drawingLayer.setTool(tool); }
+  setDrawingTool(tool: DrawingType) { const drawing = tool !== "select"; this.drawingLayer.setTool(tool); this.newsCalendarLayer.setInteractionEnabled(!drawing); this.chart?.setOption({ dataZoom: [{ disabled: drawing }, { disabled: drawing }] }, { lazyUpdate: true }); }
   setTradeMarkers(markers: readonly TradeChartMarker[], estimatedServerNow: number) { this.tradeMarkerLayer.setMarkers(markers, estimatedServerNow); }
   setNewsCalendarMarkers(markers: readonly OverlayMarker[]) { this.newsCalendarLayer.setMarkers(markers); }
+  setNewsCalendarMarkerActivation(callback: (marker: OverlayMarker) => void) { this.eventMarkerActivation = callback; }
+  cancelDrawing() { this.drawingLayer.cancelPending(); }
   setCandles(candles: CanonicalCandle[]) {
     const previousCount = this.candles.length;
     const prepended = previousCount > 0 && candles.length > previousCount && candles.at(-(previousCount))?.openTime === this.candles[0]?.openTime ? candles.length - previousCount : 0;
@@ -102,11 +108,9 @@ export class EChartsAdapter {
     if (prepended && previousCount) { start = ((start / 100 * previousCount) + prepended) / this.candles.length * 100; end = ((end / 100 * previousCount) + prepended) / this.candles.length * 100; }
     const priceValue = Number(this.currentPrice); const priceVisible = Number.isFinite(priceValue) && !["disconnected", "error"].includes(this.currentPriceState);
     Object.assign(priceSeries, { markLine: { silent: true, symbol: "none", data: priceVisible ? [{ yAxis: priceValue, label: { show: true, formatter: priceValue.toFixed(2), color: this.currentPriceState === "stale" ? "#f59e0b" : "#12e6d0" }, lineStyle: { color: this.currentPriceState === "stale" ? "#f59e0b" : "#12e6d0", type: this.currentPriceState === "stale" ? "dashed" : "solid" } }] : [] } });
-    const results = this.indicatorEngine.calculate(this.candles, this.indicatorConfigs);
+    let results: IndicatorResult[] = []; try { results = this.indicatorEngine.calculate(this.candles, this.indicatorConfigs); } catch (error) { console.error("Indicator overlay disabled", error instanceof Error ? error.name : "UNKNOWN"); }
     const panes = [...new Set(results.map((result) => result.pane).filter((pane) => pane !== "price"))];
-    const priceBottom = panes.length === 0 ? 45 : panes.length === 1 ? "35%" : "52%";
-    const grids: object[] = [{ left: 12, right: 74, top: 48, bottom: priceBottom, containLabel: true }];
-    panes.forEach((_, index) => grids.push({ left: 12, right: 74, top: panes.length === 1 ? "70%" : `${55 + index * 21}%`, height: panes.length === 1 ? "20%" : "16%", containLabel: true }));
+    const { grids } = calculatePaneLayout(panes, this.chart.getHeight());
     const xAxes = grids.map((_, index) => ({ type: "category", gridIndex: index, data: labels, boundaryGap: true, axisLabel: { show: index === grids.length - 1 }, axisPointer: { show: true, snap: true } }));
     const yAxes = grids.map((_, index) => ({ type: "value", gridIndex: index, scale: index === 0, min: panes[index - 1] === "rsi" ? 0 : undefined, max: panes[index - 1] === "rsi" ? 100 : undefined, position: "right" }));
     const indicatorSeries = results.flatMap((result) => this.indicatorSeries(result, panes.indexOf(result.pane) + 1));

@@ -1,6 +1,6 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
 import { INews } from "@interfaces";
-import { codestraNewsApi } from "api/generated/codestraDemo";
+import { beyvraNewsApi } from "api/generated/beyvra";
 
 interface DataTabNewsResponse{ 
   title?: string;
@@ -54,7 +54,7 @@ export async function fetchNews(data: {
   token: string;
   queryParams?: NewsQueryParams;
 }): Promise<NewsResponse> {
-  return codestraNewsApi.list<NewsResponse>(data.token, data.queryParams);
+  return beyvraNewsApi.list<NewsResponse>(data.token, data.queryParams);
 }
 
 export const useNews = (

@@ -1,5 +1,5 @@
 import { getSocketUrl } from "utils/env";
-import { codestraRealtimeV2Api } from "api/generated/codestraDemo";
+import { beyvraRealtimeV2Api } from "api/generated/beyvra";
 
 export type UnifiedRealtimeMessage = {
   type?: string;
@@ -12,9 +12,27 @@ export type UnifiedRealtimeMessage = {
 
 type Listener = (message: UnifiedRealtimeMessage) => void;
 type TicketFactory = () => Promise<string>;
+type SnapshotRecovery = () => Promise<UnifiedRealtimeMessage | void>;
+
+export class RealtimeSequenceTracker {
+  private readonly sequences = new Map<string, number>();
+
+  observe(channel: string, sequence?: number): { expected: number; received: number } | undefined {
+    if (typeof sequence !== "number") return undefined;
+    const previous = this.sequences.get(channel);
+    if (previous === undefined || sequence > previous) this.sequences.set(channel, sequence);
+    return previous !== undefined && sequence > previous + 1
+      ? { expected: previous + 1, received: sequence }
+      : undefined;
+  }
+
+  clear(channel: string): void {
+    this.sequences.delete(channel);
+  }
+}
 
 /** One authenticated socket per browser runtime, with reference-counted subscriptions. */
-class UnifiedRealtimeClient {
+export class UnifiedRealtimeClient {
   private socket: WebSocket | null = null;
   private reconnectTimer: number | undefined;
   private reconnectAttempt = 0;
@@ -22,16 +40,19 @@ class UnifiedRealtimeClient {
   private connecting = false;
   private readonly listeners = new Map<string, Set<Listener>>();
   private readonly channels = new Set<string>();
-  private readonly useV2 = import.meta.env.VITE_REALTIME_V2_ENABLED === "true";
+  private readonly recovery = new Map<string, SnapshotRecovery>();
+  private readonly sequenceTracker = new RealtimeSequenceTracker();
+  private readonly useV2 = import.meta.env.VITE_REALTIME_V2_ENABLED !== "false";
   private v2Failed = false;
 
   constructor(private readonly identityToken: string, private readonly ticket: TicketFactory) {}
 
-  subscribe(channel: string, listener: Listener): () => void {
+  subscribe(channel: string, listener: Listener, recoverSnapshot?: SnapshotRecovery): () => void {
     const channelListeners = this.listeners.get(channel) || new Set<Listener>();
     channelListeners.add(listener);
     this.listeners.set(channel, channelListeners);
     this.channels.add(channel);
+    if (recoverSnapshot) this.recovery.set(channel, recoverSnapshot);
     this.closed = false;
     void this.open();
     if (this.socket?.readyState === WebSocket.OPEN) this.send({ action: "subscribe", request_id: crypto.randomUUID(), channels: [channel] });
@@ -41,6 +62,8 @@ class UnifiedRealtimeClient {
       if (!current?.size) {
         this.listeners.delete(channel);
         this.channels.delete(channel);
+        this.recovery.delete(channel);
+        this.sequenceTracker.clear(channel);
         this.send({ action: "unsubscribe", request_id: crypto.randomUUID(), channels: [channel] });
       }
       if (!this.channels.size) this.close();
@@ -61,7 +84,7 @@ class UnifiedRealtimeClient {
     try {
       const useV2Transport = this.useV2 && !this.v2Failed;
       const wsTicket = useV2Transport
-        ? (await codestraRealtimeV2Api.connectionToken(this.identityToken)).token
+        ? (await beyvraRealtimeV2Api.connectionToken(this.identityToken)).token
         : await this.ticket();
       if (this.closed || !this.channels.size) return;
       const socket = useV2Transport
@@ -85,7 +108,7 @@ class UnifiedRealtimeClient {
             ? { ...(raw.push.pub?.data || {}), channel: raw.push.channel, type: raw.push.pub?.data?.type || "event" }
             : raw as UnifiedRealtimeMessage;
           const channel = message.channel || "system.status";
-          this.dispatch(channel, message);
+          void this.dispatchWithRecovery(channel, message);
           if (channel !== "system.status" && message.type?.startsWith("market.")) this.dispatch("market.status", message);
         } catch {
           this.dispatch("system.status", { type: "error", code: "INVALID_MESSAGE" });
@@ -104,7 +127,7 @@ class UnifiedRealtimeClient {
       };
     } catch {
       this.connecting = false;
-      if (this.useV2 && import.meta.env.VITE_REALTIME_V2_V1_FALLBACK_ENABLED !== "false") this.v2Failed = true;
+      if (this.useV2 && import.meta.env.VITE_REALTIME_V2_V1_FALLBACK_ENABLED === "true") this.v2Failed = true;
       this.dispatch("system.status", { type: "connection", status: "error" });
       if (!this.closed && this.channels.size) this.reconnectTimer = window.setTimeout(() => void this.open(), 1_000);
     }
@@ -117,7 +140,7 @@ class UnifiedRealtimeClient {
         // Subscription authorization is performed by the private middleware
         // proxy. Keep the signed token endpoint available for SDK consumers,
         // but do not put bearer material on the wire when proxy auth is enabled.
-        await codestraRealtimeV2Api.subscriptionToken(this.tokenForApi(), channel);
+        await beyvraRealtimeV2Api.subscriptionToken(this.tokenForApi(), channel);
         this.send({ id: crypto.randomUUID(), subscribe: { channel, recover: true } });
       } catch {
         this.dispatch("system.status", { type: "error", code: "SUBSCRIPTION_TOKEN_FAILED", channel });
@@ -134,6 +157,16 @@ class UnifiedRealtimeClient {
 
   private dispatch(channel: string, message: UnifiedRealtimeMessage): void {
     this.listeners.get(channel)?.forEach((listener) => listener(message));
+  }
+
+  private async dispatchWithRecovery(channel: string, message: UnifiedRealtimeMessage): Promise<void> {
+    const gap = this.sequenceTracker.observe(channel, message.sequence);
+    if (gap) {
+      this.dispatch("system.status", { type: "sequence.gap", channel, ...gap });
+      const snapshot = await this.recovery.get(channel)?.();
+      if (snapshot) this.dispatch(channel, { ...snapshot, type: snapshot.type || "snapshot.recovered", channel });
+    }
+    this.dispatch(channel, message);
   }
 
   private send(message: unknown): void {

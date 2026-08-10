@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { codestraWalletApi } from "api/generated/codestraDemo";
+import { beyvraWalletApi } from "api/generated/beyvra";
 import { WalletData } from "@store/slices/wallet";
 
 type useUpdateWalletProps = {
@@ -14,7 +14,7 @@ export async function fetchRefillWallet(
   token: string,
 ): Promise<boolean> {
   try {
-    return await codestraWalletApi.refillLegacy(token, id) as boolean;
+    return await beyvraWalletApi.refillLegacy(token, id) as boolean;
   } catch (error) {
     throw new Error(error as string);
   }

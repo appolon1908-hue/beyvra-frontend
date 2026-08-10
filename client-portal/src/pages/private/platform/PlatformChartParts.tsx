@@ -6,8 +6,10 @@ import { ChartInterval, TimeframeCapability } from "./chart/chartTypes";
 import { IndicatorConfig } from "./chart/indicators/types";
 import { DrawingState, DrawingType } from "./chart/drawings/types";
 import { TradeChartMarker } from "./chart/trades/types";
+import { WorkspaceDrawer } from "./chart/ChartWorkspaceUIStore";
 
-export function MarketStatus({ symbol, interval, state, error, lastUpdate, onRetry }: { symbol: string; interval: string; state: string; error: string; lastUpdate?: number; onRetry: () => void }) {
+export function MarketStatus({ symbol, interval, state, marketStatus, error, lastUpdate, onRetry }: { symbol: string; interval: string; state: string; marketStatus: string; error: string; lastUpdate?: number; onRetry: () => void }) {
+  const label = marketStatus === "CLOSED" ? "MARKET CLOSED" : state === "connected" ? "LIVE" : state === "recovering" || state === "loading" ? "RECONNECTING" : state === "stale" ? "STALE" : state === "disconnected" ? "DISCONNECTED" : "UNAVAILABLE";
   return <>
     {state !== "connected" && <div className={`market-data-state market-data-state--${state}`} role="status" aria-live="polite">
       {state === "loading" ? "Loading market history…" : state === "disconnected" ? "Live market feed disconnected. Reconnecting…" : error}
@@ -15,12 +17,12 @@ export function MarketStatus({ symbol, interval, state, error, lastUpdate, onRet
       {(state === "error" || state === "disconnected") && <button type="button" onClick={onRetry}>Retry</button>}
     </div>}
     <div className="chart-status-bar" role="status" aria-live="polite">
-      <span>{symbol}</span><span className={`quote-state quote-state--${state}`}>{state === "connected" ? "Demo feed connected" : state}</span><span>Interval: {interval}</span>
+      <span>{symbol}</span><span className={`quote-state quote-state--${state}`}>{label}</span><span>Interval: {interval}</span>
     </div>
   </>;
 }
 
-export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, capabilities, setCandleInterval, handleZoom, resetView, centerLive, indicators, updateIndicator, drawingTool, setDrawingTool, drawingState, drawingActions }: {
+export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, capabilities, setCandleInterval, handleZoom, resetView, centerLive, indicators, updateIndicator, drawingTool, setDrawingTool, drawingState, drawingActions, activeToolbar, setActiveToolbar, fullscreen, toggleFullscreen }: {
   selectedChart: ChartType;
   setSelectedChart: (value: ChartType) => void;
   candleInterval: ChartInterval;
@@ -35,6 +37,10 @@ export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, 
   setDrawingTool: (tool: DrawingType) => void;
   drawingState: DrawingState;
   drawingActions: { remove: () => void; clear: () => void; lock: () => void; visibility: () => void; allVisibility: () => void; undo: () => void; redo: () => void; updateText: (id: string, text: string) => void };
+  activeToolbar: WorkspaceDrawer;
+  setActiveToolbar: (drawer: WorkspaceDrawer) => void;
+  fullscreen: boolean;
+  toggleFullscreen: () => void;
 }) {
   return <div className="chart-controls">
     <DropdownMenu menuItems={[{ text: "Candlesticks", onclick: () => setSelectedChart("candlesticks") }, { text: "Heikin-Ashi", onclick: () => setSelectedChart("heikin-ashi") }, { text: "Area", onclick: () => setSelectedChart("area") }, { text: "Line", onclick: () => setSelectedChart("line") }, { text: "Bars", onclick: () => setSelectedChart("bar") }]}>
@@ -43,8 +49,9 @@ export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, 
     <div className="zoom-controls">
       <button type="button" onClick={() => handleZoom(true)} aria-label="Zoom chart in"><ZoomInChartIcon /></button>
       <button type="button" onClick={() => handleZoom(false)} aria-label="Zoom chart out"><ZoomOutChartIcon /></button>
-      <button type="button" onClick={resetView}>Reset</button>
-      <button type="button" onClick={centerLive}>Live</button>
+      <button type="button" onClick={resetView} aria-label="Reset chart view">Reset</button>
+      <button type="button" onClick={centerLive} aria-label="Center live price">Live</button>
+      <button type="button" onClick={toggleFullscreen} aria-label={fullscreen ? "Exit chart fullscreen" : "Enter chart fullscreen"}>{fullscreen ? "Exit full screen" : "Full screen"}</button>
     </div>
     <div className="timeframe-controls" aria-label="Chart timeframe">
       {(["5s", "1m", "5m", "15m"] as ChartInterval[]).map((interval) => {
@@ -53,14 +60,14 @@ export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, 
         return <button key={interval} type="button" disabled={disabled} title={disabled ? capability?.reason || "Market-data capability unavailable" : undefined} className={candleInterval === interval ? "selected" : ""} onClick={() => setCandleInterval(interval)} aria-pressed={candleInterval === interval}>{interval}</button>;
       })}
     </div>
-    <details className="indicator-controls"><summary>Indicators</summary><div className="indicator-menu">
+    <details className="indicator-controls" open={activeToolbar === "indicators"} onToggle={(event) => setActiveToolbar(event.currentTarget.open ? "indicators" : "none")}><summary aria-label="Open indicators">Indicators</summary><div className="indicator-menu">
       {indicators.map((indicator) => <fieldset key={indicator.id}><label><input type="checkbox" checked={indicator.enabled} onChange={(event) => updateIndicator(indicator.id, { enabled: event.target.checked })} /> {indicator.type === "bollinger" ? "Bollinger Bands" : indicator.type.toUpperCase()}</label>
         {indicator.type === "macd" ? <><label>Fast<input aria-label="MACD fast period" type="number" min="2" max="200" value={indicator.fast} onChange={(event) => updateIndicator(indicator.id, { fast: Number(event.target.value) })} /></label><label>Slow<input aria-label="MACD slow period" type="number" min="3" max="500" value={indicator.slow} onChange={(event) => updateIndicator(indicator.id, { slow: Number(event.target.value) })} /></label><label>Signal<input aria-label="MACD signal period" type="number" min="2" max="200" value={indicator.signal} onChange={(event) => updateIndicator(indicator.id, { signal: Number(event.target.value) })} /></label></>
           : <label>Period<input aria-label={`${indicator.type.toUpperCase()} period`} type="number" min="2" max={indicator.type === "rsi" ? 200 : 500} value={indicator.period} onChange={(event) => updateIndicator(indicator.id, { period: Number(event.target.value) })} /></label>}
         {indicator.type === "bollinger" && <label>Deviation<input aria-label="Bollinger deviation" type="number" min="0.1" max="10" step="0.1" value={indicator.deviation} onChange={(event) => updateIndicator(indicator.id, { deviation: Number(event.target.value) })} /></label>}
       </fieldset>)}
     </div></details>
-    <details className="drawing-controls"><summary>Drawings</summary><div className="drawing-menu" aria-label="Drawing tools">
+    <details className="drawing-controls" open={activeToolbar === "drawings"} onToggle={(event) => setActiveToolbar(event.currentTarget.open ? "drawings" : "none")}><summary aria-label="Open drawing tools">Drawings</summary><div className="drawing-menu" aria-label="Drawing tools">
       <div className="drawing-tools">{(["select", "trendline", "horizontal", "vertical", "fibonacci", "measurement", "text"] as DrawingType[]).map((tool) => <button key={tool} type="button" className={drawingTool === tool ? "selected" : ""} aria-pressed={drawingTool === tool} onClick={() => setDrawingTool(tool)}>{tool === "horizontal" ? "Support / resistance" : tool === "measurement" ? "Measure" : tool[0].toUpperCase() + tool.slice(1)}</button>)}</div>
       <div className="drawing-actions"><button type="button" disabled={!drawingState.selectedId} onClick={drawingActions.remove}>Delete</button><button type="button" disabled={!drawingState.drawings.length} onClick={drawingActions.clear}>Clear all</button><button type="button" disabled={!drawingState.selectedId} onClick={drawingActions.lock}>{drawingState.drawings.find((item) => item.id === drawingState.selectedId)?.locked ? "Unlock" : "Lock"}</button><button type="button" disabled={!drawingState.selectedId} onClick={drawingActions.visibility}>Hide/show selected</button><button type="button" onClick={drawingActions.allVisibility}>{drawingState.visible ? "Hide all" : "Show all"}</button><button type="button" disabled={!drawingState.canUndo} onClick={drawingActions.undo}>Undo</button><button type="button" disabled={!drawingState.canRedo} onClick={drawingActions.redo}>Redo</button></div>
       {drawingState.drawings.find((item) => item.id === drawingState.selectedId)?.type === "text" && <label>Annotation<input aria-label="Annotation text" maxLength={500} value={drawingState.drawings.find((item) => item.id === drawingState.selectedId)?.text || ""} onChange={(event) => drawingActions.updateText(drawingState.selectedId!, event.target.value)} /></label>}
@@ -76,7 +83,7 @@ export function OpenTrades({ trades }: { trades: DemoTrade[] }) {
 export function TradeMarkerSummary({ markers, serverNow }: { markers: TradeChartMarker[]; serverNow: number }) {
   return <div className="trade-marker-summary" aria-label="Demo trade chart markers">{markers.slice(0, 4).map((marker) => {
     const remaining = Math.max(0, Math.ceil(marker.expiryTime - serverNow / 1000)); const result = marker.status === "WON" ? "✓ WON" : marker.status === "LOST" ? "✕ LOST" : marker.status === "DRAW" ? "= DRAW" : marker.status;
-    return <span key={marker.tradeId} data-trade-id={marker.tradeId}>{marker.direction === "UP" ? "▲" : "▼"} {marker.direction} · {result}{marker.status === "ACTIVE" || marker.status === "PENDING" ? ` · ${remaining}s` : ""}</span>;
+    return <span key={marker.tradeId} data-trade-id={marker.tradeId} aria-label={`${marker.status === "ACTIVE" ? "Active" : marker.status.toLowerCase()} ${marker.direction} demo trade opened at ${marker.openPrice}, ${marker.status === "ACTIVE" || marker.status === "PENDING" ? `expires in ${remaining} seconds` : result}`}>{marker.direction === "UP" ? "▲" : "▼"} {marker.direction} · {result}{marker.status === "ACTIVE" || marker.status === "PENDING" ? ` · ${remaining}s` : ""}</span>;
   })}{markers.length > 4 && <span>+{markers.length - 4} more</span>}</div>;
 }
 

@@ -8,7 +8,8 @@ import Select, { type StylesConfig } from "react-select";
 //import WalkThrough from "./WalkThrough";
 import { useNavigate } from "react-router-dom";
 import { getApiUrl } from "utils/env";
-import { codestraAuthApi } from "api/generated/codestraDemo";
+import { beyvraAuthApi } from "api/generated/beyvra";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 import GoogleAuthButton from "./GoogleAuthButton";
 
 
@@ -89,9 +90,9 @@ const SignUpForm = () => {
       phone_number: `${countryCode.value}${localPhone}`,
     };
     setIsPending(true);
-    codestraAuthApi.registerDemo<{ registrationId?: string; maskedEmail?: string }>({ ...payload, displayName: `${payload.first_name} ${payload.last_name}`, legalAccepted: data.accepted_terms, locale: "en" })
+    beyvraAuthApi.registerDemo<{ registrationId?: string; maskedEmail?: string }>({ ...payload, displayName: `${payload.first_name} ${payload.last_name}`, legalAccepted: data.accepted_terms, locale: "en" })
       .then((result) => { if (result.registrationId) { setPendingRegistration({ id: result.registrationId, email: result.maskedEmail || payload.email }); toast.success("Check your email for a verification code."); } })
-      .catch((error) => toast.error(error.message || "Registration failed."))
+      .catch((error) => { logInternalError(error, { endpoint: "auth.register_demo" }); toast.error(toUserSafeErrorText(error, "auth")); })
       .finally(() => setIsPending(false));
   };
 
@@ -129,9 +130,9 @@ const SignUpForm = () => {
       if (!/^\d{6}$/.test(otp) || otpPending) return;
       setOtpPending(true);
       try {
-        await codestraAuthApi.verifyRegistration({ registrationId: pendingRegistration.id, code: otp });
+        await beyvraAuthApi.verifyRegistration({ registrationId: pendingRegistration.id, code: otp });
         toast.success("Your demo account is ready."); navigate("/platform", { replace: true });
-      } catch (error) { toast.error(error instanceof Error ? error.message : "Verification failed."); }
+      } catch (error) { logInternalError(error, { endpoint: "auth.verify_registration" }); toast.error(toUserSafeErrorText(error, "auth")); }
       finally { setOtpPending(false); }
     };
     return <Form layout="vertical" onFinish={verifyOtp} className="otp-verification-form">

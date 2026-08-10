@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { IWallet } from "@interfaces";
-import { codestraWalletApi } from "api/generated/codestraDemo";
+import { beyvraWalletApi } from "api/generated/beyvra";
 
 type WalletsResponse = {
   count: number;
@@ -17,7 +17,7 @@ type useWalletProps = {
 
 export async function fethWallet(token: string): Promise<WalletsResponse> {
   try {
-    const result = await codestraWalletApi.wallets(token) as any;
+    const result = await beyvraWalletApi.wallets(token) as any;
     return {
       count: result.count || 0,
       next: result.next || null,

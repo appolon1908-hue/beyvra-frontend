@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 
 import { IWallet } from "@interfaces";
-import { codestraWalletApi } from "api/generated/codestraDemo";
+import { beyvraWalletApi } from "api/generated/beyvra";
 
 type useCreateWalletProps = {
   onSuccess?: (data: IWallet, variables: unknown, context: unknown) => void;
@@ -18,7 +18,7 @@ export async function fetchCreateWallet(
   data: IWallet[],
   token: string
 ): Promise<boolean> {
-  return codestraWalletApi.create(token, data) as Promise<boolean>;
+  return beyvraWalletApi.create(token, data) as Promise<boolean>;
 }
 
 export const useCreateWallet = (props: useCreateWalletProps) => {
