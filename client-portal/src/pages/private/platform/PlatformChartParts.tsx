@@ -8,14 +8,23 @@ import { DrawingState, DrawingType } from "./chart/drawings/types";
 import { TradeChartMarker } from "./chart/trades/types";
 import { WorkspaceDrawer } from "./chart/ChartWorkspaceUIStore";
 
-export function MarketStatus({ symbol, interval, state, marketStatus, error, lastUpdate, onRetry }: { symbol: string; interval: string; state: string; marketStatus: string; error: string; lastUpdate?: number; onRetry: () => void }) {
-  const label = marketStatus === "CLOSED" ? "MARKET CLOSED" : state === "connected" ? "LIVE" : state === "recovering" || state === "loading" ? "RECONNECTING" : state === "stale" ? "STALE" : state === "disconnected" ? "DISCONNECTED" : "UNAVAILABLE";
+export function MarketStatus({ symbol, interval, state, marketStatus, error, lastUpdate, candleCount, historyLoading, onRetry }: { symbol: string; interval: string; state: string; marketStatus: string; error: string; lastUpdate?: number; candleCount: number; historyLoading: boolean; onRetry: () => void }) {
+  const label = marketStatus === "CLOSED" ? "MARKET CLOSED" : state === "connected" ? "LIVE" : state === "reconnected" ? "RECONNECTED" : state === "recovering" ? "RECOVERING GAP" : state === "loading" || state === "reconnecting" ? "RECONNECTING" : state === "stale" ? "STALE" : state === "disconnected" ? "DISCONNECTED" : "UNAVAILABLE";
+  const stateMessage = state === "loading" ? "Loading market history…"
+    : state === "recovering" ? "A live update was missed. Refreshing the trusted market snapshot…"
+      : state === "reconnecting" ? "Live market feed interrupted. Reconnecting…"
+        : state === "reconnected" ? "Live market feed restored."
+          : state === "disconnected" ? "Live market feed disconnected."
+            : state === "provider-unavailable" ? error || "Market data is temporarily unavailable."
+              : error;
   return <>
     {state !== "connected" && <div className={`market-data-state market-data-state--${state}`} role="status" aria-live="polite">
-      {state === "loading" ? "Loading market history…" : state === "disconnected" ? "Live market feed disconnected. Reconnecting…" : error}
+      {stateMessage}
       {lastUpdate ? <span className="market-data-last-update">Last update {new Date(lastUpdate).toLocaleTimeString()}</span> : null}
-      {(state === "error" || state === "disconnected") && <button type="button" onClick={onRetry}>Retry</button>}
+      {(state === "error" || state === "disconnected" || state === "provider-unavailable") && <button type="button" onClick={onRetry}>Retry</button>}
     </div>}
+    {state !== "loading" && candleCount === 0 && <div className="chart-empty-state" role="status">No market history is available for this instrument and timeframe.</div>}
+    {historyLoading && <div className="chart-history-loading" role="status">Loading earlier candles…</div>}
     <div className="chart-status-bar" role="status" aria-live="polite">
       <span>{symbol}</span><span className={`quote-state quote-state--${state}`}>{label}</span><span>Interval: {interval}</span>
     </div>
@@ -54,7 +63,7 @@ export function ChartToolbar({ selectedChart, setSelectedChart, candleInterval, 
       <button type="button" onClick={toggleFullscreen} aria-label={fullscreen ? "Exit chart fullscreen" : "Enter chart fullscreen"}>{fullscreen ? "Exit full screen" : "Full screen"}</button>
     </div>
     <div className="timeframe-controls" aria-label="Chart timeframe">
-      {(["5s", "1m", "5m", "15m"] as ChartInterval[]).map((interval) => {
+      {(["5s", "1m", "5m", "15m", "1h", "4h", "1d"] as ChartInterval[]).map((interval) => {
         const capability = capabilities.find((item) => item.interval === interval);
         const disabled = !capability?.available;
         return <button key={interval} type="button" disabled={disabled} title={disabled ? capability?.reason || "Market-data capability unavailable" : undefined} className={candleInterval === interval ? "selected" : ""} onClick={() => setCandleInterval(interval)} aria-pressed={candleInterval === interval}>{interval}</button>;

@@ -97,6 +97,10 @@ export class EChartsAdapter {
     const labels = this.candles.map((candle) => candle.openTime);
     const ohlc = this.chartType === "heikin-ashi" ? heikinAshi(this.candles) : this.candles.map((candle) => [Number(candle.open), Number(candle.close), Number(candle.low), Number(candle.high)]);
     const closes = this.candles.map((candle) => Number(candle.close));
+    const volumes = this.candles.map((candle) => ({
+      value: Number(candle.volume),
+      itemStyle: { color: Number(candle.close) >= Number(candle.open) ? "rgba(38,166,154,.55)" : "rgba(239,83,80,.55)" },
+    }));
     const isCandle = this.chartType === "candlesticks" || this.chartType === "heikin-ashi";
     const priceSeries = isCandle
       ? { id: "price", type: "candlestick", data: ohlc, itemStyle: { color: "#26a69a", color0: "#ef5350", borderColor: "#26a69a", borderColor0: "#ef5350" } }
@@ -109,13 +113,32 @@ export class EChartsAdapter {
     const priceValue = Number(this.currentPrice); const priceVisible = Number.isFinite(priceValue) && !["disconnected", "error"].includes(this.currentPriceState);
     Object.assign(priceSeries, { markLine: { silent: true, symbol: "none", data: priceVisible ? [{ yAxis: priceValue, label: { show: true, formatter: priceValue.toFixed(2), color: this.currentPriceState === "stale" ? "#f59e0b" : "#12e6d0" }, lineStyle: { color: this.currentPriceState === "stale" ? "#f59e0b" : "#12e6d0", type: this.currentPriceState === "stale" ? "dashed" : "solid" } }] : [] } });
     let results: IndicatorResult[] = []; try { results = this.indicatorEngine.calculate(this.candles, this.indicatorConfigs); } catch (error) { console.error("Indicator overlay disabled", error instanceof Error ? error.name : "UNKNOWN"); }
-    const panes = [...new Set(results.map((result) => result.pane).filter((pane) => pane !== "price"))];
+    const panes = ["volume", ...new Set(results.map((result) => result.pane).filter((pane) => pane !== "price"))];
     const { grids } = calculatePaneLayout(panes, this.chart.getHeight());
-    const xAxes = grids.map((_, index) => ({ type: "category", gridIndex: index, data: labels, boundaryGap: true, axisLabel: { show: index === grids.length - 1 }, axisPointer: { show: true, snap: true } }));
-    const yAxes = grids.map((_, index) => ({ type: "value", gridIndex: index, scale: index === 0, min: panes[index - 1] === "rsi" ? 0 : undefined, max: panes[index - 1] === "rsi" ? 100 : undefined, position: "right" }));
+    const xAxes = grids.map((_, index) => ({ type: "category", gridIndex: index, data: labels, boundaryGap: true, axisLabel: { show: index === grids.length - 1 }, axisPointer: { show: true, snap: true, label: { show: true } } }));
+    const yAxes = grids.map((_, index) => ({ type: "value", gridIndex: index, scale: index === 0, min: panes[index - 1] === "rsi" || panes[index - 1] === "volume" ? 0 : undefined, max: panes[index - 1] === "rsi" ? 100 : undefined, position: "right", axisPointer: { show: true, label: { show: true } } }));
     const indicatorSeries = results.flatMap((result) => this.indicatorSeries(result, panes.indexOf(result.pane) + 1));
     const xAxisIndex = grids.map((_, index) => index);
-    this.chart.setOption({ animation: false, axisPointer: { link: [{ xAxisIndex: "all" }] }, tooltip: { trigger: "axis" }, grid: grids, xAxis: xAxes, yAxis: yAxes, dataZoom: [{ type: "inside", xAxisIndex, start, end, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { type: "slider", xAxisIndex, height: 18, bottom: 8, start, end, showDetail: false }], series: [priceSeries, ...indicatorSeries] }, { notMerge: true, lazyUpdate: true });
+    const volumeSeries = { id: "volume", name: "Volume", type: "bar", xAxisIndex: 1, yAxisIndex: 1, data: volumes, animation: false, barMaxWidth: 8 };
+    this.chart.setOption({
+      animation: false,
+      axisPointer: { type: "cross", link: [{ xAxisIndex: "all" }], label: { show: true } },
+      tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "cross" },
+        formatter: (params: Array<{ dataIndex?: number }> | { dataIndex?: number }) => {
+          const first = Array.isArray(params) ? params[0] : params; const candle = this.candles[first?.dataIndex ?? -1];
+          if (!candle) return "";
+          const value = (input: string) => Number(input).toLocaleString(undefined, { maximumFractionDigits: 8 });
+          return `${new Date(candle.openTime).toLocaleString()}<br/>O ${value(candle.open)} · H ${value(candle.high)} · L ${value(candle.low)} · C ${value(candle.close)}<br/>Volume ${value(candle.volume)}`;
+        },
+      },
+      grid: grids,
+      xAxis: xAxes,
+      yAxis: yAxes,
+      dataZoom: [{ type: "inside", xAxisIndex, start, end, filterMode: "none", zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }, { type: "slider", xAxisIndex, height: 18, bottom: 8, start, end, showDetail: false }],
+      series: [priceSeries, volumeSeries, ...indicatorSeries],
+    }, { notMerge: true, lazyUpdate: true });
     this.drawingLayer.render();
   }
 

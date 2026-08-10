@@ -122,6 +122,7 @@ export class UnifiedRealtimeClient {
         if (!this.closed && this.channels.size) {
           const delay = Math.min(30_000, 1_000 * 2 ** this.reconnectAttempt) + Math.floor(Math.random() * 500);
           this.reconnectAttempt += 1;
+          this.dispatch("system.status", { type: "connection", status: "reconnecting", attempt: this.reconnectAttempt, delay });
           this.reconnectTimer = window.setTimeout(() => void this.open(), delay);
         }
       };

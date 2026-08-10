@@ -25,7 +25,7 @@ export type MarketSnapshot = {
   candles: Array<{ open_time: string; close_time: string; open: string; high: string; low: string; close: string; volume: string; complete: boolean; sequence: number }>;
 };
 
-export type ChartConnectionState = "loading" | "connected" | "recovering" | "stale" | "disconnected" | "error";
+export type ChartConnectionState = "loading" | "connected" | "reconnecting" | "reconnected" | "recovering" | "stale" | "disconnected" | "provider-unavailable" | "error";
 export type ChartDataState = {
   instrumentId: string;
   interval: ChartInterval;

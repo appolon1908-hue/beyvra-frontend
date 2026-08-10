@@ -3,7 +3,8 @@ import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
 import { getUnifiedRealtimeClient, UnifiedRealtimeMessage } from "realtime/UnifiedRealtimeClient";
 import { applyLiveCandle, normalizeCandle, normalizeCandles, prependHistory } from "./candles";
 import { CanonicalCandle, ChartDataState, ChartInterval, MarketCapabilities, MarketSnapshot } from "./chartTypes";
-import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
+import { logInternalError } from "errors/userSafeError";
+import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
 import { readWithLegacyMigration, writeCompatibilityValue } from "compat/storageKeys";
 
 type Listener = () => void;
@@ -33,7 +34,7 @@ export class ChartDataController {
       const capabilities = await authenticatedRequest<MarketCapabilities>(`v1/instruments/${encodeURIComponent(instrumentId)}/market-data-capabilities`, this.token, { signal: abort.signal });
       if (!this.current(generation, instrumentId, abort)) return;
       const selected = capabilities.timeframes.find((item) => item.interval === interval);
-      if (!selected?.available) { this.update({ ...this.state, capabilities: capabilities.timeframes, connectionState: "error", error: toUserSafeErrorText({ code: "MARKET_DATA_STALE" }, "market") }); return; }
+      if (!selected?.available) { this.update({ ...this.state, capabilities: capabilities.timeframes, connectionState: "provider-unavailable", error: BeyvraErrorMapper.text({ code: "MARKET_DATA_STALE" }) }); return; }
       const snapshot = await this.fetchSnapshot(instrumentId, interval, abort.signal);
       if (!this.current(generation, instrumentId, abort)) return;
       this.applySnapshot(snapshot, capabilities.timeframes);
@@ -44,7 +45,7 @@ export class ChartDataController {
   async selectInterval(interval: ChartInterval) {
     if (interval === this.state.interval) return;
     const capability = this.state.capabilities.find((item) => item.interval === interval);
-    if (!capability?.available) { this.update({ ...this.state, error: toUserSafeErrorText({ code: "MARKET_DATA_STALE" }, "market") }); return; }
+    if (!capability?.available) { this.update({ ...this.state, error: BeyvraErrorMapper.text({ code: "MARKET_DATA_STALE" }) }); return; }
     const generation = this.generation; const instrumentId = this.state.instrumentId;
     this.snapshotAbort?.abort(); this.historyAbort?.abort(); this.unsubscribeCandle();
     const abort = new AbortController(); this.snapshotAbort = abort;
@@ -67,7 +68,7 @@ export class ChartDataController {
       const page = await this.fetchCandles(instrumentId, interval, historyCursor, abort.signal);
       if (!this.current(generation, instrumentId, abort)) return;
       this.update({ ...this.state, candles: prependHistory(this.state.candles, normalizeCandles(page.candles)), historyCursor: page.history_cursor, historyLoading: false });
-    } catch (error) { if (!abort.signal.aborted) { logInternalError(error, { endpoint: "market.history" }); this.update({ ...this.state, historyLoading: false, error: toUserSafeErrorText(error, "market") }); } }
+    } catch (error) { if (!abort.signal.aborted) { logInternalError(error, { endpoint: "market.history" }); this.update({ ...this.state, historyLoading: false, error: BeyvraErrorMapper.text(error) }); } }
   }
 
   stop() { ++this.generation; this.snapshotAbort?.abort(); this.historyAbort?.abort(); this.unsubscribeAll(); this.update({ ...this.state, connectionState: "disconnected" }); }
@@ -92,6 +93,7 @@ export class ChartDataController {
   }
   private subscribeRealtime(instrumentId: string, interval: ChartInterval) {
     const client = getUnifiedRealtimeClient(this.token, async () => (await webSocketTicketFetcher(this.token)).ws_ticket);
+    this.unsubscribers.push(client.subscribe("system.status", (event) => this.onConnectionEvent(event)));
     this.unsubscribers.push(client.subscribe(this.quoteChannel(instrumentId), (event) => this.onEvent(event)));
     this.subscribeCandle(instrumentId, interval);
   }
@@ -116,9 +118,21 @@ export class ChartDataController {
       this.update({ ...this.state, candles: applyLiveCandle(this.state.candles, candle), connectionState: "connected" });
     }
   }
+  private onConnectionEvent(event: UnifiedRealtimeMessage) {
+    if (event.type === "sequence.gap" && this.channelMatchesCurrent(String(event.channel || ""))) { void this.recover(); return; }
+    if (event.type !== "connection") return;
+    const status = String(event.status || "");
+    if (status === "connected") {
+      const reconnected = ["disconnected", "reconnecting", "recovering"].includes(this.state.connectionState);
+      this.update({ ...this.state, connectionState: reconnected ? "reconnected" : "connected", error: undefined });
+    } else if (status === "reconnecting") this.update({ ...this.state, connectionState: "reconnecting" });
+    else if (status === "disconnected") this.update({ ...this.state, connectionState: "disconnected" });
+    else if (status === "error") this.update({ ...this.state, connectionState: "reconnecting", error: BeyvraErrorMapper.text({ code: "NETWORK_ERROR" }, "realtime") });
+  }
   private eventCandle(data: Record<string, unknown>, sequence: number): CanonicalCandle | undefined {
     const seconds = Number(data.time); if (!Number.isFinite(seconds)) return undefined;
-    const openTime = new Date(seconds * 1000).toISOString(); const duration = this.state.interval === "1m" ? 60 : this.state.interval === "5s" ? 5 : 60;
+    const durations: Record<ChartInterval, number> = { "5s": 5, "1m": 60, "5m": 300, "15m": 900, "1h": 3_600, "4h": 14_400, "1d": 86_400 };
+    const openTime = new Date(seconds * 1000).toISOString(); const duration = durations[this.state.interval];
     return normalizeCandle({ open_time: openTime, close_time: new Date((seconds + duration) * 1000).toISOString(), open: String(data.open), high: String(data.high), low: String(data.low), close: String(data.close), volume: String(data.volume ?? "0"), complete: Boolean(data.closed), sequence });
   }
   private recover() {
@@ -135,7 +149,7 @@ export class ChartDataController {
   private candleChannel(instrumentId: string, interval: ChartInterval) { return `market.candle:${instrumentId}:${interval}`; }
   private unsubscribeCandle() { this.unsubscribers.pop()?.(); }
   private unsubscribeAll() { for (const unsubscribe of this.unsubscribers.splice(0)) unsubscribe(); }
-  private fail(error: unknown) { logInternalError(error, { endpoint: "market.realtime" }); this.update({ ...this.state, connectionState: "error", error: toUserSafeErrorText(error, "market") }); }
+  private fail(error: unknown) { logInternalError(error, { endpoint: "market.realtime" }); this.update({ ...this.state, connectionState: BeyvraErrorMapper.marketState(error), error: BeyvraErrorMapper.text(error) }); }
   private persistInterval(interval: ChartInterval) { if (interval === "5s") return; try { writeCompatibilityValue(this.storage, INTERVAL_KEY, interval); } catch { /* preference failure is non-fatal */ } }
   private update(state: ChartDataState) { this.state = state; this.listeners.forEach((listener) => listener()); }
 }

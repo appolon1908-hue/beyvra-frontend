@@ -10,5 +10,12 @@ export default defineConfig({
   },
   server: {
     host: true,
+    proxy: process.env.VITE_DEV_API_PROXY_TARGET ? {
+      '/api': {
+        target: process.env.VITE_DEV_API_PROXY_TARGET,
+        changeOrigin: true,
+        ws: true,
+      },
+    } : undefined,
   }
 });

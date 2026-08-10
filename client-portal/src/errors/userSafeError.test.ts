@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { logInternalError, toUserSafeError, toUserSafeErrorText } from "./userSafeError";
+import { BeyvraErrorMapper } from "./BeyvraErrorMapper";
 
 const forbidden = /ApiError|Exception|Traceback|requestId|request_id|correlationId|correlation_id|traceId|stack|\/api\/|https?:\/\/|psycopg|IntegrityError|OperationalError|Redis|NATS|JetStream|Centrifugo|Docker|financial-service|provider-internal|localhost|172\.|10\.|192\.168\./i;
 
@@ -50,5 +51,12 @@ describe("user-safe error contract", () => {
       retryable: true,
     });
     expect(toUserSafeErrorText(raw)).not.toMatch(forbidden);
+    expect(BeyvraErrorMapper.text(raw)).not.toMatch(forbidden);
+  });
+
+  it("classifies provider outages without exposing provider diagnostics", () => {
+    const raw = { status: 503, code: "PROVIDER_UNAVAILABLE", requestId: "hidden", message: "provider-internal /api/private" };
+    expect(BeyvraErrorMapper.marketState(raw)).toBe("provider-unavailable");
+    expect(BeyvraErrorMapper.text(raw)).not.toMatch(forbidden);
   });
 });

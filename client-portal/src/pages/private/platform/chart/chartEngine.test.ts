@@ -40,13 +40,13 @@ describe("ChartDataController request budgets", () => {
     const { ChartDataController } = await import("./ChartDataController");
     request.mockResolvedValueOnce({ instrument_id: "BTC-USD", timeframes: [{ interval: "1m", available: true }, { interval: "5s", available: false, reason: "GENUINE_5S_SOURCE_UNAVAILABLE" }] });
     const controller = new ChartDataController("token"); await controller.selectInstrument("BTC-USD", "5s");
-    expect(request).toHaveBeenCalledTimes(1); expect(subscribe).not.toHaveBeenCalled(); expect(controller.getSnapshot().error).toBe("GENUINE_5S_SOURCE_UNAVAILABLE");
+    expect(request).toHaveBeenCalledTimes(1); expect(subscribe).not.toHaveBeenCalled(); expect(controller.getSnapshot().error).toBe("Market data unavailable: Current market data is temporarily unavailable.");
   });
   it("uses one snapshot and two required subscriptions", async () => {
     const { ChartDataController } = await import("./ChartDataController"); const time = "2026-08-07T00:00:00.000Z";
     request.mockResolvedValueOnce({ instrument_id: "BTC-USD", timeframes: [{ interval: "1m", available: true }] }).mockResolvedValueOnce({ instrument_id: "BTC-USD", interval: "1m", sequence: 1, server_time: time, market_status: "OPEN", quote: { bid: "1", ask: "2", mid: "1.5", occurred_at: time }, candles: [raw(time)] });
     const controller = new ChartDataController("token"); await controller.selectInstrument("BTC-USD", "1m");
-    expect(request).toHaveBeenCalledTimes(2); expect(subscribe.mock.calls.map((call) => call[0])).toEqual(["market.quote:BTC-USD", "market.candle:BTC-USD:1m"]);
+    expect(request).toHaveBeenCalledTimes(2); expect(subscribe.mock.calls.map((call) => call[0])).toEqual(["system.status", "market.quote:BTC-USD", "market.candle:BTC-USD:1m"]);
     controller.refreshQuoteAge(Date.parse(time) + 16_000); expect(controller.getSnapshot().connectionState).toBe("stale");
   });
   it("rapid asset switching applies only the final generation", async () => {
@@ -58,7 +58,22 @@ describe("ChartDataController request budgets", () => {
     const third = controller.selectInstrument("BTC-USD", "1m"); await Promise.resolve(); await Promise.resolve();
     const snapshot = (instrument_id: string) => ({ instrument_id, interval: "1m", sequence: 1, server_time: time, market_status: "OPEN", quote: { bid: "1", ask: "2", mid: "1.5", occurred_at: time }, candles: [raw(time)] });
     deferred.get("BTC-2")?.(snapshot("BTC-USD")); await third; deferred.get("ETH-USD")?.(snapshot("ETH-USD")); deferred.get("BTC-1")?.(snapshot("BTC-USD")); await Promise.all([first, second]);
-    expect(controller.getSnapshot().instrumentId).toBe("BTC-USD"); expect(subscribe).toHaveBeenCalledTimes(2);
+    expect(controller.getSnapshot().instrumentId).toBe("BTC-USD"); expect(subscribe).toHaveBeenCalledTimes(3);
+  });
+  it("surfaces disconnect/reconnect and replaces state from REST after a sequence gap", async () => {
+    const { ChartDataController } = await import("./ChartDataController"); const time = "2026-08-07T00:00:00.000Z";
+    const snapshot = (sequence: number, close: string) => ({ instrument_id: "BTC-USD", interval: "1m", sequence, server_time: time, market_status: "OPEN", quote: { bid: close, ask: close, mid: close, occurred_at: time }, candles: [raw(time, close)] });
+    request.mockResolvedValueOnce({ instrument_id: "BTC-USD", timeframes: [{ interval: "1m", available: true }] }).mockResolvedValueOnce(snapshot(10, "2")).mockResolvedValueOnce(snapshot(12, "2.5"));
+    const controller = new ChartDataController("token"); await controller.selectInstrument("BTC-USD", "1m");
+    const status = subscribe.mock.calls.find((call) => call[0] === "system.status")?.[1];
+    const quote = subscribe.mock.calls.find((call) => call[0] === "market.quote:BTC-USD")?.[1];
+    status({ type: "connection", status: "disconnected" }); expect(controller.getSnapshot().connectionState).toBe("disconnected");
+    status({ type: "connection", status: "reconnecting" }); expect(controller.getSnapshot().connectionState).toBe("reconnecting");
+    status({ type: "connection", status: "connected" }); expect(controller.getSnapshot().connectionState).toBe("reconnected");
+    quote({ channel: "market.quote:BTC-USD", sequence: 12, data: { mid: "99" } });
+    expect(controller.getSnapshot().connectionState).toBe("recovering");
+    await vi.waitFor(() => expect(controller.getSnapshot().quote?.mid).toBe("2.5"));
+    expect(controller.getSnapshot().candles[0].close).toBe("2.5");
   });
 });
 
@@ -96,15 +111,18 @@ describe("ECharts lifecycle and local controls", () => {
     const configs = DEFAULT_INDICATORS.map((config) => ({ ...config, enabled: config.type === "rsi" || config.type === "macd" })) as IndicatorConfig[];
     adapter.setIndicators(configs); adapter.setCandles(Array.from({ length: 40 }, (_, index) => candle(new Date(Date.UTC(2026, 7, 1) + index * 60_000).toISOString(), String(index + 2))));
     const option = [...setOption.mock.calls].reverse().find((call) => Array.isArray(call[0].grid))?.[0];
-    expect(option.grid).toHaveLength(3); expect(option.xAxis).toHaveLength(3); expect(option.dataZoom[0].xAxisIndex).toEqual([0, 1, 2]);
+    expect(option.grid).toHaveLength(4); expect(option.xAxis).toHaveLength(4); expect(option.dataZoom[0].xAxisIndex).toEqual([0, 1, 2, 3]);
+    expect(option.series.find((series: { id: string }) => series.id === "volume")).toMatchObject({ type: "bar", xAxisIndex: 1, yAxisIndex: 1 });
+    expect(option.axisPointer.type).toBe("cross");
+    expect(option.tooltip.formatter([{ dataIndex: 0 }])).toContain("O 1 · H 3 · L 0.5 · C 2");
     const callsBefore = request.mock.calls.length; adapter.zoom(-10); expect(request).toHaveBeenCalledTimes(callsBefore);
   });
 });
 
 describe("chart data performance", () => {
-  it("normalizes 5,000 candles within the bounded test budget", () => {
-    const candles = Array.from({ length: 5_000 }, (_, index) => raw(new Date(Date.UTC(2026, 7, 1) + index * 60_000).toISOString()));
+  it.each([1_000, 5_000, 10_000])("normalizes %i candles within the bounded test budget", (count) => {
+    const candles = Array.from({ length: count }, (_, index) => raw(new Date(Date.UTC(2026, 7, 1) + index * 60_000).toISOString()));
     const started = performance.now(); const result = normalizeCandles(candles); const elapsed = performance.now() - started;
-    expect(result).toHaveLength(5_000); expect(elapsed).toBeLessThan(1_000);
+    expect(result).toHaveLength(count); expect(elapsed).toBeLessThan(1_000);
   });
 });

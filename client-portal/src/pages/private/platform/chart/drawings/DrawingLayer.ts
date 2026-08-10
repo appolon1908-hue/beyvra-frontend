@@ -8,7 +8,7 @@ export type DrawingLayerCallbacks = {
   onMove: (id: string, points: DrawingPoint[]) => void;
 };
 
-type ZrClick = { offsetX: number; offsetY: number; target?: { id?: string } };
+type ZrClick = { offsetX: number; offsetY: number; target?: { id?: string | number } };
 const pointTime = (point: DrawingPoint) => new Date(point.time * 1000).toISOString();
 
 export class DrawingLayer {
@@ -48,7 +48,7 @@ export class DrawingLayer {
     return { time: Math.floor(Date.parse(candle.openTime) / 1000), price: String(Number(converted[1])) };
   }
   private handleCanvasClick(event: ZrClick) {
-    if (this.tool === "select" || event.target?.id?.startsWith("drawing-")) return;
+    if (this.tool === "select" || (typeof event.target?.id === "string" && event.target.id.startsWith("drawing-"))) return;
     const point = this.dataPoint([event.offsetX, event.offsetY]); if (!point) return;
     this.pending.push(point); const required = TWO_POINT_DRAWINGS.includes(this.tool as PersistedDrawingType) ? 2 : 1;
     if (this.pending.length === required) { this.callbacks?.onCreate(this.tool as PersistedDrawingType, this.pending); this.pending = []; }

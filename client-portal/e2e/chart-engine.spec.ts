@@ -7,8 +7,9 @@ test("ECharts workspace, indicators, and drawings remain local and long-lived", 
   const pageErrors: string[] = []; page.on("pageerror", (error) => pageErrors.push(error.stack || error.message));
   let snapshotRequests = 0; let capabilityRequests = 0; let newsRequests = 0;
   const origin = baseURL ?? "http://127.0.0.1:8080";
+  const apiOrigin = process.env.E2E_API_ORIGIN ?? origin;
   await page.setViewportSize({ width: 1024, height: 768 });
-  const session = await request.post(`${origin}/api/v1/demo/sessions`, { headers: { "Idempotency-Key": `chart-${Date.now()}` }, data: {} });
+  const session = await request.post(`${apiOrigin}/api/v1/demo/sessions`, { headers: { "Idempotency-Key": `chart-${Date.now()}` }, data: {} });
   expect(session.ok()).toBeTruthy(); const { access } = await session.json();
   await context.addCookies([{ name: "access_token", value: access, url: origin }]);
   await page.route("**/api/v1/instruments/BTC-USD/market-data-capabilities", (route) => { capabilityRequests += 1; return route.fulfill({ json: { instrument_id: "BTC-USD", timeframes: [{ interval: "5s", available: false, reason: "GENUINE_5S_SOURCE_UNAVAILABLE" }, { interval: "1m", available: true, source: "isolated-test-adapter", mode: "native" }] } }); });
@@ -58,4 +59,5 @@ test("ECharts workspace, indicators, and drawings remain local and long-lived", 
   expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true); expect(await page.locator(".chart-surface canvas").count()).toBe(1);
   const accessibility = await new AxeBuilder({ page }).disableRules(["color-contrast"]).analyze(); expect(accessibility.violations.filter((item) => item.impact === "critical")).toEqual([]);
   await page.setViewportSize({ width: 390, height: 844 }); await page.getByRole("button", { name: "Open market events" }).click(); await expect(page.locator(".chart-event-drawer")).toHaveCSS("position", "fixed"); await page.keyboard.press("Escape"); await expect(page.locator(".chart-event-drawer")).toHaveCount(0); expect(await page.locator(".chart-surface canvas").count()).toBe(1);
+  if (pageErrors.length) throw new Error(`Browser errors after interactions: ${pageErrors.join(" | ")}`);
 });
