@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 const routes = [
   "/", "/markets/Commodities", "/markets/shares", "/markets/indices",
   "/markets/etfs", "/markets/bonds", "/markets/ipos", "/markets/crypto",

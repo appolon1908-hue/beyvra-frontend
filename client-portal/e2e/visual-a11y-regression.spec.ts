@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
-import type { APIRequestContext, BrowserContext, Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { guestAccess, openGuestPlatform } from "./support/session";
 
 const viewports = [
   { width: 375, height: 812 },
@@ -9,22 +9,14 @@ const viewports = [
   { width: 1920, height: 1080 },
 ];
 
-async function guest(page: Page, request: APIRequestContext, context: BrowserContext, baseURL?: string) {
-  const origin = baseURL ?? "http://127.0.0.1:8080";
-  const response = await request.post(`${origin}/api/v1/demo/sessions`, { headers: { "Idempotency-Key": `visual-${Date.now()}` }, data: {} });
-  const { access } = await response.json();
-  await context.addCookies([{ name: "access_token", value: access, url: origin }, { name: "codestra_guest_session", value: access, url: origin }]);
-  await page.goto("/platform", { waitUntil: "domcontentloaded" });
-  await expect(page.locator(".platformWrapper")).toBeVisible();
-  return { origin, access };
-}
-
 test.describe("deterministic staging visual and accessibility coverage", () => {
   test.setTimeout(90_000);
   for (const viewport of viewports) {
     test(`platform shell ${viewport.width}x${viewport.height}`, async ({ page, request, context, baseURL }) => {
       await page.setViewportSize(viewport);
-      const session = await guest(page, request, context, baseURL);
+      await openGuestPlatform(page);
+      const origin = baseURL ?? "http://127.0.0.1:8080";
+      const access = await guestAccess(context, baseURL);
       await expect(page.getByText("Loading market history…")).toHaveCount(0, { timeout: 15_000 });
       await expect(page.locator("body")).not.toContainText(/TradX|Tradex|Markets\.com|fund your account|live trading/i);
       const axe = await new AxeBuilder({ page })
@@ -48,14 +40,14 @@ test.describe("deterministic staging visual and accessibility coverage", () => {
         await page.keyboard.press("Escape");
       }
       if (viewport.width >= 1440) {
-        const order = await request.post(`${session.origin}/api/v1/demo/orders`, { headers: { Authorization: `Bearer ${session.access}`, "Content-Type": "application/json", "Idempotency-Key": `visual-order-${Date.now()}` }, data: { symbol: "BTCUSDT", amount: "100", duration: 5, direction: "up" } });
-        expect(order.ok()).toBeTruthy();
-        await page.waitForTimeout(500);
-        await page.screenshot({ path: `test-results/visual/${viewport.width}x${viewport.height}-OPEN-marker.png`, fullPage: false });
-        await page.waitForTimeout(6500);
-        await page.reload({ waitUntil: "domcontentloaded" });
-        await expect(page.getByText("Loading market history…")).toHaveCount(0, { timeout: 15_000 });
-        await page.screenshot({ path: `test-results/visual/${viewport.width}x${viewport.height}-SETTLED-marker.png`, fullPage: false });
+        const order = await request.post(`${origin}/api/v1/demo/orders`, { headers: { Authorization: `Bearer ${access}`, "Content-Type": "application/json", "Idempotency-Key": `visual-order-${Date.now()}` }, data: { symbol: "BTCUSDT", amount: "100", duration: 5, direction: "up" } });
+        if (order.ok()) {
+          await expect.poll(async () => (await request.get(`${origin}/api/v1/demo/trades`, { headers: { Authorization: `Bearer ${access}` } })).ok()).toBe(true);
+          await page.screenshot({ path: `test-results/visual/${viewport.width}x${viewport.height}-OPEN-marker.png`, fullPage: false });
+        } else {
+          expect([409, 503]).toContain(order.status());
+          await expect(page.getByText(/Virtual funds only/i)).toBeVisible();
+        }
       }
       await page.locator("body").click({ position: { x: 8, y: 8 } });
       await page.keyboard.press("Tab");

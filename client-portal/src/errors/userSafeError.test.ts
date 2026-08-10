@@ -27,10 +27,11 @@ describe("user-safe error contract", () => {
     expect(toUserSafeErrorText({ ...error, requestId: "secret-reference", message: "IntegrityError at /api/private" }, context)).not.toMatch(forbidden);
   });
 
-  it("keeps the request reference in structured logs only", () => {
-    const spy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+  it("keeps browser diagnostics free of internal identifiers and topology", () => {
+    const spy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     logInternalError({ status: 503, code: "PROVIDER_UNAVAILABLE", requestId: "ref-123" }, { endpoint: "auth.login", durationMs: 15_000 });
-    expect(spy).toHaveBeenCalledWith("beyvra_request_failed", expect.objectContaining({ request_id: "ref-123", internal_error_code: "PROVIDER_UNAVAILABLE" }));
+    expect(spy).toHaveBeenCalledWith("beyvra_request_failed", { http_status: 503, duration_ms: 15_000 });
+    expect(JSON.stringify(spy.mock.calls)).not.toMatch(/ref-123|auth\.login|PROVIDER_UNAVAILABLE|request_id|service/i);
     spy.mockRestore();
   });
 

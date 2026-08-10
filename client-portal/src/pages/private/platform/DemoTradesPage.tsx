@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { beyvraDemoApi } from "api/generated/beyvra";
-import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
+import { logInternalError } from "errors/userSafeError";
+import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
 
 type DemoTrade = { id: number; state: string; result?: string | null; symbol: string; direction: string; amount: string; openingPrice: string; closingPrice?: string | null; openedAt: string; expiresAt: string };
 
@@ -15,7 +16,7 @@ export default function DemoTradesPage() {
     if (!cookies.access_token) return;
     setLoading(true); setError("");
     try { setTrades(await beyvraDemoApi.trades<DemoTrade[]>(cookies.access_token)); }
-    catch (error) { logInternalError(error, { endpoint: "trading.demo_trades" }); setError(toUserSafeErrorText(error, "trading")); }
+    catch (error) { logInternalError(error, { endpoint: "trading.demo_trades" }); setError(BeyvraErrorMapper.text(error, "trading")); }
     finally { setLoading(false); }
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps

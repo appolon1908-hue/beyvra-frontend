@@ -11,7 +11,7 @@ import { demoConfigFallback } from "api/demo/useDemoConfig";
 import { useWorkspaceBootstrap } from "api/workspace/useWorkspaceBootstrap";
 import { useDemoTrades } from "./hooks/useDemoTrades";
 import { recordPlatformEvent } from "../../../observability/platformTelemetry";
-import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
+import { logInternalError } from "errors/userSafeError";
 import { ChartDataController } from "./chart/ChartDataController";
 import { EChartsAdapter, ChartType } from "./chart/EChartsAdapter";
 import { ChartInterval } from "./chart/chartTypes";
@@ -26,6 +26,7 @@ import { ChartEventDrawer } from "./chart/events/ChartEventDrawer";
 import { useNewsCalendarOverlay } from "./hooks/useNewsCalendarOverlay";
 import { ChartWorkspaceUIStore } from "./chart/ChartWorkspaceUIStore";
 import { ChartOverlayErrorBoundary } from "./chart/ChartOverlayErrorBoundary";
+import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
 
 interface PlatformProps { themeSelect: string; tradeFormHeight: number; bottomSidebarHeight: number }
 const instrumentIdFor = (value: string) => `${value.replace(/USDT$|\/USD$/i, "").toUpperCase()}-USD`;
@@ -102,7 +103,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
     if (orderState === "submitting" || !quote || chartState.connectionState !== "connected") return;
     setOrderState("submitting"); setOrderError("");
     try { const order: DemoOrderRequest = { symbol: tradingPair, amount, duration, direction }; await authenticatedRequest<DemoTrade>(apiEndpoints.demo.orders, cookies.access_token, { method: "POST", headers: { "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify(order) }); setOrderState("accepted"); await refreshTrades(); window.setTimeout(() => setOrderState("idle"), 1800); }
-    catch (error) { recordPlatformEvent("order_rejected", { code: error instanceof ApiError ? error.code || `HTTP_${error.status}` : "UNKNOWN" }); logInternalError(error, { endpoint: "trading.order" }); setOrderError(toUserSafeErrorText(error, "trading")); setOrderState("rejected"); }
+    catch (error) { recordPlatformEvent("order_rejected", { code: error instanceof ApiError ? error.code || `HTTP_${error.status}` : "UNKNOWN" }); logInternalError(error, { endpoint: "trading.order" }); setOrderError(BeyvraErrorMapper.text(error, "trading")); setOrderState("rejected"); }
   };
 
   const closeTicket = () => { closeOverlay(); window.setTimeout(() => ticketTriggerRef.current?.focus(), 0); };

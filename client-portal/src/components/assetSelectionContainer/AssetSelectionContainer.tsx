@@ -8,6 +8,7 @@ import { apiEndpoints } from "api/endpoints";
 import { PlusIcon2, SearchIcon2 } from "../../assets/icons";
 import "./assetSelectionContainer.scss";
 import { usePlatformOverlay } from "pages/private/platform/PlatformOverlayContext";
+import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
 
 type MarketAsset = {
   id: number;
@@ -98,7 +99,7 @@ const AssetSelectionContainer: React.FunctionComponent = () => {
           </label>
           <div className="asset-list-scrollable" aria-live="polite">
             {assets.isPending && <p role="status">Loading assets…</p>}
-            {assets.isError && <p role="alert">Assets could not be loaded.</p>}
+            {assets.isError && <p role="alert">{BeyvraErrorMapper.text(assets.error, "market")}</p>}
             {!assets.isPending && !assets.isError && filtered.length === 0 && <p>No assets match your search.</p>}
             {filtered.map((asset: MarketAsset) => (
               <button

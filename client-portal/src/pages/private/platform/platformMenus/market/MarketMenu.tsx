@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@store/hooks";
 import { setChartSymbol } from "@store/slices/socketStockCrypto";
 import { authenticatedRequest } from "api/client";
 import { apiEndpoints } from "api/endpoints";
+import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
 
 type MarketAsset = { id: number; name: string; symbol: string };
 type AssetResponse = MarketAsset[] | { results: MarketAsset[] };
@@ -41,7 +42,7 @@ const MarketMenu = () => {
       </label>
       <p className="market-menu-selected">Selected: <strong>{selectedSymbol}</strong></p>
       {assets.isPending && <p role="status">Loading markets…</p>}
-      {assets.isError && <p role="alert">Markets could not be loaded. Try again from the chart asset selector.</p>}
+      {assets.isError && <p role="alert">{BeyvraErrorMapper.text(assets.error, "market")}</p>}
       {!assets.isPending && !assets.isError && filtered.length === 0 && <p>No markets match your search.</p>}
       <div className="live-market-list" aria-live="polite">
         {filtered.map((asset: MarketAsset) => (

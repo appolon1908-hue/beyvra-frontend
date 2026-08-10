@@ -17,6 +17,7 @@ import { revokeSession } from "api/user/logout";
 import { beyvraAuthApi } from "api/generated/beyvra";
 import { logInternalError } from "errors/userSafeError";
 import { writeCompatibilityValue } from "compat/storageKeys";
+import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
 
 
 const idleTimeLimit = 15 * 60 * 1000; // 15 minutes in milliseconds
@@ -57,7 +58,7 @@ const RequireAuth = () => {
       .catch((error: unknown) => {
         if (disposed) return;
         setBootstrap(error instanceof DOMException && error.name === "AbortError" ? "ERROR" : "ERROR");
-        setBootstrapError("Beyvra could not resolve this session.");
+        setBootstrapError(BeyvraErrorMapper.text(error, "auth"));
         logInternalError(error, { endpoint: "auth.session_bootstrap" });
       })
       .finally(() => window.clearTimeout(timeout));

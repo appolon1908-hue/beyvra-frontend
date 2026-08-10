@@ -67,13 +67,8 @@ export function toUserSafeErrorText(error: unknown, context: ErrorContext = "gen
 
 export function logInternalError(error: unknown, data: { endpoint?: string; durationMs?: number; service?: string } = {}): void {
   const value = metadata(error);
-  console.error("beyvra_request_failed", {
-    request_id: value.requestId,
-    correlation_id: value.correlationId,
-    internal_error_code: value.code ?? "UNKNOWN",
+  console.warn("beyvra_request_failed", {
     http_status: value.status,
-    endpoint: data.endpoint,
     duration_ms: data.durationMs,
-    service: data.service ?? "frontend",
   });
 }

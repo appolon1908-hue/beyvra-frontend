@@ -135,7 +135,7 @@
 .market-data-state {
   position: absolute;
   z-index: 5;
-  top: 0.75rem;
+  top: 58px;
   right: 0.75rem;
   left: auto;
   transform: none;
@@ -182,6 +182,20 @@
 }
 .quote-state--connected { color: var(--color-positive); }
 .quote-state--error, .quote-state--disconnected { color: var(--color-warning); }
+.chart-controls {
+  position: absolute;
+  z-index: 8;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: calc(100% - 180px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.chart-controls::-webkit-scrollbar { display: none; }
+.chart-controls .zoom-controls, .chart-controls .timeframe-controls { display: flex; flex: 0 0 auto; flex-wrap: nowrap; gap: 6px; margin-top: 0; }
 .timeframe-controls { display: flex; gap: 4px; margin-top: 8px; }
 .timeframe-controls button { min-width: 44px; min-height: 36px; border-radius: 8px; color: var(--color-text-secondary); background: var(--color-surface-2); }
 .timeframe-controls button.selected { color: var(--color-brand-contrast); background: var(--color-brand); }
@@ -335,6 +349,14 @@
 
   .platformWrapper .chart-controls::-webkit-scrollbar { display: none; }
   .platformWrapper .chart-controls button { flex: 0 0 auto; min-width: 40px; min-height: 40px; }
+  .platformWrapper .chart-controls .zoom-controls,
+  .platformWrapper .chart-controls .timeframe-controls {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin-top: 0;
+  }
 
   .platformWrapper .chart-status-bar {
     left: 8px;
@@ -975,7 +997,14 @@
 
 /* Final lifecycle/status layout safeguards. */
 @media (max-width: 767px) {
-  .platformWrapper .market-data-state { top: 54px; right: 8px; max-width: 280px; font-size: 11px; }
+  .platformWrapper .market-data-state {
+    top: 148px;
+    right: 8px;
+    left: 8px;
+    max-width: none;
+    font-size: 11px;
+  }
+  .platformWrapper .market-data-state button { display: block; margin: 6px auto 0; }
   .platformWrapper .chart-controls { top: 8px; right: 8px; left: 8px; max-width: calc(100% - 16px); }
   .platformWrapper .demo-direction-actions button:disabled::after { content: "Waiting for a trusted quote"; display: block; margin-top: 2px; font-size: 9px; font-weight: 500; }
 }
