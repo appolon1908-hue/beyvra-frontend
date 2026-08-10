@@ -40,7 +40,7 @@ describe("ChartDataController request budgets", () => {
     const { ChartDataController } = await import("./ChartDataController");
     request.mockResolvedValueOnce({ instrument_id: "BTC-USD", timeframes: [{ interval: "1m", available: true }, { interval: "5s", available: false, reason: "GENUINE_5S_SOURCE_UNAVAILABLE" }] });
     const controller = new ChartDataController("token"); await controller.selectInstrument("BTC-USD", "5s");
-    expect(request).toHaveBeenCalledTimes(1); expect(subscribe).not.toHaveBeenCalled(); expect(controller.getSnapshot().error).toBe("GENUINE_5S_SOURCE_UNAVAILABLE");
+    expect(request).toHaveBeenCalledTimes(1); expect(subscribe).not.toHaveBeenCalled(); expect(controller.getSnapshot().error).toBe("Market data unavailable: Current market data is temporarily unavailable.");
   });
   it("uses one snapshot and two required subscriptions", async () => {
     const { ChartDataController } = await import("./ChartDataController"); const time = "2026-08-07T00:00:00.000Z";
