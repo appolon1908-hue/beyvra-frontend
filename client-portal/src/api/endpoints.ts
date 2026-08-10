@@ -44,6 +44,15 @@ export const apiEndpoints = {
     trades: "v1/demo/trades",
     wallet: "v1/demo/wallet",
   },
+  simulationTrading: {
+    preview: "v1/trading/orders/preview",
+    orders: "v1/trading/orders",
+    order: (orderId: string) => `v1/trading/orders/${encodeURIComponent(orderId)}`,
+    cancel: (orderId: string) => `v1/trading/orders/${encodeURIComponent(orderId)}/cancel`,
+    trades: "v1/trading/trades",
+    positions: "v1/trading/positions",
+    accounts: "v1/trading/accounts",
+  },
   news: {
     list: "v1/news",
     detail: (articleId: string) => `v1/news/${encodeURIComponent(articleId)}`,

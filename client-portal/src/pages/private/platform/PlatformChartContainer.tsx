@@ -2,14 +2,14 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, use
 import "./platform.scss";
 import { useCookies } from "react-cookie";
 import { useAppSelector } from "@store/hooks";
-import { ApiError, authenticatedRequest } from "api/client";
-import { apiEndpoints } from "api/endpoints";
+import { ApiError } from "api/client";
 import { usePlatformOverlay } from "./PlatformOverlayContext";
-import { DemoOrderRequest, DemoTrade } from "api/demo/types";
+import { createSimulationOrder, previewSimulationOrder, SimulationOrderRequest } from "api/trading/simulation";
 import { ChartToolbar, MarketStatus, TradeMarkerSummary, TradeTicket } from "./PlatformChartParts";
 import { demoConfigFallback } from "api/demo/useDemoConfig";
 import { useWorkspaceBootstrap } from "api/workspace/useWorkspaceBootstrap";
 import { useDemoTrades } from "./hooks/useDemoTrades";
+import { useSimulationTrading } from "./hooks/useSimulationTrading";
 import { recordPlatformEvent } from "../../../observability/platformTelemetry";
 import { logInternalError } from "errors/userSafeError";
 import { ChartDataController } from "./chart/ChartDataController";
@@ -64,7 +64,8 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   const ticketTriggerRef = useRef<HTMLButtonElement>(null);
   const eventTriggerRef = useRef<HTMLButtonElement>(null);
   const drawerOriginRef = useRef<HTMLElement | null>(null);
-  const { trades: openTrades, refresh: refreshTrades, lastEvent: demoTradeEvent } = useDemoTrades(cookies.access_token, demoAccountId, workspaceBootstrap?.payload.realtime);
+  const { trades: openTrades, lastEvent: demoTradeEvent } = useDemoTrades(cookies.access_token, demoAccountId, workspaceBootstrap?.payload.realtime);
+  const simulation = useSimulationTrading(cookies.access_token, accountScope === "guest-demo" ? undefined : accountScope);
   const eventOverlay = useNewsCalendarOverlay(newsCalendarStore, cookies.access_token, instrumentId, eventOverlayState.visibility);
   const quote = chartState.quote ? Number(chartState.quote.mid) : undefined;
   const selectedChart: ChartType = workspaceUI.chartType; const drawingTool: DrawingType = workspaceUI.drawingTool;
@@ -90,6 +91,10 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   useEffect(() => { if (chartState.quote?.occurredAt) tradeMarkerStore.synchronizeServerTime(chartState.quote.occurredAt); }, [tradeMarkerStore, chartState.quote?.occurredAt]);
   useEffect(() => tradeMarkerStore.replaceInitial(openTrades, demoAccountId || accountScope), [tradeMarkerStore, openTrades, demoAccountId, accountScope]);
   useEffect(() => { if (demoTradeEvent) tradeMarkerStore.applyRealtime(demoTradeEvent, demoAccountId || accountScope); }, [tradeMarkerStore, demoTradeEvent, demoAccountId, accountScope]);
+  useEffect(() => {
+    const data = simulation.lastEvent?.data as { state?: string } | undefined;
+    if (data?.state) setOrderState(data.state === "REJECTED" ? "rejected" : "accepted");
+  }, [simulation.lastEvent]);
   useEffect(() => adapterRef.current?.setTradeMarkers(["all", "trades"].includes(eventOverlayState.filter) ? tradeMarkerStore.markersFor(instrumentId) : [], tradeMarkerState.estimatedServerNow), [tradeMarkerStore, tradeMarkerState, instrumentId, eventOverlayState.filter]);
   useEffect(() => newsCalendarStore.setInstrumentFilter(instrumentId), [newsCalendarStore, instrumentId]);
   useEffect(() => adapterRef.current?.setNewsCalendarMarkers(newsCalendarStore.markersFor()), [newsCalendarStore, eventOverlayState]);
@@ -102,7 +107,7 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   const submitDemoOrder = async (direction: "up" | "down") => {
     if (orderState === "submitting" || !quote || chartState.connectionState !== "connected") return;
     setOrderState("submitting"); setOrderError("");
-    try { const order: DemoOrderRequest = { symbol: tradingPair, amount, duration, direction }; await authenticatedRequest<DemoTrade>(apiEndpoints.demo.orders, cookies.access_token, { method: "POST", headers: { "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify(order) }); setOrderState("accepted"); await refreshTrades(); window.setTimeout(() => setOrderState("idle"), 1800); }
+    try { const order: SimulationOrderRequest = { instrument: instrumentId, side: direction === "up" ? "BUY" : "SELL", order_type: "MARKET", quantity: (amount / quote).toFixed(8) }; await previewSimulationOrder(cookies.access_token, order); await createSimulationOrder(cookies.access_token, order); setOrderState("accepted"); await simulation.refresh(); window.setTimeout(() => setOrderState("idle"), 1800); }
     catch (error) { recordPlatformEvent("order_rejected", { code: error instanceof ApiError ? error.code || `HTTP_${error.status}` : "UNKNOWN" }); logInternalError(error, { endpoint: "trading.order" }); setOrderError(BeyvraErrorMapper.text(error, "trading")); setOrderState("rejected"); }
   };
 
