@@ -1,13 +1,27 @@
 import { useMutation } from "@tanstack/react-query";
-import { ITransaction } from "@interfaces";
 import { authenticatedRequest } from "api/client";
 import { apiEndpoints } from "api/endpoints";
 
+export type TransactionHistoryEntry = {
+  id: string;
+  type: "ORDER" | "TRADE" | "FEE" | "DEPOSIT" | "WITHDRAWAL" | "TRANSFER" | "ADJUSTMENT" | "RESERVATION" | "SETTLEMENT";
+  asset: string;
+  instrument?: string;
+  side?: string;
+  quantity?: string;
+  price?: string;
+  amount: string;
+  fee: string;
+  status: string;
+  occurred_at: string;
+  settled_at: string | null;
+  source_ref: string;
+  simulation: boolean;
+};
+
 export type TransactionResultType = {
-  count: number;
   next: string | null;
-  previous: string | null;
-  results: ITransaction[];
+  results: TransactionHistoryEntry[];
 };
 
 type UseTransactionsProps = {
@@ -23,15 +37,13 @@ type UseTransactionsProps = {
 type FetchTransactionsArgs = {
   token: string;
   options?: {
-    currency: string;
-    date_from?: string;
-    date_to?: string;
-    page?: number;
-    page_size?: number;
-    sort_by?: string;
-    sort_desc?: string;
-    status?: "PENDING" | "SUCCESSFUL" | "FAILED" | "REFUNDED";
-    type?: "DEPOSIT" | "WITHDRAWAL" | "TRADE" | "TRANSFER";
+    asset?: string;
+    created_after?: string;
+    created_before?: string;
+    cursor?: string;
+    instrument?: string;
+    limit?: number;
+    status?: string;
   };
 };
 
@@ -64,7 +76,7 @@ export const useTransactions = (props: UseTransactionsProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, unknown, any>({
+  return useMutation<TransactionResultType, unknown, FetchTransactionsArgs>({
     mutationFn: fetchTransactions,
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {

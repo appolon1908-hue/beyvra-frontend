@@ -4,17 +4,15 @@ import { CalendarIcon, FillCaretDownIcon } from "../../../../../../assets/icons"
 
 
 import "../trades.scss";
-import { ITransaction } from "@interfaces";
 import { useAppSelector } from "@store/hooks";
-import useTransactions from "api/wallet/useTransactions";
+import useTransactions, { TransactionHistoryEntry } from "api/wallet/useTransactions";
 import { statusAndTypesList } from "pages/private/transactions/constants";
 import { useCookies } from "react-cookie";
-import { dateFormter } from "helpers/dateFormter";
 
 interface UserToolsProps {
   tabKey: string;
   setTabKey: Dispatch<SetStateAction<string>>;
-  setTableData: Dispatch<SetStateAction<ITransaction[]>>
+  setTableData: Dispatch<SetStateAction<TransactionHistoryEntry[]>>
   tabs: {
     label: string;
     key: string;
@@ -68,12 +66,10 @@ useEffect(() => {
       {
         token: cookies.access_token,
         options: {
-          currency,
           asset,
-          date_from: startDate,
-          date_to: endDate,
+          created_after: startDate,
+          created_before: endDate,
           status,
-          type,
         },
       },
       {
@@ -126,7 +122,7 @@ useEffect(() => {
             placeholder="Start Date"
             suffixIcon={<CalendarIcon />}
             onChange={(event) => {
-              if (event) setStartDate(dateFormter(event.toDate()));
+              if (event) setStartDate(event.toDate().toISOString());
             }}
             className="trades-user-tools-date-picker"
           />
@@ -137,7 +133,7 @@ useEffect(() => {
             size="large"
             placeholder="End Date"
             onChange={(event) => {
-              if (event) setEndDate(dateFormter(event.toDate()));
+              if (event) setEndDate(event.toDate().toISOString());
             }}
             suffixIcon={<CalendarIcon />}
             className="trades-user-tools-date-picker"

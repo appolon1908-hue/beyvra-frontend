@@ -21,7 +21,7 @@
     "brand:check": "node scripts/check-public-identity.mjs",
     "test:errors": "vitest run src/errors/userSafeError.test.ts src/compat/storageKeys.test.ts src/api/generated/beyvra.test.ts",
     "test:realtime": "vitest run src/realtime/UnifiedRealtimeClient.test.ts",
-    "test": "npm run typecheck && npm run build:prod",
+    "test": "npm run typecheck && npm run test:contract && npm run build:prod",
     "test:contract": "node scripts/check-api-contract.mjs",
     "inventory:api": "node scripts/inventory-api-callers.mjs",
     "test:e2e": "playwright test"

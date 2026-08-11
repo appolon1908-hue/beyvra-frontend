@@ -43,14 +43,13 @@ export const TransactionPart: FC = () => {
     const tempData = data?.results.map((item) => (
       {
         tradeID: item.id,
-        user: item.user.email,
-        amount: `${item.amount} (${item.currency.symbol})`,
-        asset: item.currency.symbol,
-        price: `${item.amount}$`,
-        tradeType: 'Buy',
-        date: moment(item.request_date).format('DD MMM YYYY'),
-        fee: `${item.network_fee}$`,
-        tranasactionID: item.txid || '-',
+        amount: `${item.amount} (${item.asset})`,
+        asset: item.asset,
+        price: item.price ?? '-',
+        tradeType: item.side ?? item.type,
+        date: moment(item.occurred_at).format('DD MMM YYYY'),
+        fee: item.fee,
+        tranasactionID: item.source_ref,
         status: item.status,
       }
     ));
@@ -87,7 +86,7 @@ export const TransactionPart: FC = () => {
           />
         </div>
       </div>
-      <TransactionTable data={tableData} column={['Trade ID', 'User', 'Amount (Currency)', 'Asset', 'Price (per unit) ', 'Trade Type ("Buy" or "Sell")', 'Date', 'Fees', 'Transaction ID', 'Status']} />
+      <TransactionTable data={tableData} column={['Trade ID', 'Amount (Currency)', 'Asset', 'Price (per unit) ', 'Trade Type ("Buy" or "Sell")', 'Date', 'Fees', 'Transaction ID', 'Status']} />
     </>
   );
 };
