@@ -21,6 +21,8 @@
     "brand:check": "node scripts/check-public-identity.mjs",
     "test:errors": "vitest run src/errors/userSafeError.test.ts src/compat/storageKeys.test.ts src/api/generated/beyvra.test.ts",
     "test:realtime": "vitest run src/realtime/UnifiedRealtimeClient.test.ts",
+    "test:financial": "vitest run src/features/moneyMovement/moneyMovement.test.tsx src/components/financial/FinancialDisabledNotice.test.tsx src/realtime/FinancialRealtimeProjection.test.ts src/realtime/UnifiedRealtimeClient.test.ts src/errors/userSafeError.test.ts",
+    "financial:boundary": "node scripts/check-financial-boundary.mjs",
     "test": "npm run typecheck && npm run build:prod",
     "test:contract": "node scripts/check-api-contract.mjs",
     "test:e2e": "playwright test"

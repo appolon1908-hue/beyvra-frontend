@@ -1,0 +1,86 @@
+.money-movement {
+  --mm-bg: #071018;
+  --mm-panel: #0d1924;
+  --mm-panel-2: #122231;
+  --mm-border: #24384a;
+  --mm-text: #f5f8fb;
+  --mm-muted: #9eb0bf;
+  --mm-accent: #55d6be;
+  min-height: 100vh;
+  padding: clamp(20px, 4vw, 64px);
+  color: var(--mm-text);
+  background: radial-gradient(circle at 90% 0, #123447 0, transparent 34%), var(--mm-bg);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.money-movement *, .money-movement *::before, .money-movement *::after { box-sizing: border-box; }
+.money-movement a { color: var(--mm-accent); }
+.money-movement__header { display: flex; justify-content: space-between; gap: 28px; max-width: 1180px; margin: 0 auto 24px; }
+.money-movement__header h1 { margin: 8px 0; font-size: clamp(2rem, 5vw, 4.5rem); line-height: 1; }
+.money-movement__header p { max-width: 680px; color: var(--mm-muted); }
+.money-movement__brand { font-weight: 800; text-decoration: none; letter-spacing: .04em; }
+.money-movement__eyebrow { margin: 24px 0 0; color: var(--mm-accent) !important; font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.money-movement__mode { min-width: 220px; align-self: flex-start; display: grid; gap: 5px; padding: 18px; border: 1px solid #704544; border-radius: 16px; background: #29191c; }
+.money-movement__mode span, .money-movement__mode small { color: #d9a9a8; }
+.money-movement__nav { max-width: 1180px; margin: 0 auto; display: flex; gap: 8px; overflow-x: auto; padding: 6px; border: 1px solid var(--mm-border); border-radius: 14px; background: var(--mm-panel); }
+.money-movement__nav a { flex: 0 0 auto; padding: 10px 14px; color: var(--mm-muted); border-radius: 9px; text-decoration: none; }
+.money-movement__nav a.active, .money-movement__nav a:focus-visible { color: #061016; background: var(--mm-accent); outline: none; }
+.money-movement__demo-separator, .simulation-callout, .funding-panel, .requirements, .activity-layout, .wallet-grid, .money-alert { max-width: 1180px; margin-left: auto; margin-right: auto; }
+.money-movement__demo-separator { display: flex; justify-content: space-between; gap: 16px; margin-top: 18px; padding: 12px 16px; color: var(--mm-muted); border-left: 3px solid var(--mm-accent); background: #0a141d; }
+.funding-gate { max-width: 1180px; margin: 28px auto; }
+.funding-gate h2 { margin-bottom: 12px; }
+.wallet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 16px; margin-top: 28px; }
+.wallet-card, .security-card, .deposit-instructions, .activity-detail, .requirements li { padding: 22px; border: 1px solid var(--mm-border); border-radius: 16px; background: var(--mm-panel); }
+.wallet-card header { display: flex; justify-content: space-between; font-size: 1.35rem; font-weight: 700; }
+.wallet-card header small { padding: 5px 8px; color: #d9a9a8; background: #29191c; border-radius: 6px; font-size: .7rem; }
+.wallet-card dl, .activity-detail dl, .deposit-instructions dl { display: grid; gap: 10px; }
+.wallet-card dl div, .activity-detail dl div, .deposit-instructions dl div { display: flex; justify-content: space-between; gap: 18px; border-bottom: 1px solid var(--mm-border); padding-bottom: 9px; }
+.wallet-card dt, .activity-detail dt, .deposit-instructions dt { color: var(--mm-muted); }
+.wallet-card footer { color: var(--mm-muted); font-size: .78rem; }
+.simulation-callout { margin-top: 28px; padding: 24px; display: flex; justify-content: space-between; align-items: center; gap: 24px; border: 1px dashed #507385; border-radius: 16px; background: #0a151f; }
+.simulation-callout h2 { margin: 6px 0; }
+.funding-tabs { max-width: 1180px; margin: 28px auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.funding-tabs button { padding: 13px; color: var(--mm-muted); background: var(--mm-panel); border: 1px solid var(--mm-border); border-radius: 10px; cursor: pointer; }
+.funding-tabs button[aria-selected="true"] { color: #051016; background: var(--mm-accent); border-color: var(--mm-accent); font-weight: 700; }
+.funding-tabs button:focus-visible, .money-movement button:focus-visible, .money-movement a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.funding-panel { margin-top: 12px; padding: clamp(18px, 3vw, 34px); border: 1px solid var(--mm-border); border-radius: 18px; background: var(--mm-panel); }
+.flow-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(260px, .8fr); gap: 24px; }
+.flow-grid fieldset { display: grid; gap: 15px; margin: 18px 0 0; padding: 20px; border: 1px solid var(--mm-border); border-radius: 14px; }
+.flow-grid legend { padding: 0 8px; font-weight: 700; }
+.flow-grid label { display: grid; gap: 7px; color: var(--mm-muted); }
+.flow-grid input, .flow-grid select { width: 100%; min-height: 44px; padding: 10px; color: var(--mm-text); border: 1px solid var(--mm-border); border-radius: 8px; background: #08121b; }
+.flow-grid button { min-height: 44px; border: 0; border-radius: 9px; font-weight: 700; }
+.preview-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.preview-summary span { display: grid; gap: 6px; padding: 12px; background: var(--mm-panel-2); border-radius: 9px; }
+.deposit-address { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 18px; align-items: start; }
+.network-warning { padding: 12px; border-left: 3px solid #e6bb54; background: #272311; }
+.break-value { overflow-wrap: anywhere; }
+.requirements { margin-top: 28px; }
+.requirements ul, .activity-list { list-style: none; padding: 0; display: grid; gap: 10px; }
+.requirements li { display: grid; gap: 6px; }
+.requirements li span, .empty-copy, .security-card p { color: var(--mm-muted); }
+.activity-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr); gap: 20px; margin-top: 28px; }
+.activity-list button { width: 100%; display: flex; justify-content: space-between; gap: 16px; padding: 16px; color: var(--mm-text); text-align: left; border: 1px solid var(--mm-border); border-radius: 12px; background: var(--mm-panel); cursor: pointer; }
+.activity-list button span { display: grid; gap: 5px; }
+.activity-list button span:last-child { text-align: right; }
+.activity-list small { color: var(--mm-muted); }
+.activity-detail { position: relative; align-self: start; position: sticky; top: 20px; }
+.activity-detail__close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; color: var(--mm-text); border: 1px solid var(--mm-border); border-radius: 50%; background: transparent; }
+.money-alert { margin-top: 20px; padding: 16px; display: grid; gap: 6px; border: 1px solid #7d514b; border-radius: 12px; background: #271b1a; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+@media (max-width: 767px) {
+  .money-movement__header, .simulation-callout, .money-movement__demo-separator { flex-direction: column; }
+  .money-movement__mode { width: 100%; }
+  .flow-grid, .activity-layout { grid-template-columns: 1fr; }
+  .activity-detail { position: static; }
+  .preview-summary { grid-template-columns: 1fr; }
+  .deposit-address { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 420px) {
+  .money-movement { padding: 16px; }
+  .funding-tabs { grid-template-columns: 1fr; }
+  .money-movement__demo-separator { font-size: .85rem; }
+  .wallet-card dl div, .activity-detail dl div, .deposit-instructions dl div { flex-direction: column; gap: 4px; }
+}

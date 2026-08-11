@@ -14,3 +14,4 @@ export {
   codestraNewsApi as beyvraNewsApi,
   codestraPortfolioApi as beyvraPortfolioApi,
 } from "./codestraDemo";
+export { financialApi as beyvraFinancialApi } from "features/moneyMovement/api";

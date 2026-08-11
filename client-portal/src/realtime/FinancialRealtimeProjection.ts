@@ -2,10 +2,11 @@ import { authenticatedRequest } from "api/client";
 import { UnifiedRealtimeClient, UnifiedRealtimeMessage } from "./UnifiedRealtimeClient";
 
 export const FINANCIAL_REALTIME_TOPICS = {
-  "wallet.updated.v1": "v1/wallets/",
-  "deposit.updated.v1": "v1/deposits/",
-  "withdrawal.updated.v1": "v1/withdrawals/",
-  "transfer.updated.v1": "v1/transfers/",
+  "wallet.updated.v1": "v1/wallets",
+  "deposit.updated.v1": "v1/deposits",
+  "withdrawal.updated.v1": "v1/withdrawals",
+  "transfer.updated.v1": "v1/transfers",
+  "compliance.requirement.updated.v1": "v1/compliance/requirements",
 } as const;
 
 export type FinancialRealtimeTopic = keyof typeof FINANCIAL_REALTIME_TOPICS;

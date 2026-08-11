@@ -57,6 +57,7 @@ const SessionExpired = lazy(() => import("pages/public/sessionExpired/SessionExp
 const Home = lazy(() => import("pages/public/home/main/Home"));
 const StatusDetails = lazy(() => import("./pages/public/statusDetails/StatusDetails"));
 const IntegrationsAdmin = lazy(() => import("./pages/private/integrations/IntegrationsAdmin"));
+const MoneyMovementPage = lazy(() => import("./features/moneyMovement/MoneyMovementPage"));
 
 export const GlobalLoginMaxAge = 2629746;
 
@@ -107,6 +108,9 @@ const App: React.FunctionComponent = () => {
               <Route path="/platform/sessions" element={<Platform />} />
               <Route path="/platform/settings/security" element={<Platform />} />
               <Route path="/platform/settings/sessions" element={<Platform />} />
+              <Route path="/platform/wallet" element={<MoneyMovementPage section="wallet" />} />
+              <Route path="/platform/funding" element={<MoneyMovementPage section="funding" />} />
+              <Route path="/platform/activity" element={<MoneyMovementPage section="activity" />} />
               <Route path="/home" element={<Platform />} />
               <Route path="/kyc-document" element={<KYC />} />
               <Route path="/welcome" element={<PrivateRoute />}>

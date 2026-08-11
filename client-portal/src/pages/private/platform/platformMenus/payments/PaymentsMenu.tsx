@@ -14,7 +14,6 @@ interface PaymentsMenuProps {
 const PaymentsMenu: React.FunctionComponent<PaymentsMenuProps> = (_props) => {
   const navigate = useNavigate();
   const [fundsMode, setFundsMode] = useState<"deposit" | "withdraw" | null>(null);
-  const [showRealMoneyDisabled, setShowRealMoneyDisabled] = useState(false);
 
   return (
     <>
@@ -25,17 +24,17 @@ const PaymentsMenu: React.FunctionComponent<PaymentsMenuProps> = (_props) => {
         <button type="button" className="paymentItem" onClick={() => setFundsMode("withdraw")}>
           <WithdrawIcon2 /> <h2>Demo withdraw</h2>
         </button>
-        <button type="button" className="paymentItem" onClick={() => setShowRealMoneyDisabled(true)}>
-          <TransactionIcon2 /> <h2>Real transfer unavailable</h2>
+        <button type="button" className="paymentItem" onClick={() => navigate("/platform/funding")}>
+          <TransactionIcon2 /> <h2>Real money movement</h2>
         </button>
-        <button type="button" className="paymentItem" onClick={() => navigate("/transactions")}>
-          <HistoryIcon /> <h2>Transactions</h2>
+        <button type="button" className="paymentItem" onClick={() => navigate("/platform/activity")}>
+          <HistoryIcon /> <h2>Money activity</h2>
         </button>
       </div>
       {fundsMode && (
         <DemoFundsModal mode={fundsMode} open onClose={() => setFundsMode(null)} />
       )}
-      {showRealMoneyDisabled && <FinancialDisabledNotice />}
+      <FinancialDisabledNotice />
     </>
   );
 };
