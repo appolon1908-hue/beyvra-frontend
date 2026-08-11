@@ -2,9 +2,8 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DepositsIcon2, WithdrawIcon2, TransactionIcon2, HistoryIcon } from "../../../../../assets/icons";
 import { RightSubDrawerContent } from "../../types";
-import TransferMenu from "../transfer/TransferMenu";
-import TransferSuccessMenu from "../transfersuccessful/TransferSuccessMenu";
 import DemoFundsModal from "./DemoFundsModal";
+import FinancialDisabledNotice from "../../../../../components/financial/FinancialDisabledNotice";
 import "./paymentsMenu.scss";
 
 interface PaymentsMenuProps {
@@ -15,8 +14,7 @@ interface PaymentsMenuProps {
 const PaymentsMenu: React.FunctionComponent<PaymentsMenuProps> = (_props) => {
   const navigate = useNavigate();
   const [fundsMode, setFundsMode] = useState<"deposit" | "withdraw" | null>(null);
-  const [transferOpen, setTransferOpen] = useState(false);
-  const [transferSuccess, setTransferSuccess] = useState(false);
+  const [showRealMoneyDisabled, setShowRealMoneyDisabled] = useState(false);
 
   return (
     <>
@@ -27,8 +25,8 @@ const PaymentsMenu: React.FunctionComponent<PaymentsMenuProps> = (_props) => {
         <button type="button" className="paymentItem" onClick={() => setFundsMode("withdraw")}>
           <WithdrawIcon2 /> <h2>Demo withdraw</h2>
         </button>
-        <button type="button" className="paymentItem" onClick={() => setTransferOpen(true)}>
-          <TransactionIcon2 /> <h2>Transfer</h2>
+        <button type="button" className="paymentItem" onClick={() => setShowRealMoneyDisabled(true)}>
+          <TransactionIcon2 /> <h2>Real transfer unavailable</h2>
         </button>
         <button type="button" className="paymentItem" onClick={() => navigate("/transactions")}>
           <HistoryIcon /> <h2>Transactions</h2>
@@ -37,17 +35,7 @@ const PaymentsMenu: React.FunctionComponent<PaymentsMenuProps> = (_props) => {
       {fundsMode && (
         <DemoFundsModal mode={fundsMode} open onClose={() => setFundsMode(null)} />
       )}
-      <TransferMenu
-        isModalOpen={transferOpen}
-        setIsModalOpen={setTransferOpen}
-        setIsSucsessModalOpen={setTransferSuccess}
-      />
-      <TransferSuccessMenu
-        isModalOpen={transferSuccess}
-        setIsModalOpen={setTransferSuccess}
-        title="Transfer successful"
-        button="Close"
-      />
+      {showRealMoneyDisabled && <FinancialDisabledNotice />}
     </>
   );
 };

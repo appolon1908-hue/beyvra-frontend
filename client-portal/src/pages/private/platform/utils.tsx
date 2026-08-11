@@ -31,7 +31,6 @@ import ChangePassword from "./platformMenus/changePassword/ChangePassword";
 import EditName from "./platformMenus/editName/EditName";
 import ConfirmMail from "./platformMenus/confirmMail/ConfirmMail";
 import ConfirmPhone from "./platformMenus/confirmPhone/ConfirmPhone";
-import WithdrawMenu from "./platformMenus/withdraw/WithdrawMenu";
 import AddAccountMenu from "./platformMenus/add-account/AddAccount";
 import TradersWayMenu from "./platformMenus/tradersWay/TradersWayMenu";
 import VerifyPayment from "./platformMenus/VerifyPayment/VerifyPayment";
@@ -39,17 +38,13 @@ import MagicBoxRewards from "./platformMenus/MagicBoxRewards/MagicBoxRewards";
 import InviteFriends from "./platformMenus/inviteFriends/InviteFriends";
 import { ArrowLeftOS } from "../../../assets/icons";
 import CardDetailsMenu from "./platformMenus/cardDetailsMenu/CardDetailsMenu";
-import WithdrawAccount from "./platformMenus/withdrawAccount/WithdrawAccount";
 import BoostCubes from "./platformMenus/boostClubes/BoostCubes";
-import DepositSuccessful from "./platformMenus/depositSuccessful/DepositSuccessful";
 import VerificationHelpCenterMenu from "./platformMenus/verificationHelpCenterMenu/VerificationHelpCenterMenu";
 import VerificationHelpCenterSubMenu from "./platformMenus/verificationHelpCenterSubMenu/VerificationHelpCenterSubMenu";
 import PasswordSuccess from "./platformMenus/passwordSuccess/PasswordSuccess";
 import AccountArchiveMenu from "./platformMenus/accountArchiveMenu/AccountArchiveMenu";
 import AccountArchivedSuccessMenu from "./platformMenus/accountArchivedSuccessMenu/AccountArchivedSuccessMenu";
 import AccountRename from "./platformMenus/accountRename/AccountRename";
-import WithdrawRequest from "./platformMenus/withdrawRequest/WithdrawRequest";
-import WithdrawPayment from "./platformMenus/withdrawpayment/WithdrawPayment";
 import StatusMenu from "./platformMenus/status/StatusMenu";
 import AddAccountName from "./platformMenus/addAccountName/AddAccountName";
 import PublishedStrategiesMenu from "./platformMenus/publishedStrategiesMenu/PublishedStrategiesMenu";
@@ -68,6 +63,7 @@ import EducationMenu from "./platformMenus/educationMenu/EducationMenu";
 import JoinLeagues from "./platformMenus/joinLeagues/JoinLeagues";
 import TradingTutorials from "./platformMenus/tradingTutorials/TradingTutorials";
 import EventsSignalsClub from "./platformMenus/eventsSignalsClub/EventsSignalsClub";
+import FinancialDisabledNotice from "../../../components/financial/FinancialDisabledNotice";
 
 // Left Drawer Handlers
 export function leftDarwerTitleHandler(
@@ -462,16 +458,7 @@ export function rightSubDrawerBodyHandler(
         <ConfirmPhone setIsRightSubDrawerContent={setIsRightSubDrawerContent} />
       );
     case "withdraw":
-      return (
-        <WithdrawMenu
-          isModalOpen
-          setIsModalOpen={setIsRightSubDrawerOpen}
-          setIsWithdrawAccountModalOpen={(open: boolean) => {
-            setIsRightSubDrawerOpen(open);
-            if (open) setIsRightSubDrawerContent("select-withdraw-account");
-          }}
-        />
-      );
+      return <FinancialDisabledNotice />;
     case "add-account":
       return (
         <AddAccountMenu
@@ -500,34 +487,11 @@ export function rightSubDrawerBodyHandler(
         />
       );
     case "select-withdraw-account":
-      return (
-        <WithdrawAccount
-          isModalOpen
-          setIsModalOpen={setIsRightSubDrawerOpen}
-          setIsWithdrawPaymentModalOpen={(open: boolean) => {
-            setIsRightSubDrawerOpen(open);
-            if (open) setIsRightSubDrawerContent("withdraw-payment");
-          }}
-        />
-      );
+      return <FinancialDisabledNotice />;
     case "withdraw-payment":
-      return (
-        <WithdrawPayment
-          isModalOpen
-          setIsModalOpen={setIsRightSubDrawerOpen}
-          setIsWithdrawRequestModalOpen={((open: boolean) => {
-            setIsRightSubDrawerOpen(open);
-            if (open) setIsRightSubDrawerContent("select-withdarw-request");
-          }) as Dispatch<SetStateAction<boolean>>}
-        />
-      );
+      return <FinancialDisabledNotice />;
     case "select-withdarw-request":
-      return (
-        <WithdrawRequest
-          isModalOpen
-          setIsModalOpen={setIsRightSubDrawerOpen}
-        />
-      );
+      return <FinancialDisabledNotice />;
     case "boost-cubes":
       return (
         <BoostCubes
@@ -537,7 +501,7 @@ export function rightSubDrawerBodyHandler(
         />
       );
     case "depoist-successful":
-      return <DepositSuccessful />;
+      return <FinancialDisabledNotice />;
     case "add-account-name":
       return (
         <AddAccountName
