@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "environment": "isolated-staging",
+  "productionAllowed": false,
+  "realMoneyAllowed": false,
+  "scenarios": [
+    {"id": "realtime-disconnect", "target": "/ws/v2/", "fault": "disconnect", "cleanup": "browser-context-close"},
+    {"id": "market-snapshot-503", "target": "/api/v1/market/quotes", "fault": "synthetic-503", "cleanup": "route-remove"},
+    {"id": "demo-idempotency-replay", "target": "/api/v1/demo/orders", "fault": "same-key-replay", "cleanup": "reconcile-only"}
+  ]
+}
+
