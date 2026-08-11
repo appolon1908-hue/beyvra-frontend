@@ -36,8 +36,9 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run lint
+      - run: npm run test:unit
       - run: npm run test:chart
-      - run: npm audit --audit-level=critical
+      - run: npm audit --audit-level=high
 
   exact-head-base-ci:
     runs-on: ubuntu-latest
