@@ -17,7 +17,6 @@ const DocumentReviewPending = () => {
     const {mutate, isPending} = useKycFiles({
         onSuccess: (data) => {
 
-            console.log(data, "retrieved files")
             setKycFiles(data.results)
 
         },

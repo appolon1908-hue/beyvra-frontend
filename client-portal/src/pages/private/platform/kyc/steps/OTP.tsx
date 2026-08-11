@@ -55,7 +55,6 @@ const OTPVerification: React.FC<OTPProps> = ({ handleNext }) => {
       }
     } else {
       if (e == "Backspace") {
-        console.log(otp[i]);
         if (otp[i] == "") {
           if (i > 0) {
             inputRef[i - 1].current.focus();

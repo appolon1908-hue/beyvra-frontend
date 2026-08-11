@@ -50,7 +50,6 @@ const CreateAccount: React.FC<createAccountProps> = ({ handleNext }) => {
   const { mutate, isPending } = useRegister({
     onSuccess: (data) => {
       reset();
-      console.log("response data", data)
       toast.success(
         "Success! An email has been sent to your account. Please verify your email to complete the registration process."
       );
@@ -58,12 +57,10 @@ const CreateAccount: React.FC<createAccountProps> = ({ handleNext }) => {
       handleNext("next");
     },
     onError: (error) => {
-      // console.log(error, 'here');
     },
   });
 
   const onSubmit: SubmitHandler<SignUpFormData> = () => {
-    console.log(formData)
     mutate(formData);
   };
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {

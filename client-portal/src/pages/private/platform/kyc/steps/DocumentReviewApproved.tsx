@@ -3,8 +3,8 @@ import FileCard from '../components/docCard/FileCard'
 const DocumentReviewApprove = () => {
   return (
     <div className='max-w-4xl px-5 formContainer doc-review'>
-        <h5 className='text-2xl text-white '>Congrats! You are ready to start trading! </h5>
-        <p className='text-[#A3A8B0] my-4 text-base '>Our team reviewed your documents and everything is seems great! Go on and start trading.</p>
+        <h5 className='text-2xl text-white '>Your identity verification is approved.</h5>
+        <p className='text-[#A3A8B0] my-4 text-base '>Your available account features remain governed by your current account and compliance status.</p>
 
         <div className=' my-5'>
             <div className='flex gap-4 justify-between items-start mb-4'>
@@ -13,7 +13,7 @@ const DocumentReviewApprove = () => {
                 fileSize={300}
                 status={"approved"}
                 />
-                <span className='approved'>Rejected</span>
+                <span className='approved'>Approved</span>
             </div>
             <div>
                 <span className='text-[#2dd674]'>Change file</span>
@@ -32,7 +32,7 @@ const DocumentReviewApprove = () => {
                 fileSize={300}
                 status={"approved"}
                 />
-                <span className='approved'>Rejected</span>
+                <span className='approved'>Approved</span>
             </div>
         <div>
             <span className='text-[#2dd674]'>Change file</span>

@@ -29,8 +29,8 @@ const DocumnetUpload: React.FC<documentProps>  = ({handleNext}) => {
       handleNext("next")
 
     },
-    onError: (error) => {
-      console.error("fetching add file Kyc error", error);
+    onError: () => {
+      toast.error("We could not upload your verification documents. Please try again.");
     },
     });
 
