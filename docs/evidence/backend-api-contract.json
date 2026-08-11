@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "backend_repository": "appolon1908-hue/trading-backend",
-  "backend_base_sha": "341e11c034415859b1aa9979cd9d97f61d9ab189",
+  "backend_base_sha": "cbca88c87a1f9e8a1396c8a3c104a15936aff570",
   "schema_digest": "sha256:ce23a233b0de6d03ad7e1aa7af4a49c4d3951186ed01675ee76d017ae1851678",
   "path_count": 347,
   "paths": [
