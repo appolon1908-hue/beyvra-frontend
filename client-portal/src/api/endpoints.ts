@@ -23,7 +23,7 @@ export const apiEndpoints = {
     deposits: "payment/deposits/history/",
   },
   notifications: {
-    list: "v1/notifications/notifications/",
+    list: "v1/notifications",
     toggle: "notification/toggle_notification/",
     inbox: "notification/inbox/",
     read: (eventId: string) => `notification/inbox/${eventId}/read/`,
@@ -34,7 +34,7 @@ export const apiEndpoints = {
     webhookDeliveries: (webhookId: string) => `notification/webhooks/${webhookId}/deliveries/`,
   },
   market: {
-    history: "v1/market/trades",
+    history: (instrument: string) => `v1/market/trades/${encodeURIComponent(instrument)}`,
     snapshot: "v1/market/quotes",
     candles: "v1/market/candles",
   },

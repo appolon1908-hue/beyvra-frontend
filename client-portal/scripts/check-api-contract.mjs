@@ -15,12 +15,13 @@ async function sourceFiles(directory) {
 }
 
 function canonical(path) {
-  const normalized = path.includes("queryParams") ? path.split("${")[0] : path;
-  return normalized
+  const normalized = (path.includes("queryParams") ? path.split("${")[0] : path).replace(/\$\{suffix\}/g, "");
+  const value = normalized
     .split("?")[0]
     .replace(/\$\{[^}]+\}/g, "{}")
     .replace(/\{[^}]+\}/g, "{}")
     .replace(/\/$/, "") || "/";
+  return value.startsWith("/") ? value : `/${value}`;
 }
 
 const schemaResponse = await fetch(schemaUrl, { redirect: "follow" });
@@ -36,13 +37,20 @@ for (const file of await sourceFiles(sourceRoot)) {
   const patterns = [
     /\$\{BASE_URL\}(\/[^`"']+)/g,
     /\$\{getEnv\(\s*["']VITE_API_BASE_URL["']\s*\)\}(\/[^`"']+)/g,
+    /codestraRequest(?:<[^\n]+?>)?\(\s*["']([^"']+)["']/g,
+    /codestraRequest(?:<[^\n]+?>)?\(\s*`([^`]+)`/g,
   ];
   for (const pattern of patterns) {
     for (const match of source.matchAll(pattern)) endpoints.add(canonical(match[1]));
   }
+
+  if (file.endsWith("/api/endpoints.ts")) {
+    for (const match of source.matchAll(/:\s*["']([^"']*\/[^"']*)["']/g)) endpoints.add(canonical(match[1]));
+    for (const match of source.matchAll(/=>\s*`([^`]+)`/g)) endpoints.add(canonical(match[1]));
+  }
 }
 
-const ignored = new Set(["/user/websocket_ticket"]);
+const ignored = new Set(["/user/websocket_ticket", "/ws/v2"]);
 const missing = [...endpoints].filter((path) => !ignored.has(path) && !backendPaths.has(path)).sort();
 console.log(`Checked ${endpoints.size} frontend API paths against ${backendPaths.size} backend paths.`);
 if (missing.length) {

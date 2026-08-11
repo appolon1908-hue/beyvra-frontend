@@ -3,7 +3,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import { authenticatedRequest } from "api/client";
 import { apiEndpoints } from "api/endpoints";
 import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
-import { getUnifiedRealtimeClient } from "realtime/UnifiedRealtimeClient";
+import { getUnifiedRealtimeClient, privateUserChannel } from "realtime/UnifiedRealtimeClient";
 
 export type NotificationEvent = {
   id: string;
@@ -73,8 +73,10 @@ export function useNotificationSocket(token?: string) {
 
   useEffect(() => {
     if (!token) return;
+    const channel = privateUserChannel("notification", token);
+    if (!channel) return;
     const realtime = getUnifiedRealtimeClient(token, async () => (await webSocketTicketFetcher(token)).ws_ticket);
-    const unsubscribe = realtime.subscribe("notification", (message) => {
+    const unsubscribe = realtime.subscribe(channel, (message) => {
       if (message.type === "system.status") setConnected((message.data as Record<string, unknown>)?.status === "connected");
       else {
         setConnected(true);

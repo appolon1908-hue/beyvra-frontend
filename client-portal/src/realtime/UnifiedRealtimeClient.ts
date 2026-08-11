@@ -31,6 +31,20 @@ export class RealtimeSequenceTracker {
   }
 }
 
+/** Decode identity only to select a private channel; the server still verifies ownership. */
+export function privateUserChannel(prefix: string, token: string): string | undefined {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return undefined;
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = JSON.parse(atob(normalized)) as Record<string, unknown>;
+    const userId = decoded.user_id ?? decoded.sub;
+    return typeof userId === "string" || typeof userId === "number" ? `${prefix}.${userId}` : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** One authenticated socket per browser runtime, with reference-counted subscriptions. */
 export class UnifiedRealtimeClient {
   private socket: WebSocket | null = null;

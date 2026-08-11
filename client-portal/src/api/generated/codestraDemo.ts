@@ -88,9 +88,9 @@ export const codestraRealtimeV2Api = {
 };
 
 export const codestraUserApi = {
-  notifications: (token: string) => codestraRequest("v1/notifications/notifications/", { token }),
+  notifications: (token: string) => codestraRequest("v1/notifications", { token }),
   toggleNotification: (token: string, body: unknown) =>
-    codestraRequest("v1/notifications/toggle_notification/", { method: "PUT", token, body: JSON.stringify(body) }),
+    codestraRequest("notification/toggle_notification/", { method: "PUT", token, body: JSON.stringify(body) }),
 };
 
 export const codestraWalletApi = {
@@ -111,21 +111,21 @@ export const codestraBankApi = {
 };
 
 export const codestraAuthApi = {
-  login: <T>(body: unknown) => codestraRequest<T>("v1/auth/token/", { method: "POST", body: JSON.stringify(body) }),
-  register: <T>(body: unknown) => codestraRequest<T>("v1/auth/create/", { method: "POST", body: JSON.stringify(body) }),
-  logout: (token: string, refresh: string) => codestraRequest<void>("v1/auth/token/logout/", { method: "POST", token, body: JSON.stringify({ refresh }) }),
-  refresh: <T>(body: unknown) => codestraRequest<T>("v1/auth/token/refresh/", { method: "POST", body: JSON.stringify(body) }),
-  forgotPassword: <T>(body: unknown) => codestraRequest<T>("v1/auth/password_reset/", { method: "POST", body: JSON.stringify(body) }),
-  resetPassword: <T>(uidb64: string, token: string, body: unknown) => codestraRequest<T>(`v1/auth/password_reset_confirm/${uidb64}/${token}/`, { method: "POST", body: JSON.stringify(body) }),
-  verifyEmail: <T>(uidb64: string, token: string) => codestraRequest<T>(`v1/auth/verify_email/${uidb64}/${token}/`),
-  sendEmailVerification: <T>(token: string, email: string) => codestraRequest<T>("v1/auth/send_email_verification/", { method: "POST", token, body: JSON.stringify({ email }) }),
-  sendEmailVerificationPublic: <T>(email: string) => codestraRequest<T>("v1/auth/send_email_verification/", { method: "POST", body: JSON.stringify(email) }),
-  statistics: <T>(token: string) => codestraRequest<T>("v1/auth/trading_statistics/", { token }),
-  websocketTicket: <T>(token: string) => codestraRequest<T>("v1/auth/websocket_ticket/", { token }),
-  sendPhoneVerification: <T>(token: string) => codestraRequest<T>("v1/auth/send_phone_verification/", { method: "POST", token }),
-  verifyPhone: <T>(token: string, body: unknown) => codestraRequest<T>("v1/auth/verify_phone/", { method: "POST", token, body: JSON.stringify(body) }),
-  mfaQr: <T>(token: string) => codestraRequest<T>("v1/auth/generate_mfa_code/", { token }),
-  verifyMfa: <T>(body: unknown, token?: string) => codestraRequest<T>("v1/auth/verify_mfa_code/", { method: "POST", token, body: JSON.stringify(body) }),
+  login: <T>(body: unknown) => codestraRequest<T>("v1/auth/login", { method: "POST", body: JSON.stringify(body) }),
+  register: <T>(body: unknown) => codestraRequest<T>("user/create/", { method: "POST", body: JSON.stringify(body) }),
+  logout: (token: string, refresh: string) => codestraRequest<void>("v1/auth/logout", { method: "POST", token, body: JSON.stringify({ refresh }) }),
+  refresh: <T>(body: unknown) => codestraRequest<T>("user/token/refresh/", { method: "POST", body: JSON.stringify(body) }),
+  forgotPassword: <T>(body: unknown) => codestraRequest<T>("v1/auth/password/forgot", { method: "POST", body: JSON.stringify(body) }),
+  resetPassword: <T>(uidb64: string, token: string, body: Record<string, unknown>) => codestraRequest<T>("v1/auth/password/reset", { method: "POST", body: JSON.stringify({ ...body, uid: uidb64, token }) }),
+  verifyEmail: <T>(uidb64: string, token: string) => codestraRequest<T>(`user/verify_email/${uidb64}/${token}/`),
+  sendEmailVerification: <T>(token: string, email: string) => codestraRequest<T>("user/send_email_verification/", { method: "POST", token, body: JSON.stringify({ email }) }),
+  sendEmailVerificationPublic: <T>(email: string) => codestraRequest<T>("user/send_email_verification/", { method: "POST", body: JSON.stringify(email) }),
+  statistics: <T>(token: string) => codestraRequest<T>("user/trading_statistics/", { token }),
+  websocketTicket: <T>(token: string) => codestraRequest<T>("user/websocket_ticket/", { token }),
+  sendPhoneVerification: <T>(token: string) => codestraRequest<T>("user/send_phone_verification/", { method: "POST", token }),
+  verifyPhone: <T>(token: string, body: unknown) => codestraRequest<T>("user/verify_phone/", { method: "POST", token, body: JSON.stringify(body) }),
+  mfaQr: <T>(token: string) => codestraRequest<T>("v1/auth/mfa/setup", { method: "POST", token }),
+  verifyMfa: <T>(body: unknown, token?: string) => codestraRequest<T>("v1/auth/mfa/verify", { method: "POST", token, body: JSON.stringify(body) }),
   guestDemo: <T>(idempotencyKey?: string) => codestraRequest<T>("v1/demo/sessions", { method: "POST", idempotencyKey, body: "{}" }),
   registerDemo: <T>(body: unknown) => codestraRequest<T>("v1/auth/register", { method: "POST", body: JSON.stringify(body) }),
   verifyRegistration: <T>(body: unknown) => codestraRequest<T>("v1/auth/email-verification/verify", { method: "POST", body: JSON.stringify(body) }),
@@ -136,16 +136,16 @@ export const codestraAuthApi = {
 };
 
 export const codestraProfileApi = {
-  profile: (token: string) => codestraRequest("v1/me/", { token }),
-  legacyProfile: <T>(token: string) => codestraRequest<T>("user/profile/", { token }),
-  update: (token: string, body: FormData | Record<string, unknown>) => codestraRequest("v1/me/", { method: "PATCH", token, body: body instanceof FormData ? body : JSON.stringify(body) }),
-  changePassword: (token: string, body: unknown) => codestraRequest("v1/auth/password_change/", { method: "POST", token, body: JSON.stringify(body) }),
-  disableWalkthrough: (token: string) => codestraRequest("v1/auth/disable_walkthrough/", { method: "PUT", token }),
+  profile: (token: string) => codestraRequest("v1/me", { token }),
+  legacyProfile: <T>(token: string) => codestraRequest<T>("user/me/", { token }),
+  update: (token: string, body: FormData | Record<string, unknown>) => codestraRequest("v1/account", { method: "PATCH", token, body: body instanceof FormData ? body : JSON.stringify(body) }),
+  changePassword: (token: string, body: unknown) => codestraRequest("user/password_change/", { method: "POST", token, body: JSON.stringify(body) }),
+  disableWalkthrough: (token: string) => codestraRequest("user/disable_walkthrough/", { method: "PUT", token }),
 };
 
 export const codestraIntegrationsApi = {
-  crmConnections: <T>(token: string) => codestraRequest<T>("integrations/crm/connections", { token }),
-  importUsers: <T>(token: string, body: FormData, idempotencyKey: string) => codestraRequest<T>("integrations/users/imports", { method: "POST", token, body, idempotencyKey }),
+  crmConnections: <T>(token: string) => codestraRequest<T>("v1/integrations/crm/connections", { token }),
+  importUsers: <T>(token: string, body: FormData, idempotencyKey: string) => codestraRequest<T>("v1/users/imports", { method: "POST", token, body, idempotencyKey }),
 };
 
 export const codestraKycApi = {
