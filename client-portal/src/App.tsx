@@ -92,6 +92,9 @@ const App: React.FunctionComponent = () => {
             <Route element={<RequireAuth />}>
               <Route path="/platform" element={<Platform />} />
               <Route path="/platform/assets" element={<Platform />} />
+              <Route path="/platform/inzone" element={<Platform />} />
+              <Route path="/platform/rewards" element={<Platform />} />
+              <Route path="/platform/market" element={<Platform />} />
               <Route path="/platform/trades" element={<DemoTradesPage />} />
               <Route path="/platform/trades/:tradeId" element={<DemoTradesPage />} />
               <Route path="/platform/portfolio" element={<Platform />} />
@@ -100,6 +103,8 @@ const App: React.FunctionComponent = () => {
               <Route path="/platform/help" element={<Platform />} />
               <Route path="/platform/profile" element={<DemoAccountPage section="profile" />} />
               <Route path="/platform/settings" element={<DemoAccountPage section="settings" />} />
+              <Route path="/platform/security" element={<Platform />} />
+              <Route path="/platform/sessions" element={<Platform />} />
               <Route path="/platform/settings/security" element={<Platform />} />
               <Route path="/platform/settings/sessions" element={<Platform />} />
               <Route path="/home" element={<Platform />} />

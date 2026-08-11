@@ -10,8 +10,9 @@ import { Spin } from "antd";
 import { useAppDispatch, useAppSelector } from "@store/hooks";
 import { setPortfolioWindow } from "@store/slices/app";
 import { CurrentDrawerType } from "pages/private/platform/types";
-import { featureEnabled, PlatformFeatureFlags, stagingPlatformFeatures } from "config/platformFeatures";
+import { PlatformFeatureFlags } from "config/platformFeatures";
 import { usePlatformOverlay } from "pages/private/platform/PlatformOverlayContext";
+import { useNavigate } from "react-router-dom";
 
 type DrawerType =
   | "trades"
@@ -41,9 +42,9 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
   isLeftSubDrawerOpen,
   currentDrawer,
   setCurrentDrawer,
-  features = stagingPlatformFeatures,
   id,
 }) => {
+  const navigate = useNavigate();
   const { togglePortfolioWindow } = useAppSelector(state => state.app)
   const onlineTraders = useAppSelector(state => state.socketStockCrypto.onlinetraders)
   const dispatch = useAppDispatch()
@@ -108,7 +109,31 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
         </button>
 
         <button
-          aria-label="Assets"
+          aria-label="InZone"
+          onClick={() => navigate("/platform/inzone")}
+          className=""
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
+        >
+          <div className="icon flex justify-center whiteIcons">
+            <NewsIcon />
+          </div>
+          <p className="text">InZone</p>
+        </button>
+
+        <button
+          aria-label="Rewards"
+          onClick={() => navigate("/platform/rewards")}
+          className=""
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
+        >
+          <div className="icon flex justify-center whiteIcons">
+            <NewsIcon />
+          </div>
+          <p className="text">Rewards</p>
+        </button>
+
+        <button
+          aria-label="Market"
           onClick={() => onSelect("market")}
           className={isDrawerOpen && currentDrawer === "market" ? "active" : ""}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
@@ -116,7 +141,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
           <div className="icon flex justify-center whiteIcons">
             <MarketIcon />
           </div>
-          <p className="text">Assets</p>
+          <p className="text">Market</p>
         </button>
 
         <button
@@ -130,17 +155,6 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
           </div>
           <p className="text">Help</p>
         </button>
-        {featureEnabled("newsStream", features) && <button
-          aria-label="News"
-          onClick={() => onSelect("news")}
-          className={isDrawerOpen && currentDrawer === "news" ? "active" : ""}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
-        >
-          <div className="icon flex justify-center whiteIcons">
-            <NewsIcon />
-          </div>
-          <p className="text">News</p>
-        </button>}
       </div>
       <div className="bottom">
         <div className="online">

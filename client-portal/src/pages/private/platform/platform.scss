@@ -426,7 +426,7 @@
 }
 
 @media (min-width: 1920px) {
-  .platformWrapper .trade-content { grid-template-columns: minmax(0, 1fr) minmax(320px, 22vw); }
+  .platformWrapper .trade-content { grid-template-columns: minmax(0, 1fr) 300px; }
   .platformWrapper .trade-form { width: 100%; min-width: 0; }
 }
 
@@ -498,6 +498,25 @@
 .platformWrapper .chart-container { min-width: 0; min-height: 0; width: 100% !important; height: 100% !important; }
 .platformWrapper .trade-graph { grid-column: 1; position: relative; overflow: hidden; background: #101214; }
 .platformWrapper .chart-container { float: none; margin: 0 !important; }
+
+/* Authoritative demo-workspace frame (desktop reference: 1919 x 911). */
+@media (min-width: 1440px) {
+  .platformWrapper { grid-template-columns: 100px minmax(0, 1fr); }
+  .platformWrapper .sidebar { width: 100px; min-width: 100px; }
+  .platformWrapper .trade-section { grid-template-rows: 91px minmax(0, 1fr); }
+  .platformWrapper .topbarContainer { height: 91px; min-height: 91px; }
+  .platformWrapper .trade-content { grid-template-columns: minmax(0, 1fr) 300px; }
+  .platformWrapper .trade-ticket-shell { width: 300px; min-width: 300px; }
+}
+
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .platformWrapper { grid-template-columns: 80px minmax(0, 1fr); }
+  .platformWrapper .sidebar { width: 80px; min-width: 80px; }
+  .platformWrapper .trade-section { grid-template-rows: 91px minmax(0, 1fr); }
+  .platformWrapper .topbarContainer { height: 91px; min-height: 91px; }
+  .platformWrapper .trade-content { grid-template-columns: minmax(0, 1fr) 300px; }
+  .platformWrapper .trade-ticket-shell { width: 300px; min-width: 300px; }
+}
 .platformWrapper .trade-ticket-shell {
   grid-column: 2;
   position: relative;
@@ -564,19 +583,19 @@
 @media (min-width: 1440px) {
   .platformWrapper .sidebar { width: 100px; min-width: 100px; }
   .platformWrapper { grid-template-columns: 100px minmax(0, 1fr); }
-  .platformWrapper .trade-section { grid-template-rows: 94px minmax(0, 1fr); }
-  .platformWrapper .topbarContainer { height: 94px; min-height: 94px; padding: 12px 20px; }
+  .platformWrapper .trade-section { grid-template-rows: 91px minmax(0, 1fr); }
+  .platformWrapper .topbarContainer { height: 91px; min-height: 91px; padding: 15px 19px 15px 20px; }
 }
 
 @media (min-width: 1200px) and (max-width: 1439px) {
-  .platformWrapper .sidebar { width: 72px; min-width: 72px; }
-  .platformWrapper { grid-template-columns: 72px minmax(0, 1fr); }
-  .platformWrapper .trade-section { grid-template-rows: 94px minmax(0, 1fr); }
-  .platformWrapper .topbarContainer { height: 94px; min-height: 94px; padding: 12px; }
+  .platformWrapper .sidebar { width: 80px; min-width: 80px; }
+  .platformWrapper { grid-template-columns: 80px minmax(0, 1fr); }
+  .platformWrapper .trade-section { grid-template-rows: 91px minmax(0, 1fr); }
+  .platformWrapper .topbarContainer { height: 91px; min-height: 91px; padding: 15px 12px; }
 }
 
 @media (min-width: 1200px) {
-  .leftMainDrawer, .leftSubDrawer { top: 94px !important; height: calc(100dvh - 94px) !important; }
+  .leftMainDrawer, .leftSubDrawer { top: 91px !important; height: calc(100dvh - 91px) !important; }
   .platformWrapper .sidebar .top { margin-top: 16px; gap: 4px; }
   .platformWrapper .sidebar .top button { width: 100%; min-height: 88px; padding: 10px 8px; flex-direction: column; gap: 7px; }
   .platformWrapper .sidebar .top button .text { display: block; font-size: 14px; }

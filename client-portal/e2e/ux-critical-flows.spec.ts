@@ -45,7 +45,7 @@ test.describe("authenticated critical UX", () => {
   test("profile, settings, trades, help, market and chart states are reachable", async ({ page }) => {
     await openGuestPlatform(page);
     await expect(page.locator(".chart-surface canvas").first()).toBeVisible();
-    await page.getByRole("button", { name: "Assets" }).click();
+    await page.getByRole("button", { name: "Market", exact: true }).click();
     await expect(page.locator("body")).not.toContainText(forbidden);
     await page.keyboard.press("Escape");
     await expect(page.locator(".leftMainDrawer")).not.toHaveClass(/ant-drawer-open/);
