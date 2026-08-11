@@ -21,40 +21,45 @@ interface DataNewsResponse {
 }
 
 interface NewsResponse {
-  status: string,
-  totalResults: number,
+  next_cursor: string | null,
+  delayed: boolean,
+  stale: boolean,
   results: INews[]
   news: DataNewsResponse;
 }
 
 type NewsQueryParams = {
-  symbol?: string;
-  start?: string;
-  end?: string;
-  sort?: "asc" | "desc";
-  include_content?: string;
-  exclude_contentless?: string;
-  size?: string;
+  q?: string;
+  instrument?: string;
+  category?: string;
+  source?: string;
+  language?: string;
+  country?: string;
+  published_after?: string;
+  published_before?: string;
+  limit?: string;
+  cursor?: string;
 };
 
 type useNewsProps = {
   onSuccess?: (
     data: NewsResponse,
-    variables: { token: string; queryParams?: NewsQueryParams },
+    variables: { token: string; feed?: "latest" | "market" | "crypto"; queryParams?: NewsQueryParams },
     context: unknown
   ) => void;
   onError?: (
     error: unknown,
-    variables: { token: string; queryParams?: NewsQueryParams },
+    variables: { token: string; feed?: "latest" | "market" | "crypto"; queryParams?: NewsQueryParams },
     context: unknown
   ) => void;
 };
 
 export async function fetchNews(data: {
   token: string;
+  feed?: "latest" | "market" | "crypto";
   queryParams?: NewsQueryParams;
 }): Promise<NewsResponse> {
-  return beyvraNewsApi.list<NewsResponse>(data.token, data.queryParams);
+  return beyvraNewsApi.feed<NewsResponse>(data.token, data.feed || "latest", data.queryParams);
 }
 
 export const useNews = (
@@ -62,7 +67,7 @@ export const useNews = (
 ): UseMutationResult<
   NewsResponse,
   unknown,
-  { token: string; queryParams?: NewsQueryParams }
+  { token: string; feed?: "latest" | "market" | "crypto"; queryParams?: NewsQueryParams }
 > => {
   const {
     onSuccess: onSuccessOverride,
@@ -70,7 +75,7 @@ export const useNews = (
     ...rest
   } = props || ({} as useNewsProps);
 
-  return useMutation<NewsResponse,unknown,{ token: string; queryParams?: NewsQueryParams }>({
+  return useMutation<NewsResponse,unknown,{ token: string; feed?: "latest" | "market" | "crypto"; queryParams?: NewsQueryParams }>({
     mutationFn: (data) => fetchNews(data),
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {

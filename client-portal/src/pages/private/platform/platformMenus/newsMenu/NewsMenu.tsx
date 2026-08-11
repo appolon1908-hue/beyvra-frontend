@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import { Button } from "antd";
-import moment from "moment";
 
 import { useNews } from "api/news/useNews";
 import Loading from "components/loading";
@@ -19,13 +18,9 @@ const titleHandler = (titleKey: string) => {
   switch (titleKey) {
     case "Forex":
       return "Forex";
-    case "all":
-      return "All";
-    case "Stocks":
-      return "Stocks";
-    case "Commodities":
-      return "Commodities";
-    case "Crypto":
+    case "latest": return "Latest";
+    case "market": return "Market";
+    case "crypto":
       return "Crypto";
     default:
       return "";
@@ -54,7 +49,7 @@ const RenderTab = ({
 };
 
 interface NewsFeedProps {
-  articles: Record<string, INews>;
+  articles: INews[];
   label: string;
   searchTerm: string; 
 
@@ -69,9 +64,9 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ articles, label, searchTerm }) => {
     setModalOpen(true);
   };
   
-  const selectedArticles = Object.values(articles || {}).filter((article) =>
-    article?.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    article?.text?.toLowerCase().includes(searchTerm.toLowerCase())
+  const selectedArticles = articles.filter((article) =>
+    (article.headline || article.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (article.summary || article.text || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
   
   return (
@@ -79,15 +74,16 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ articles, label, searchTerm }) => {
       {selectedArticles.length > 0 ? (
         selectedArticles.map((item, index) => (
           <div
-            key={index}
+            key={item.news_id || item.article_id || index}
             onClick={() => handleArticleClick(item)}
             className="textContainer cursor-pointer"
           >
-            <h2>{item?.title?.substring(0, 65)}</h2>
-            <p>{item?.text ? `${item?.text?.substring(0, 190)}...` : ""}</p>
+            <h2>{(item.headline || item.title || "").substring(0, 120)}</h2>
+            <p>{(item.summary || item.text || "").substring(0, 240)}</p>
             <div className="textFooter">
               <TimerIcon />
-              <span className="text-[#2dd674]"> 15 min Read</span>
+              <span>{item.source_name || item.publisher || "News source"}</span>
+              {item.delayed && <span className="news-delay-label">Delayed news</span>}
             </div>
           </div>
         ))
@@ -114,7 +110,7 @@ interface NewsMenuProps {}
 
 const NewsMenu: React.FunctionComponent<NewsMenuProps> = () => {
   const [cookies] = useCookies(["access_token"]);
-  const [selectedFeed, setSelectedFeed] = useState("all");
+  const [selectedFeed, setSelectedFeed] = useState<"latest" | "market" | "crypto">("latest");
   const { themeSelect } = useAppSelector((state) => state.themeBg);
   const [searchTerm, setSearchTerm] = useState("");
   const requestedForToken = useRef<string | null>(null);
@@ -127,27 +123,20 @@ const NewsMenu: React.FunctionComponent<NewsMenuProps> = () => {
   const { mutate: mutateNews, data, isPending } = result;
 
   const items = [
-    { id: "1", tab: "all", label: "all feed" },
-    { id: "2", tab: "Forex", label: "forex feed" },
-    { id: "3", tab: "Stocks", label: "stock feed" },
-    { id: "4", tab: "Commodities", label: "commodities feed" },
-    { id: "5", tab: "Crypto", label: "crypto feed" },
+    { id: "1", tab: "latest" as const, label: "latest feed" },
+    { id: "2", tab: "market" as const, label: "market feed" },
+    { id: "3", tab: "crypto" as const, label: "crypto feed" },
   ];
 
   const handleNewsSelection = (feed: any) => {
     setSelectedFeed(feed.tab);
-    if (feed.queryParams) {
-      mutateNews({
-        token: cookies.access_token,
-        queryParams: feed.queryParams,
-      });
-    }
+    mutateNews({ token: cookies.access_token, feed: feed.tab });
   };
 
   useEffect(() => {
     if (cookies.access_token && requestedForToken.current !== cookies.access_token) {
       requestedForToken.current = cookies.access_token;
-      mutateNews({ token: cookies.access_token });
+      mutateNews({ token: cookies.access_token, feed: "latest" });
     }
   }, [mutateNews, cookies.access_token]);
 
@@ -157,15 +146,7 @@ const NewsMenu: React.FunctionComponent<NewsMenuProps> = () => {
 
   
 
-const getSelectedArticles = (): Record<string, INews> => {
-  const articles = Array.isArray(data?.results) ? data.results : [];
-  const filtered = selectedFeed === "all"
-    ? articles
-    : articles.filter((article) =>
-        article.category?.some((category) => category.toLowerCase() === selectedFeed.toLowerCase())
-      );
-  return Object.fromEntries(filtered.map((article) => [article.article_id, article]));
-};
+const getSelectedArticles = (): INews[] => Array.isArray(data?.results) ? data.results : [];
 
   const selectedArticles = getSelectedArticles();
 
@@ -203,6 +184,7 @@ const getSelectedArticles = (): Record<string, INews> => {
       </div>
 
       <div className="news-content">
+        {data?.delayed && <p className="news-delay-disclosure">Delayed news</p>}
         <NewsFeed articles={selectedArticles} label={selectedFeed} searchTerm={searchTerm}/>
       </div>
     </div>

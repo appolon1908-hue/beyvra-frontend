@@ -178,6 +178,17 @@ export const codestraNewsApi = {
     return codestraRequest<T>(`v1/news${suffix}`, { token });
   },
   article: <T = unknown>(token: string, id: string | number) => codestraRequest<T>(`v1/news/${id}`, { token }),
+  feed: <T = unknown>(token: string, feed: "latest" | "market" | "crypto", query: Record<string, string | undefined> = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(query).forEach(([key, value]) => value != null && params.set(key, value));
+    const endpoint = feed === "latest" ? "v1/news" : `v1/news/${feed}`;
+    return codestraRequest<T>(`${endpoint}${params.toString() ? `?${params}` : ""}`, { token });
+  },
+  sources: <T = unknown>(token: string, query: Record<string, string | undefined> = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(query).forEach(([key, value]) => value != null && params.set(key, value));
+    return codestraRequest<T>(`v1/news/sources${params.toString() ? `?${params}` : ""}`, { token });
+  },
 };
 
 export const codestraPortfolioApi = {

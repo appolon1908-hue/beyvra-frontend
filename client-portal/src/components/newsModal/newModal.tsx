@@ -39,8 +39,9 @@ const NewsModal: React.FC<NewsModalProps> = ({
   });
 
   const handleToggleReadMore = () => {
-    if (!fullArticle && article?.article_id) {
-      mutate({ token: cookies.access_token, articleId: article.article_id });
+    const articleId = article?.news_id || article?.article_id;
+    if (!fullArticle && articleId) {
+      mutate({ token: cookies.access_token, articleId });
     } else {
       setReadMore((prev) => !prev);
     }
@@ -60,7 +61,7 @@ const NewsModal: React.FC<NewsModalProps> = ({
     return (
       <>
         <p className="max-w-xl m-auto text-center text-base">
-          {article?.text ? `${article?.text?.substring(0, 190)}...` : ""}
+          {(article?.summary || article?.text || "").substring(0, 1000)}
         </p>
         {/* <p className="text-center m-auto w-max flex gap-3 my-5 text-[#0094ff]">
           <TimerIcon /> <span> 15 min Read</span>
@@ -114,13 +115,14 @@ const NewsModal: React.FC<NewsModalProps> = ({
         <h2 className="font-bold text-2xl text-center my-7 capitalize">{article?.creator}</h2>
             
         <h3 className="max-w-md m-auto text-lg text-center">
-          {article?.title?.substring(0, 65)}
+          {(article?.headline || article?.title || "").substring(0, 140)}
         </h3>
         {/* <span className="max-w-md m-auto text-lg text-center">
           {article?.full_text}
         </span> */}
         {/* <h3 className="text-center text-lg font-semibold my-3">{moment(article?.pubDate).format("dd.mm.yy")}</h3> */}
         {renderContent()}
+        {article?.article_url?.startsWith("https://") && <p className="text-center mt-4"><a href={article.article_url} target="_blank" rel="noopener noreferrer">Open original article</a></p>}
       </div>
     </Modal>
   );
