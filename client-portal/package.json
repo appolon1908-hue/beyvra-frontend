@@ -19,6 +19,7 @@
     "audit:gate": "node scripts/audit-gate.mjs",
     "errors:check": "node scripts/check-user-safe-errors.mjs",
     "brand:check": "node scripts/check-public-identity.mjs",
+    "providers:check": "node scripts/check-provider-boundary.mjs",
     "test:errors": "vitest run src/errors/userSafeError.test.ts src/compat/storageKeys.test.ts src/api/generated/beyvra.test.ts",
     "test:realtime": "vitest run src/realtime/UnifiedRealtimeClient.test.ts",
     "test": "npm run typecheck && npm run build:prod",
