@@ -58,7 +58,6 @@ const Home = lazy(() => import("pages/public/home/main/Home"));
 const StatusDetails = lazy(() => import("./pages/public/statusDetails/StatusDetails"));
 const IntegrationsAdmin = lazy(() => import("./pages/private/integrations/IntegrationsAdmin"));
 
-export const GlobalLoginMaxAge = 2629746;
 
 const App: React.FunctionComponent = () => {
   const { i18n } = useTranslation();

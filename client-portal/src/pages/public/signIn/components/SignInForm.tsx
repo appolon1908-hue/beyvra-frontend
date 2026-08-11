@@ -7,7 +7,7 @@ import { ISignInForm } from "@interfaces";
 import { LoginSuccess, useLogin } from "api/user/useLogin";
 import { useState } from "react";
 import use2FAVerify from "api/user/use2FAVerify";
-import { GlobalLoginMaxAge } from "App";
+import { authCookieOptions } from "security/authCookies";
 import GoogleAuthButton from "./GoogleAuthButton";
 import { getApiUrl } from "utils/env";
 import { toast } from "react-toastify";
@@ -35,8 +35,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
 
   const finishLogin = (data: LoginSuccess) => {
     if (!data.access || !data.refresh || !data.user) return;
-    const persistent = rememberMe ? { maxAge: GlobalLoginMaxAge } : {};
-    const cookieOptions = { secure: true, sameSite: "strict" as const, path: "/", ...persistent };
+    const cookieOptions = authCookieOptions(rememberMe);
     setCookie("access_token", data.access, cookieOptions);
     setCookie("refresh_token", data.refresh, cookieOptions);
     setCookie("step", "", cookieOptions);

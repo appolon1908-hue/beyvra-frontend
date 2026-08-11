@@ -15,7 +15,7 @@ import { useSearchParams } from "react-router-dom";
 import { beyvraAuthApi } from "api/generated/beyvra";
 import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
-import { GlobalLoginMaxAge } from "App";
+import { authCookieOptions } from "security/authCookies";
 
 interface SignInProps { }
 
@@ -52,7 +52,7 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
         const result = await beyvraAuthApi.googleCredential<{ access?: string; refresh?: string; user?: { is_walkthrough?: boolean } }>(ticket);
         if (!result.access || !result.refresh) throw new Error("GOOGLE_TICKET_INVALID");
         if (cancelled) return;
-        const cookieOptions = { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict" as const, path: "/" };
+        const cookieOptions = authCookieOptions();
         setCookie("access_token", result.access, cookieOptions);
         setCookie("refresh_token", result.refresh, cookieOptions);
         setCookie("step", "", cookieOptions);

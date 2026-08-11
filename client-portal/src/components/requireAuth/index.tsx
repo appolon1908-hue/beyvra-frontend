@@ -11,7 +11,7 @@ import Modal from "components/modal/Modal";
 import WarningIcon from "assets/icons/WarningIcon";
 
 import "./styles.scss";
-import { GlobalLoginMaxAge } from "App";
+import { authCookieOptions } from "security/authCookies";
 import useKyc from "api/kyc/useKycInfo";
 import { revokeSession } from "api/user/logout";
 import { beyvraAuthApi } from "api/generated/beyvra";
@@ -91,7 +91,7 @@ const RequireAuth = () => {
       { refresh: cookies.refresh_token },
       {
         onSuccess: (data) => {
-          setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
+          setCookie("access_token", data.access, authCookieOptions());
           setIsIdle(false);
           window.location.reload();
         },
@@ -155,7 +155,7 @@ const RequireAuth = () => {
           { refresh: cookies.refresh_token },
           {
             onSuccess: (data) => {
-              setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
+              setCookie("access_token", data.access, authCookieOptions());
             },
           }
         );
