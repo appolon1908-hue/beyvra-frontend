@@ -23,7 +23,8 @@ const tokenUserId = (token: string): string | undefined => {
   try {
     const segment = token.split(".")[1];
     if (!segment) return undefined;
-    const payload = JSON.parse(window.atob(segment.replace(/-/g, "+").replace(/_/g, "/"))) as Record<string, unknown>;
+    const normalized=segment.replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(window.atob(normalized+"=".repeat((4-normalized.length%4)%4))) as Record<string, unknown>;
     const value = payload.user_id ?? payload.sub;
     return typeof value === "string" || typeof value === "number" ? String(value) : undefined;
   } catch { return undefined; }
@@ -31,7 +32,7 @@ const tokenUserId = (token: string): string | undefined => {
 
 export const complianceDisplayState = (profile: ComplianceProfile): "Verification required" | "Verification pending" | "Manual review" | "Restricted" | "Approved" | "Expired" => {
   if (profile.kyc_state === "EXPIRED" || profile.kyc_state === "REQUIRES_UPDATE") return "Expired";
-  if (profile.account_state === "RESTRICTED" || profile.account_state === "SUSPENDED" || profile.account_state === "CLOSED" || profile.aml_state === "BLOCKED" || profile.sanctions_state === "CONFIRMED_MATCH") return "Restricted";
+  if (profile.account_state === "RESTRICTED" || profile.account_state === "SUSPENDED" || profile.account_state === "CLOSED" || profile.kyc_state === "REJECTED" || profile.aml_state === "BLOCKED" || profile.sanctions_state === "CONFIRMED_MATCH") return "Restricted";
   if (profile.kyc_state === "IN_REVIEW" || profile.aml_state === "REVIEW_REQUIRED" || profile.sanctions_state === "POSSIBLE_MATCH" || profile.sanctions_state === "MANUAL_REVIEW") return "Manual review";
   if (profile.kyc_state === "PENDING") return "Verification pending";
   if (profile.kyc_state === "APPROVED" && profile.aml_state === "CLEARED" && profile.sanctions_state === "CLEAR" && profile.jurisdiction_state === "SUPPORTED" && profile.account_state === "ACTIVE") return "Approved";
