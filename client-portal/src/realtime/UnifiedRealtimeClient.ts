@@ -26,6 +26,12 @@ export class RealtimeSequenceTracker {
       : undefined;
   }
 
+  isDuplicateOrStale(channel: string, sequence?: number): boolean {
+    if (typeof sequence !== "number") return false;
+    const previous = this.sequences.get(channel);
+    return previous !== undefined && sequence <= previous;
+  }
+
   clear(channel: string): void {
     this.sequences.delete(channel);
   }
@@ -161,6 +167,7 @@ export class UnifiedRealtimeClient {
   }
 
   private async dispatchWithRecovery(channel: string, message: UnifiedRealtimeMessage): Promise<void> {
+    if (this.sequenceTracker.isDuplicateOrStale(channel, message.sequence)) return;
     const gap = this.sequenceTracker.observe(channel, message.sequence);
     if (gap) {
       this.dispatch("system.status", { type: "sequence.gap", channel, ...gap });

@@ -6,10 +6,13 @@ export const apiEndpoints = {
     summary: "portfolio/summary/",
   },
   wallets: {
-    list: "wallet/wallets/",
-    transactions: "wallet/transactions/",
-    deposit: (walletId: number) => `wallet/wallets/${walletId}/deposit/`,
-    withdraw: (walletId: number) => `wallet/wallets/${walletId}/withdraw/`,
+    list: "v1/demo/wallets",
+    transactions: "v1/reports/transactions",
+    refill: "v1/demo/wallets/refill",
+    // Compatibility-only demo actions. New code must use refill and canonical
+    // trading endpoints; real-value funding remains server-disabled.
+    deposit: (_walletId: number) => "v1/demo/wallets/refill",
+    withdraw: (_walletId: number) => "v1/withdrawals",
   },
   trades: {
     list: "trades/",
@@ -23,11 +26,12 @@ export const apiEndpoints = {
     deposits: "payment/deposits/history/",
   },
   notifications: {
-    list: "v1/notifications/notifications/",
-    toggle: "notification/toggle_notification/",
-    inbox: "notification/inbox/",
-    read: (eventId: string) => `notification/inbox/${eventId}/read/`,
-    readAll: "notification/inbox/read-all/",
+    list: "v1/notifications",
+    toggle: "v1/notifications/preferences",
+    inbox: "v1/notifications",
+    read: (eventId: string) => `v1/notifications/${eventId}/read`,
+    readAll: "v1/notifications/read-all",
+    preferences: "v1/notifications/preferences",
     webhooks: "notification/webhooks/",
     webhook: (webhookId: string) => `notification/webhooks/${webhookId}/`,
     webhookTest: (webhookId: string) => `notification/webhooks/${webhookId}/test/`,
@@ -42,7 +46,9 @@ export const apiEndpoints = {
     config: "v1/demo/config",
     orders: "v1/demo/orders",
     trades: "v1/demo/trades",
-    wallet: "v1/demo/wallet",
+    wallet: "v1/demo/account",
+    wallets: "v1/demo/wallets",
+    positions: "v1/demo/positions",
   },
   simulationTrading: {
     preview: "v1/trading/orders/preview",

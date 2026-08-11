@@ -11,6 +11,7 @@ export type NotificationEvent = {
   message: string;
   category: string;
   payload: Record<string, unknown>;
+  read: boolean;
   is_read: boolean;
   created_at: string;
 };
@@ -27,19 +28,16 @@ export const notificationInboxKey = ["notification-inbox"] as const;
 export function useNotificationInbox(token?: string) {
   return useInfiniteQuery({
     queryKey: notificationInboxKey,
-    initialPageParam: 1,
+    initialPageParam: "",
     queryFn: async ({ pageParam }) => {
       const response = await authenticatedRequest<InboxResponse>(
-        `${apiEndpoints.notifications.inbox}?page=${pageParam}`,
+        `${apiEndpoints.notifications.inbox}?limit=50${pageParam ? `&cursor=${encodeURIComponent(pageParam)}` : ""}`,
         token!,
       );
       if (Array.isArray(response)) {
         return { results: response, nextPage: undefined };
       }
-      const nextPage = response.next
-        ? Number(new URL(response.next, window.location.origin).searchParams.get("page")) || undefined
-        : undefined;
-      return { results: response.results, nextPage };
+      return { results: response.results, nextPage: response.next || undefined };
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
     enabled: Boolean(token),

@@ -13,6 +13,9 @@ describe("RealtimeSequenceTracker", () => {
   it("tracks channels independently and tolerates duplicate delivery", () => {
     const tracker = new RealtimeSequenceTracker();
     expect(tracker.observe("orders", 7)).toBeUndefined();
+    expect(tracker.isDuplicateOrStale("orders", 7)).toBe(true);
+    expect(tracker.isDuplicateOrStale("orders", 6)).toBe(true);
+    expect(tracker.isDuplicateOrStale("orders", 8)).toBe(false);
     expect(tracker.observe("orders", 7)).toBeUndefined();
     expect(tracker.observe("wallet", 100)).toBeUndefined();
     expect(tracker.observe("orders", 8)).toBeUndefined();

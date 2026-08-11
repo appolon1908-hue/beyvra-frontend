@@ -7,10 +7,11 @@ type DemoFundsInput = { walletId: number; amount: number };
 export function useDemoDeposit(token?: string) {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: ({ walletId, amount }: DemoFundsInput) => authenticatedRequest(
-      apiEndpoints.wallets.deposit(walletId), token!, {
+    mutationFn: ({ amount }: DemoFundsInput) => authenticatedRequest(
+      apiEndpoints.wallets.refill, token!, {
         method: "POST",
-        body: JSON.stringify({ amount, currency: "USD", gateway: "demo" }),
+        headers: { "Idempotency-Key": crypto.randomUUID() },
+        body: JSON.stringify({ amount }),
       }
     ),
     onSuccess: () => {
@@ -26,7 +27,8 @@ export function useDemoWithdrawal(token?: string) {
     mutationFn: ({ walletId, amount }: DemoFundsInput) => authenticatedRequest(
       apiEndpoints.wallets.withdraw(walletId), token!, {
         method: "POST",
-        body: JSON.stringify({ amount, gateway: "demo" }),
+        headers: { "Idempotency-Key": crypto.randomUUID() },
+        body: JSON.stringify({ amount }),
       }
     ),
     onSuccess: () => {
