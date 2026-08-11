@@ -14,16 +14,33 @@ type Listener = (message: UnifiedRealtimeMessage) => void;
 type TicketFactory = () => Promise<string>;
 type SnapshotRecovery = () => Promise<UnifiedRealtimeMessage | void>;
 
+export type SequenceObservation =
+  | { status: "UNSEQUENCED" }
+  | { status: "APPLIED"; sequence: number }
+  | { status: "DUPLICATE_OR_STALE"; sequence: number }
+  | { status: "GAP"; expected: number; received: number };
+
 export class RealtimeSequenceTracker {
   private readonly sequences = new Map<string, number>();
 
-  observe(channel: string, sequence?: number): { expected: number; received: number } | undefined {
-    if (typeof sequence !== "number") return undefined;
+  observe(channel: string, sequence?: number): SequenceObservation {
+    if (typeof sequence !== "number" || !Number.isSafeInteger(sequence) || sequence < 0) return { status: "UNSEQUENCED" };
     const previous = this.sequences.get(channel);
-    if (previous === undefined || sequence > previous) this.sequences.set(channel, sequence);
-    return previous !== undefined && sequence > previous + 1
-      ? { expected: previous + 1, received: sequence }
-      : undefined;
+    if (previous === undefined) {
+      this.sequences.set(channel, sequence);
+      return { status: "APPLIED", sequence };
+    }
+    if (sequence <= previous) return { status: "DUPLICATE_OR_STALE", sequence };
+    if (sequence > previous + 1) return { status: "GAP", expected: previous + 1, received: sequence };
+    this.sequences.set(channel, sequence);
+    return { status: "APPLIED", sequence };
+  }
+
+  replaceFromSnapshot(channel: string, sequence: number): void {
+    if (!Number.isSafeInteger(sequence) || sequence < 0) throw new Error("INVALID_SNAPSHOT_SEQUENCE");
+    const previous = this.sequences.get(channel);
+    if (previous !== undefined && sequence < previous) throw new Error("STALE_SNAPSHOT_SEQUENCE");
+    this.sequences.set(channel, sequence);
   }
 
   clear(channel: string): void {
@@ -41,6 +58,7 @@ export class UnifiedRealtimeClient {
   private readonly listeners = new Map<string, Set<Listener>>();
   private readonly channels = new Set<string>();
   private readonly recovery = new Map<string, SnapshotRecovery>();
+  private readonly recoveryInFlight = new Map<string, Promise<UnifiedRealtimeMessage | void>>();
   private readonly sequenceTracker = new RealtimeSequenceTracker();
   private readonly useV2 = import.meta.env.VITE_REALTIME_V2_ENABLED !== "false";
   private v2Failed = false;
@@ -161,11 +179,41 @@ export class UnifiedRealtimeClient {
   }
 
   private async dispatchWithRecovery(channel: string, message: UnifiedRealtimeMessage): Promise<void> {
-    const gap = this.sequenceTracker.observe(channel, message.sequence);
-    if (gap) {
-      this.dispatch("system.status", { type: "sequence.gap", channel, ...gap });
-      const snapshot = await this.recovery.get(channel)?.();
-      if (snapshot) this.dispatch(channel, { ...snapshot, type: snapshot.type || "snapshot.recovered", channel });
+    let observation = this.sequenceTracker.observe(channel, message.sequence);
+    if (observation.status === "DUPLICATE_OR_STALE") return;
+    if (observation.status === "GAP") {
+      this.dispatch("system.status", { type: "sequence.gap", channel, expected: observation.expected, received: observation.received });
+      const recover = this.recovery.get(channel);
+      if (!recover) return;
+      let pending = this.recoveryInFlight.get(channel);
+      if (!pending) {
+        pending = recover().finally(() => this.recoveryInFlight.delete(channel));
+        this.recoveryInFlight.set(channel, pending);
+      }
+      let snapshot: UnifiedRealtimeMessage | void;
+      try {
+        snapshot = await pending;
+      } catch {
+        this.dispatch("system.status", { type: "error", code: "SNAPSHOT_RECOVERY_FAILED", channel });
+        return;
+      }
+      if (!snapshot || typeof snapshot.sequence !== "number") {
+        this.dispatch("system.status", { type: "error", code: "SNAPSHOT_RECOVERY_FAILED", channel });
+        return;
+      }
+      try {
+        this.sequenceTracker.replaceFromSnapshot(channel, snapshot.sequence);
+      } catch {
+        this.dispatch("system.status", { type: "error", code: "STALE_SNAPSHOT", channel });
+        return;
+      }
+      this.dispatch(channel, { ...snapshot, type: snapshot.type || "snapshot.recovered", channel });
+      observation = this.sequenceTracker.observe(channel, message.sequence);
+      if (observation.status === "DUPLICATE_OR_STALE") return;
+      if (observation.status === "GAP") {
+        this.dispatch("system.status", { type: "sequence.gap", channel, expected: observation.expected, received: observation.received });
+        return;
+      }
     }
     this.dispatch(channel, message);
   }
