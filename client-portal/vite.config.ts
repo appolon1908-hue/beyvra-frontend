@@ -10,5 +10,19 @@ export default defineConfig({
   },
   server: {
     host: true,
-  }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+          if (/[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/.test(id)) return "vendor-react";
+          if (/[\\/]node_modules[\\/](@ant-design|antd|rc-)/.test(id)) return "vendor-antd";
+          if (/[\\/]node_modules[\\/](echarts|zrender|lightweight-charts)[\\/]/.test(id)) return "vendor-charts";
+          if (/[\\/]node_modules[\\/](@tanstack|axios)[\\/]/.test(id)) return "vendor-data";
+          return "vendor-misc";
+        },
+      },
+    },
+  },
 });

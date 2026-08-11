@@ -117,6 +117,10 @@ export class UnifiedRealtimeClient {
       };
       socket.onmessage = (event) => {
         try {
+          if (String(event.data).trim() === "{}") {
+            socket.send("{}");
+            return;
+          }
           const raw = JSON.parse(event.data) as Record<string, any>;
           const message = useV2Transport && raw.push
             ? { ...(raw.push.pub?.data || {}), channel: raw.push.channel, type: raw.push.pub?.data?.type || "event" }

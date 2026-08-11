@@ -81,7 +81,7 @@ export function OpenTrades({ trades }: { trades: DemoTrade[] }) {
 }
 
 export function TradeMarkerSummary({ markers, serverNow }: { markers: TradeChartMarker[]; serverNow: number }) {
-  return <div className="trade-marker-summary" aria-label="Demo trade chart markers">{markers.slice(0, 4).map((marker) => {
+  return <div className="trade-marker-summary" role="status" aria-label="Demo trade chart markers">{markers.slice(0, 4).map((marker) => {
     const remaining = Math.max(0, Math.ceil(marker.expiryTime - serverNow / 1000)); const result = marker.status === "WON" ? "✓ WON" : marker.status === "LOST" ? "✕ LOST" : marker.status === "DRAW" ? "= DRAW" : marker.status;
     return <span key={marker.tradeId} data-trade-id={marker.tradeId} aria-label={`${marker.status === "ACTIVE" ? "Active" : marker.status.toLowerCase()} ${marker.direction} demo trade opened at ${marker.openPrice}, ${marker.status === "ACTIVE" || marker.status === "PENDING" ? `expires in ${remaining} seconds` : result}`}>{marker.direction === "UP" ? "▲" : "▼"} {marker.direction} · {result}{marker.status === "ACTIVE" || marker.status === "PENDING" ? ` · ${remaining}s` : ""}</span>;
   })}{markers.length > 4 && <span>+{markers.length - 4} more</span>}</div>;

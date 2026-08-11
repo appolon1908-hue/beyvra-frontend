@@ -14,10 +14,14 @@ test("Guest Demo BTCUSDT order is idempotent and settles server-side", async ({ 
   expect(duplicate.ok()).toBeTruthy();
   expect((await duplicate.json()).id).toBe(firstBody.id);
   const open = await request.get(`${origin}/api/v1/demo/trades`, { headers });
-  expect((await open.json()).some((trade: { id: number; state: string }) => trade.id === firstBody.id)).toBeTruthy();
+  const openBody = await open.json();
+  const openTrades = Array.isArray(openBody) ? openBody : openBody.results;
+  expect(openTrades.some((trade: { id: number; state: string }) => trade.id === firstBody.id)).toBeTruthy();
   await new Promise((resolve) => setTimeout(resolve, 7_000));
   const settled = await request.get(`${origin}/api/v1/demo/trades`, { headers });
-  const result = (await settled.json()).find((trade: { id: number }) => trade.id === firstBody.id);
+  const settledBody = await settled.json();
+  const settledTrades = Array.isArray(settledBody) ? settledBody : settledBody.results;
+  const result = settledTrades.find((trade: { id: number }) => trade.id === firstBody.id);
   expect(["WON", "LOST", "DRAW"]).toContain(result.state);
   expect(result.closingPrice).toBeTruthy();
 });
