@@ -5,6 +5,7 @@
  */
 import { getApiUrl } from "utils/env";
 import { ApiError } from "api/errors";
+import { getCookie } from "utils/getCookie";
 
 export type DemoWallet = {
   available: string;
@@ -30,6 +31,9 @@ export async function codestraRequest<T>(path: string, options: RequestOptions =
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), options.timeoutMs ?? 15_000);
   const requestId = crypto.randomUUID();
+  const method = (options.method ?? "GET").toUpperCase();
+  const unsafe = !["GET", "HEAD", "OPTIONS"].includes(method);
+  const bearerToken = options.token?.includes(".") ? options.token : "";
   try {
     const response = await fetch(getApiUrl(path), {
       ...options,
@@ -38,7 +42,8 @@ export async function codestraRequest<T>(path: string, options: RequestOptions =
       headers: {
         Accept: "application/json",
         ...(options.body && !(options.body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
-        ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+        ...(bearerToken ? { Authorization: `Bearer ${bearerToken}` } : {}),
+        ...(unsafe && getCookie("csrftoken") ? { "X-CSRFToken": getCookie("csrftoken")! } : {}),
         ...(options.idempotencyKey ? { "Idempotency-Key": options.idempotencyKey } : {}),
         "X-Request-ID": requestId,
       },

@@ -36,9 +36,7 @@ const RequireAuth = () => {
   const [isIdle, setIsIdle] = useState(false);
   const [bootstrap, setBootstrap] = useState<"BOOTING" | "ANONYMOUS" | "GUEST_READY" | "USER_READY" | "EXPIRED" | "ERROR">("BOOTING");
   const [bootstrapError, setBootstrapError] = useState("");
-  const isGuestDemo = Boolean(cookies.access_token && (() => {
-    try { return JSON.parse(atob(cookies.access_token.split(".")[1])).guest_demo === true; } catch { return false; }
-  })());
+  const isGuestDemo = bootstrap === "GUEST_READY";
 
   useEffect(() => {
     let disposed = false;
@@ -91,7 +89,7 @@ const RequireAuth = () => {
       { refresh: cookies.refresh_token },
       {
         onSuccess: (data) => {
-          setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
+          setCookie("access_token", "session", { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict", path: "/" });
           setIsIdle(false);
           window.location.reload();
         },
@@ -155,23 +153,11 @@ const RequireAuth = () => {
           { refresh: cookies.refresh_token },
           {
             onSuccess: (data) => {
-              setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
+              setCookie("access_token", "session", { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict", path: "/" });
             },
           }
         );
       };
-
-      const tokenPayload = JSON.parse(
-        atob(cookies?.access_token?.split(".")[1])
-      );
-      const tokenExpirationTime = new Date(tokenPayload?.exp * 1000);
-      const currentTime = new Date();
-      const timeUntilExpiration =
-        tokenExpirationTime.getTime() - currentTime.getTime();
-
-      if (timeUntilExpiration <= 24 * 1000) {
-        refresh();
-      }
 
       const intervalId = setInterval(() => {
         refresh();

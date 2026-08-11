@@ -42,8 +42,8 @@ const EmailSignInForm: React.FC<SignInFormProps> = ({ handleNext }) => {
       toast.success(
         "Success! Login was successful."
       );
-      setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
-      setCookie("refresh_token", data.refresh);
+      setCookie("access_token", "session", { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict", path: "/" });
+      setCookie("refresh_token", "session", { secure: true, sameSite: "strict", path: "/" });
       setCookie("step", '')
       handleNext("next")
       // data?.user.is_walkthrough ? navigate('/platform') : navigate("/welcome");

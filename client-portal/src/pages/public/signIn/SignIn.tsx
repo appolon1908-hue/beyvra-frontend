@@ -53,8 +53,8 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
         if (!result.access || !result.refresh) throw new Error("GOOGLE_TICKET_INVALID");
         if (cancelled) return;
         const cookieOptions = { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict" as const, path: "/" };
-        setCookie("access_token", result.access, cookieOptions);
-        setCookie("refresh_token", result.refresh, cookieOptions);
+        setCookie("access_token", "session", cookieOptions);
+        setCookie("refresh_token", "session", cookieOptions);
         setCookie("step", "", cookieOptions);
         searchParams.delete("google_ticket");
         setSearchParams(searchParams, { replace: true });

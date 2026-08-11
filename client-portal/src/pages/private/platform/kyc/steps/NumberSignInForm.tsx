@@ -35,8 +35,8 @@ const NumberSignInForm: React.FC<SignInFormProps> = ({ handleNext }) => {
   const { handleSubmit, register, formState: { errors } } = useForm<ISignInForm>();
   const { mutate, isPending } = useLogin({
     onSuccess: (data) => {
-      setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
-      setCookie("refresh_token", data.refresh);
+      setCookie("access_token", "session", { maxAge: GlobalLoginMaxAge, secure: true, sameSite: "strict", path: "/" });
+      setCookie("refresh_token", "session", { secure: true, sameSite: "strict", path: "/" });
       setCookie("step", '')
       handleNext("next")
       // data?.user.is_walkthrough ? navigate('/platform') : navigate("/welcome");

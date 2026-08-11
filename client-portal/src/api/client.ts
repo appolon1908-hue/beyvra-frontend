@@ -1,5 +1,6 @@
 import { getApiUrl } from "utils/env";
 import { ApiError } from "api/errors";
+import { getCookie } from "utils/getCookie";
 export { ApiError } from "api/errors";
 
 export type AuthenticatedRequestOptions = RequestInit & {
@@ -17,6 +18,8 @@ export async function authenticatedRequest<T>(
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
   const abortFromCaller = () => controller.abort();
+  const unsafe = !["GET", "HEAD", "OPTIONS"].includes((requestInit.method ?? "GET").toUpperCase());
+  const bearerToken = token.includes(".") ? token : "";
   callerSignal?.addEventListener("abort", abortFromCaller, { once: true });
   try {
     const response = await fetch(getApiUrl(endpoint), {
@@ -26,7 +29,8 @@ export async function authenticatedRequest<T>(
       headers: {
         Accept: "application/json",
         ...(requestInit.body ? { "Content-Type": "application/json" } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(bearerToken ? { Authorization: `Bearer ${bearerToken}` } : {}),
+        ...(unsafe && getCookie("csrftoken") ? { "X-CSRFToken": getCookie("csrftoken")! } : {}),
         "X-Request-ID": requestId,
         ...requestInit.headers,
       },

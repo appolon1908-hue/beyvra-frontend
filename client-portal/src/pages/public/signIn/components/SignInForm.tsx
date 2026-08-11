@@ -37,8 +37,8 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
     if (!data.access || !data.refresh || !data.user) return;
     const persistent = rememberMe ? { maxAge: GlobalLoginMaxAge } : {};
     const cookieOptions = { secure: true, sameSite: "strict" as const, path: "/", ...persistent };
-    setCookie("access_token", data.access, cookieOptions);
-    setCookie("refresh_token", data.refresh, cookieOptions);
+    setCookie("access_token", "session", cookieOptions);
+    setCookie("refresh_token", "session", cookieOptions);
     setCookie("step", "", cookieOptions);
     navigate(destination || (data.user.is_walkthrough ? "/walkThrough" : "/platform"), { replace: true });
   };
@@ -69,6 +69,11 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
     setGuestPending(true);
     try {
       await beyvraAuthApi.guestDemo(crypto.randomUUID());
+      setCookie("access_token", "session", {
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+      });
       navigate(destination || "/platform", { replace: true });
     } catch {
       toast.error("Demo access is temporarily unavailable. Please try again.");
