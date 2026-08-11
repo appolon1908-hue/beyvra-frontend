@@ -1,0 +1,451 @@
+{
+  "schema_version": 1,
+  "caller_count": 74,
+  "unmapped_count": 0,
+  "callers": [
+    {
+      "file": "src/api/client.ts",
+      "line": 11,
+      "caller": "export async function authenticatedRequest<T>(",
+      "classification": "CANONICAL_CLIENT_ABSTRACTION"
+    },
+    {
+      "file": "src/api/client.ts",
+      "line": 22,
+      "caller": "const response = await fetch(getApiUrl(endpoint), {",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/compliance/useCompliance.ts",
+      "line": 3,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/compliance/useCompliance.ts",
+      "line": 42,
+      "caller": "export function useComplianceProfile(token?: string) { return useQuery({ queryKey:[\"compliance-profile\"], queryFn:()=>authenticatedRequest<ComplianceProfile>(apiEndpoints.compliance.profile,token!), enabled:Boolean(token), staleTime:15_000 }); }",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/compliance/useCompliance.ts",
+      "line": 43,
+      "caller": "export function useComplianceRequirements(token?: string) { return useQuery({ queryKey:[\"compliance-requirements\"], queryFn:()=>authenticatedRequest<{results:ComplianceRequirement[]}>(apiEndpoints.compliance.requirements,token!), enabled:Boolean(token), staleTime:15_000 }); }",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/demo/useDemoConfig.ts",
+      "line": 3,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/demo/useDemoConfig.ts",
+      "line": 21,
+      "caller": "queryFn: () => authenticatedRequest<DemoConfiguration>(apiEndpoints.demo.config, cookies.access_token, { timeoutMs: 10_000 }),",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/generated/codestraDemo.ts",
+      "line": 34,
+      "caller": "const response = await fetch(getApiUrl(path), {",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useNotificationInbox.ts",
+      "line": 3,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/notification/useNotificationInbox.ts",
+      "line": 33,
+      "caller": "const response = await authenticatedRequest<InboxResponse>(",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useNotificationInbox.ts",
+      "line": 34,
+      "caller": "`${apiEndpoints.notifications.inbox}?limit=50${pageParam ? `&cursor=${encodeURIComponent(pageParam)}` : \"\"}`,",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useNotificationInbox.ts",
+      "line": 51,
+      "caller": "mutationFn: (eventId: string) => authenticatedRequest(",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useNotificationInbox.ts",
+      "line": 52,
+      "caller": "apiEndpoints.notifications.read(eventId), token!, { method: \"POST\" }",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useNotificationInbox.ts",
+      "line": 61,
+      "caller": "mutationFn: () => authenticatedRequest(",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useNotificationInbox.ts",
+      "line": 62,
+      "caller": "apiEndpoints.notifications.readAll, token!, { method: \"POST\" }",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useWebhooks.ts",
+      "line": 2,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/notification/useWebhooks.ts",
+      "line": 34,
+      "caller": "queryFn: async () => unwrap(await authenticatedRequest<WebhookSubscription[] | { results?: WebhookSubscription[] }>(apiEndpoints.notifications.webhooks, token!)),",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useWebhooks.ts",
+      "line": 43,
+      "caller": "authenticatedRequest<WebhookSubscription>(apiEndpoints.notifications.webhooks, token!, { method: \"POST\", body: JSON.stringify(payload) }),",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useWebhooks.ts",
+      "line": 55,
+      "caller": "authenticatedRequest<WebhookSubscription>(apiEndpoints.notifications.webhook(id), token!, { method: \"PATCH\", body: JSON.stringify(payload) }),",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useWebhooks.ts",
+      "line": 63,
+      "caller": "mutationFn: (id: string) => authenticatedRequest<void>(apiEndpoints.notifications.webhook(id), token!, { method: \"DELETE\" }),",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useWebhooks.ts",
+      "line": 71,
+      "caller": "mutationFn: (id: string) => authenticatedRequest(apiEndpoints.notifications.webhookTest(id), token!, { method: \"POST\", body: JSON.stringify({}) }),",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/notification/useWebhooks.ts",
+      "line": 79,
+      "caller": "queryFn: async () => unwrap(await authenticatedRequest<WebhookDelivery[] | { results?: WebhookDelivery[] }>(apiEndpoints.notifications.webhookDeliveries(id!), token!)),",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/portfolio/usePortfolioSummary.ts",
+      "line": 2,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/portfolio/usePortfolioSummary.ts",
+      "line": 29,
+      "caller": "queryFn: () => authenticatedRequest<PortfolioSummary>(apiEndpoints.portfolio.summary, token),",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/tenant/useTenantContext.ts",
+      "line": 3,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/tenant/useTenantContext.ts",
+      "line": 13,
+      "caller": "queryFn: () => authenticatedRequest<TenantContext>(apiEndpoints.integrations.tenantContext, cookies.access_token),",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/trades/useTrades.ts",
+      "line": 2,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/trades/useTrades.ts",
+      "line": 25,
+      "caller": "const payload = await authenticatedRequest<TradeRecord[] | { results: TradeRecord[] }>(",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/trades/useTrades.ts",
+      "line": 26,
+      "caller": "`${apiEndpoints.trades.list}?status=${status}`,",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/trades/useTrades.ts",
+      "line": 39,
+      "caller": "mutationFn: (tradeId: number) => authenticatedRequest<TradeRecord>(apiEndpoints.trades.cancel(tradeId), token, { method: \"POST\" }),",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/trading/simulation.ts",
+      "line": 1,
+      "caller": "import { authenticatedRequest, ApiError } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/trading/simulation.ts",
+      "line": 43,
+      "caller": "return authenticatedRequest<{ results: T[] }>(endpoint, token, { headers: simulationHeaders });",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/trading/simulation.ts",
+      "line": 46,
+      "caller": "export const listSimulationOrders = (token: string) => list<SimulationOrder>(apiEndpoints.simulationTrading.orders, token);",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/trading/simulation.ts",
+      "line": 47,
+      "caller": "export const listSimulationPositions = (token: string) => list<SimulationPosition>(apiEndpoints.simulationTrading.positions, token);",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/trading/simulation.ts",
+      "line": 48,
+      "caller": "export const listSimulationAccounts = (token: string) => list<SimulationAccount>(apiEndpoints.simulationTrading.accounts, token);",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/trading/simulation.ts",
+      "line": 51,
+      "caller": "const result = await authenticatedRequest<SimulationPreview>(apiEndpoints.simulationTrading.preview, token, {",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/trading/simulation.ts",
+      "line": 61,
+      "caller": "return authenticatedRequest<SimulationOrder>(apiEndpoints.simulationTrading.orders, token, {",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/trading/simulation.ts",
+      "line": 69,
+      "caller": "return authenticatedRequest<SimulationOrder>(apiEndpoints.simulationTrading.cancel(orderId), token, {",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/wallet/useDemoFunds.ts",
+      "line": 2,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/wallet/useDemoFunds.ts",
+      "line": 10,
+      "caller": "mutationFn: ({ amount }: DemoFundsInput) => authenticatedRequest(",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/wallet/useDemoFunds.ts",
+      "line": 11,
+      "caller": "apiEndpoints.wallets.refill, token!, {",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/wallet/useDemoFunds.ts",
+      "line": 27,
+      "caller": "mutationFn: ({ walletId, amount }: DemoFundsInput) => authenticatedRequest(",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/wallet/useDemoFunds.ts",
+      "line": 28,
+      "caller": "apiEndpoints.wallets.withdraw(walletId), token!, {",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/wallet/useTrade.ts",
+      "line": 5,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/wallet/useTrade.ts",
+      "line": 20,
+      "caller": "return await authenticatedRequest<boolean>(apiEndpoints.trades.list, token, {",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/wallet/useTransactions.ts",
+      "line": 3,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/wallet/useTransactions.ts",
+      "line": 55,
+      "caller": "return authenticatedRequest<TransactionResultType>(`${apiEndpoints.wallets.transactions}?${searchParams}`, token);",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/api/workspace/useWorkspaceBootstrap.ts",
+      "line": 3,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/api/workspace/useWorkspaceBootstrap.ts",
+      "line": 30,
+      "caller": "const payload = await authenticatedRequest<WorkspaceBootstrap>(apiEndpoints.workspace.bootstrap, cookies.access_token, { timeoutMs: 10_000 });",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/components/assetSelectionContainer/AssetSelectionContainer.tsx",
+      "line": 6,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/components/assetSelectionContainer/AssetSelectionContainer.tsx",
+      "line": 35,
+      "caller": "const response = await authenticatedRequest<AssetResponse>(",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/components/assetSelectionContainer/AssetSelectionContainer.tsx",
+      "line": 36,
+      "caller": "apiEndpoints.trades.assets,",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/i18n/geoLocale.ts",
+      "line": 16,
+      "caller": "const response = await fetch(endpoint, { credentials: \"same-origin\" });",
+      "classification": "APPROVED_EXTERNAL_LOCALE_DISCOVERY"
+    },
+    {
+      "file": "src/pages/private/integrations/IntegrationsAdmin.tsx",
+      "line": 2,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/pages/private/integrations/IntegrationsAdmin.tsx",
+      "line": 21,
+      "caller": "setConnections(await authenticatedRequest<CRMConnection[]>(apiEndpoints.integrations.crmConnections, token));",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/pages/private/integrations/IntegrationsAdmin.tsx",
+      "line": 31,
+      "caller": "const endpoint = action === \"commit\" ? apiEndpoints.integrations.importCommit(id) : apiEndpoints.integrations.importCancel(id);",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/pages/private/integrations/IntegrationsAdmin.tsx",
+      "line": 32,
+      "caller": "await authenticatedRequest(endpoint, token, { method: \"POST\", body: \"{}\" });",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/pages/private/integrations/IntegrationsAdmin.tsx",
+      "line": 35,
+      "caller": "const createUser = async (event: FormEvent) => { event.preventDefault(); const payload = { ...user, consent: { terms_accepted: user.terms_accepted } }; await authenticatedRequest(apiEndpoints.integrations.users, token, { method: \"POST\", body: JSON.stringify(payload), headers: { \"Idempotency-Key\": cr",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/pages/private/integrations/IntegrationsAdmin.tsx",
+      "line": 36,
+      "caller": "const createCRM = async (event: FormEvent) => { event.preventDefault(); await authenticatedRequest(apiEndpoints.integrations.crmConnections, token, { method: \"POST\", body: JSON.stringify({ ...crm, provider: \"generic_webhook\", event_categories: [\"user.created\", \"demo_account.created\"] }) }); setCrm({",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/pages/private/integrations/IntegrationsAdmin.tsx",
+      "line": 42,
+      "caller": "<section><h2>Bulk user import</h2><a href={getApiUrl(apiEndpoints.integrations.importTemplate)} download>Download CSV template</a><input aria-label=\"Upload users CSV\" type=\"file\" accept=\".csv,text/csv\" onChange={(event) => { const file = event.target.files?.[0]; if (file) void upload(file).catch((er",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/pages/private/platform/chart/ChartDataController.ts",
+      "line": 1,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/pages/private/platform/chart/ChartDataController.ts",
+      "line": 34,
+      "caller": "const capabilities = await authenticatedRequest<MarketCapabilities>(`v1/instruments/${encodeURIComponent(instrumentId)}/market-data-capabilities`, this.token, { signal: abort.signal });",
+      "classification": "MAPPED_PARAMETERIZED_CLIENT"
+    },
+    {
+      "file": "src/pages/private/platform/chart/ChartDataController.ts",
+      "line": 82,
+      "caller": "return authenticatedRequest<MarketSnapshot>(`v1/market-data/snapshot?${new URLSearchParams({ instrument_id: instrumentId, interval, limit: \"500\" })}`, this.token, { signal });",
+      "classification": "MAPPED_PARAMETERIZED_CLIENT"
+    },
+    {
+      "file": "src/pages/private/platform/chart/ChartDataController.ts",
+      "line": 86,
+      "caller": "return authenticatedRequest<CandlePage>(`v1/market-data/candles?${params}`, this.token, { signal });",
+      "classification": "MAPPED_PARAMETERIZED_CLIENT"
+    },
+    {
+      "file": "src/pages/private/platform/hooks/useDemoTrades.ts",
+      "line": 2,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/pages/private/platform/hooks/useDemoTrades.ts",
+      "line": 29,
+      "caller": "const payload = await authenticatedRequest<DemoTrade[] | { results: DemoTrade[] }>(apiEndpoints.demo.trades, token, { timeoutMs: 10_000 });",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/pages/private/platform/hooks/useNewsCalendarOverlay.ts",
+      "line": 2,
+      "caller": "import { ApiError, authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/pages/private/platform/hooks/useNewsCalendarOverlay.ts",
+      "line": 13,
+      "caller": "try { const payload = await authenticatedRequest<{ results: NewsArticle[] }>(`${apiEndpoints.news.list}?instrument_id=${encodeURIComponent(instrumentId)}&limit=25`, token); if (current === generation.current) { store.replaceNews(payload.results); setMessage(\"\"); } }",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/pages/private/platform/hooks/useNewsCalendarOverlay.ts",
+      "line": 18,
+      "caller": "try { const payload = await authenticatedRequest<{ results: EconomicEvent[] }>(`${apiEndpoints.news.calendar}?instrument_id=${encodeURIComponent(instrumentId)}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, token); store.replaceEconomic(payload.results); }",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/pages/private/platform/hooks/useNewsCalendarOverlay.ts",
+      "line": 23,
+      "caller": "try { store.mergeNewsDetail(await authenticatedRequest<NewsArticle>(apiEndpoints.news.detail(articleId), token)); }",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/pages/private/platform/platformMenus/market/MarketMenu.tsx",
+      "line": 7,
+      "caller": "import { authenticatedRequest } from \"api/client\";",
+      "classification": "CLIENT_IMPORT"
+    },
+    {
+      "file": "src/pages/private/platform/platformMenus/market/MarketMenu.tsx",
+      "line": 22,
+      "caller": "const response = await authenticatedRequest<AssetResponse>(apiEndpoints.trades.assets, cookies.access_token);",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/realtime/UnifiedRealtimeClient.ts",
+      "line": 97,
+      "caller": "? new WebSocket(getSocketUrl(\"ws/v2/connection/websocket\"))",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    },
+    {
+      "file": "src/realtime/UnifiedRealtimeClient.ts",
+      "line": 98,
+      "caller": ": new WebSocket(getSocketUrl(\"ws/v1/\", { ws_ticket: wsTicket }));",
+      "classification": "MAPPED_CANONICAL_CLIENT"
+    }
+  ]
+}
