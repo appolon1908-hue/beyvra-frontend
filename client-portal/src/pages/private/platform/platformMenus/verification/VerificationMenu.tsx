@@ -1,89 +1,24 @@
 import { Dispatch, SetStateAction } from "react";
-import { InfoCircleIcon } from "../../../../../assets/icons";
-import MainItemCard from "../../../../../components/mainItemCard/MainItemCard";
-import "./verificationMenu.scss";
-import { RightSubDrawerContent } from "../../types";
-import PrimaryButton from "../../../../../components/primaryButton/PrimaryButton";
-import { useAppSelector } from "@store/hooks";
+import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
-import nonVerifiedCard from '../../../../../assets/portfolio/verify-status.png'
+import { complianceDisplayState, ComplianceRequirement, useComplianceProfile, useComplianceRequirements } from "api/compliance/useCompliance";
+import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
+import { RightSubDrawerContent } from "../../types";
+import "./verificationMenu.scss";
 
-interface VerificationMenuProps {
-  setIsRightSubDrawerOpen?: Dispatch<SetStateAction<boolean>>;
-  setIsRightSubDrawerContent?: Dispatch<SetStateAction<RightSubDrawerContent>>;
-}
+interface VerificationMenuProps { setIsRightSubDrawerOpen?: Dispatch<SetStateAction<boolean>>; setIsRightSubDrawerContent?: Dispatch<SetStateAction<RightSubDrawerContent>>; }
+const copy={"Verification required":"Complete identity verification to continue.","Verification pending":"We are reviewing your verification information.","Manual review":"Your account is being reviewed.","Restricted":"Some account actions are currently unavailable.","Approved":"Your account verification is complete.","Expired":"Your verification information needs to be updated."} as const;
 
-const VerificationMenu: React.FunctionComponent<VerificationMenuProps> = ({
-  setIsRightSubDrawerOpen,
-  setIsRightSubDrawerContent,
-}) => {
-  const { themeSelect } = useAppSelector((state) => state.themeBg);
-  const navigate = useNavigate();
-
-  return (
-    <div className={`${themeSelect} verificationsContainer max-w-3xl m-auto`}>
-      <div className="verificationBadge">
-        <img src="/menu-images/verification-img.png" />
-      </div>
-      {/* <div className="kycVerifyButton w-1/3 m-auto">
-        <PrimaryButton
-          onClick={() => {
-            navigate("/kyc-document/?query=biodata-kyc");
-          }}
-          className="verificationLearnMore"
-          Title="KYC Verification"
-        />
-      </div> */}
-
-      {/* <MainItemCard pointer={false} className="verificationDetail" variant={2}>
-        <p>
-          Verification is a mandatory process for financial market participants.
-          With its help, we're able to create a safe space for trading where
-          you can be sure that your funds are secure.
-        </p>
-      </MainItemCard> */}
-      {/* <div className="learnMoreButton w-1/3 m-auto">
-        <PrimaryButton
-          onClick={() => {
-            if (setIsRightSubDrawerOpen) {
-              setIsRightSubDrawerOpen(true);
-            }
-            if (setIsRightSubDrawerContent) {
-              setIsRightSubDrawerContent("verification-helpcenter-menu");
-            }
-          }}
-          className="verificationLearnMore"
-          Title="Learn More"
-        />
-      </div> */}
-
-       {/* <div className="m-auto w-max mt-10">
-
-        <div>
-          <h3 className="text-base">KYC Verification Status</h3>
-          <h4 className="text-gray-400 font-semibold text-sm">User</h4>
-          <p className="text-sm">Hdjendfwenfoijefhewfoihef843498_294yr87f</p>
-
-        </div>
-        <div className="mt-4">
-          <p className="text-gray-500">Account number</p>
-          <p className="font-normal">348765203845923745934059</p>
-        </div>
-
-        <div>
-          <p className="text-gray-500">Current KYC status</p>
-          <p className="text-green-500 text-sm">Verified</p>
-
-          <div className="pt-3">
-            <img src={nonVerifiedCard} alt="" className="bg-gray-8 p-3 rounded-xl h-14 w-14" />
-          </div>
-
-
-      </div>
-      
-      </div> */}
-    </div>
-  );
+const VerificationMenu=(_props:VerificationMenuProps)=>{
+  const [cookies]=useCookies(["access_token"]); const navigate=useNavigate();
+  const profile=useComplianceProfile(cookies.access_token); const requirements=useComplianceRequirements(cookies.access_token);
+  if(profile.isLoading) return <div className="verificationsContainer max-w-3xl m-auto" role="status">Loading verification status…</div>;
+  if(profile.error||!profile.data) return <div className="verificationsContainer max-w-3xl m-auto" role="alert">{BeyvraErrorMapper.text(profile.error,"generic")}</div>;
+  const state=complianceDisplayState(profile.data);
+  return <section className="verificationsContainer max-w-3xl m-auto" aria-labelledby="compliance-title">
+    <h2 id="compliance-title">Account verification</h2><p className="text-lg font-semibold" data-testid="compliance-state">{state}</p><p>{copy[state]}</p>
+    {requirements.data?.results.filter((x:ComplianceRequirement)=>x.required&&x.status!=="COMPLETED").length ? <div><h3>What you need to do</h3><ul>{requirements.data.results.filter((x:ComplianceRequirement)=>x.required&&x.status!=="COMPLETED").map((x:ComplianceRequirement)=><li key={x.requirement_id}>{x.user_action||"Provide the requested verification information."}</li>)}</ul></div>:null}
+    {(state==="Verification required"||state==="Expired")&&<button type="button" onClick={()=>navigate("/kyc-document/?query=biodata-kyc")}>Continue verification</button>}
+  </section>;
 };
-
 export default VerificationMenu;

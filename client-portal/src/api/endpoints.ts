@@ -53,6 +53,11 @@ export const apiEndpoints = {
     positions: "v1/trading/positions",
     accounts: "v1/trading/accounts",
   },
+  compliance: {
+    profile: "v1/compliance/profile",
+    requirements: "v1/compliance/requirements",
+    kycSessions: "v1/compliance/kyc/sessions",
+  },
   news: {
     list: "v1/news",
     detail: (articleId: string) => `v1/news/${encodeURIComponent(articleId)}`,
