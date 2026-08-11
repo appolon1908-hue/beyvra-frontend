@@ -57,6 +57,7 @@ const SessionExpired = lazy(() => import("pages/public/sessionExpired/SessionExp
 const Home = lazy(() => import("pages/public/home/main/Home"));
 const StatusDetails = lazy(() => import("./pages/public/statusDetails/StatusDetails"));
 const IntegrationsAdmin = lazy(() => import("./pages/private/integrations/IntegrationsAdmin"));
+const OperationalCenter = lazy(() => import("./pages/private/operations/OperationalCenter"));
 
 export const GlobalLoginMaxAge = 2629746;
 
@@ -117,6 +118,7 @@ const App: React.FunctionComponent = () => {
               <Route path="/statusDetails" element={<StatusDetails />} />
               <Route path="/walkThrough" element={<WalkThrough />} />
               <Route path="/admin/integrations" element={<IntegrationsAdmin />} />
+              <Route path="/platform/operations" element={<OperationalCenter />} />
             </Route>
             <Route path="/" element={<LandingPage />} />
             <Route path="/markets" element={<Navigate to="/markets/Commodities" replace />} />

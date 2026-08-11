@@ -23,7 +23,7 @@ export const apiEndpoints = {
     deposits: "payment/deposits/history/",
   },
   notifications: {
-    list: "v1/notifications/notifications/",
+    list: "v1/notifications/",
     toggle: "notification/toggle_notification/",
     inbox: "notification/inbox/",
     read: (eventId: string) => `notification/inbox/${eventId}/read/`,
@@ -32,6 +32,19 @@ export const apiEndpoints = {
     webhook: (webhookId: string) => `notification/webhooks/${webhookId}/`,
     webhookTest: (webhookId: string) => `notification/webhooks/${webhookId}/test/`,
     webhookDeliveries: (webhookId: string) => `notification/webhooks/${webhookId}/deliveries/`,
+  },
+  operations: {
+    supportCases: "v1/support/cases",
+    supportCase: (id: string) => `v1/support/cases/${encodeURIComponent(id)}`,
+    supportMessages: (id: string) => `v1/support/cases/${encodeURIComponent(id)}/messages`,
+    transactions: "v1/reports/transactions",
+    activity: "v1/reports/activity",
+    sessions: "v1/security/sessions",
+    revokeSession: (id: string) => `v1/security/sessions/${encodeURIComponent(id)}/revoke`,
+    notificationRead: (id: string) => `v1/notifications/${encodeURIComponent(id)}/read`,
+    notificationReadAll: "v1/notifications/read-all",
+    notificationPreferences: "v1/notifications/preferences",
+    safetyFlags: "internal/v1/safety-flags",
   },
   market: {
     history: "v1/market/trades",
