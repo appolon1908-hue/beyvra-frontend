@@ -11,7 +11,7 @@ async function submit(page: Page) {
 
 test("invalid credentials show only the safe 401 contract", async ({ page, context }) => {
   await context.clearCookies();
-  await page.route("**/api/v1/auth/token/", (route) => route.fulfill({
+  await page.route("**/api/v1/auth/login", (route) => route.fulfill({
     status: 401,
     contentType: "application/json",
     headers: { "X-Request-ID": "operator-only-401" },
@@ -29,7 +29,7 @@ for (const [status, code, title, message] of [
   [503, "PROVIDER_UNAVAILABLE", "Sign-in temporarily unavailable", "Please try again shortly."],
 ] as const) test(`status ${status} uses safe auth copy`, async ({ page, context }) => {
   await context.clearCookies();
-  await page.route("**/api/v1/auth/token/", (route) => route.fulfill({
+  await page.route("**/api/v1/auth/login", (route) => route.fulfill({
     status,
     contentType: "application/json",
     body: JSON.stringify({ code, detail: "OperationalError at https://api.internal/api/token", request_id: "hidden-reference" }),

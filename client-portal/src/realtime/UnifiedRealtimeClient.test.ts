@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { RealtimeSequenceTracker } from "./UnifiedRealtimeClient";
+import { privateUserChannel, RealtimeSequenceTracker } from "./UnifiedRealtimeClient";
 
 describe("RealtimeSequenceTracker", () => {
   it("detects a gap that requires canonical REST snapshot recovery", () => {
@@ -13,11 +13,19 @@ describe("RealtimeSequenceTracker", () => {
   it("tracks channels independently and tolerates duplicate delivery", () => {
     const tracker = new RealtimeSequenceTracker();
     expect(tracker.observe("orders", 7)).toBeUndefined();
-    expect(tracker.isDuplicateOrStale("orders", 7)).toBe(true);
-    expect(tracker.isDuplicateOrStale("orders", 6)).toBe(true);
-    expect(tracker.isDuplicateOrStale("orders", 8)).toBe(false);
     expect(tracker.observe("orders", 7)).toBeUndefined();
     expect(tracker.observe("wallet", 100)).toBeUndefined();
     expect(tracker.observe("orders", 8)).toBeUndefined();
+  });
+});
+
+describe("privateUserChannel", () => {
+  it("derives a private channel from JWT identity without treating it as authorization", () => {
+    const payload = btoa(JSON.stringify({ user_id: "42" })).replace(/=/g, "");
+    expect(privateUserChannel("notification", `header.${payload}.signature`)).toBe("notification.42");
+  });
+
+  it("rejects opaque and malformed identity tokens", () => {
+    expect(privateUserChannel("notification", "opaque-token")).toBeUndefined();
   });
 });

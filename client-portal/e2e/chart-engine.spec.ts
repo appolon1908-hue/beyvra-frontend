@@ -58,6 +58,7 @@ test("ECharts workspace, indicators, and drawings remain local and long-lived", 
   await page.locator(".ticket-trigger").click({ force: true }); await expect(page.getByText("Demo order", { exact: true })).toBeVisible();
   expect(await canvas!.evaluate((element) => element.isConnected)).toBe(true); expect(await page.locator(".chart-surface canvas").count()).toBe(1);
   const accessibility = await new AxeBuilder({ page }).disableRules(["color-contrast"]).analyze(); expect(accessibility.violations.filter((item) => item.impact === "critical")).toEqual([]);
+  await page.getByRole("button", { name: "Close demo trade ticket" }).first().click();
   await page.setViewportSize({ width: 390, height: 844 }); await page.getByRole("button", { name: "Open market events" }).click(); await expect(page.locator(".chart-event-drawer")).toHaveCSS("position", "fixed"); await page.keyboard.press("Escape"); await expect(page.locator(".chart-event-drawer")).toHaveCount(0); expect(await page.locator(".chart-surface canvas").count()).toBe(1);
   if (pageErrors.length) throw new Error(`Browser errors after interactions: ${pageErrors.join(" | ")}`);
 });
