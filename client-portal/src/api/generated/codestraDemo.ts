@@ -144,8 +144,8 @@ export const codestraProfileApi = {
 };
 
 export const codestraIntegrationsApi = {
-  crmConnections: <T>(token: string) => codestraRequest<T>("integrations/crm/connections", { token }),
-  importUsers: <T>(token: string, body: FormData, idempotencyKey: string) => codestraRequest<T>("integrations/users/imports", { method: "POST", token, body, idempotencyKey }),
+  crmConnections: <T>(token: string) => codestraRequest<T>("v1/integrations/crm/connections", { token }),
+  importUsers: <T>(token: string, body: FormData, idempotencyKey: string) => codestraRequest<T>("v1/users/imports", { method: "POST", token, body, idempotencyKey }),
 };
 
 export const codestraKycApi = {

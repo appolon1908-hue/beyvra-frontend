@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import FinancialDisabledNotice from "components/financial/FinancialDisabledNotice";
 import { FINANCIAL_ENDPOINTS } from "./api";
+import { socketEndpoints } from "api/endpoints";
 import { BackendDepositDestination, DestinationBadge, RequirementList, WalletGrid } from "./components";
 import {
   DEPOSIT_STATES, DISABLED_FINANCIAL_FEATURES, TRANSFER_STATES, WITHDRAWAL_STATES,
@@ -16,11 +17,12 @@ const render = (value: React.ReactNode) => renderToStaticMarkup(<MemoryRouter>{v
 describe("provider-neutral money movement contract", () => {
   it("uses only canonical Beyvra API paths", () => {
     expect(Object.values(FINANCIAL_ENDPOINTS)).toEqual([
-      "v1/features", "v1/wallets", "v1/deposits", "v1/withdrawals",
-      "v1/withdrawals/preview", "v1/transfers", "v1/transfers/preview",
-      "v1/compliance/profile", "v1/compliance/requirements",
+      "v1/features/", "v1/wallets/", "v1/deposits/", "v1/withdrawals/",
+      "v1/withdrawals/preview/", "v1/transfers/", "v1/transfers/preview/",
+      "v1/compliance/profile/", "v1/compliance/requirements/",
     ]);
     expect(JSON.stringify(FINANCIAL_ENDPOINTS)).not.toMatch(/polygon|oms|provider|financial-service|https?:/i);
+    expect(socketEndpoints.canonical).toBe("ws/v2/");
   });
 
   it("fails feature discovery closed and accepts only literal server true", () => {

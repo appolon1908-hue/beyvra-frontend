@@ -8,18 +8,18 @@ import {
 type Token = string | undefined;
 type PreviewInput = { account_ref?: string; asset: string; amount: string; destination_ref?: string; beneficiary_ref?: string };
 
-const resource = (name: string, id?: string) => `v1/${name}${id ? `/${encodeURIComponent(id)}` : ""}`;
+const resource = (name: string, id?: string) => `v1/${name}${id ? `/${encodeURIComponent(id)}` : ""}/`;
 
 export const FINANCIAL_ENDPOINTS = Object.freeze({
-  features: "v1/features",
-  wallets: "v1/wallets",
-  deposits: "v1/deposits",
-  withdrawals: "v1/withdrawals",
-  withdrawalPreview: "v1/withdrawals/preview",
-  transfers: "v1/transfers",
-  transferPreview: "v1/transfers/preview",
-  complianceProfile: "v1/compliance/profile",
-  complianceRequirements: "v1/compliance/requirements",
+  features: "v1/features/",
+  wallets: "v1/wallets/",
+  deposits: "v1/deposits/",
+  withdrawals: "v1/withdrawals/",
+  withdrawalPreview: "v1/withdrawals/preview/",
+  transfers: "v1/transfers/",
+  transferPreview: "v1/transfers/preview/",
+  complianceProfile: "v1/compliance/profile/",
+  complianceRequirements: "v1/compliance/requirements/",
 });
 
 export const financialApi = {
@@ -40,7 +40,7 @@ export const financialApi = {
   createWithdrawal: (body: PreviewInput, idempotencyKey: string, token?: Token) =>
     beyvraRequest<Withdrawal>(resource("withdrawals"), { method: "POST", token, idempotencyKey, body: JSON.stringify(body) }),
   cancelWithdrawal: (id: string, idempotencyKey: string, token?: Token) =>
-    beyvraRequest<Withdrawal>(`${resource("withdrawals", id)}/cancel`, { method: "POST", token, idempotencyKey }),
+    beyvraRequest<Withdrawal>(`${resource("withdrawals", id)}cancel/`, { method: "POST", token, idempotencyKey }),
   transfers: (token?: Token) => beyvraRequest<Paginated<Transfer> | Transfer[]>(resource("transfers"), { token }),
   transfer: (id: string, token?: Token) => beyvraRequest<Transfer>(resource("transfers", id), { token }),
   previewTransfer: (body: PreviewInput, token?: Token) =>
