@@ -16,11 +16,12 @@ async function sourceFiles(directory) {
 
 function canonical(path) {
   const normalized = path.includes("queryParams") ? path.split("${")[0] : path;
-  return normalized
+  const value = normalized
     .split("?")[0]
     .replace(/\$\{[^}]+\}/g, "{}")
     .replace(/\{[^}]+\}/g, "{}")
     .replace(/\/$/, "") || "/";
+  return value.startsWith("/") ? value : `/${value}`;
 }
 
 const schemaResponse = await fetch(schemaUrl, { redirect: "follow" });
@@ -40,11 +41,31 @@ for (const file of await sourceFiles(sourceRoot)) {
   for (const pattern of patterns) {
     for (const match of source.matchAll(pattern)) endpoints.add(canonical(match[1]));
   }
+
+  // The canonical client accepts provider-neutral relative paths instead of
+  // interpolating a base URL at each call site. Resolve its bounded endpoint
+  // table and resource helper so those callers cannot silently evade drift.
+  if (file.endsWith(join("features", "moneyMovement", "api.ts"))) {
+    const endpointTable = source.match(/FINANCIAL_ENDPOINTS\s*=\s*Object\.freeze\(\{([\s\S]*?)\}\)/)?.[1] ?? "";
+    for (const match of endpointTable.matchAll(/:\s*["'](v1\/[^"']+)["']/g)) {
+      endpoints.add(canonical(match[1]));
+    }
+    for (const match of source.matchAll(/resource\(\s*["']([^"']+)["']\s*(,\s*[^)]*)?\)/g)) {
+      endpoints.add(canonical(`v1/${match[1]}${match[2] ? "/{}" : ""}`));
+    }
+    for (const match of source.matchAll(/`\$\{resource\(\s*["']([^"']+)["']\s*,[^)]*\)\}(\/[^`]*)`/g)) {
+      endpoints.add(canonical(`v1/${match[1]}/{}${match[2]}`));
+    }
+  }
 }
 
 const ignored = new Set(["/user/websocket_ticket"]);
 const missing = [...endpoints].filter((path) => !ignored.has(path) && !backendPaths.has(path)).sort();
 console.log(`Checked ${endpoints.size} frontend API paths against ${backendPaths.size} backend paths.`);
+if (!endpoints.size) {
+  console.error("No frontend API paths discovered; contract certification is invalid.");
+  process.exit(1);
+}
 if (missing.length) {
   console.error("Missing from backend schema:\n" + missing.map((path) => `- ${path}`).join("\n"));
   process.exit(1);
