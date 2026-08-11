@@ -25,7 +25,6 @@ const KYC = () => {
 
 
 
-  console.log(queryParam)
   const handleNextPage = (dir: string) => {
     if(step == 8 ){
       return

@@ -84,7 +84,6 @@ const BioDetails: React.FC<BioDetailsProps> = ({ handleNext }) => {
         setDoesKycExist(true)
 
         setFormData(updatedFormData);
-        console.log(updatedFormData, formData)
 
         form.setFieldsValue({
           id_number: updatedFormData.id_number,
@@ -100,7 +99,6 @@ const BioDetails: React.FC<BioDetailsProps> = ({ handleNext }) => {
   const { mutate: mutateUpdate, isPending: isPendingUpdate } = useVerificationUpdate({
     onSuccess: (data) => {
 
-      console.log("get data for KYC", data)
       toast.success("Update was successful")
       dispatch(setUserKYC(data as KycProp));
       handleNext("next")
@@ -134,7 +132,6 @@ const BioDetails: React.FC<BioDetailsProps> = ({ handleNext }) => {
         formData: formDataParse
 
       })
-      // console.log("kyc updaate not working", Object.fromEntries(formDataParse), "heysdsds", formData.first_name, formDataParse.get('first_name'))
 
     }
     else {
@@ -159,9 +156,6 @@ const BioDetails: React.FC<BioDetailsProps> = ({ handleNext }) => {
     })
 
   }, [cookies.access_token, mutateKYCData])
-
-  console.log(formData)
-
 
   if (isLoading) {
     return <Loading />

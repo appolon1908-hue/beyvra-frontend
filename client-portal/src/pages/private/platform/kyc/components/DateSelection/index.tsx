@@ -10,7 +10,6 @@ interface dateSelectionProps {
 const DateSelection: React.FC<dateSelectionProps> = ({setFormData, formData}) => {
     const fetchDate = formData?.dob
     const [year, month, day] = fetchDate?.split("-")
-    console.log("year", year)
     const [daysArray, setDaysArray] = useState([]);
     const initialState = {
         days: 31,
@@ -26,7 +25,6 @@ const DateSelection: React.FC<dateSelectionProps> = ({setFormData, formData}) =>
     };
     const [state, setState] = useReducer((state: any, newState: any) => ({ ...state, ...newState }), initialState);
 
-    console.log("state", state.dayValue)
     const{
         days,
         months,
@@ -174,11 +172,9 @@ const DateSelection: React.FC<dateSelectionProps> = ({setFormData, formData}) =>
                 year: selectedYear
     
             })
-            console.log("selected year", selectedYear )
         }
     };
 
-    console.log("fuldate", day, month, year, monthsArray)
 
     return(
         <div className="flex flex-col md:flex-row gap-1 md:gap-4 justify-between">
