@@ -5,22 +5,10 @@ export const apiEndpoints = {
   portfolio: {
     summary: "portfolio/summary/",
   },
-  wallets: {
-    list: "wallet/wallets/",
-    transactions: "wallet/transactions/",
-    deposit: (walletId: number) => `wallet/wallets/${walletId}/deposit/`,
-    withdraw: (walletId: number) => `wallet/wallets/${walletId}/withdraw/`,
-  },
   trades: {
-    list: "trades/",
+    list: "v1/trading/trades",
     assets: "trades/assets/",
-    detail: (tradeId: number) => `trades/${tradeId}/`,
-    cancel: (tradeId: number) => `trades/${tradeId}/cancel/`,
-  },
-  payments: {
-    list: "payment/",
-    methods: "payment/methods/",
-    deposits: "payment/deposits/history/",
+    detail: (tradeId: string) => `v1/trading/trades/${encodeURIComponent(tradeId)}`,
   },
   notifications: {
     list: "v1/notifications/notifications/",
@@ -40,9 +28,6 @@ export const apiEndpoints = {
   },
   demo: {
     config: "v1/demo/config",
-    orders: "v1/demo/orders",
-    trades: "v1/demo/trades",
-    wallet: "v1/demo/wallet",
   },
   simulationTrading: {
     preview: "v1/trading/orders/preview",

@@ -67,11 +67,7 @@ export async function codestraRequest<T>(path: string, options: RequestOptions =
 }
 
 export const codestraDemoApi = {
-  wallet: (token: string) => codestraRequest<DemoWallet>("v1/demo/wallet", { token }),
   config: (token: string) => codestraRequest<DemoConfig>("v1/demo/config", { token }),
-  trades: <T>(token: string) => codestraRequest<T>("v1/demo/trades", { token }),
-  refill: (token: string, idempotencyKey = crypto.randomUUID()) =>
-    codestraRequest<DemoWallet>("v1/demo/wallet/refill", { method: "POST", token, idempotencyKey }),
 };
 
 export type RealtimeV2Token = { token: string; channel?: string; expires_in: number; gateway?: string };

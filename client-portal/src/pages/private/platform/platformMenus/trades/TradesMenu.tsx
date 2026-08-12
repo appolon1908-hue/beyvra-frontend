@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useAppSelector } from "@store/hooks";
-import { useCancelTrade, useTrades, type TradeRecord } from "api/trades/useTrades";
+import { useTrades, type TradeRecord } from "api/trades/useTrades";
 import type { LeftSubDrawer } from "../../types";
 import type { Dispatch, SetStateAction } from "react";
 import "./tradesMenu.scss";
@@ -21,9 +21,8 @@ const TradesMenu = (_props: TradesMenuProps) => {
   const [cookies] = useCookies(["access_token"]);
   const { themeSelect } = useAppSelector((state) => state.themeBg);
   const trades = useTrades(cookies.access_token, status);
-  const cancelTrade = useCancelTrade(cookies.access_token);
   const filtered = useMemo(() => (trades.data || []).filter((trade: TradeRecord) =>
-    `${trade.id} ${trade.trade_type}`.toLowerCase().includes(search.toLowerCase()),
+    `${trade.id} ${trade.instrument} ${trade.side}`.toLowerCase().includes(search.toLowerCase()),
   ), [search, trades.data]);
 
   return (
@@ -47,17 +46,11 @@ const TradesMenu = (_props: TradesMenuProps) => {
       <div className="trade-lifecycle-list">
         {filtered.map((trade: TradeRecord) => (
           <article key={trade.id} className="assetsListItem">
-            <div><strong>Trade #{trade.id}</strong><p>{trade.trade_type.toUpperCase()} · ${Number(trade.price_per_unit).toFixed(2)}</p></div>
-            <div><p>{trade.is_active ? "Open" : "Completed"}</p><p>Net: ${Number(trade.net).toFixed(2)}</p></div>
-            {trade.is_active && (
-              <button type="button" disabled={cancelTrade.isPending} onClick={() => cancelTrade.mutate(trade.id)}>
-                {cancelTrade.isPending ? "Cancelling…" : "Cancel"}
-              </button>
-            )}
+            <div><strong>Trade #{trade.id}</strong><p>{trade.side} {trade.instrument} · ${Number(trade.price).toFixed(2)}</p></div>
+            <div><p>{trade.state}</p><p>Fee: ${Number(trade.fee).toFixed(2)}</p></div>
           </article>
         ))}
       </div>
-      {cancelTrade.isError && <p role="alert">{toUserSafeErrorText(cancelTrade.error, "trading")}</p>}
     </section>
   );
 };

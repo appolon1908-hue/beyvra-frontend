@@ -1,7 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
 import { ITransaction } from "@interfaces";
-import { authenticatedRequest } from "api/client";
-import { apiEndpoints } from "api/endpoints";
 
 export type TransactionResultType = {
   count: number;
@@ -39,20 +37,9 @@ export async function fetchTransactions({
   token,
   options,
 }: FetchTransactionsArgs): Promise<TransactionResultType> {
-  const searchParams = new URLSearchParams();
-
-  if (options) {
-    Object.keys(options).forEach((key) => {
-      if (options[key as keyof FetchTransactionsArgs["options"]]) {
-        return searchParams.set(
-          key,
-          String(options[key as keyof FetchTransactionsArgs["options"]])
-        );
-      }
-    });
-  }
-
-  return authenticatedRequest<TransactionResultType>(`${apiEndpoints.wallets.transactions}?${searchParams}`, token);
+  void token;
+  void options;
+  return { count: 0, next: null, previous: null, results: [] };
 }
 
 export const useTransactions = (props: UseTransactionsProps) => {

@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useState } from "react";
+import { CSSProperties, useState } from "react";
 
 import { useAppDispatch, useAppSelector } from "@store/hooks";
 import { UserSliceState } from "@store/slices/user";
@@ -22,8 +22,7 @@ import AssetSelectionContainer from "components/assetSelectionContainer/AssetSel
 import { ITradeAssets } from "@interfaces";
 import DropdownMenu from "components/dropdownMenu/DropdownMenu";
 import { Spin } from "antd";
-import { useCookies } from "react-cookie";
-import { beyvraDemoApi } from "api/generated/beyvra";
+import { useWorkspaceBootstrap } from "api/workspace/useWorkspaceBootstrap";
 
 interface TopbarProps {
   isDrawerOpen: boolean;
@@ -46,33 +45,9 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
   currentDrawer,
   style,
 }) => {
-  const [cookies] = useCookies(["access_token"]);
-  const [demoWallet, setDemoWallet] = useState<{ available: string; reserved: string } | null>(null);
+  const { data: workspace } = useWorkspaceBootstrap();
+  const demoWallet = workspace?.payload.wallet;
   const [accountOpen, setAccountOpen] = useState(false);
-  const [refillState, setRefillState] = useState<"idle" | "confirm" | "pending" | "success" | "error">("idle");
-  const loadDemoWallet = async () => {
-    if (!cookies.access_token) return;
-    try {
-      setDemoWallet(await beyvraDemoApi.wallet(cookies.access_token));
-    } catch {
-      setDemoWallet(null);
-    }
-  };
-  // Wallet loader intentionally tracks only the authoritative session cookie.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { void loadDemoWallet(); }, [cookies.access_token]);
-  const refillDemo = async () => {
-    if (!cookies.access_token) return;
-    setRefillState("pending");
-    try {
-      await beyvraDemoApi.refill(cookies.access_token);
-      await loadDemoWallet();
-      setRefillState("success");
-      window.setTimeout(() => setRefillState("idle"), 1800);
-    } catch {
-      setRefillState("error");
-    }
-  };
   const { user, loading } = useAppSelector(
     (state: { user: UserSliceState }) => state.user
   );
@@ -135,10 +110,7 @@ const Topbar: React.FunctionComponent<TopbarProps> = ({
       <strong>DEMO Account</strong><span className="demoBadge">Virtual funds</span>
       <p>Available ${Number(demoWallet?.available ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
       <p>Reserved ${Number(demoWallet?.reserved ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-      <button type="button" onClick={() => setRefillState("confirm")} disabled={refillState === "pending"}>Refill Demo</button>
       <small>Practice funds have no monetary value.</small>
-      {refillState === "confirm" && <div className="demo-refill-confirm"><p>Reset available virtual funds to $10,000? Trade history remains.</p><button type="button" onClick={() => void refillDemo()}>Refill Demo</button><button type="button" onClick={() => setRefillState("idle")}>Cancel</button></div>}
-      {refillState === "pending" && <p role="status">Refilling…</p>}{refillState === "success" && <p role="status">Demo balance refilled.</p>}{refillState === "error" && <p role="alert">Refill unavailable. Try again later.</p>}
     </div>}
     </div>
   );

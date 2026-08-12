@@ -1,26 +1,29 @@
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
-import { beyvraDemoApi } from "api/generated/beyvra";
+import { authenticatedRequest } from "api/client";
+import { apiEndpoints } from "api/endpoints";
 import { logInternalError } from "errors/userSafeError";
 import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
 
-type DemoTrade = { id: number; state: string; result?: string | null; symbol: string; direction: string; amount: string; openingPrice: string; closingPrice?: string | null; openedAt: string; expiresAt: string };
+type Trade = { id: string; state: string; instrument: string; side: string; quantity: string; price: string; fee: string; trade_time: string };
 
 export default function DemoTradesPage() {
   const [cookies] = useCookies(["access_token"]);
-  const [tab, setTab] = useState<"open" | "closed">("open");
-  const [trades, setTrades] = useState<DemoTrade[]>([]);
+  const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const load = async () => {
     if (!cookies.access_token) return;
     setLoading(true); setError("");
-    try { setTrades(await beyvraDemoApi.trades<DemoTrade[]>(cookies.access_token)); }
-    catch (error) { logInternalError(error, { endpoint: "trading.demo_trades" }); setError(BeyvraErrorMapper.text(error, "trading")); }
-    finally { setLoading(false); }
+    try {
+      const payload = await authenticatedRequest<{ results: Trade[] }>(apiEndpoints.simulationTrading.trades, cookies.access_token, { headers: { "X-Beyvra-Simulation-Mode": "true" } });
+      setTrades(payload.results);
+    } catch (caught) {
+      logInternalError(caught, { endpoint: "trading.trades" });
+      setError(BeyvraErrorMapper.text(caught, "trading"));
+    } finally { setLoading(false); }
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { void load(); }, [cookies.access_token]);
-  const visible = trades.filter((trade) => tab === "open" ? trade.state === "OPEN" : trade.state !== "OPEN");
-  return <main className="demo-trades-page" aria-labelledby="demo-trades-title"><h1 id="demo-trades-title">Demo Trades</h1><p>All results use virtual funds and have no monetary value.</p><div role="tablist"><button role="tab" aria-selected={tab === "open"} onClick={() => setTab("open")}>Open Trades</button><button role="tab" aria-selected={tab === "closed"} onClick={() => setTab("closed")}>Closed Trades</button></div>{loading ? <p role="status">Loading trades…</p> : error ? <div role="alert">{error} <button onClick={() => void load()}>Retry</button></div> : visible.length === 0 ? <p>No {tab} demo trades.</p> : <div className="demo-trades-list">{visible.map((trade) => <article key={trade.id}><h2>{trade.symbol} · {trade.direction.toUpperCase()}</h2><p>Trade #{trade.id} · Virtual amount ${trade.amount}</p><p>Opening quote: {trade.openingPrice}{trade.closingPrice ? ` · Closing quote: ${trade.closingPrice}` : ""}</p><p>{trade.state}{trade.result ? ` · ${trade.result}` : ""} · Expires {new Date(trade.expiresAt).toLocaleString()}</p></article>)}</div>}</main>;
+  return <main className="demo-trades-page" aria-labelledby="demo-trades-title"><h1 id="demo-trades-title">Simulated Trades</h1><p>All results use virtual funds and have no monetary value.</p>{loading ? <p role="status">Loading trades…</p> : error ? <div role="alert">{error} <button onClick={() => void load()}>Retry</button></div> : trades.length === 0 ? <p>No simulated trades.</p> : <div className="demo-trades-list">{trades.map((trade) => <article key={trade.id}><h2>{trade.instrument} · {trade.side}</h2><p>Trade #{trade.id} · Quantity {trade.quantity}</p><p>Execution price: {trade.price} · Fee: {trade.fee}</p><p>{trade.state} · {new Date(trade.trade_time).toLocaleString()}</p></article>)}</div>}</main>;
 }

@@ -9,6 +9,25 @@ import { demoTradeFromRealtime, tradeEventVersion } from "../chart/trades/TradeM
 export type DemoRealtimeScope = { demo_order_channel: string; demo_execution_channel: string };
 export const authorizedDemoChannels = (scope: DemoRealtimeScope) => [scope.demo_order_channel, scope.demo_execution_channel] as const;
 
+type CanonicalTrade = {
+  id: string; instrument: string; side: "BUY" | "SELL"; quantity: string;
+  price: string; trade_time: string; state: string;
+};
+
+const markerTrade = (trade: CanonicalTrade): DemoTrade => ({
+  id: trade.id,
+  symbol: trade.instrument.replace("-USD", "USDT"),
+  direction: trade.side === "BUY" ? "up" : "down",
+  amount: Number(trade.quantity) * Number(trade.price),
+  state: "WON",
+  result: null,
+  openingPrice: trade.price,
+  closingPrice: trade.price,
+  openedAt: trade.trade_time,
+  expiresAt: trade.trade_time,
+  settledAt: trade.trade_time,
+});
+
 export function useDemoTrades(token?: string, accountId?: string, realtime?: DemoRealtimeScope) {
   const orderChannel = realtime?.demo_order_channel;
   const executionChannel = realtime?.demo_execution_channel;
@@ -26,8 +45,11 @@ export function useDemoTrades(token?: string, accountId?: string, realtime?: Dem
     if (!token || !accountId) return;
     const generation = requestGeneration.current;
     try {
-      const payload = await authenticatedRequest<DemoTrade[] | { results: DemoTrade[] }>(apiEndpoints.demo.trades, token, { timeoutMs: 10_000 });
-      const next = Array.isArray(payload) ? payload : payload.results;
+      const payload = await authenticatedRequest<{ results: CanonicalTrade[] }>(apiEndpoints.simulationTrading.trades, token, {
+        timeoutMs: 10_000,
+        headers: { "X-Beyvra-Simulation-Mode": "true" },
+      });
+      const next = payload.results.map(markerTrade);
       if (generation === requestGeneration.current && Array.isArray(next)) setTrades(next);
     } catch {
       // Preserve the last server state during transient polling failures.

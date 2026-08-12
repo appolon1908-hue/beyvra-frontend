@@ -1,37 +1,14 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { authenticatedRequest } from "api/client";
-import { apiEndpoints } from "api/endpoints";
+import { useMutation } from "@tanstack/react-query";
 
 type DemoFundsInput = { walletId: number; amount: number };
+const disabled = async (_input: DemoFundsInput): Promise<never> => {
+  throw new Error("SIMULATION_MONEY_MOVEMENT_DISABLED");
+};
 
-export function useDemoDeposit(token?: string) {
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: ({ walletId, amount }: DemoFundsInput) => authenticatedRequest(
-      apiEndpoints.wallets.deposit(walletId), token!, {
-        method: "POST",
-        body: JSON.stringify({ amount, currency: "USD", gateway: "demo" }),
-      }
-    ),
-    onSuccess: () => {
-      client.invalidateQueries({ queryKey: ["portfolio-summary"] });
-      client.invalidateQueries({ queryKey: ["transactions"] });
-    },
-  });
+export function useDemoDeposit(_token?: string) {
+  return useMutation({ mutationFn: disabled });
 }
 
-export function useDemoWithdrawal(token?: string) {
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: ({ walletId, amount }: DemoFundsInput) => authenticatedRequest(
-      apiEndpoints.wallets.withdraw(walletId), token!, {
-        method: "POST",
-        body: JSON.stringify({ amount, gateway: "demo" }),
-      }
-    ),
-    onSuccess: () => {
-      client.invalidateQueries({ queryKey: ["portfolio-summary"] });
-      client.invalidateQueries({ queryKey: ["transactions"] });
-    },
-  });
+export function useDemoWithdrawal(_token?: string) {
+  return useMutation({ mutationFn: disabled });
 }
