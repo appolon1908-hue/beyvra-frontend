@@ -1,5 +1,8 @@
 import { getSocketUrl } from "utils/env";
 import { beyvraRealtimeV2Api } from "api/generated/beyvra";
+import { socketEndpoints } from "api/endpoints";
+
+export const realtimeV2SocketPath = socketEndpoints.canonical;
 
 export type UnifiedRealtimeMessage = {
   type?: string;
@@ -102,7 +105,7 @@ export class UnifiedRealtimeClient {
         : await this.ticket();
       if (this.closed || !this.channels.size) return;
       const socket = useV2Transport
-        ? new WebSocket(getSocketUrl("ws/v2/connection/websocket"))
+        ? new WebSocket(getSocketUrl(realtimeV2SocketPath))
         : new WebSocket(getSocketUrl("ws/v1/", { ws_ticket: wsTicket }));
       this.socket = socket;
       socket.onopen = () => {

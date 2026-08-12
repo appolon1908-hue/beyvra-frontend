@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import { privateUserChannel, RealtimeSequenceTracker } from "./UnifiedRealtimeClient";
+import {
+  privateUserChannel,
+  realtimeV2SocketPath,
+  RealtimeSequenceTracker,
+} from "./UnifiedRealtimeClient";
+
+describe("realtime V2 public transport", () => {
+  it("uses the public proxy route and leaves the Centrifugo rewrite to nginx", () => {
+    expect(realtimeV2SocketPath).toBe("ws/v2/");
+    expect(realtimeV2SocketPath).not.toContain("connection/websocket");
+  });
+});
 
 describe("RealtimeSequenceTracker", () => {
   it("detects a gap that requires canonical REST snapshot recovery", () => {
