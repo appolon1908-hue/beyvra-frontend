@@ -46,7 +46,7 @@ describe("ChartDataController request budgets", () => {
     const { ChartDataController } = await import("./ChartDataController"); const time = "2026-08-07T00:00:00.000Z";
     request.mockResolvedValueOnce({ instrument_id: "BTC-USD", timeframes: [{ interval: "1m", available: true }] }).mockResolvedValueOnce({ instrument_id: "BTC-USD", interval: "1m", sequence: 1, server_time: time, market_status: "OPEN", quote: { bid: "1", ask: "2", mid: "1.5", occurred_at: time }, candles: [raw(time)] });
     const controller = new ChartDataController("token"); await controller.selectInstrument("BTC-USD", "1m");
-    expect(request).toHaveBeenCalledTimes(2); expect(subscribe.mock.calls.map((call) => call[0])).toEqual(["system.status", "market.quote:BTC-USD", "market.candle:BTC-USD:1m"]);
+    expect(request).toHaveBeenCalledTimes(2); expect(subscribe.mock.calls.map((call) => call[0])).toEqual(["system.status", "market.BTC-USD.quote", "market.BTC-USD.candle.1m"]);
     controller.refreshQuoteAge(Date.parse(time) + 16_000); expect(controller.getSnapshot().connectionState).toBe("stale");
   });
   it("rapid asset switching applies only the final generation", async () => {
@@ -66,11 +66,11 @@ describe("ChartDataController request budgets", () => {
     request.mockResolvedValueOnce({ instrument_id: "BTC-USD", timeframes: [{ interval: "1m", available: true }] }).mockResolvedValueOnce(snapshot(10, "2")).mockResolvedValueOnce(snapshot(12, "2.5"));
     const controller = new ChartDataController("token"); await controller.selectInstrument("BTC-USD", "1m");
     const status = subscribe.mock.calls.find((call) => call[0] === "system.status")?.[1];
-    const quote = subscribe.mock.calls.find((call) => call[0] === "market.quote:BTC-USD")?.[1];
+    const quote = subscribe.mock.calls.find((call) => call[0] === "market.BTC-USD.quote")?.[1];
     status({ type: "connection", status: "disconnected" }); expect(controller.getSnapshot().connectionState).toBe("disconnected");
     status({ type: "connection", status: "reconnecting" }); expect(controller.getSnapshot().connectionState).toBe("reconnecting");
     status({ type: "connection", status: "connected" }); expect(controller.getSnapshot().connectionState).toBe("reconnected");
-    quote({ channel: "market.quote:BTC-USD", sequence: 12, data: { mid: "99" } });
+    quote({ channel: "market.BTC-USD.quote", sequence: 12, data: { mid: "99" } });
     expect(controller.getSnapshot().connectionState).toBe("recovering");
     await vi.waitFor(() => expect(controller.getSnapshot().quote?.mid).toBe("2.5"));
     expect(controller.getSnapshot().candles[0].close).toBe("2.5");

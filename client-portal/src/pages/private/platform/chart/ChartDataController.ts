@@ -109,11 +109,11 @@ export class ChartDataController {
     if (previous !== undefined && event.sequence > previous + 1) { void this.recover(); return; }
     this.sequences.set(channel, event.sequence);
     const data = (event.data || {}) as Record<string, unknown>;
-    if (channel.startsWith("market.quote:")) {
+    if (channel.endsWith(".quote")) {
       const occurredAt = String(event.occurred_at || event.server_time || new Date().toISOString());
       const mid = String(data.mid ?? data.close ?? ""); if (!mid) return;
       this.update({ ...this.state, quote: { bid: String(data.bid ?? mid), ask: String(data.ask ?? mid), mid, occurredAt }, quoteAgeMs: 0, connectionState: "connected" });
-    } else if (channel.startsWith("market.candle:")) {
+    } else if (channel.includes(".candle.")) {
       const candle = this.eventCandle(data, event.sequence); if (!candle) return;
       this.update({ ...this.state, candles: applyLiveCandle(this.state.candles, candle), connectionState: "connected" });
     }
@@ -145,8 +145,8 @@ export class ChartDataController {
   }
   private current(generation: number, instrumentId: string, abort: AbortController) { return generation === this.generation && instrumentId === this.state.instrumentId && !abort.signal.aborted; }
   private channelMatchesCurrent(channel: string) { return channel === this.quoteChannel(this.state.instrumentId) || channel === this.candleChannel(this.state.instrumentId, this.state.interval); }
-  private quoteChannel(instrumentId: string) { return `market.quote:${instrumentId}`; }
-  private candleChannel(instrumentId: string, interval: ChartInterval) { return `market.candle:${instrumentId}:${interval}`; }
+  private quoteChannel(instrumentId: string) { return `market.${instrumentId}.quote`; }
+  private candleChannel(instrumentId: string, interval: ChartInterval) { return `market.${instrumentId}.candle.${interval}`; }
   private unsubscribeCandle() { this.unsubscribers.pop()?.(); }
   private unsubscribeAll() { for (const unsubscribe of this.unsubscribers.splice(0)) unsubscribe(); }
   private fail(error: unknown) { logInternalError(error, { endpoint: "market.realtime" }); this.update({ ...this.state, connectionState: BeyvraErrorMapper.marketState(error), error: BeyvraErrorMapper.text(error) }); }

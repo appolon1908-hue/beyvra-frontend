@@ -25,7 +25,7 @@ const AssetSection = () => {
   useEffect(() => {
     if (!wsTicket) return;
     const realtime = getUnifiedRealtimeClient(wsTicket, async () => (await webSocketTicketFetcher(wsTicket)).ws_ticket);
-    const unsubscribe = realtime.subscribe("market.candle:BTCUSDT:1m", (message) => {
+    const unsubscribe = realtime.subscribe("market.BTCUSDT.candle.1m", (message) => {
       const incomingData = (message.data || {}) as Record<string, unknown>;
       if (message.type === "market.candle.updated" && incomingData.type === "candle") {
         setConnectionStatus("Connected");
