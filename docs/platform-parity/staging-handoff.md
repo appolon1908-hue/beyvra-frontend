@@ -7,7 +7,7 @@ is unchanged and activation remains blocked.
 
 - Backend: `codestra-backend:staging-demo-entry-20260804a`
 - Frontend: `codestra-frontend:staging-google-570f908`
-- Staging URL: `https://staging.codestra.cloud/`
+- Staging URL: `https://staging.beyvra.com/`
 - Google provider response: `GET /api/v1/auth/providers` returns HTTP 200 with
   Google disabled until approved OAuth credentials and legal versions exist.
 - The sign-in bundle contains the truthful disabled Google control; no live

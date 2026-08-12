@@ -1,6 +1,7 @@
 # Codestra/Tradi redesign — Phase 0 audit
 
-Captured 2026-08-03 against `https://staging.codestra.cloud/` before visual
+Historical pre-convergence capture: captured 2026-08-03 against
+`https://staging.codestra.cloud/` before visual
 changes. Existing worktrees were clean:
 
 ```text
