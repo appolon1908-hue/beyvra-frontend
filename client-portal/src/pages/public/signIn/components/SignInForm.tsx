@@ -67,7 +67,11 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
     if (guestPending) return;
     setGuestPending(true);
     try {
-      await beyvraAuthApi.guestDemo(crypto.randomUUID());
+      const session = await beyvraAuthApi.guestDemo<{ access: string; expiresIn: number }>(crypto.randomUUID());
+      setCookie("access_token", session.access, {
+        ...authCookieOptions(false),
+        maxAge: session.expiresIn,
+      });
       navigate(destination || "/platform", { replace: true });
     } catch {
       toast.error("Demo access is temporarily unavailable. Please try again.");

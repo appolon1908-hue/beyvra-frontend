@@ -131,7 +131,7 @@ const SignUpForm = () => {
       setOtpPending(true);
       try {
         await beyvraAuthApi.verifyRegistration({ registrationId: pendingRegistration.id, code: otp });
-        toast.success("Your demo account is ready."); navigate("/platform", { replace: true });
+        toast.success("Your demo account is ready. Sign in to continue."); navigate("/signIn?tab=login", { replace: true });
       } catch (error) { logInternalError(error, { endpoint: "auth.verify_registration" }); toast.error(toUserSafeErrorText(error, "auth")); }
       finally { setOtpPending(false); }
     };

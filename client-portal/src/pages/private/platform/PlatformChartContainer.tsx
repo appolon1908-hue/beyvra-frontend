@@ -101,9 +101,6 @@ const PlatformChartContainer: React.FunctionComponent<PlatformProps> = ({ themeS
   useEffect(() => { if (eventOverlayState.selectedEventType !== "NEWS" || !eventOverlayState.selectedEventId) return; const article = eventOverlayState.news.find((item) => item.article_id === eventOverlayState.selectedEventId); if (article && article.summary === undefined) void eventOverlay.loadNewsDetail(article.article_id); }, [eventOverlay, eventOverlayState.news, eventOverlayState.selectedEventId, eventOverlayState.selectedEventType]);
   useEffect(() => { setAmount((current) => Math.min(demoConfig.maxAmount, Math.max(demoConfig.minAmount, current))); if (!demoConfig.durations.includes(duration)) setDuration(demoConfig.durations[0] ?? 15); }, [demoConfig, duration]);
   useEffect(() => { const sync = () => workspaceUIStore.setFullscreen(Boolean(document.fullscreenElement)); document.addEventListener("fullscreenchange", sync); return () => document.removeEventListener("fullscreenchange", sync); }, [workspaceUIStore]);
-  useEffect(() => { if (workspaceUI.compact && isTicketOpen) closeOverlay(); }, [workspaceUI.compact, isTicketOpen, closeOverlay]);
-  useEffect(() => { const closeTicketOnMobile = () => { if (window.innerWidth < 768 && isTicketOpen) closeOverlay(); }; closeTicketOnMobile(); window.addEventListener("resize", closeTicketOnMobile); return () => window.removeEventListener("resize", closeTicketOnMobile); }, [isTicketOpen, closeOverlay]);
-
   const submitDemoOrder = async (direction: "up" | "down") => {
     if (orderState === "submitting" || !quote || chartState.connectionState !== "connected") return;
     setOrderState("submitting"); setOrderError("");
