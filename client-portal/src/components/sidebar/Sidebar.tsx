@@ -1,11 +1,8 @@
 import {
-  AiIcon,
-  EventsIcon,
   HelpIcon,
   LogoIcon,
   MarketIcon,
   NewsIcon,
-  Portfolio,
   TradesIcon,
 } from "../../assets/icons";
 import "./sidebar.scss";
@@ -13,6 +10,9 @@ import { Spin } from "antd";
 import { useAppDispatch, useAppSelector } from "@store/hooks";
 import { setPortfolioWindow } from "@store/slices/app";
 import { CurrentDrawerType } from "pages/private/platform/types";
+import { PlatformFeatureFlags } from "config/platformFeatures";
+import { usePlatformOverlay } from "pages/private/platform/PlatformOverlayContext";
+import { useNavigate } from "react-router-dom";
 
 type DrawerType =
   | "trades"
@@ -20,9 +20,8 @@ type DrawerType =
   | "events"
   | "help"
   | "news"
-  | "ai"
   | "assets"
-  | "portfolio"
+  | "ai"
   | null;
 
 interface SidebarProps {
@@ -33,6 +32,7 @@ interface SidebarProps {
   id?: string;
   currentDrawer: DrawerType;
   setCurrentDrawer: React.Dispatch<React.SetStateAction<CurrentDrawerType>>;
+  features?: PlatformFeatureFlags;
 }
 
 const Sidebar: React.FunctionComponent<SidebarProps> = ({
@@ -44,17 +44,18 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
   setCurrentDrawer,
   id,
 }) => {
+  const navigate = useNavigate();
   const { togglePortfolioWindow } = useAppSelector(state => state.app)
   const onlineTraders = useAppSelector(state => state.socketStockCrypto.onlinetraders)
   const dispatch = useAppDispatch()
+  const { openOverlay, closeOverlay } = usePlatformOverlay();
   const onSelect = (activeDrawer: CurrentDrawerType) => {
+    if (activeDrawer === "market" || activeDrawer === "assets") openOverlay("market");
+    else closeOverlay();
     if (isLeftSubDrawerOpen) {
       setIsLeftSubDrawerOpen(false);
-    } else {
-      setIsDrawerOpen(
-        isDrawerOpen && currentDrawer === activeDrawer ? false : true
-      );
     }
+    setIsDrawerOpen(!(isDrawerOpen && currentDrawer === activeDrawer));
     if (togglePortfolioWindow) {
       dispatch(setPortfolioWindow(false))
       // setIsDrawerOpen(false)
@@ -66,7 +67,6 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
       setIsLeftSubDrawerOpen(false);
       dispatch(setPortfolioWindow(true));
       setIsDrawerOpen(false)
-      console.log("set  false")
 
 
     } else if (togglePortfolioWindow) {
@@ -88,7 +88,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
 
 
   return (
-    <div className="sidebar" id={id ? id : ""} style={{ zIndex: '900' }}>
+    <div className="sidebar" id={id ? id : ""}>
       
       <div className="logo">
           <a href="/platform"> <LogoIcon /></a>
@@ -97,6 +97,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
       <div className="top">
         
         <button
+          aria-label="Trades"
           onClick={() => onSelect("trades")}
           className={isDrawerOpen && currentDrawer === "trades" ? "active" : ""}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
@@ -108,6 +109,31 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
         </button>
 
         <button
+          aria-label="InZone"
+          onClick={() => navigate("/platform/inzone")}
+          className=""
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
+        >
+          <div className="icon flex justify-center whiteIcons">
+            <NewsIcon />
+          </div>
+          <p className="text">InZone</p>
+        </button>
+
+        <button
+          aria-label="Rewards"
+          onClick={() => navigate("/platform/rewards")}
+          className=""
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
+        >
+          <div className="icon flex justify-center whiteIcons">
+            <NewsIcon />
+          </div>
+          <p className="text">Rewards</p>
+        </button>
+
+        <button
+          aria-label="Market"
           onClick={() => onSelect("market")}
           className={isDrawerOpen && currentDrawer === "market" ? "active" : ""}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
@@ -119,28 +145,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
         </button>
 
         <button
-          onClick={() => onSelect("events")}
-          className={isDrawerOpen && currentDrawer === "events" ? "active" : ""}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
-        >
-          <div className="icon flex justify-center whiteIcons">
-            <EventsIcon />
-          </div>
-          <p className="text">Events</p>
-        </button>
-
-        <button
-          onClick={() => handlePortfolioNavigation("portfolio")}
-          className={isDrawerOpen && currentDrawer === "events" ? "active" : ""}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
-        >
-          <div className="icon flex justify-center whiteIcons">
-            <Portfolio />
-          </div>
-          <p className="text">Portfolio</p>
-        </button>
-
-        <button
+          aria-label="Help"
           onClick={() => onSelect("help")}
           className={isDrawerOpen && currentDrawer === "help" ? "active" : ""}
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
@@ -149,26 +154,6 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({
             <HelpIcon />
           </div>
           <p className="text">Help</p>
-        </button>
-        <button
-          onClick={() => onSelect("news")}
-          className={isDrawerOpen && currentDrawer === "news" ? "active" : ""}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
-        >
-          <div className="icon flex justify-center whiteIcons">
-            <NewsIcon />
-          </div>
-          <p className="text">News</p>
-        </button>
-        <button
-          onClick={() => onSelect("ai")}
-          className={isDrawerOpen && currentDrawer === "ai" ? "active" : ""}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}
-        >
-          <div className="icon flex justify-center whiteIcons">
-            <AiIcon />
-          </div>
-          <p className="text">AI</p>
         </button>
       </div>
       <div className="bottom">

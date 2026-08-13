@@ -1,29 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import getEnv from "utils/env";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 export async function webSocketTicketFetcher(
   token: string,
-) {
-  try {
-    const response = await fetch(
-      `${getEnv("VITE_API_BASE_URL")}/user/websocket_ticket`,
-        {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+): Promise<{ ws_ticket: string }> {
+  return beyvraAuthApi.websocketTicket<{ ws_ticket: string }>(token);
 }
 
 type UseWebSocketTicketProps = {

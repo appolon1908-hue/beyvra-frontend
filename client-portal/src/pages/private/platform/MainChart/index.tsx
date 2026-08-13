@@ -40,7 +40,7 @@ const MainChart: React.FunctionComponent<any>  = forwardRef(({ data: newData,col
 
   useEffect(() => {
     getClockMutate(cookies.access_token);
-  }, []);
+  }, [cookies.access_token, getClockMutate]);
   
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const MainChart: React.FunctionComponent<any>  = forwardRef(({ data: newData,col
         },
       });
     }
-  }, [markets.symbol, clockData]);
+  }, [markets.symbol, clockData, marketDataMutation, cookies.access_token]);
 
   useEffect(() => {
     // Load the list of assets
@@ -73,7 +73,7 @@ const MainChart: React.FunctionComponent<any>  = forwardRef(({ data: newData,col
         },
       }
     );
-  }, [cookies.access_token]);
+  }, [assetsListMutate, cookies.access_token, dispatch]);
 
   useEffect(() => {
     if (market && typeof market === "object") {
@@ -122,7 +122,7 @@ const MainChart: React.FunctionComponent<any>  = forwardRef(({ data: newData,col
       //   })
       // );
     }
-  }, [market]);
+  }, [dispatch, market, markets?.symbol]);
 
   // useEffect(() => {
   //   // if (markets?.crypto[markets?.symbol]?.length > 0) {
@@ -143,7 +143,7 @@ const MainChart: React.FunctionComponent<any>  = forwardRef(({ data: newData,col
     
     }
     
-  },[finished])
+  },[finished, trade])
 
 
 

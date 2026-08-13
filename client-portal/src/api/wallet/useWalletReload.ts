@@ -1,7 +1,6 @@
-import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 
-import getEnv from "utils/env";
+import { beyvraWalletApi } from "api/generated/beyvra";
 import { WalletData } from "@store/slices/wallet";
 
 type useUpdateWalletProps = {
@@ -14,27 +13,8 @@ export async function fetchRefillWallet(
   id: string | number,
   token: string,
 ): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
-    const response = await fetch(`${BASE_URL}/wallet/wallets/${id}/refill/`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      Object.keys(result).forEach((field) => {
-        const errors = result[field];
-        errors.forEach((errorMessage: string) => {
-          toast.error(`${field}: ${errorMessage}`);
-        });
-      });
-      throw new Error(`${result}`);
-    }
-    return result;
+    return await beyvraWalletApi.refillLegacy(token, id) as boolean;
   } catch (error) {
     throw new Error(error as string);
   }

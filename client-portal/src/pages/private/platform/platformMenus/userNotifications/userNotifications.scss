@@ -22,3 +22,75 @@
     }
   }
 }
+
+.notification-inbox__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #d8d8dc;
+  padding: 8px 0;
+}
+
+.notification-inbox button {
+  cursor: pointer;
+}
+
+.notification-inbox button:disabled {
+  cursor: default;
+  opacity: .65;
+}
+
+.notification-container.is-read {
+  opacity: .72;
+}
+
+.notification-container .userNotificationsMessageContainer {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  display: grid;
+  gap: 6px;
+}
+
+.notification-container time {
+  color: #ababad;
+  font-size: .75rem;
+}
+
+.notification-inbox__load-more {
+  width: 100%;
+  margin-top: 12px;
+  min-height: 44px;
+  border: 1px solid #6f7179;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+}
+
+.notification-inbox__load-more:focus-visible,
+.notification-container button:focus-visible,
+.notification-inbox__header button:focus-visible {
+  outline: 3px solid #80bfff;
+  outline-offset: 2px;
+}
+.webhook-integrations { margin-top: 24px; padding: 16px; border-top: 1px solid rgba(255,255,255,.12); }
+.webhook-integrations h2 { margin: 0; color: #fff; font-size: 16px; }
+.webhook-help, .webhook-integrations p { color: #9aa8bb; font-size: 12px; }
+.webhook-integrations form { display: grid; gap: 8px; margin: 12px 0 16px; }
+.webhook-integrations input { width: 100%; border: 1px solid #33445b; border-radius: 6px; background: #111a28; color: #fff; padding: 9px 10px; }
+.webhook-integrations button { border: 1px solid #3c8f75; border-radius: 6px; background: #1b5d4c; color: #fff; padding: 8px 10px; cursor: pointer; }
+.webhook-integrations button:disabled { cursor: wait; opacity: .55; }
+.webhook-row { border: 1px solid rgba(255,255,255,.12); border-radius: 8px; padding: 12px; margin-top: 10px; }
+.webhook-row__summary, .webhook-row__actions, .webhook-delivery { display: flex; align-items: center; gap: 8px; }
+.webhook-row__summary { justify-content: space-between; }
+.webhook-row__summary strong { display: block; color: #fff; font-size: 12px; overflow-wrap: anywhere; }
+.webhook-row__summary span { display: block; color: #9aa8bb; font-size: 11px; margin-top: 3px; }
+.webhook-row__actions { margin-top: 10px; flex-wrap: wrap; }
+.webhook-row__actions button { background: #17263b; border-color: #344d6a; font-size: 11px; }
+.webhook-deliveries { border-top: 1px solid rgba(255,255,255,.1); margin-top: 10px; padding-top: 8px; }
+.webhook-delivery { flex-wrap: wrap; padding: 6px 0; color: #b8c4d4; font-size: 11px; }
+.delivery-status { font-weight: 600; }
+.delivery-status--S { color: #43d19a; }.delivery-status--F { color: #ff7d7d; }.delivery-status--P { color: #ffd166; }
+.delivery-error { color: #ff9c9c; flex-basis: 100%; overflow-wrap: anywhere; }

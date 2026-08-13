@@ -26,7 +26,7 @@ const OTPVerification: React.FC<OTPProps> = ({ handleNext }) => {
   const { handleSubmit, register, reset, formState: {errors} } = useForm<OTPInputProps>();
 
   const [otp, setOtp] = useState(["", "", "", ""]);
-  const inputRef:any = [useRef(), useRef(), useRef(), useRef()];
+  const inputRef:any = [useRef(null), useRef(null), useRef(null), useRef(null)];
 
   const { mutate, isPending } = useOTPVerification({
     onSuccess: (data) => {

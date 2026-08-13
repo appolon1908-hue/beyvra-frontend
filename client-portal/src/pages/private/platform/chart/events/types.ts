@@ -1,0 +1,7 @@
+export type Importance = "LOW" | "MEDIUM" | "HIGH";
+export type NewsArticle = { article_id: string; provider_id: string; provider_article_id: string; headline: string; summary?: string; publisher?: string; canonical_url?: string | null; published_at: string; updated_at?: string | null; retracted_at?: string | null; importance: Importance; affected_instruments: string[]; status: "PUBLISHED" | "UPDATED" | "RETRACTED" };
+export type EconomicEvent = { event_id: string; provider_id: string; title: string; country?: string; currency?: string; importance: Importance; scheduled_at: string; actual_at?: string | null; previous_value?: string; forecast_value?: string; actual_value?: string; unit?: string; affected_instruments: string[]; status: "SCHEDULED" | "ACTIVE" | "RELEASED" | "UPDATED" | "CANCELLED" };
+export type OverlayFilter = "all" | "trades" | "high" | "news" | "economic";
+export type OverlayEventType = "NEWS" | "ECONOMIC_EVENT";
+export type OverlayMarker = { id: string; kind: "news" | "economic"; eventIds: string[]; count: number; time: string; importance: Importance; title: string; source: string; instrumentIds: string[] };
+export type OverlaySnapshot = { news: NewsArticle[]; economicEvents: EconomicEvent[]; selectedEventId?: string; selectedEventType?: OverlayEventType; drawerOpen: boolean; filter: OverlayFilter; visibility: boolean; importanceFilter: "ALL" | "HIGH"; instrumentFilter: string; latestSequence: Readonly<Record<string, number>>; providerState: "idle" | "loading" | "available" | "unavailable"; revision: number };

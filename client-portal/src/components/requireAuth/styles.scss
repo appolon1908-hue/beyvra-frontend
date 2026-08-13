@@ -24,3 +24,6 @@
     }
   }
 }
+.route-bootstrap { min-height: 100dvh; display: grid; place-content: center; gap: 12px; padding: 24px; background: #0b0e11; color: #f4f7fa; text-align: center; }
+.route-bootstrap button { min-height: 44px; padding: 0 16px; border: 1px solid #29333d; border-radius: 8px; background: #192129; color: #f4f7fa; }
+.route-bootstrap--error { max-width: 520px; margin: 0 auto; }

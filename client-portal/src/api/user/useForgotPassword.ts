@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { beyvraAuthApi } from "api/generated/beyvra";
+import { ApiError } from "api/errors";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 
 type ForgotPassResponse = {
   detail: string;
@@ -13,7 +15,7 @@ type useFrogotPassowrdProps = {
     context: unknown
   ) => void;
   onError?: (
-    error: ForgotPassResponse,
+    error: Error,
     variables: unknown,
     context: unknown
   ) => void;
@@ -24,27 +26,9 @@ type ForgotPasswordVariables = {
   email: string;
 };
 
-export async function fetchForgotPassword(data: ForgotPasswordVariables) {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/user/password_reset/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      referrerPolicy: "no-referrer",
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      toast.error(result.detail);
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+export async function fetchForgotPassword(data: ForgotPasswordVariables): Promise<ForgotPassResponse> {
+  try { return await beyvraAuthApi.forgotPassword<ForgotPassResponse>(data); }
+  catch (error) { logInternalError(error, { endpoint: "auth.forgot_password" }); toast.error(toUserSafeErrorText(error, "auth")); throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN"); }
 }
 
 export const useFrogotPassowrd = (props: useFrogotPassowrdProps) => {
@@ -56,7 +40,7 @@ export const useFrogotPassowrd = (props: useFrogotPassowrdProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, ForgotPassResponse, any>({
+  return useMutation<ForgotPassResponse, Error, ForgotPasswordVariables>({
     mutationFn: fetchForgotPassword,
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {

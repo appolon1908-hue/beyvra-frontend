@@ -1,8 +1,37 @@
-{$DOMAIN:localhost} {
-    tls internal
+{$DOMAIN:staging.beyvra.com} {
     encode zstd gzip
-    reverse_proxy frontend:80
+
+    @metrics {
+        path /metrics
+        remote_ip 127.0.0.1 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+    }
+    handle @metrics {
+        reverse_proxy nginx:80 {
+            header_up X-Forwarded-For {remote_host}
+        }
+    }
+
+    @backend path /api/* /admin/* /static/* /media/*
+    handle @backend {
+        reverse_proxy nginx:80 {
+            header_up X-Forwarded-For {remote_host}
+        }
+    }
+
+    @websocket path /ws/*
+    handle @websocket {
+        reverse_proxy nginx:80 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote_host}
+        }
+    }
+
+    handle {
+        reverse_proxy frontend:80
+    }
     header {
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://staging.beyvra.com wss://staging.beyvra.com https://api.segment.io; frame-src 'self' https://accounts.google.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
         Strict-Transport-Security "max-age=31536000; includeSubDomains"
         X-Content-Type-Options "nosniff"
         Referrer-Policy "strict-origin-when-cross-origin"

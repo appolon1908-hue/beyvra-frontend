@@ -81,11 +81,11 @@ useEffect(() => {
       }
     );
   }
-}, [currency, startDate, endDate, status, type]);
+}, [currency, startDate, endDate, status, type, asset, transactionsMutate, cookies.access_token, setTableData]);
   
   return (
     <div className="user-options-bar user-options-trades">
-      <div className="user-option-control-item trades-user-option-select-box tradex-select-tabkey">
+      <div className="user-option-control-item trades-user-option-select-box beyvra-select-tabkey">
         <Select
           onChange={setTabKey}
           defaultValue="Forex"

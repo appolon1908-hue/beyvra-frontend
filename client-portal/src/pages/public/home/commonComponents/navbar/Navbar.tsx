@@ -1,6 +1,4 @@
 import "./navbar.scss";
-import TradxLogo from "../../../../../assets/home/tradxlogo.png";
-
 import {
   ArrowDownOS,
   MenuBar,
@@ -9,17 +7,12 @@ import {
 } from "assets/icons";
 import { useEffect, useRef, useState } from "react";
 import { localFlagHandler } from "i18n/helpers";
-import { Spin } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import i18n from "../../../../../i18n";
-import { languages } from "../../../../../constants";
 import { useCookies } from "react-cookie";
 
 
 const Navbar= () => {
-    const [ipAddress, setIpAddress] = useState('');
-    const [geoInfo, setGeoInfo] = useState<{countryCode:string}>()
-    const [loading, setLoading] = useState(false)
     const [activeMobileMenu, setActiveMobileMenu] = useState(null);
     const [cookies, setCookie] = useCookies(['language']);
   
@@ -35,48 +28,8 @@ const Navbar= () => {
 
   const navigate = useNavigate();
 
-  const getVisitorIp = async()=>{
-    // setLoading(true)
-    try {
-      const response = await fetch('https://api.ipify.org')
-      const data   = await response.text()
-      console.log(data);
-      setIpAddress(data)
-    } catch (error) {
-      console.log(error);
-      setLoading(false)
-    }
-  }
-
-  const fetchIpInfo = async ()=>{
-    try {
-      const response = await fetch(`http://ip-api.com/json/${ipAddress}`)
-      const data = await response.json()
-      setGeoInfo(data)
-      // setLoading(false)
-    } catch (error) {
-      // setCountryCode('EN')
-      console.log(error);
-      // setLoading(false)
-    }
-  }
-  useEffect(()=>{
-    getVisitorIp()
-  },[])
-
-  useEffect(()=>{
-    fetchIpInfo()
-    if(geoInfo){
-      console.log(geoInfo?.countryCode);
-      // setCountryCode(geoInfo?.countryCode)
-    }
-    console.log(geoInfo);
-  },[ipAddress])
-
   const [toggleLanguageSelector, setToggleLanguageSelector] = useState(false);
   const [toggleMobileNav, setToggleMobileNav] = useState(false);
-  console.log(localFlagHandler(countryCode.toLocaleLowerCase()));
-  console.log(countryCode.toLocaleLowerCase());
   const languageSelectorRef = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = (event: globalThis.MouseEvent) => {
@@ -95,36 +48,19 @@ const Navbar= () => {
     };
   }, []);
 
-
-  useEffect(() => {
-    const matchedLanguage = languages.find(language => language.value.toLowerCase() === countryCode.toLowerCase());
-    
-    if (matchedLanguage) {
-      i18n.changeLanguage(matchedLanguage.languageKey);
-    } else {
-      setCountryCode('EN');
-      i18n.changeLanguage('en');
-    }
-  }, [countryCode]);
-
-
-  useEffect(() => {
-    const browserLanguage = navigator.language;
-    const matchedLanguage = languages.find(language => language.value.toLowerCase() === browserLanguage.toLocaleLowerCase());
-    if (matchedLanguage) {
-      i18n.changeLanguage(countryCode.toLocaleLowerCase());
-    } else {
-      setCountryCode('EN')
-      i18n.changeLanguage("en");
-    }
-  }, [])
+  const selectLanguage = (language: string) => {
+    setCountryCode(language);
+    setCookie("language", language, { path: "/" });
+    void i18n.changeLanguage(language);
+    setToggleLanguageSelector(false);
+  };
 
   return (
     <div className="navbarContainer">
       {/* left side nav */}
       <div className="leftSideNav">
         <Link to="/">
-          <img src={TradxLogo} alt="" />
+          <img src="/logo.svg" alt="Beyvra home" />
         </Link>
 
         <div className="navContent">
@@ -210,11 +146,6 @@ const Navbar= () => {
     
         {/* language selector */}
         <div ref={languageSelectorRef} className="languageSelectorContainer">
-          {loading ? (
-            <div style={{ marginRight: "10px" }}>
-              <Spin />
-            </div>
-          ) : (
             <div
               
               className="languageButton"
@@ -227,7 +158,6 @@ const Navbar= () => {
               <h2>{countryCode.toUpperCase()}</h2>
               <ArrowDownOS height="15" width="10" />
             </div>
-          )}
 
           <div
             className={`languageDropDownMenu ${
@@ -239,9 +169,7 @@ const Navbar= () => {
             <div
               className="languageValue"
               onClick={() => {
-                setCountryCode("en");
-                setCookie('language', "en", { path: '/' });
-                setToggleLanguageSelector(false);
+                selectLanguage("en");
               }}
             >
               <img src={localFlagHandler("en")} alt="" />
@@ -250,10 +178,7 @@ const Navbar= () => {
             <div
               className="languageValue"
               onClick={() => {
-                setCountryCode("es");
-                setCookie('language', "es", { path: '/' });
-
-                setToggleLanguageSelector(false);
+                selectLanguage("es");
               }}
             >
               <img src={localFlagHandler("es")} alt="" />
@@ -262,22 +187,16 @@ const Navbar= () => {
             <div
               className="languageValue"
               onClick={() => {
-                setCountryCode("jp");
-                setCookie('language', "jp", { path: '/' });
-
-                setToggleLanguageSelector(false);
+                selectLanguage("ja");
               }}
             >
-              <img src={localFlagHandler("jp")} alt="" />
+              <img src={localFlagHandler("ja")} alt="" />
               <h2>Japanese</h2>
             </div>
             <div
               className="languageValue"
               onClick={() => {
-                setCountryCode("AR");
-                setCookie('language', "AR", { path: '/' });
-
-                setToggleLanguageSelector(false);
+                selectLanguage("ar");
               }}
             >
               <img src={localFlagHandler("ar")} alt="" />
@@ -286,10 +205,7 @@ const Navbar= () => {
             <div
               className="languageValue"
               onClick={() => {
-                setCountryCode("HI");
-                setCookie('language', "HI", { path: '/' });
-
-                setToggleLanguageSelector(false);
+                selectLanguage("hi");
               }}
             >
               <img src={localFlagHandler("hi")} alt="" />
@@ -297,31 +213,26 @@ const Navbar= () => {
             </div>
           </div>
         </div>
-        <button
-          className="primaryButton"
-          onClick={() => {
-            // dispatch(setSignInTab('1'))
-            navigate("/");
-          }}
-        >
-          Registration
-        </button>
+        <Link className="navSignIn" to="/signIn?tab=login">Sign In</Link>
+        <Link className="primaryButton" to="/signIn?tab=registration&mode=demo">Try Demo</Link>
         
       </div>
-      <div className="menuBarButton" onClick={() => setToggleMobileNav(true)}>
+      <button type="button" className="menuBarButton" aria-label="Open navigation menu" aria-expanded={toggleMobileNav} onClick={() => setToggleMobileNav(true)}>
         <MenuBar height="30px" width="30px" />
-      </div>
+      </button>
       <div
         className={`${toggleMobileNav ? "mobileNavOpen" : "mobileNavClose"}`}
       >
-        <div
+        <button
+          type="button"
           className="menuCloseIcon"
+          aria-label="Close navigation menu"
           onClick={() => setToggleMobileNav(false)}
         >
           <MenuCloseIcon />
-        </div>
+        </button>
         <div className="mobileNavLogo">
-          <img src={TradxLogo} alt="" />
+          <img src="/logo.svg" alt="Beyvra home" />
         </div>
 
         <div className="mobileNavContent">
@@ -330,8 +241,8 @@ const Navbar= () => {
             <SearchIcon height="13" width="13" />
             <input id="search" name="search" type="text" placeholder="Search" />
           </div>
-          <span>Markets</span>
-          <span>Trading</span>
+          <Link to="/markets/crypto" onClick={() => setToggleMobileNav(false)}>Markets</Link>
+          <Link to="/trading" onClick={() => setToggleMobileNav(false)}>Trading</Link>
           {/* <span>Learn</span> */}
           <div className="mobileBottomNav">
             {/* language selector */}
@@ -376,26 +287,20 @@ const Navbar= () => {
               </div>
             </div>
             <div>
-              <button
+              <Link
                 className="primaryButton"
-                onClick={() => {
-                  // dispatch(setSignInTab('1'))
-                  navigate("/signIn");
-                  setToggleMobileNav(false);
-                }}
+                to="/signIn?tab=login"
+                onClick={() => setToggleMobileNav(false)}
               >
-                Login
-              </button>
-              <button
+                Sign In
+              </Link>
+              <Link
                 className="secondaryButton"
-                onClick={() => {
-                  // dispatch(setSignInTab('2'))
-                  navigate("/signIn");
-                  setToggleMobileNav(false);
-                }}
+                to="/signIn?tab=registration&mode=demo"
+                onClick={() => setToggleMobileNav(false)}
               >
-                Sign Up
-              </button>
+                Try Demo
+              </Link>
             </div>
           </div>
         </div>

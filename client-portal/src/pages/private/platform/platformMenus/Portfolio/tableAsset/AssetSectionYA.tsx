@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { useAppSelector } from "@store/hooks";
+import { getUnifiedRealtimeClient } from "realtime/UnifiedRealtimeClient";
+import { webSocketTicketFetcher } from "api/user/useWebSocketTicket";
 
 interface CryptoAsset {
   id: string;
@@ -16,60 +19,21 @@ interface CryptoAsset {
 
 const AssetSection = () => {
   const [cryptoData, setCryptoData] = useState<CryptoAsset[]>([]);
-  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<string>("Connecting...");
+  const { wsTicket } = useAppSelector((state) => state.user);
 
   useEffect(() => {
-    const connectWebSocket = () => {
-      const ws = new WebSocket(`ws://127.0.0.1:8000/ws`);
-      setWebSocket(ws);
-
-      ws.onopen = () => {
-        console.log("WebSocket connection established.");
+    if (!wsTicket) return;
+    const realtime = getUnifiedRealtimeClient(wsTicket, async () => (await webSocketTicketFetcher(wsTicket)).ws_ticket);
+    const unsubscribe = realtime.subscribe("market.BTCUSDT.candle.1m", (message) => {
+      const incomingData = (message.data || {}) as Record<string, unknown>;
+      if (message.type === "market.candle.updated" && incomingData.type === "candle") {
         setConnectionStatus("Connected");
-
-        // Initial request for general data type
-        const request = { type: "general" };
-        ws.send(JSON.stringify(request));
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const incomingData = JSON.parse(event.data);
-
-          if (incomingData.type === "general" && Array.isArray(incomingData.data)) {
-            // Update state with the incoming general data
-            setCryptoData(incomingData.data);
-          }
-        } catch (error) {
-          console.error("Error parsing WebSocket message:", error);
-        }
-      };
-
-      ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
-        setConnectionStatus("Error connecting");
-      };
-
-      ws.onclose = (event) => {
-        console.log("WebSocket connection closed.", event);
-        setConnectionStatus("Connection closed. Reconnecting...");
-
-        // Attempt to reconnect after a delay
-        setTimeout(connectWebSocket, 3000);
-      };
-    };
-
-    connectWebSocket();
-
-    // Clean up WebSocket connection on component unmount
-    return () => {
-      if (webSocket) {
-        webSocket.close();
-        console.log("WebSocket connection cleaned up.");
+        setCryptoData([{ id: String(incomingData.symbol), symbol: String(incomingData.symbol), price: String(incomingData.close), change: "0", change_percentage: "0", market_cap: "0", volume: String(incomingData.volume), volume_in_currencies_24h: "0", total_volume_all_currencies_24h: "0", circulating_supply: "0", im: String(incomingData.symbol) }]);
       }
-    };
-  }, [webSocket]);
+    });
+    return () => { unsubscribe(); setConnectionStatus("Disconnected"); };
+  }, [wsTicket]);
   //  // Mapping for crypto images
   //  const cryptoImages: Record<string, string> = {
   //   Bitcoin: Bitcoin, // Bitcoin

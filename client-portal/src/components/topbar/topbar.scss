@@ -67,6 +67,9 @@
       padding: 0.2rem 0.6rem;
       margin-right: 10px;
       width: max-content;
+      color: inherit;
+      border: 0;
+      background: transparent;
 
       p.value {
         color: #fff;
@@ -86,6 +89,15 @@
         span {
           color: rgba(45, 254, 77, 1);
           font-size: 16px;
+        }
+        .demoBadge {
+          background: rgba(76, 141, 255, 0.18);
+          border: 1px solid rgba(76, 141, 255, 0.5);
+          border-radius: 999px;
+          color: #a9c7ff;
+          font-size: 10px;
+          letter-spacing: .06em;
+          padding: 2px 6px;
         }
       }
     }
@@ -157,5 +169,66 @@
         height: 5rem;
       }
     }
+    button:focus-visible {
+      outline: 3px solid #80bfff;
+      outline-offset: 2px;
+    }
   }
+}
+
+.topbarContainer {
+  min-height: var(--header-height);
+  height: var(--header-height);
+  background: var(--color-surface-1);
+  border-bottom: 1px solid var(--color-border);
+  padding: 8px 16px;
+  z-index: 10;
+  .conversionDiv { min-width: 0; }
+  .payProfileTab { flex-shrink: 0; }
+  .demoBadge { font-variant-numeric: tabular-nums; }
+  &::after {
+    content: "DEMO · simulated trading";
+    color: var(--color-demo);
+    font-size: 12px;
+    letter-spacing: .04em;
+    white-space: nowrap;
+    margin-left: 8px;
+  }
+}
+
+@media (max-width: 767px) {
+  .topbarContainer {
+    height: 56px;
+    min-height: 56px;
+    padding: 4px 8px;
+    &::after { display: none; }
+  }
+}
+
+.topbarContainer {
+  font-family: var(--font-ui), Inter, system-ui, sans-serif;
+  background: var(--platform-surface, var(--color-surface-1));
+  border-bottom-color: var(--platform-border, var(--color-border));
+  .conversionDiv { overflow-x: auto; scrollbar-width: none; }
+  .conversionDiv::-webkit-scrollbar { display: none; }
+  .payProfileTab .demo { min-height: 48px; border-radius: 10px; }
+  .payProfileTab .demo:hover { background: var(--platform-surface-raised, #2a2d35); }
+  .payProfileTab .demo .dem span { font-size: 13px; font-weight: 600; }
+  .payProfileTab .demo .amount .value { font-variant-numeric: tabular-nums; font-size: 16px; font-weight: 650; }
+  .payProfileTab .profile { min-width: 48px; min-height: 48px; }
+  button:focus-visible { outline: 2px solid var(--platform-accent, #00e65c); outline-offset: 2px; }
+}
+.demo-account-control { position: relative; }
+.demo-account-popover { position: absolute; z-index: 100; top: calc(100% + 8px); right: 0; width: 260px; padding: 16px; background: #171c22; border: 1px solid #29313a; border-radius: 10px; color: #f4f7f9; box-shadow: 0 12px 32px rgba(0,0,0,.35); }
+.demo-account-popover p { margin: 8px 0; font-variant-numeric: tabular-nums; }
+.demo-account-popover button { min-height: 44px; margin-top: 8px; padding: 0 12px; border: 1px solid #343b44; border-radius: 8px; background: #20252b; color: #eef2f5; cursor: pointer; }
+.demo-account-popover button:hover { background: #2a3037; }
+.demo-account-popover small { display: block; color: #9aa6b2; margin-top: 8px; }
+.demo-refill-confirm { margin-top: 12px; padding-top: 10px; border-top: 1px solid #29313a; }
+
+@media (min-width: 1280px) {
+  .platformWrapper .topbarContainer { padding: 15px 19px 15px 20px; background: #141414; }
+  .platformWrapper .topbarContainer::after { display: none; }
+  .platformWrapper .topbarContainer .payProfileTab .demo { min-height: 60px; }
+  .platformWrapper .topbarContainer .payProfileTab .profile { width: 60px; height: 60px; min-width: 60px; min-height: 60px; }
 }

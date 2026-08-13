@@ -77,7 +77,6 @@ const AssetsMenu: React.FunctionComponent<AssetsMenuProps> = ({setIsDrawerOpen})
       <SearchBar className="assetsSearchbar" />
 
       <div className="assetsFilters">
-        <div className="filterButton">Favorites</div>
         <Select
           className="filterSelectlist"
           defaultValue="any"

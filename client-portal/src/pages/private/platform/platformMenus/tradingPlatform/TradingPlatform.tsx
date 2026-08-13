@@ -21,7 +21,7 @@ const TradingPlatformList = [
       },
       {
         id: 2,
-        content: "Why Should I Choose Tradx?",
+        content: "Why Should I Choose Beyvra?",
       },
       {
         id: 3,
@@ -57,7 +57,7 @@ const TradingPlatformList = [
       },
       {
         id: 2,
-        content: "Why Should I Choose Tradx?",
+        content: "Why Should I Choose Beyvra?",
       },
       {
         id: 3,

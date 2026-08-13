@@ -16,7 +16,7 @@ import { useCookies } from 'react-cookie';
 import useLogin from 'api/user/useLogin';
 import FormInput from '../components/FormInput';
 import KYCButton from '../components/Button';
-import { GlobalLoginMaxAge } from 'App';
+import { authCookieOptions } from 'security/authCookies';
 
 interface SignInFormProps {
   setForgotPasswordView: React.Dispatch<React.SetStateAction<boolean>>;
@@ -42,9 +42,10 @@ const EmailSignInForm: React.FC<SignInFormProps> = ({ handleNext }) => {
       toast.success(
         "Success! Login was successful."
       );
-      setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
-      setCookie("refresh_token", data.refresh);
-      setCookie("step", '')
+      const cookieOptions = authCookieOptions();
+      setCookie("access_token", data.access, cookieOptions);
+      setCookie("refresh_token", data.refresh, cookieOptions);
+      setCookie("step", '', cookieOptions)
       handleNext("next")
       // data?.user.is_walkthrough ? navigate('/platform') : navigate("/welcome");
 

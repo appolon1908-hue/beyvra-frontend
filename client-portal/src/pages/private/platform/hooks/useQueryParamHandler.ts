@@ -24,9 +24,8 @@ const useQueryParamHandler = ({
 }: UseQueryParamHandlerProps) => {
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-
   useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
     const transactionId = queryParams.get("t");
     const status = queryParams.get("s");
 
@@ -44,7 +43,7 @@ const useQueryParamHandler = ({
       // Clear the query parameters after processing
       window.history.replaceState(null, "", "#/platform");
     }
-  }, [location.search, history]);
+  }, [location.search, dispatch, setIsRightDrawerOpen, setIsRightDrawerContent, setIsRightSubDrawerOpen, setIsRightSubDrawerContent]);
 };
 
 export default useQueryParamHandler;

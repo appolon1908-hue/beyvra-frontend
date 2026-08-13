@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import getEnv from "utils/env";
+import { beyvraKycApi } from "api/generated/beyvra";
 import IKYC from "@interfaces/IKYC";
 
 interface PortfolioResponse {
@@ -29,28 +29,7 @@ export async function fetchPortfio(data: {
   token: string;
 
 }): Promise<PortfolioResponse> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-   
-
-      const response = await fetch(`${BASE_URL}/user/kyc/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${data.token}`,
-      },
-    });
-
-    const result = await response.json();
-    console.log("get portfolio", result)
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return beyvraKycApi.profile<PortfolioResponse>(data.token);
 }
  const usePortfolio = (props: usePortfoliorops): UseMutationResult<PortfolioResponse, unknown, { token: string }> => {
   const {

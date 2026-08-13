@@ -60,13 +60,13 @@ const AiAssetSummaryMenu = () => {
       <div className="assetHeader">
         <SecondaryButton
           className="favouriteBtn"
-          Title="Add to Favorites"
-          onClick={() => null}
+          Title="Favorites unavailable"
+          disabled
         />
         <PrimaryButton
           className="tradeBtn"
-          Title="Trade"
-          onClick={() => null}
+          Title="Open trade form"
+          disabled
         />
       </div>
       <div className="assetBody">

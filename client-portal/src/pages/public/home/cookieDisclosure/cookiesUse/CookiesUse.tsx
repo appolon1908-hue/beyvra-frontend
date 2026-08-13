@@ -5,7 +5,7 @@ import './cookiesUse.scss'
 const contentOne = (
     <div className='cookiesUseContentItem'>
         <h2>Cookie Name:  Cookies Configured</h2>
-        <p>TradX.com Internal Cookies</p>
+        <p>Beyvra.com Internal Cookies</p>
 
         <h2>Lawful Basis:</h2>
         <p>Strictly Necessary </p>

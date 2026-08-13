@@ -63,7 +63,7 @@ const UserExp = () => {
                 <img src={TetherBgIcon} alt="" />
                 <p>250 EUR</p>
               </div>
-              <p>{t("estTime")}: 2 hours</p>
+              <p>{t("estimatedHours", { count: 2 })}</p>
 
 
 

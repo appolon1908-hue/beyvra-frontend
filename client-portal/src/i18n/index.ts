@@ -8,8 +8,19 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
+    supportedLngs: ["en", "ar", "de", "es", "fr", "hi", "ja"],
     fallbackLng: "en",
-    debug: true,     
+    load: "languageOnly",
+    backend: {
+      loadPath: "/locales/{{lng}}/translation.json",
+    },
+    detection: {
+      order: ["querystring", "localStorage", "navigator", "htmlTag"],
+      caches: ["localStorage"],
+      lookupQuerystring: "lang",
+      lookupLocalStorage: "i18nextLng",
+    },
+    debug: false,
     interpolation: {
       escapeValue: false,
     },

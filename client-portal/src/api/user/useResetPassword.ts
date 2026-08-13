@@ -1,7 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-import getEnv from "utils/env";
+import { beyvraAuthApi } from "api/generated/beyvra";
+import { ApiError } from "api/errors";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 
 type ResetPasswordVariables = {
   uidb64?: string;
@@ -18,7 +20,7 @@ type useResetPasswordProps = {
     context: unknown
   ) => void;
   onError?: (
-    error: VerificationReponse,
+    error: Error,
     variables: ResetPasswordVariables,
     context: unknown
   ) => void;
@@ -26,28 +28,9 @@ type useResetPasswordProps = {
 };
 
 export async function fetchResetPassword(data: ResetPasswordVariables) {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(
-      `${BASE_URL}/user/password_reset_confirm/${data.uidb64}/${data.token}/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data.data),
-      }
-    );
-    const result = await response.json();
-
-    if (!response.ok) {
-      toast.error(result.detail);
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  if (!data.uidb64 || !data.token) throw new ApiError(400, "VALIDATION_ERROR");
+  try { return await beyvraAuthApi.resetPassword<VerificationReponse>(data.uidb64, data.token, data.data); }
+  catch (error) { logInternalError(error, { endpoint: "auth.password_reset" }); toast.error(toUserSafeErrorText(error, "auth")); throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN"); }
 }
 
 export const useResetPassword = (props: useResetPasswordProps) => {
@@ -59,7 +42,7 @@ export const useResetPassword = (props: useResetPasswordProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, VerificationReponse, ResetPasswordVariables>({
+  return useMutation<VerificationReponse, Error, ResetPasswordVariables>({
     mutationFn: fetchResetPassword,
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {

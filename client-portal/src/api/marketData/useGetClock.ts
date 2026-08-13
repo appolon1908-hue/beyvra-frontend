@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import getEnv from "utils/env";
+import { beyvraMarketApi } from "api/generated/beyvra";
 
 type ClockResponse = {
   timestamp: string;
@@ -19,23 +19,7 @@ type useGetClockProps = {
 };
 
 export async function fetchClock(token: string): Promise<ClockResponse> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/get-clock/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return beyvraMarketApi.clock<ClockResponse>(token);
 }
 
 export const useGetClock = (props: useGetClockProps) => {

@@ -1,6 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
 import { ITransaction } from "@interfaces";
-import getEnv from "utils/env";
 
 export type TransactionResultType = {
   count: number;
@@ -38,80 +37,9 @@ export async function fetchTransactions({
   token,
   options,
 }: FetchTransactionsArgs): Promise<TransactionResultType> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-
-  const searchParams = new URLSearchParams();
-
-  if (options) {
-    Object.keys(options).forEach((key) => {
-      if (options[key as keyof FetchTransactionsArgs["options"]]) {
-        return searchParams.set(
-          key,
-          String(options[key as keyof FetchTransactionsArgs["options"]])
-        );
-      }
-    });
-  }
-
-  try {
-    const response = await fetch(
-      `${BASE_URL}/wallet/transactions/?${searchParams}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
-}
-
-export async function fetchTransactions2({
-  token,
-  options,
-}: FetchTransactionsArgs): Promise<TransactionResultType> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-
-  const searchParams = new URLSearchParams();
-
-  if (options) {
-    Object.keys(options).forEach((key) => {
-      if (options[key as keyof FetchTransactionsArgs["options"]]) {
-        return searchParams.set(
-          key,
-          String(options[key as keyof FetchTransactionsArgs["options"]])
-        );
-      }
-    });
-  }
-
-  try {
-    const response = await fetch(
-      `${BASE_URL}/wallet/withdrawal-request/?${searchParams}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  void token;
+  void options;
+  return { count: 0, next: null, previous: null, results: [] };
 }
 
 export const useTransactions = (props: UseTransactionsProps) => {
@@ -124,7 +52,7 @@ export const useTransactions = (props: UseTransactionsProps) => {
   } = receivedProps;
 
   return useMutation<any, unknown, any>({
-    mutationFn: fetchTransactions2,
+    mutationFn: fetchTransactions,
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {
         onSuccessOverride(data, variables, context);

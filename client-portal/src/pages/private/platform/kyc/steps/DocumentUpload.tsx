@@ -75,7 +75,7 @@ const DocumnetUpload: React.FC<documentProps>  = ({handleNext}) => {
     mutateKYCData({token: cookies.access_token})
 
     
-  }, [])
+  }, [cookies.access_token, mutateKYCData])
   return (
     <div className='bg-[#152338] formContainer px-5  kyc-document flex justify-center items-center'>
       <div className='m-auto w-full border border-gray-900 bg-black-100'>

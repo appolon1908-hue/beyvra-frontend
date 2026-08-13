@@ -5,6 +5,7 @@ import ExecutiveIcon1 from '../../../../../assets/home/executiveIcon1.png'
 import ExecutiveIcon2 from '../../../../../assets/home/executiveIcon2.png' 
 import Slider from 'components/slider/Slider';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 const ExecutiveBonuses = () => {
     const settings_3 = {
         dots: false,
@@ -28,6 +29,7 @@ const ExecutiveBonuses = () => {
         }]
       };
       const {t} = useTranslation()
+      const navigate = useNavigate()
   return (
     <div className='executiveBonusesContainer'>
 
@@ -44,10 +46,10 @@ const ExecutiveBonuses = () => {
                     <img src={ExecutiveIcon1} alt="" />
                     <p>{t("clubMembershipPlan")}</p>
                     <span>50% {t("off")}</span>
-                    <button>{t("getBonus")}</button>
+                    <button type="button" onClick={() => navigate('/signIn')}>{t("getBonus")}</button>
                   </div>
                   <div className='rightSideExecutiveSliderContainer'>
-                      <button>{t("exclusive")}</button>
+                      <button type="button" onClick={() => navigate('/signIn')}>{t("exclusive")}</button>
                   </div>  
                 </div>
             </div>
@@ -57,10 +59,10 @@ const ExecutiveBonuses = () => {
                     <img src={ExecutiveIcon2} alt="" />
                     <p>{t("tradeDiscount")}</p>
                     <span>20% {t("off")}</span>
-                    <button>{t("getBonus")}</button>
+                    <button type="button" onClick={() => navigate('/signIn')}>{t("getBonus")}</button>
                   </div>
                   <div className='rightSideExecutiveSliderContainer'>
-                      <button>{t("exclusive")}</button>
+                      <button type="button" onClick={() => navigate('/signIn')}>{t("exclusive")}</button>
                   </div>
                 </div>
             </div>

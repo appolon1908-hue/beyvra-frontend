@@ -72,7 +72,7 @@ const AddAccountMenu: React.FunctionComponent<AddAccountMenuProps> = ({
     if (walletTypes.length <= 0) {
       mutate(cookies.access_token);
     }
-  }, [cookies.access_token]);
+  }, [cookies.access_token, mutate, walletTypes.length]);
   // useEffect(() => {
 
   // }, []);

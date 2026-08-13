@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import "./InfoBlockWithButton.scss";
 import { FC } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface InfoBlockWithButtonProps {
   item: {
@@ -14,12 +15,13 @@ interface InfoBlockWithButtonProps {
 
 const InfoBlockWithButton: FC<InfoBlockWithButtonProps> = ({ item }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
     <div className="infoBlockWithButtonContainer">
       <div>
         <h2>{t(item.title)}</h2>
         <span>{t(item.text)}</span>
-        <button>{t(item.buttonText)}</button>
+        <button type="button" onClick={() => navigate('/signIn')}>{t(item.buttonText)}</button>
       </div>
       {/* <img src={item.image} alt="" /> */}
 

@@ -12,8 +12,6 @@ import {
   NotificationIcon2,
   ReloadIcon,
   SettingsIcon2,
-  SignalsIcon,
-  TooltipIcon,
 } from "../../../../../assets/icons";
 import StoriesModal from "./components/Stories";
 import { StorieList, storiesList } from "./data";
@@ -29,6 +27,7 @@ import { revokeSession } from "api/user/logout";
 import { useAppDispatch } from "@store/hooks";
 import { setUser } from "@store/slices/user";
 import { setWallets } from "@store/slices/wallet";
+import { writeCompatibilityValue } from "compat/storageKeys";
 
 interface ProfileMenuProps {
   setIsRightSubDrawerOpen: Dispatch<SetStateAction<boolean>>;
@@ -82,13 +81,16 @@ const ProfileMenu: React.FunctionComponent<ProfileMenuProps> = ({
     dispatch(setWallets([]));
     removeCookie('access_token', { path: '/' });
     removeCookie('refresh_token', { path: '/' });
+    writeCompatibilityValue(localStorage, 'beyvra:last-logout', Date.now().toString(), 'codestra:last-logout');
     navigate("/signIn", { replace: true });
   };
 
 
   return (
     <div className={`${themeSelect}`}>
-      <div
+      <button
+        type="button"
+        aria-label="Open notifications"
         className="headerExtraIcon"
         onClick={() => {
           setIsRightSubDrawerOpen(true);
@@ -96,7 +98,7 @@ const ProfileMenu: React.FunctionComponent<ProfileMenuProps> = ({
         }}
       >
         <NotificationIcon2 />
-      </div>
+      </button>
       <div className="flexTraderProfile">
         <div className="trader">
           <p className="traderHead">
@@ -137,38 +139,6 @@ const ProfileMenu: React.FunctionComponent<ProfileMenuProps> = ({
             </div>
           ))}
         </Slider>
-      </div>
-
-      <div
-        className="profileCard-set"
-        onClick={() => {
-          setIsRightSubDrawerOpen(true);
-          setIsRightSubDrawerContent("traders-way");
-        }}
-      >
-        <div className="levelCard">
-          <div className="levelCardTitleContainer">
-            <SignalsIcon />
-            <p className="levelCardTitle">Beginner</p>
-          </div>
-          <div className="levelBar">
-            <p>LEVEL 1</p>
-            <p className="levelText">0/50 XP</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="statusTooltip">
-        <div
-          className="statusTooltipInner"
-          onClick={() => {
-            setIsRightSubDrawerOpen(true);
-            setIsRightSubDrawerContent("status");
-          }}
-        >
-          <p>What are Statuses?</p>
-          <TooltipIcon />
-        </div>
       </div>
 
       <div className="taskCards">

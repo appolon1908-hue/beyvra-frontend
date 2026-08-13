@@ -36,7 +36,7 @@ const Review = () => {
     <section className="testimonials" >
         <div className="container">
             <div className="section-header">
-                <h1> Join the Tradi community.</h1>
+                <h1> Join the Beyvra community.</h1>
                 <h2>In your country and connect with like-minded traders! </h2>
             
             </div>

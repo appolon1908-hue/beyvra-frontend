@@ -70,6 +70,27 @@
   }
 }
 
+.live-market-menu {
+  padding: 1rem;
+  color: #fff;
+
+  h2 { font-size: 1.1rem; margin: 0 0 .35rem; }
+  .market-menu-description { color: #a5acb7; font-size: .82rem; margin-bottom: 1rem; }
+  .market-menu-search input {
+    width: 100%; padding: .65rem .75rem; border: 1px solid #4b5260;
+    border-radius: .45rem; background: #15171c; color: #fff;
+  }
+  .market-menu-selected { color: #b9c2d0; margin: .9rem 0 .5rem; }
+  .live-market-list { display: grid; gap: .45rem; max-height: 60vh; overflow: auto; }
+  .live-market-list button {
+    display: flex; justify-content: space-between; gap: .75rem; width: 100%;
+    padding: .7rem .75rem; border: 1px solid #343946; border-radius: .45rem;
+    background: #20232a; color: #fff; text-align: left;
+  }
+  .live-market-list button.active { border-color: #2dd674; background: #173425; }
+  .live-market-list button span:last-child { color: #9fe8b8; }
+}
+
 .day.market-menu {
 
   .mainItemCardv2 {

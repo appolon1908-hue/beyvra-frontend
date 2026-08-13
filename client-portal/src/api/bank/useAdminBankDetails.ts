@@ -1,25 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import getEnv from "utils/env";
+import { beyvraBankApi } from "api/generated/beyvra";
 
 async function withdrawWireTransferFetcher(token: string): Promise<boolean> {
   try {
-    const BASE_URL = getEnv("VITE_API_BASE_URL");
-    const response = await fetch(`${BASE_URL}/bank_account/tradxio/`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      const errorKey = Object.keys(result)[0];
-      const [errorMessage] = result[errorKey] as string;
-
-      throw new Error(errorMessage);
-    }
-    return result;
+    return beyvraBankApi.details(token);
   } catch (error) {
     throw new Error(error as string);
   }

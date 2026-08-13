@@ -8,8 +8,10 @@ import piCard3  from '../../../../../assets/trading/Frame3.png'
 import TGlobe  from '../../../../../assets/trading/T-globe.png'
 import graphycon from '../../../../../assets/trading/graphycon.png'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 const TrackTradeLanding = () => {
     const {t} = useTranslation()
+    const navigate = useNavigate()
   return (
     <div className='trackTradeWrapper'>
         <div className='textWrapper'> 
@@ -19,7 +21,7 @@ const TrackTradeLanding = () => {
                 <img src={graphycon} alt="graph icon" />
                 <p>{t("copyTradeText")}</p>
             </div>
-            <button>{t("copyTrdBtn")}</button>
+            <button type="button" onClick={() => navigate('/signIn')}>{t("copyTrdBtn")}</button>
 
 
         </div>

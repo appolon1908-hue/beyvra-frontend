@@ -1,5 +1,5 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import getEnv from "utils/env";
+import { beyvraPortfolioApi } from "api/generated/beyvra";
 import IKYC from "@interfaces/IKYC";
 
 interface PortfolioResponse {
@@ -25,34 +25,9 @@ type UsePortfolioProps = {
 export async function fetchCryptoMarket(data: {
   token: string;
 }): Promise<PortfolioResponse> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
   const MAX_ITEMS = 1000
-  console.log("fetch market data function started", data.token);
-
-  try {
-    const response = await fetch(`${BASE_URL}/portfolio/crypto-market-data/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${data.token}`,
-      },
-    });
-
-    const result = await response.json();
-    console.log("crypto API response", response, result);
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    const limitedResults = {
-      ...result,
-      results: result.results.slice(0, MAX_ITEMS),
-    };
-
-    return limitedResults;
-    // return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  const result = await beyvraPortfolioApi.cryptoMarket<PortfolioResponse>(data.token);
+  return { ...result, results: result.results.slice(0, MAX_ITEMS) };
 }
 
 const useCrptoMarketData = (

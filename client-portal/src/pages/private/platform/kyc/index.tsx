@@ -107,7 +107,7 @@ useEffect(()=> {
     setStep(8)
   }
 }
-,[])
+,[queryParam])
   return(
     <div className="kycWrapper  relative">
       <KYCHeader  step={step}/>

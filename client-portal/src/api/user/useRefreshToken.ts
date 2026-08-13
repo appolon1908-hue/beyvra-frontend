@@ -1,6 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 interface TokenRefreshSuccess {
   access: string;
@@ -27,27 +26,8 @@ type useRefreshTokenProps = {
 
 export async function fethRefreshToken(
   data: RefreshTokenVariables
-): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/user/token/refresh/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      referrerPolicy: "no-referrer",
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      toast.error(result.detail);
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+): Promise<TokenRefreshSuccess> {
+  return beyvraAuthApi.refresh<TokenRefreshSuccess>(data);
 }
 
 export const useRefreshToken = (props: useRefreshTokenProps) => {

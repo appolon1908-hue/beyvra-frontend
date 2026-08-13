@@ -1,33 +1,29 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from "react-cookie";
+import { useTranslation } from "react-i18next";
 
 import "./landing.scss";
 import Herosection from "./herosection"
-import Review from "./review"
-import Footer from "./footer"
-import Aboutus from "./aboutus"
 import Navbar from '../home/commonComponents/navbar/Navbar';
-import Discover from './discover';
-import Explore from './explore';
-import Onyourway from './onyourway';
-import Withdrawcard from './withdrawcard';
-import Maingraph from './maingraph';
+import DemoHighlights from './demoHighlights';
 
 
 const LandingPage = () => {
 
   const navigate = useNavigate();
   const [cookies] = useCookies(['access_token']);
+  const { t } = useTranslation();
   const isAuthenticated = Boolean(cookies.access_token);
+  const wasAuthenticatedOnMount = useRef(isAuthenticated);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (wasAuthenticatedOnMount.current) {
       navigate('/platform'); // Redirect to main page if authenticated
     }
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
-  if (isAuthenticated) {
+  if (wasAuthenticatedOnMount.current) {
     return null;
   }
 
@@ -37,14 +33,14 @@ const LandingPage = () => {
     <div className="landingPage">
       <Navbar/>
       <Herosection />
-      <Maingraph />
-      <Aboutus />
-      <Discover />
-      <Withdrawcard />
-      <Explore />
-      <Onyourway />
-      <Review />
-      <Footer />
+      <DemoHighlights />
+      <footer className="demoFooter">
+        <p>{t("demoFooterDisclosure")}</p>
+        <nav aria-label="Legal">
+          <a href="/privacy">{t("privacy")}</a>
+          <a href="/terms">{t("terms")}</a>
+        </nav>
+      </footer>
     </div>
   );
 };

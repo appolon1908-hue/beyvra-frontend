@@ -21,18 +21,17 @@ const ResetPassword: React.FunctionComponent<ResetPasswordProps> = () => {
 
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const { handleSubmit, register } = useForm<IResetPasswordForm>();
+  const { handleSubmit, register, watch, formState: { errors } } = useForm<IResetPasswordForm>();
+  const newPassword = watch("new_password", "");
 
   const { mutate, isPending } = useResetPassword({
     onSuccess: (data) => {
       toast.success(data.detail);
       setTimeout(() => {
-        navigate("/platform");
+        navigate("/signIn", { replace: true });
       }, 2000);
     },
-    onError: (error) => {
-      console.log("error", error);
-    },
+    onError: () => { },
   });
 
   const onSubmit = handleSubmit((data) =>
@@ -49,30 +48,44 @@ const ResetPassword: React.FunctionComponent<ResetPasswordProps> = () => {
         <p className="formTitle">Reset Password</p>
       </Form.Item>
 
-      <Form layout="vertical" onFinish={onSubmit} style={{ width: "300px" }}>
+      {!uidb64 || !token ? (
+        <div style={{ width: "300px", textAlign: "center" }}>
+          <p>This password reset link is incomplete or invalid.</p>
+          <Button type="primary" onClick={() => navigate("/signIn", { replace: true })}>Return to login</Button>
+        </div>
+      ) : <Form layout="vertical" onFinish={onSubmit} style={{ width: "300px" }}>
         <Form.Item
-          name="new_password"
-          rules={[{ required: true, message: "Required" }]}
+          validateStatus={errors.new_password ? "error" : undefined}
+          help={errors.new_password?.message}
         >
           <input
             className="customInput"
             type={passwordVisible ? "text" : "password"}
             id="new_password"
             placeholder="New Password"
-            {...register("new_password")}
+            autoComplete="new-password"
+            {...register("new_password", {
+              required: "Password is required",
+              minLength: { value: 8, message: "Use at least 8 characters" },
+              maxLength: { value: 20, message: "Use no more than 20 characters" },
+            })}
           />
         </Form.Item>
 
         <Form.Item
-          name="new_password_confirm"
-          rules={[{ required: true, message: "Required" }]}
+          validateStatus={errors.new_password_confirm ? "error" : undefined}
+          help={errors.new_password_confirm?.message}
         >
           <input
             className="customInput"
             type={passwordVisible ? "text" : "password"}
             id="new_password_confirm"
             placeholder="Confirm Password"
-            {...register("new_password_confirm")}
+            autoComplete="new-password"
+            {...register("new_password_confirm", {
+              required: "Please confirm your password",
+              validate: (value) => value === newPassword || "Passwords do not match",
+            })}
           />
         </Form.Item>
         <div className="showPassContainer">
@@ -93,7 +106,7 @@ const ResetPassword: React.FunctionComponent<ResetPasswordProps> = () => {
         >
           Change Password
         </Button>
-      </Form>
+      </Form>}
     </div>
   );
 };

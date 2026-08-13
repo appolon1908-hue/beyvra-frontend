@@ -52,8 +52,8 @@ const Trading = () => {
         <div className="container">
         <TradingExperience  
         image={imageBgEve} 
-        title={"Use MT4 to trade with tradex.io"} 
-        text={"If you already have a tradex.io account, you are all set. Now you can simply install MT4 and add a trading account via your desktop markets.com platform. For more information on how to add MetaTrader trading account please click here. If you don’t have a markets.com account yet, don’t worry – registering is easy and fast."}
+        title={"Use MT4 to trade with beyvra.com"}
+        text={"If you already have a beyvra.com account, you are all set. Now you can simply install MT4 and add a trading account via your desktop markets.com platform. For more information on how to add MetaTrader trading account please click here. If you don’t have a markets.com account yet, don’t worry – registering is easy and fast."}
         button={true}
         />
 
@@ -149,9 +149,9 @@ const Trading = () => {
         </div>
         <TradingSteps
         step1="Sign up for a
-        Tradex.io account"
+        Beyvra.io account"
         step2='Login to 
-        Tradex.io'
+        Beyvra.io'
         step3="Select Copy Trading"
         step4="Review  Profile Stats"
         // step5="Select a profile to Copy "
@@ -160,9 +160,9 @@ const Trading = () => {
 
 <TradingSteps
         step1="Sign up for a
-        Tradex.io account"
+        Beyvra.io account"
         step2='Login to 
-        Tradex.io'
+        Beyvra.io'
         step3="Select Copy Trading"
         step4="Review  Profile Stats"
         step5="Select a profile to Copy "
@@ -214,7 +214,7 @@ const Trading = () => {
         title="How is Profit Calculated in ForexTrading?"
         text1='Profit in forex trading is calculated by subtracting the entry price from the exit price of a trade. This can be in either a positive or negative value depending on whether the trade resulted in a loss or gain. Forex traders will look to open a trade at a lower price and close it at a higher price, in order to turn a profit'
         text2="However, you don't need to do these calculations manually as
-tradex.io offers a commodity calculator that does the job for you. You simply need to input the necessary information, and the calculator will provide you with the estimate profit or loss amount. This makes the process simple and convenient, allowing you to focus on making informed trading decisions."
+beyvra.com offers a commodity calculator that does the job for you. You simply need to input the necessary information, and the calculator will provide you with the estimate profit or loss amount. This makes the process simple and convenient, allowing you to focus on making informed trading decisions."
         icon1={USUKICon}
         image={BgImage}
         icon2={UkIFlag}
@@ -227,7 +227,7 @@ tradex.io offers a commodity calculator that does the job for you. You simply ne
       <TrackTrade/>
     </div>
     <div className="container">
-      <MetaTrading title='Trade using MT4 with tradex.io'
+      <MetaTrading title='Trade using MT4 with beyvra.com'
       body='You can access popular and easy-to-use web trading platform MetaTrader 4 with your markets.com account. A complete listing of our trading conditions for trading via MetaTrader platforms'
       type= "mt5"/>
     </div>

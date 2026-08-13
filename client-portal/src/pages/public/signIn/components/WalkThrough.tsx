@@ -1,53 +1,34 @@
 import { useState } from "react";
 import "./WalkThrough.scss";
-import { useDispatch } from "react-redux";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
-import { LoginSuccess, useLogin } from "api/user/useLogin";
-import { GlobalLoginMaxAge } from "App";
-// Assuming you have these modal components
+import useDisableWalkThrough from "api/user/useDisableWalkthrough";
 
-const WalkThrough = ({ registerData }: { registerData: any }) => {
-  const [isModalOpen, setIsModalOpen] = useState(true);
+const WalkThrough = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = 10;
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [, setCookie] = useCookies(["access_token", "refresh_token", "step"]);
-  const [userData, setUserData] = useState<LoginSuccess | null>(null);
-  const [showOtp, setShowOTP] = useState(false);
+  const [cookies, , removeCookie] = useCookies(["access_token", "step"]);
 
-  const { mutate: loginMutate, isPending: isLoginPending } = useLogin({
-    onSuccess: (data) => {
-      if (data?.user?.two_factor_authentication_enabled) {
-        setUserData(data);
-        setShowOTP(true);
-      } else {
-        if (!data.access || !data.refresh || !data.user) return;
-        setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
-        setCookie("refresh_token", data.refresh);
-        setCookie("step", "");
-        data.user.is_walkthrough
-          ? navigate("/welcome")
-          : navigate("/platform");
-      }
+  const { mutate: completeWalkthrough, isPending } = useDisableWalkThrough({
+    onSuccess: () => {
+      removeCookie("step", { path: "/" });
+      navigate("/platform", { replace: true });
     },
   });
 
-  const handleClose = () => {
-    setIsModalOpen(false);
-    loginMutate(registerData); // Trigger login after modal is closed
+  const handleComplete = () => {
+    if (!cookies.access_token || isPending) return;
+    completeWalkthrough({ token: cookies.access_token });
   };
 
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
       setCurrentStep((prevStep) => prevStep + 1);
     } else {
-      handleClose(); // Login when the final step is completed
+      handleComplete();
     }
   };
-
-  if (!isModalOpen) return null;
 
   const renderModalContent = () => {
     switch (currentStep) {
@@ -70,22 +51,23 @@ const WalkThrough = ({ registerData }: { registerData: any }) => {
       case 8:
         return <Investements3ContentModal handleNext={handleNext} />;
       case 9:
-        return <CompleteContentModal handleNext={handleClose} />;
+        return <CompleteContentModal handleNext={handleComplete} />;
       default:
-        return <CompleteContentModal handleNext={handleClose} />;
+        return <CompleteContentModal handleNext={handleComplete} />;
     }
   };
 
   return (
     <div className="walkthrough-modal">
       <div className="walkthrough-content">
-        <button className="close-button" onClick={handleClose}>
-          X
+        <button className="close-button" onClick={handleComplete} disabled={isPending} aria-label="Skip training">
+          ×
         </button>
         <div className="modal-counter">{`${
           currentStep + 1
         }/${totalSteps}`}</div>
         {renderModalContent()}
+        {isPending && <div className="walkthrough-saving" role="status">Saving your progress…</div>}
       </div>
     </div>
   );
@@ -102,7 +84,7 @@ const WelcomeContentModal = ({ handleNext }: WalkthroughStepProps) => {
         We&#39;ll help you take your first steps on our online trading platform.
       </div>
       <div className="welcome-modal_button" onClick={handleNext}>
-        Start Traning
+        Start Training
       </div>
     </div>
   );
@@ -374,7 +356,7 @@ const CompleteContentModal = ({ handleNext }: WalkthroughStepProps) => {
           className="welcome-modal_button company-modal_button"
           onClick={handleNext}
         >
-          Complete Traning
+          Complete Training
         </div>
       </div>
     </div>

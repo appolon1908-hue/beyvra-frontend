@@ -1,6 +1,6 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
 import { INews } from "@interfaces";
-import getEnv from "utils/env";
+import { beyvraNewsApi } from "api/generated/beyvra";
 
 // Type for the fetchNews function's parameters
 type FetchNewsParams = {
@@ -24,25 +24,8 @@ type UseNewsProps = {
 
 // Function to fetch the news article data from the API
 export async function fetchNewsArticle({ token, articleId }: FetchNewsParams): Promise<INews> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  
-  try {
-    const response = await fetch(`${BASE_URL}/news/${articleId}/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `Failed to fetch the news article. HTTP status: ${response.status}`);
-    }
-
-    return response.json();
-  } catch (error) {
-    throw new Error((error as Error).message || "An unexpected error occurred while fetching the news article.");
-  }
+  if (!articleId) throw new Error("A news article id is required.");
+  return beyvraNewsApi.article<INews>(token, articleId);
 }
 
 // Custom hook to use the fetchNews function with react-query's useMutation

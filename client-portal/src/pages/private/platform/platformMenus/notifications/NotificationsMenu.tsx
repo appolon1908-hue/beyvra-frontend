@@ -21,10 +21,10 @@ const NotificationsMenu: React.FunctionComponent<
     },
     onError: (error) => { },
   });
-  const handleNotificationToggle = (data: INotification) => {
+  const handleNotificationToggle = (data: INotification, isEnabled: boolean) => {
 
     mutate({
-      data: {notification_id: data?.id},
+      data: {notification_id: data?.id, is_enabled: isEnabled},
       token: cookies.access_token,
     });
   };
@@ -38,7 +38,7 @@ const NotificationsMenu: React.FunctionComponent<
           <Toggle
             key={_i}
             label={notificationData?.name}
-            onChange={()=> handleNotificationToggle(notificationData)}
+            onChange={(checked) => handleNotificationToggle(notificationData, checked)}
             subtext={notificationData?.description}
             defaultChecked={notificationData?.is_enabled}
             infoText={notificationData?.name === "Push Notifications" ? "Why should I receive them?" :""}

@@ -29,6 +29,24 @@
   }
 }
 
+.paymentsMenu .paymentItem {
+  width: 100%;
+  border: 0;
+  color: inherit;
+  text-align: left;
+}
+
+.demo-funds-field {
+  display: grid;
+  gap: 6px;
+  margin: 16px 0;
+}
+
+.demo-funds-field .ant-select,
+.demo-funds-field .ant-input-number {
+  width: 100%;
+}
+
 .active{
   background: #30ec7e;
 }

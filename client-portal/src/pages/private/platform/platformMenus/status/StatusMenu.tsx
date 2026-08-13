@@ -64,8 +64,8 @@ const StatusMenu: React.FunctionComponent<StatusMenuProps> = ({}) => {
             </p>
             <PrimaryButton
               className="primebtn"
-              onClick={() => null}
               Title="Deposit EUR €500"
+              disabled
               icon={<OpenLockIcon />}
             />
           </div>
@@ -90,8 +90,8 @@ const StatusMenu: React.FunctionComponent<StatusMenuProps> = ({}) => {
             </p>
             <PrimaryButton
               className="primebtn"
-              onClick={() => null}
               Title="Deposit EUR €3000"
+              disabled
               icon={<OpenLockIcon />}
             />
           </div>

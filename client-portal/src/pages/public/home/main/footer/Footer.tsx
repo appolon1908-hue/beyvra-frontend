@@ -1,7 +1,5 @@
 import './footer.scss'
 
-import FooterIcon from '../../../../../assets/home/tradxlogo.png'
-
 import XIcon from '../../../../../assets/home/footerSocial/x.png'
 import FacebookIcon from '../../../../../assets/home/footerSocial/facebook.png'
 import InstagramIcon from '../../../../../assets/home/footerSocial/instagram.png'
@@ -44,7 +42,7 @@ const Footer = () => {
         <div className="footerBackgroundContainer">
 
         <div className="leftSideFooterContainer">
-            <img src={FooterIcon} alt="" />
+            <img src="/logo.svg" alt="Beyvra" />
         </div>
         
         <div className="rightSideFooterContainer">

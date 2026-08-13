@@ -67,7 +67,7 @@ import {
 
 export interface InitialAccountsListProps {
   id?: number;
-  icon?: JSX.Element;
+  icon?: React.ReactElement;
   title?: string;
   amount?: string;
 }

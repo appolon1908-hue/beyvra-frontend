@@ -6,25 +6,55 @@ body{
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 60px;
+  min-height: 100svh;
+  padding: 80px 20px 32px;
+  background: var(--color-canvas);
   @media (max-width: 768px) {
     padding-top: 20px;
   }
 
   .centerWrapper {
     overflow-y: auto;
-    width: 23rem;
+    width: min(100%, 30rem);
     max-height: 52.375rem;
     margin: 1.25rem;
     border: linear-gradient(179.91deg, #404040 0.08%, rgba(14, 14, 14, 0) 112.74%);
-    background: radial-gradient(100.15% 191.04% at 15.32% 0%, #171717 0%, #101010 66.17%);
+    background: var(--color-surface-1);
+    border: 1px solid var(--color-border);
     padding: 0rem 1.5rem 2em 1.5rem;
     border-radius: 1rem;
     @media (max-width: 768px) {
-      width: 23rem;
+      width: 100%;
       justify-content: center;
       flex-wrap: wrap;
       padding: 0rem 1rem;
+    }
+
+    .authBranding {
+      padding: 28px 0 12px;
+      text-align: left;
+
+      .authEyebrow {
+        color: var(--color-brand);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        color: var(--color-text);
+        font-size: 2rem;
+        line-height: 1.1;
+        margin: 8px 0;
+      }
+
+      p {
+        color: var(--color-text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin: 0;
+      }
     }
 
     .emailSentContainer {
@@ -101,12 +131,34 @@ body{
     .ant-form {
       width: 100% !important;
     }
+    .registration-intro {
+      margin-bottom: 1rem;
+
+      h2 {
+        color: #fff;
+        font-size: 1.25rem;
+        margin: 0 0 0.35rem;
+      }
+
+      p {
+        color: #9cb0c2;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        margin: 0;
+      }
+    }
     .ant-form-item {
       margin-bottom: 0;
 
       .ant-form-item-control {
         margin-bottom: 0.6rem;
       }
+    }
+    .ant-form-item label {
+      color: var(--color-text-secondary);
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 0.35rem;
     }
     input.loginInput,
     .ant-input-affix-wrapper {
@@ -120,6 +172,24 @@ body{
       &::placeholder {
         color: #9cb0c2;
         font-size: 0.9rem;
+      }
+    }
+    .password-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: -0.25rem 0 0.75rem;
+    }
+    .agreement-checkbox {
+      align-items: flex-start;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      gap: 0.6rem;
+
+      input {
+        accent-color: #2dfe4d;
+        margin-top: 0.2rem;
       }
     }
     .ant-input-affix-wrapper {
@@ -155,7 +225,9 @@ body{
       color: #fff;
       font-weight: 400;
     }
-    p.forgotPass {
+    .forgotPass {
+      background: transparent;
+      border: 0;
       cursor: pointer;
       color: #6aff41;
       font-weight: 400;
@@ -229,6 +301,23 @@ body{
     height: 0px;
   }
 }
+
+.auth-divider { display:flex; align-items:center; gap:12px; margin:18px 0 12px; color:var(--color-text-muted); font-size:12px; }
+.auth-divider::before, .auth-divider::after { content:""; height:1px; flex:1; background:var(--color-border); }
+.google-auth-button { width:100%; min-height:48px; border:1px solid var(--color-border-strong); border-radius:12px; background:var(--color-surface-2); color:var(--color-text); display:flex; align-items:center; justify-content:center; gap:10px; font-weight:600; cursor:pointer; }
+.google-auth-button:hover:not(:disabled) { background:var(--color-surface-3); }
+.google-auth-button:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.google-auth-button:disabled { opacity:.55; cursor:not-allowed; }
+.google-auth-mark { width:24px; height:24px; border-radius:50%; background:#fff; color:#4285f4; display:inline-flex; align-items:center; justify-content:center; font-weight:800; }
+.google-auth-hint, .google-auth-error { font-size:12px; margin:8px 0 0; color:var(--color-text-muted); }
+.google-auth-error { color:var(--color-negative); }
+.try-demo-button { width:100%; min-height:48px; margin-top:12px; border:1px solid var(--color-border-strong); border-radius:12px; background:transparent; color:var(--color-text); font-weight:600; cursor:pointer; }
+.try-demo-button:hover:not(:disabled) { background:var(--color-surface-2); }
+.try-demo-button:focus-visible { outline:none; box-shadow:var(--focus-ring); }
+.try-demo-button:disabled { opacity:.55; cursor:not-allowed; }
+.otp-verification-form { width:100%; }
+.otp-input { text-align:center; letter-spacing:.5em; font-size:1.5rem; font-variant-numeric:tabular-nums; }
+.otp-help { color:var(--color-text-secondary); font-size:.8rem; line-height:1.5; }
 
 .tabinactive{
   background-color: #242424;

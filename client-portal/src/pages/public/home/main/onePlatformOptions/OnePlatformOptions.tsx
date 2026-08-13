@@ -12,6 +12,7 @@ import Graph2Image from '../../../../../assets/home/graph2.png'
 import Graph3Image from '../../../../../assets/home/graph3.png'
 import Graph4Image from '../../../../../assets/home/graph4.png'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 
 const OnePlatformOptions = () => {
@@ -24,6 +25,7 @@ const OnePlatformOptions = () => {
       ];
 
       const {t} = useTranslation()
+      const navigate = useNavigate()
 
   return (
     <div className="platformOptionsContainer">
@@ -51,15 +53,15 @@ const OnePlatformOptions = () => {
 
         </div>
 
-        <button>{t("tradeCommodites")}</button>
+        <button type="button" onClick={() => navigate('/signIn')}>{t("tradeCommodites")}</button>
 
         <div className='assetTableContainer'>
         <div className="asset-table-container">
       <div className="asset-table-header">
-        <div>Asset</div>
-        <div>Sell</div>
-        <div>Buy</div>
-        <div>Change (%)</div>
+        <div>{t("asset")}</div>
+        <div>{t("sell")}</div>
+        <div>{t("buy")}</div>
+        <div>{t("changePercent")}</div>
       </div>
       {data.map((item, index) => (
         <div className="asset-table-row" key={index}>

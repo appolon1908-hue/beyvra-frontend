@@ -1,24 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import {  IUser } from "@interfaces";
-import getEnv from "utils/env";
+import { beyvraProfileApi } from "api/generated/beyvra";
 
-export async function disableUserWalkThrough( token: string): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
+export async function disableUserWalkThrough(token: string): Promise<IUser> {
   try {
-    const response = await fetch(`${BASE_URL}/user/disable_walkthrough/`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json' 
-      },
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
+    return await beyvraProfileApi.disableWalkthrough(token) as IUser;
   } catch (error) {
     throw new Error(error as string);
   }
@@ -38,7 +24,7 @@ export const useDisableWalkThrough = (props: useDisableWalkThroughProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, unknown, any>({
+  return useMutation<IUser, Error, { token: string }>({
     mutationFn: (variables) => disableUserWalkThrough(variables.token),
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {

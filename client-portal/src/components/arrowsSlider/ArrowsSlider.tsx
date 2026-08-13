@@ -39,7 +39,7 @@ const ArrowsSlider: FC<ArrowsSliderProps> = ({ children }) => {
     return () => {
       container?.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [scrollbarContainerRef]);
 
   const handleChevronLeftClick = () => {
     if (scrollbarContainerRef.current) {

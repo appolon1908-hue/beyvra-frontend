@@ -4,16 +4,17 @@ import TradingFunctionality from '../../../../../assets/home/tradeFunctionality.
 import CustomMarker1 from '../Indicators/customMarker1/CustomMarker1'
 import CustomMarker2 from '../Indicators/customMarker2/CustomMarker2'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 const Landing = () => {
     const {t} = useTranslation()
-    console.log(t);
+    const navigate = useNavigate()
   return (
     <div>
         <div className="landingHeaderTitle">
             <h2>{t("beTheMasterWithUs")}</h2>
             <span>{t("excelWithUs")}</span>
-            <button>{t("startTrading")}</button>
+            <button type="button" onClick={() => navigate('/signIn')}>{t("startTrading")}</button>
         </div>
         <div className='bottomGraphImageContainer'>
             <div className='homeGraphContainer'>

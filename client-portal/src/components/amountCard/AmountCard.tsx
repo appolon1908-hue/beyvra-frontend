@@ -24,7 +24,7 @@ const AmountCard: React.FC<ContentProps> = ({
   const storeAmountHandler = useCallback(() => {
     dispatch(setPaymentAmount(amount));
     setIsModalOpen && setIsModalOpen(false)
-  }, [amount]);
+  }, [amount, dispatch, setIsModalOpen]);
 
   return (
     <div className="amount-card" onClick={storeAmountHandler}>

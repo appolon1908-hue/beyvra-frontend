@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { IWalletType } from "@interfaces";
-import getEnv from "utils/env";
+import { beyvraWalletApi } from "api/generated/beyvra";
 
 type WalletTypeResponse = {
   
@@ -18,23 +18,7 @@ type useWalletTypesProps = {
 };
 
 export async function fetchTradeList(token: string) {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/trades/assets/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return beyvraWalletApi.tradeAssets(token);
 }
 
 export const useTradeList = (props: useWalletTypesProps) => {

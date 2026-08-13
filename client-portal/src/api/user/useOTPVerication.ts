@@ -1,30 +1,10 @@
 // import { IOTPForm, IUser } from "@interfaces";
 import { IOTPInputProps, IUser } from "@interfaces";
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
-export async function fethOTPVerification(data: IOTPInputProps): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/user/token/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      referrerPolicy: "no-referrer",
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      // toast.error(result.detail);
-      // throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+export async function fethOTPVerification(data: IOTPInputProps): Promise<LoginSuccess> {
+  return beyvraAuthApi.login<LoginSuccess>(data);
 }
 
 interface LoginSuccess {

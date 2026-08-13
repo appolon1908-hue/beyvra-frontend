@@ -8,10 +8,10 @@ const Footer = () => {
         <div className="container">
             
             <div className="footer__container">
-                <h1>TRADI</h1>
+                <h1>Beyvra</h1>
 
                 <p>
-                Tradi is a paper-trading platform that gives users access to demo financial instruments for learning and practice.
+                Beyvra is a paper-trading platform that gives users access to demo financial instruments for learning and practice.
                 </p>
 
                 <h4>Coderstra SRL</h4>
@@ -23,8 +23,8 @@ const Footer = () => {
             
             <div className="footer__container margintop">
 
-                <a href="/reg"><h4>Terms and Conditions</h4></a>
-                <a href="/prv"><h4>Privacy Policy</h4></a>
+                <a href="/terms"><h4>Terms and Conditions</h4></a>
+                <a href="/privacy"><h4>Privacy Policy</h4></a>
 
             </div>
 
@@ -126,8 +126,7 @@ const Footer = () => {
         </div>
 
         <div className="rightreserved">
-            <h4> <span>Tradi</span> | Owned and Controlled by Codestra.co
-            2026 © Tradi, All Rights Reserved </h4>
+            <h4><span>Beyvra</span> · 2026 © Beyvra, All Rights Reserved</h4>
         </div>
 
         

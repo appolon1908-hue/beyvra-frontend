@@ -1,8 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-
 import { IUser } from "@interfaces";
-import getEnv from "utils/env";
+import { beyvraProfileApi } from "api/generated/beyvra";
 
 type useUpdateUserProps = {
   onSuccess?: (data: IUser, variables: unknown, context: unknown) => void;
@@ -22,7 +20,6 @@ export async function fetcUpdateUser(
   data: UserData,
   token: string
 ): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
     const formData = new FormData();
 
@@ -36,27 +33,7 @@ export async function fetcUpdateUser(
       }
     });
 
-    const response = await fetch(`${BASE_URL}/user/me/`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      referrerPolicy: "no-referrer",
-      body: formData,
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      Object.keys(result).forEach((field) => {
-        const errors = result[field];
-        errors.forEach((errorMessage: string) => {
-          toast.error(`${field}: ${errorMessage}`);
-        });
-      });
-      throw new Error(`${result}`);
-    }
-    return result;
+    return await beyvraProfileApi.update(token, formData) as boolean;
   } catch (error) {
     throw new Error(error as string);
   }

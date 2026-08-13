@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-import getEnv from "utils/env";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 type PhoneVerificationVariables = {
   code: string;
@@ -27,26 +27,7 @@ export async function fetchPhoneVerify(
   data: PhoneVerificationVariables,
   token: string
 ) {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/user/verify_phone/`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      toast.error(result.detail);
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return beyvraAuthApi.verifyPhone(token, data);
 }
 
 export const usePhoneVerify = (props: usePhoneVerifyProps) => {

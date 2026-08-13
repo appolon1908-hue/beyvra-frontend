@@ -1,44 +1,32 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { ApiError } from "api/errors";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
+import { beyvraAuthApi } from "api/generated/beyvra";
+import type { IUser } from "@interfaces";
 
 export interface RegisterResponse {
-  id: number;
-  email: string;
+  access: string;
+  refresh: string;
+  user: IUser;
 }
 
-export async function fethRegister(data: Record<string, string>): Promise<RegisterResponse> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
+export async function fetchRegister(data: Record<string, string>): Promise<RegisterResponse> {
   try {
-    const response = await fetch(`${BASE_URL}/user/create/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      referrerPolicy: "no-referrer",
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      Object.keys(result).forEach((field) => {
-        const errors = result[field];
-
-        errors.forEach((errorMessage: string) => {
-          toast.error(`${field}: ${errorMessage}`);
-        });
-      });
-      throw new Error(`${result}`);
-    }
-    return result;
+    return await beyvraAuthApi.register<RegisterResponse>(data);
   } catch (error) {
-    throw new Error(error as string);
+    logInternalError(error, { endpoint: "auth.register" });
+    toast.error(toUserSafeErrorText(error, "auth"));
+    throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN");
   }
 }
 
+/** @deprecated Use fetchRegister. */
+export const fethRegister = fetchRegister;
+
 type useRegisterProps = {
-  onSuccess?: (data: unknown, variables: unknown, context: unknown) => void;
-  onError?: (error: unknown, variables: unknown, context: unknown) => void;
+  onSuccess?: (data: RegisterResponse, variables: Record<string, string>, context: unknown) => void;
+  onError?: (error: Error, variables: Record<string, string>, context: unknown) => void;
   [index: string]: any;
 };
 export const useRegister = (props: useRegisterProps) => {
@@ -51,7 +39,7 @@ export const useRegister = (props: useRegisterProps) => {
   } = receivedProps;
 
   return useMutation<RegisterResponse, Error, Record<string, string>>({
-    mutationFn: fethRegister,
+    mutationFn: fetchRegister,
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {
         onSuccessOverride(data, variables, context);
@@ -59,7 +47,6 @@ export const useRegister = (props: useRegisterProps) => {
     },
     onError: (error, variables, context) => {
       if (onErrorOverride) {
-        console.log(error, 'occured')
         onErrorOverride(error, variables, context);
       }
     },

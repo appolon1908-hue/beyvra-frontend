@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import getEnv from "utils/env";
 
 type FetcherData = { amount: number; walletId: string; token: string };
 
@@ -8,31 +7,8 @@ export async function stripeCheckoutFetcher({
   walletId,
   token,
 }: FetcherData): Promise<boolean> {
-  try {
-    const BASE_URL = getEnv("VITE_API_BASE_URL");
-    const response = await fetch(`${BASE_URL}/payment/stripe_checkout/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        amount: amount,
-        wallet_id: walletId,
-      }),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      const errorKey = Object.keys(result)[0];
-      const [errorMessage] = result[errorKey] as string;
-
-      throw new Error(errorMessage);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  void amount; void walletId; void token;
+  throw new Error("Payments are unavailable in the Beyvra Demo environment.");
 }
 
 type Props = {

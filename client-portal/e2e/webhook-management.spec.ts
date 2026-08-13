@@ -1,0 +1,33 @@
+import { expect, test } from "@playwright/test";
+
+test("verified users can manage webhook integrations through the current API contract", async ({ request, baseURL }) => {
+  test.skip(!process.env.STAGING_TEST_OTP_SECRET, "Approved staging OTP fixture is not configured");
+  const origin = baseURL ?? "http://127.0.0.1:8080";
+  const unique = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
+  const email = `webhook-api-${unique}@example.test`;
+  const password = "WebhookUi9!";
+  const registration = await request.post(`${origin}/api/v1/auth/register`, { data: { email, password, displayName: "Webhook UI", legalAccepted: true, locale: "en" } });
+  expect(registration.status()).toBe(202);
+  const pending = await registration.json();
+  const secret = process.env.STAGING_TEST_OTP_SECRET!;
+  const otpResponse = await request.get(`${origin}/api/v1/auth/test/otp?registrationId=${encodeURIComponent(pending.registrationId)}`, { headers: { "X-Staging-Test-OTP": secret ?? "" } });
+  expect(otpResponse.ok()).toBeTruthy();
+  const otp = await otpResponse.json();
+  const verified = await request.post(`${origin}/api/v1/auth/email-verification/verify`, { data: { registrationId: pending.registrationId, code: otp.code } });
+  expect(verified.ok()).toBeTruthy();
+  const login = await request.post(`${origin}/api/user/token/`, { data: { email, password } });
+  expect(login.ok()).toBeTruthy();
+  const token = (await login.json()).access;
+  const auth = { Authorization: `Bearer ${token}` };
+  const create = await request.post(`${origin}/api/notification/webhooks/`, { headers: auth, data: { url: "https://example.com/codestra-webhook", secret: "webhook-signing-secret-2026", categories: ["SECURITY"] } });
+  expect(create.ok(), await create.text()).toBeTruthy();
+  const webhook = await create.json();
+  const testDelivery = await request.post(`${origin}/api/notification/webhooks/${webhook.id}/test/`, { headers: auth, data: {} });
+  expect(testDelivery.ok(), await testDelivery.text()).toBeTruthy();
+  const deliveries = await request.get(`${origin}/api/notification/webhooks/${webhook.id}/deliveries/`, { headers: auth });
+  expect(deliveries.ok()).toBeTruthy();
+  const update = await request.patch(`${origin}/api/notification/webhooks/${webhook.id}/`, { headers: { ...auth, "Content-Type": "application/json" }, data: { is_active: false } });
+  expect(update.ok()).toBeTruthy();
+  const remove = await request.delete(`${origin}/api/notification/webhooks/${webhook.id}/`, { headers: auth });
+  expect(remove.ok()).toBeTruthy();
+});

@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import "./CommoditiesUpDown.scss";
 
 //img
@@ -29,12 +30,13 @@ const data = [
 
 const CommoditiesUpDown = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
     <div className="commoditiesUpDownContainer">
       <div className="commoditiesUpDownFirst">
         <h2>{t("whyTradeCommodityCFDs")}</h2>
         <span>{t("subWhyTradeCommodityCFDs")}</span>
-        <button>{t("startTrading")}</button>
+        <button type="button" onClick={() => navigate('/signIn')}>{t("startTrading")}</button>
       </div>
       <div className="commoditiesUpDownSecond">
         <img src={DdopsImg} alt="" />

@@ -4,6 +4,7 @@ import { ArrowLeftOS, ArrowRightOS } from "assets/icons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Slider from "components/slider/Slider";
+import { useNavigate } from "react-router-dom";
 
 interface CategorySliderProps {
   allPairsData: Array<{
@@ -38,6 +39,7 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
   losginDownData,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const ArrowButtonPrevious: React.FC<{ onClick: any }> = ({ onClick }) => {
     return (
       <button onClick={onClick} className="categoryPreviousSliderButton">
@@ -100,7 +102,7 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
               <div className="categorySliderTopLeftContainer">
                 <h2>{t(card.title)}</h2>
                 <span>{t(card.subtitle)}</span>
-                <button>{t(card.category).toLocaleUpperCase()}</button>
+                <button type="button" onClick={() => navigate('/signIn')}>{t(card.category).toLocaleUpperCase()}</button>
               </div>
               {/* right */}
               <div className="categorySliderTopRightContainer">
@@ -114,7 +116,7 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
             </div>
             {/* bottom */}
             <div className="categorySliderBottomContainer">
-              <button>{t("trade")}</button>
+              <button type="button" onClick={() => navigate('/signIn')}>{t("trade")}</button>
             </div>
           </div>
         ))}
@@ -124,7 +126,11 @@ const CategorySlider: React.FC<CategorySliderProps> = ({
 
   const [toggleContent, setToggleContent] = useState(0);
 
-  const toggleContentData = [AllPairs, <h1>content2</h1>, <h1>content3</h1>];
+  const toggleContentData = [
+    AllPairs,
+    <h1>{t("marketDataComingSoon")}</h1>,
+    <h1>{t("marketDataComingSoon")}</h1>,
+  ];
   return (
     <div className="categorySliderPageContainer">
       <div className="categorySliderTabContainer">

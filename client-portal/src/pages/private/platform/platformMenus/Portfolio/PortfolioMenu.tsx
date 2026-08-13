@@ -1,11 +1,25 @@
 import './portfolioMenu.scss'
 import AssetCard from './card/AssetCard'
-import { investMentPerformanceData } from './data/performacedData'
 import AssetSection from './tableAsset/AssetSection'
 import CardInfo from './card/CardInfo'
 import PortfolioHeader from './header/PortfolioHeader'
+import { useCookies } from 'react-cookie'
+import { usePortfolioSummary, type PortfolioSummary } from 'api/portfolio/usePortfolioSummary'
+import { toUserSafeErrorText } from 'errors/userSafeError'
 
 const PortfolioMenu = () => {
+    const [cookies] = useCookies(["access_token"])
+    const { data, isPending, isError, error, refetch } = usePortfolioSummary(cookies.access_token)
+
+    if (isPending) return <div className='portfolioMenu text-white' role='status'>Loading portfolio…</div>
+    if (isError) return (
+        <div className='portfolioMenu text-white' role='alert'>
+            <p>{toUserSafeErrorText(error, 'wallet')}</p>
+            <button type='button' onClick={() => refetch()}>Try again</button>
+        </div>
+    )
+    if (!data) return <div className='portfolioMenu text-white' role='status'>No portfolio data is available.</div>
+
     return (
         <div className='text-white portfolioMenu'>
             <PortfolioHeader />
@@ -17,19 +31,18 @@ const PortfolioMenu = () => {
                 <div className="grid md:grid-cols-2 gap-10">
                     <div className='w-full'>
                         <div className='w-full'>
-                            <CardInfo />
+                            <CardInfo totalBalance={data.total_balance} profitLoss={data.profit_loss} />
                         </div>
-                        <AssetSection />
+                        <AssetSection holdings={data.holdings} />
                     </div>
                     <div className=' grid sm:grid-cols-2 gap-6'>
-                        {investMentPerformanceData.map(item => (
+                        {data.distributions.length === 0 && <p>No investments yet.</p>}
+                        {data.distributions.map((item: PortfolioSummary["distributions"][number]) => (
                             <AssetCard
+                                key={item.name}
                                 value={item.value}
                                 percentage={item.percentage}
-                                investment={item.investment}
-                            // value={item.value}
-                            // percentage={(item.c - item.o).toFixed(2)}
-                            // investment={item.T}
+                                investment={item.name}
                             />
                         ))}
                     </div>

@@ -11,9 +11,13 @@ import Modal from "components/modal/Modal";
 import WarningIcon from "assets/icons/WarningIcon";
 
 import "./styles.scss";
-import { GlobalLoginMaxAge } from "App";
+import { authCookieOptions } from "security/authCookies";
 import useKyc from "api/kyc/useKycInfo";
 import { revokeSession } from "api/user/logout";
+import { beyvraAuthApi } from "api/generated/beyvra";
+import { logInternalError } from "errors/userSafeError";
+import { writeCompatibilityValue } from "compat/storageKeys";
+import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
 
 
 const idleTimeLimit = 15 * 60 * 1000; // 15 minutes in milliseconds
@@ -30,6 +34,36 @@ const RequireAuth = () => {
   ]);
   const [show, setShow] = useState(false);
   const [isIdle, setIsIdle] = useState(false);
+  const [bootstrap, setBootstrap] = useState<"BOOTING" | "ANONYMOUS" | "GUEST_READY" | "USER_READY" | "EXPIRED" | "ERROR">("BOOTING");
+  const [bootstrapError, setBootstrapError] = useState("");
+  const isGuestDemo = Boolean(cookies.access_token && (() => {
+    try { return JSON.parse(atob(cookies.access_token.split(".")[1])).guest_demo === true; } catch { return false; }
+  })());
+
+  useEffect(() => {
+    let disposed = false;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 8_000);
+    if (!cookies.access_token) {
+      setBootstrap("ANONYMOUS");
+      window.clearTimeout(timeout);
+      return () => controller.abort();
+    }
+    setBootstrap("BOOTING");
+    beyvraAuthApi.session<{ state?: string }>(cookies.access_token)
+      .then(async (payload) => {
+        if (disposed) return;
+        setBootstrap(payload.state === "guest.ready" ? "GUEST_READY" : "USER_READY");
+      })
+      .catch((error: unknown) => {
+        if (disposed) return;
+        setBootstrap(error instanceof DOMException && error.name === "AbortError" ? "ERROR" : "ERROR");
+        setBootstrapError(BeyvraErrorMapper.text(error, "auth"));
+        logInternalError(error, { endpoint: "auth.session_bootstrap" });
+      })
+      .finally(() => window.clearTimeout(timeout));
+    return () => { disposed = true; controller.abort(); window.clearTimeout(timeout); };
+  }, [cookies.access_token]);
 
   const { mutate: mutateKYC } = useKyc({
     onSuccess: (data) => {
@@ -48,7 +82,7 @@ const RequireAuth = () => {
       console.error("error refreshing the token", error?.refresh);
       removeCookie("access_token", { path: "/" });
       removeCookie("refresh_token", { path: "/" });
-      navigate("/signIn", { replace: true, state: { from: location } });
+      navigate("/session-expired", { replace: true, state: { from: location } });
     },
   });
 
@@ -57,7 +91,7 @@ const RequireAuth = () => {
       { refresh: cookies.refresh_token },
       {
         onSuccess: (data) => {
-          setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
+          setCookie("access_token", data.access, authCookieOptions());
           setIsIdle(false);
           window.location.reload();
         },
@@ -75,6 +109,7 @@ const RequireAuth = () => {
     dispatch(setWallets([]));
     removeCookie("access_token", { path: "/" });
     removeCookie("refresh_token", { path: "/" });
+    writeCompatibilityValue(localStorage, "beyvra:last-logout", Date.now().toString(), "codestra:last-logout");
     setIsIdle(false);
     navigate("/signIn", { replace: true });
   };
@@ -94,9 +129,8 @@ const RequireAuth = () => {
   };
 
   useEffect(() => {
-    mutateKYC({
-      token: cookies.access_token
-    });
+    if (!cookies.access_token) return;
+    if (!isGuestDemo) mutateKYC({ token: cookies.access_token });
     // Set up event listeners for user activity
     window.addEventListener('mousemove', resetTimer);
     window.addEventListener('keydown', resetTimer);
@@ -110,10 +144,10 @@ const RequireAuth = () => {
       window.removeEventListener('mousemove', resetTimer);
       window.removeEventListener('keydown', resetTimer);
     };
-  }, []);
+  }, [cookies.access_token, mutateKYC, isGuestDemo]);
 
   useEffect(() => {
-    if (cookies?.access_token) {
+    if (cookies?.access_token && !isGuestDemo && cookies.refresh_token) {
       const refreshInterval = 4 * 60 * 1000;
 
       const refresh = () => {
@@ -121,7 +155,7 @@ const RequireAuth = () => {
           { refresh: cookies.refresh_token },
           {
             onSuccess: (data) => {
-              setCookie("access_token", data.access, { maxAge: GlobalLoginMaxAge });
+              setCookie("access_token", data.access, authCookieOptions());
             },
           }
         );
@@ -145,10 +179,27 @@ const RequireAuth = () => {
 
       return () => clearInterval(intervalId);
     }
-  }, [cookies.access_token]);
+  }, [cookies?.access_token, cookies.refresh_token, mutate, setCookie, isGuestDemo]);
 
-  if (!cookies.access_token) {
-    return <Navigate to="/signIn" state={{ from: location }} />;
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== "beyvra:last-logout" && event.key !== "codestra:last-logout") return;
+      dispatch(setUser(null));
+      dispatch(setWallets([]));
+      removeCookie("access_token", { path: "/" });
+      removeCookie("refresh_token", { path: "/" });
+      navigate("/signIn?tab=login", { replace: true });
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [dispatch, navigate, removeCookie]);
+
+  if (bootstrap === "BOOTING") return <div className="route-bootstrap" role="status" aria-live="polite">Loading your Beyvra session…</div>;
+  if (bootstrap === "ERROR") return <main className="route-bootstrap route-bootstrap--error"><h1>Session unavailable</h1><p>{bootstrapError}</p><button type="button" onClick={() => window.location.reload()}>Try Again</button><button type="button" onClick={() => navigate("/login", { replace: true })}>Back to Login</button></main>;
+  if (bootstrap === "EXPIRED") return <main className="route-bootstrap route-bootstrap--error"><h1>Session expired</h1><p>Log in to continue.</p><button type="button" onClick={() => navigate("/login", { replace: true, state: { from: location } })}>Log In</button></main>;
+  if (bootstrap === "ANONYMOUS" || !cookies.access_token) {
+    const destination = `${location.pathname}${location.search}`;
+    return <Navigate to={`/login?redirect=${encodeURIComponent(destination)}`} replace state={{ from: location }} />;
   }
 
   return (

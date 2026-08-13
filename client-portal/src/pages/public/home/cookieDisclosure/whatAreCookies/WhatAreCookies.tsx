@@ -3,7 +3,7 @@ const WhatAreCookies = () => {
   return (
     <div className="whatAreCookiesContainer">
         <h2>2. WHAT ARE COOKIES AND HOW TO DISABLE THEM?</h2>
-        <p>Cookies are small text files stored on your computer when you visit certain web pages. At Finalto BVI we use cookies on our website Tradx.com  (the “Website”) to allow the Website to recognise you on subsequent visits, or to authorise other designated websites to recognise you.<br/><br/>
+        <p>Cookies are small text files stored on your computer when you visit certain web pages. At Finalto BVI we use cookies on our website Beyvra.com  (the “Website”) to allow the Website to recognise you on subsequent visits, or to authorise other designated websites to recognise you.<br/><br/>
 
 Cookies can be used by us for other purposes. For instance, they are used to remember your preferences on our Website, to remember your user ID on our Website, and to help you navigate between pages more efficiently. Cookies can also be used by us to collect information about webpages visited and content viewed by you, links and buttons clicked, URLs visited before and after you visit our Website.
 Much, though not all, of the data that is collected through cookies is anonymous, though some of it is designed to detect browsing patterns and approximate geographical location to improve your user experience.<br/><br/>

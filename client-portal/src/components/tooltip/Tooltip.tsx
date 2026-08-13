@@ -5,7 +5,7 @@ import "./tooltip.scss";
 import { useTooltip } from "hooks/useTooltip";
 
 type TooltipProps = {
-  elementRef: RefObject<HTMLElement>;
+  elementRef: RefObject<HTMLElement | null>;
   children: React.ReactNode;
 };
 

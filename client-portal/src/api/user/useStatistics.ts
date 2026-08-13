@@ -1,29 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { IUser, IUserStat } from "@interfaces";
-import getEnv from "utils/env";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 export async function fetchUserStat(token: string): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-
-  try {
-    const response = await fetch(`${BASE_URL}/user/trading_statistics/`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-
-      
-      throw new Error(`${result}`);
-    }
-
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return beyvraAuthApi.statistics(token);
 }
 
 type useProfileProps = {

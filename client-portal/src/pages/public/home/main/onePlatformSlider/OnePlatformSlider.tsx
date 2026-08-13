@@ -74,14 +74,14 @@ const ArrowButtonNext:React.FC<{onClick: any}>  = ({onClick }) => {
                 <div className='onePlatformSliderInnerItem'>
                   <h2>{t("forex")}</h2>
                   <img src={Forex} alt="Forex" />
-                  <button>More Info</button>
+                  <Link to="/trading/forexProfitCalculator"><button type="button">{t("moreInfo")}</button></Link>
                 </div>
             </div>
             <div className='onePlatformSliderItem'>
                 <div className='onePlatformSliderInnerItem'>
                   <h2>{t("stocks")}</h2>
                   <img src={Stocks} alt="Forex" />
-                  <button>More Info</button>
+                  <Link to="/markets/shares"><button type="button">{t("moreInfo")}</button></Link>
                 </div>
             </div>
             <div className='onePlatformSliderItem'>
@@ -89,7 +89,7 @@ const ArrowButtonNext:React.FC<{onClick: any}>  = ({onClick }) => {
                   <h2>{t("commodities")}</h2>
                   <img src={Commodities} alt="Forex" />
                   <Link to={'/markets/Commodities'}>
-                  <button>More Info</button>
+                  <button>{t("moreInfo")}</button>
                   </Link>
                 </div>
             </div>
@@ -98,7 +98,7 @@ const ArrowButtonNext:React.FC<{onClick: any}>  = ({onClick }) => {
                   <h2>{t("indices")}</h2>
                   <img src={Indices} alt="Forex" />
                   <Link to={"/markets/indices"}>
-                  <button>More Info</button>
+                  <button>{t("moreInfo")}</button>
                   </Link>
                 </div>
             </div>
@@ -107,7 +107,7 @@ const ArrowButtonNext:React.FC<{onClick: any}>  = ({onClick }) => {
                   <h2>{t("crypto")}</h2>
                   <img src={Crypto} alt="Forex" />
                   <Link to={"/markets/crypto"}>
-                  <button>More Info</button>
+                  <button>{t("moreInfo")}</button>
                   </Link>
                 </div>
             </div>
@@ -116,7 +116,7 @@ const ArrowButtonNext:React.FC<{onClick: any}>  = ({onClick }) => {
                   <h2>{t("ipos")}</h2>
                   <img src={Ipo} alt="Forex" />
                   <Link to={'/markets/ipos'}>
-                  <button>More Info</button>
+                  <button>{t("moreInfo")}</button>
                   </Link>
                 </div>
             </div>
@@ -125,7 +125,7 @@ const ArrowButtonNext:React.FC<{onClick: any}>  = ({onClick }) => {
                   <h2>{t('bonds')}</h2>
                   <img src={Bonds} alt="Forex" />
                   <Link to={'/markets/bonds'}>
-                  <button>More Info</button>
+                  <button>{t("moreInfo")}</button>
                   </Link>
                 </div>
             </div>

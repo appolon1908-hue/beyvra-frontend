@@ -14,7 +14,7 @@
   }
  
   @media (max-width: 767px) {
-    z-index: 100;
+    z-index: 1200;
     position: absolute;
     bottom: 0;
     height: auto;
@@ -45,6 +45,7 @@
       min-height: 3rem;
       cursor: pointer;
       margin-bottom: 0.5rem;
+      min-width: 3rem;
       svg {
         width: 1.425rem;
       }
@@ -68,6 +69,10 @@
           width: 1.3rem;
         }
       }
+    }
+    button:focus-visible {
+      outline: 3px solid #80bfff;
+      outline-offset: 2px;
     }
     button:hover {
       background-color:  rgba(103, 103, 103, 0.416);;
@@ -145,6 +150,31 @@
   }
 }
 
+@media (min-width: 1024px) {
+  .sidebar {
+    width: 64px;
+    background: var(--platform-rail, var(--color-canvas-elevated));
+    border-right: 1px solid var(--platform-border, var(--color-border));
+    .top { margin-top: 12px; gap: 8px; }
+    .top button { width: 56px; min-width: 56px; min-height: 56px; justify-content: center !important; padding: 8px; border-color: transparent; background: transparent; }
+    .top button .text { display: none; }
+    .logo { margin: 16px 8px 0; }
+  }
+}
+
+.sidebar {
+  font-family: var(--font-ui), Inter, system-ui, sans-serif;
+  .top button {
+    color: var(--platform-muted, #a0a5ad);
+    border-radius: 10px;
+    transition: background-color 160ms ease-out, color 160ms ease-out, transform 160ms ease-out;
+  }
+  .top button:hover { background: var(--platform-surface-raised, #2a2d35); color: var(--platform-text, #f3f6f4); transform: translateY(-1px); }
+  .top button:active { transform: scale(.98); }
+  .top button.active { color: var(--platform-accent, #00e65c); }
+  .top button:focus-visible { outline: 2px solid var(--platform-accent, #00e65c); outline-offset: 2px; }
+}
+
 .logo {
   display: flex;
   justify-content: center;
@@ -167,4 +197,30 @@
 
 .whiteIcons {
   filter: brightness(0) invert(1);
+}
+
+@media (min-width: 1440px) {
+  .platformWrapper .sidebar {
+    .logo { width: 100px; height: 98px; margin: 0; align-items: center; }
+    .logo svg { width: 38px; height: 24px; }
+    .top { width: 100%; margin: 0; gap: 0; }
+    .top button {
+      width: 100px;
+      min-width: 100px;
+      height: 90px;
+      min-height: 90px;
+      margin: 0;
+      padding: 16px 8px;
+      flex-direction: column;
+      justify-content: center !important;
+      gap: 10px !important;
+      border: 0;
+      border-radius: 0;
+    }
+    .top button .text { display: block; margin: 0; color: inherit; font-size: 16px; line-height: 18px; }
+    .top button .icon svg { width: 26px; height: 26px; }
+    .bottom { width: 60px; margin-bottom: 22px; }
+    .bottom .online .numberOnline,
+    .bottom .online .onl { font-size: 16px; line-height: 20px; }
+  }
 }

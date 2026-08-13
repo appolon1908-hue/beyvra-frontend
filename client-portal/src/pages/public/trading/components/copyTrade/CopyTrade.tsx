@@ -5,8 +5,10 @@ import flagIcon from '../../../../../assets/trading/flagIcon.png'
 import groupIcon from '../../../../../assets/trading/Group_3539.png'
 import ProfilePic from 'assets/trading/profile-pic.jpeg'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 const CopyTrade = () => {
     const {t} = useTranslation()
+    const navigate = useNavigate()
   return (
     <div className='copyTrade-wrapper'>
         <div className='copy-graph'> 
@@ -30,7 +32,7 @@ const CopyTrade = () => {
             <p>{t("whatIsCopTradeText")}</p>           
            
            <p className='extra-note'>{t("whatIsCopyTradeNote")}</p>
-            <button>{t("joinNow")}</button>
+            <button type="button" onClick={() => navigate('/signIn')}>{t("joinNow")}</button>
             </div>
 
         </div>
@@ -40,7 +42,11 @@ const CopyTrade = () => {
   )
 }
 
-export const ImageCard = ({avatar, name, profit, ROI, style} : {avatar: string,  name: string, profit: string, ROI: string, style?: {}}) => (
+export const ImageCard = ({avatar, name, profit, ROI, style} : {avatar: string,  name: string, profit: string, ROI: string, style?: {}}) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  return (
     <div style={style} className='pic-card'>
         <div className='pic-wrapper'>
         <img src={avatar} alt="pic" />
@@ -48,11 +54,12 @@ export const ImageCard = ({avatar, name, profit, ROI, style} : {avatar: string, 
         <div className='pic-info'>
             <p className='name'>{name}</p>
             <p className='fig'>{profit}</p>
-            <p className='ROI'>ROI <span>{ROI}</span> </p>
-            <button>follow</button>
+            <p className='ROI'>{t("roi")} <span>{ROI}</span> </p>
+            <button type="button" onClick={() => navigate('/signIn')}>{t("follow")}</button>
         </div>
     </div>
-)
+  );
+}
 
 
 

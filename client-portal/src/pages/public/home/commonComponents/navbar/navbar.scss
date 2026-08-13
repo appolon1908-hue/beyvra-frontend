@@ -24,14 +24,13 @@
         img{
             height: 1.6rem;
         }
-        .navContent{
+    .navContent{
             margin-right: 1rem;
             display: flex;
             @media (max-width: 932px) {
                 margin-right: 0.5rem;
               }
             @media (max-width: 730px) {
-                background-color: yellow;
                 display: none;
               }
               .navDropDownContainer {
@@ -145,6 +144,21 @@
             display: none;
           }
     }
+
+    .navSignIn{
+        align-items: center;
+        color: #ffffff;
+        display: inline-flex;
+        font-size: 14px;
+        font-weight: 600;
+        margin-right: 1rem;
+        min-height: 44px;
+        padding: 0 .5rem;
+        text-decoration: none;
+    }
+
+    .navSignIn:hover,
+    .navSignIn:focus-visible { color: #6aff41; }
     .navSearchContainer{
         display: flex;
         align-items: center;
@@ -246,6 +260,12 @@
 
 }
 .menuBarButton{
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: white;
+    justify-content: center;
+    padding: 0;
     display: none;
     @media (max-width: 730px) {
         display: flex;
@@ -300,8 +320,13 @@
         }
     }
     .menuCloseIcon{
+        align-items: center;
+        background: transparent;
+        border: 0;
+        color: white;
+        display: flex;
         position: absolute;
-        top: 4;
+        top: 16px;
         right: 0;
         margin-right: 14px;
     }
@@ -340,6 +365,11 @@
         }
         span{
             margin-top: 1.3rem;
+        }
+        > a:not(.primaryButton):not(.secondaryButton) {
+            color: white;
+            margin-top: 1.3rem;
+            text-decoration: none;
         }
         .mobileNavDropDownContainer{
             margin-top: 1.4rem;
@@ -448,6 +478,3 @@
   
   }
   
-
-
-

@@ -102,8 +102,8 @@ const AiMenu: React.FunctionComponent<AiMenuProps> = ({
             />
             <PrimaryButton
               className="lastBtn"
-              Title="Get Response"
-              onClick={() => null}
+              Title="AI assistant unavailable in staging"
+              disabled
             />
           </div>
         )}

@@ -1,4 +1,4 @@
-import { ChangeEventHandler, HTMLInputTypeAttribute, useEffect } from "react";
+import { ChangeEventHandler, HTMLInputTypeAttribute } from "react";
 import "./CreditCardInput.scss";
 import { 
     creditCardType, 
@@ -61,10 +61,6 @@ export const CreditCardNumberInput = ({
     return isArrayEmpty(returnArray)? CreditCardsList : returnArray;
   };
 
-
-  useEffect(() => {
-    filterCreditCardIcons();
-  }, [inputValue]);
 
   return (
     <div
@@ -183,4 +179,3 @@ export const CreditCardExpiryDate = ({
   };
   
   
-

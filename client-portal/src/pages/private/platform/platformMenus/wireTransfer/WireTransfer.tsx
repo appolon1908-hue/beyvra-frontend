@@ -30,7 +30,7 @@ const WireTransfer = () => {
 
   useEffect(() => {
     mutate(cookies.access_token)
-  }, [cookies.access_token])
+  }, [cookies.access_token, mutate])
 
   return (
 
@@ -51,7 +51,7 @@ const WireTransfer = () => {
           disabled
           textOnly
           //value={data?.last_name}
-          value="Codestra S.R.L"
+          value="Unavailable — demo only"
 
         />
         <Input

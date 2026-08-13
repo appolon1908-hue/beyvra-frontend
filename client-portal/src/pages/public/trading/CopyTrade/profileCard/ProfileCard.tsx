@@ -2,7 +2,9 @@ import React from 'react'
 import './profileCard.scss'
 import { Card, Col, Row } from 'antd'
 import pic from 'assets/trading/profile-pic.jpeg'
+import { useNavigate } from 'react-router-dom'
 const ProfileCard = () => {
+  const navigate = useNavigate()
   return (
     <Card className='profile-card'> 
         <Row gutter={[20, 10]} className='profile-top'>
@@ -28,8 +30,8 @@ const ProfileCard = () => {
             </Col>
         </Row>
         <div className='profile-buttons'>
-            <button className='copy'>Copy</button>
-            <button>Follow</button>
+            <button type="button" className='copy' onClick={() => navigate('/signIn')}>Copy</button>
+            <button type="button" onClick={() => navigate('/signIn')}>Follow</button>
         </div>
         <Row gutter={[10,10]} className='profile-bottom'>
             <Col span={8} className='stat'>

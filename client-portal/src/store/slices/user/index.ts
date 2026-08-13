@@ -31,7 +31,7 @@ export const userSlice = createSlice({
         ...state,
         user: {
           ...state.user,
-          is_walkthrough: true,
+          is_walkthrough: false,
         },
       };
     },

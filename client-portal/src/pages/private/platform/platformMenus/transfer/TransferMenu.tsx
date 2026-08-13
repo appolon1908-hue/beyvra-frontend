@@ -29,6 +29,11 @@ interface TransferMenuProps {
   setIsSucsessModalOpen: any;
 }
 
+const initialState = {
+  openFirstAccountSelection: false,
+  openSecondAccountSelection: false,
+};
+
 const TransferMenu: FC<TransferMenuProps> = ({
   isModalOpen,
   setIsModalOpen,
@@ -41,10 +46,6 @@ const TransferMenu: FC<TransferMenuProps> = ({
   const [isModalSelectAcountModalOpen, setIsModalSelectAcountModalOpen] =
     useState(false);
 
-  const initialState = {
-    openFirstAccountSelection: false,
-    openSecondAccountSelection: false,
-  };
   const [state, setState] = useReducer(
     (state: any, newState: any) => ({ ...state, ...newState }),
     initialState

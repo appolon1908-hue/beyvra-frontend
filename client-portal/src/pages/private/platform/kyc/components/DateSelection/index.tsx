@@ -40,7 +40,7 @@ const DateSelection: React.FC<dateSelectionProps> = ({setFormData, formData}) =>
         yearsArray
     } = state;
 
-    const formatInitialData = () => {
+    useEffect(() => {
         const dayListing = [];
         const monthListing = [];
         const yearListing = [];
@@ -60,13 +60,11 @@ const DateSelection: React.FC<dateSelectionProps> = ({setFormData, formData}) =>
             ++y;
         }
         setState({
-            ...state,
             daysArray: dayListing,
             monthsArray: monthListing,
             yearsArray: yearListing
         });
-        
-    };
+    }, [days, endYear, months, startYear]);
 
     const buildDays = (length: number) => {
        
@@ -128,10 +126,6 @@ const DateSelection: React.FC<dateSelectionProps> = ({setFormData, formData}) =>
             buildDays(len);
         }
     }
-
-    useEffect(()=> {
-        formatInitialData();
-    }, []);
 
     const handleMonthChange = (selectedMonth: string|number) => {
 

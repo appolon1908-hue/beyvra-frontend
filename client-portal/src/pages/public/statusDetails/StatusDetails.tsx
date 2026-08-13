@@ -14,6 +14,7 @@ import SecondaryButton from "../../../components/secondaryButton/SecondaryButton
 import "./statusDetails.scss";
 import Input from "../../../components/input/Input";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const FaqsList = [
   {
@@ -70,6 +71,10 @@ const FaqsList = [
 const StatusDetails = () => {
   const [value, setValue] = useState("");
   const [open, setOpen] = useState<number | null>(FaqsList[0]?.id);
+  const navigate = useNavigate();
+  const goBack = () => navigate(-1);
+  const openDeposit = () => navigate("/platform", { state: { openDeposit: true } });
+  const openSupport = () => navigate("/platform", { state: { openSupport: true } });
 
   const handleChange = (event: any) => {
     // Removing the $ sign from the start before setting the value
@@ -80,7 +85,7 @@ const StatusDetails = () => {
       <div className="navbar">
         <BigXMarkIcon />
         <div className="buttonContainer">
-          <SecondaryButton onClick={() => null} Title="Go Back" />
+            <SecondaryButton onClick={goBack} Title="Go Back" />
         </div>
       </div>
       <div className="statusText">
@@ -115,7 +120,7 @@ const StatusDetails = () => {
           </p>
           <PrimaryButton
             className="advancedButton"
-            onClick={() => null}
+            onClick={openDeposit}
             icon={<OpenLockIcon />}
             Title="Deposit EUR €3000"
           />
@@ -132,7 +137,7 @@ const StatusDetails = () => {
           </p>
           <PrimaryButton
             className="advancedButton"
-            onClick={() => null}
+            onClick={openDeposit}
             icon={<OpenLockIcon />}
             Title="Deposit EUR €3000"
           />
@@ -620,7 +625,7 @@ const StatusDetails = () => {
         />
         <PrimaryButton
           className="statusDepositButton"
-          onClick={() => null}
+          onClick={openDeposit}
           Title="Make a deposit"
         />
       </div>
@@ -634,7 +639,7 @@ const StatusDetails = () => {
           <PrimaryButton
             className="contactButton"
             Title="Contact Support"
-            onClick={() => null}
+            onClick={openSupport}
           />
         </div>
         <div className="FAQsSection">

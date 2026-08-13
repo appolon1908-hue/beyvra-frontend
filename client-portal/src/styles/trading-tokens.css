@@ -1,0 +1,27 @@
+:root {
+  --trading-bg-root: #0e131a;
+  --trading-bg-panel: #151c25;
+  --trading-bg-elevated: #1b2430;
+  --trading-bg-hover: #222d3a;
+  --trading-border-subtle: rgba(255, 255, 255, 0.07);
+  --trading-text-primary: #f2f5f8;
+  --trading-text-secondary: #9aa7b5;
+  --trading-accent: #3987f6;
+  --trading-positive: #20c997;
+  --trading-negative: #ff5f6d;
+  --trading-warning: #f5b942;
+  --trading-radius-sm: 6px;
+  --trading-radius-md: 9px;
+  --trading-space-1: 4px;
+  --trading-space-2: 8px;
+  --trading-space-3: 12px;
+  --trading-space-4: 16px;
+  --trading-header-height: 60px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useCookies } from "react-cookie";
 
 import { useAppDispatch, useAppSelector } from "@store/hooks";
@@ -26,6 +26,7 @@ import useNotificationList from "api/notification/useNotificationList";
 const useInitializeData = () => {
   const dispatch = useAppDispatch();
   const [cookies] = useCookies(["access_token","selectedAccount"]);
+  const initializedNotificationsFor = useRef<string | null>(null);
 
   // Fetch user data
   const { user } = useAppSelector(
@@ -71,10 +72,11 @@ const useInitializeData = () => {
   );
   const { mutate: notificationListMutate } = useNotificationList({
     onSuccess: (data) => {
-      // @ts-ignore
-      dispatch(setNotificationList(data.notifications));
+      dispatch(setNotificationList(data.notifications ?? []));
+      dispatch(setNotificationLoading(false));
     },
     onError: (error) => {
+      dispatch(setNotificationLoading(false));
       console.error("fetching notification list error", error);
     },
   });
@@ -94,15 +96,19 @@ const useInitializeData = () => {
       setWalletsLoading(true);
       walletMutate(cookies.access_token);
     }
-  }, [cookies.access_token, walletMutate]);
+  }, [cookies.access_token, walletMutate, wallets]);
 
   // Effect to fetch wallet data on login initializatio
   useEffect(() => {
-    if (cookies.access_token && (!notificationList || notificationList.length === 0)) {
-      setNotificationLoading(true);
+    if (
+      cookies.access_token &&
+      initializedNotificationsFor.current !== cookies.access_token
+    ) {
+      initializedNotificationsFor.current = cookies.access_token;
+      dispatch(setNotificationLoading(true));
       notificationListMutate(cookies.access_token);
     }
-  }, [cookies.access_token, notificationListMutate]);
+  }, [cookies.access_token, dispatch, notificationListMutate]);
 
 
 

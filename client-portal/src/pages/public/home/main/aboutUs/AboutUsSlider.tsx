@@ -72,13 +72,13 @@ const ArrowButtonNext:React.FC<{onClick: any}>  = ({onClick }) => {
                     <div className='aboutUsUpperQuoteImage'>
                       <img src={RightQuoteIcon} alt="" />
                     </div>
-                   <p>I was completely new to trading, and Tradex made it easy to learn the ropes. The educational resources were fantastic, and the user interface is so intuitive. </p>
+                   <p>{t("testimonialBeginner")}</p>
                     <div className='aboutUsLowerQuoteImage'>
                       <img src={LeftQuoteIcon} alt="" />
                     </div>
                   </div>
                   <div className='aboutUsSliderCardInfo'>
-                    <span>Sarah</span>
+                    <span>{t("testimonialAuthorSarah")}</span>
                     <div className='aboutUsRatingStarCard'>
                       <img src={RatingStarIcon} alt="" />
                       <img src={RatingStarIcon} alt="" />
@@ -95,13 +95,13 @@ const ArrowButtonNext:React.FC<{onClick: any}>  = ({onClick }) => {
                     <div className='aboutUsUpperQuoteImage'>
                       <img src={RightQuoteIcon} alt="" />
                     </div>
-                   <p>I was completely new to trading, and Tradex made it easy to learn the ropes. The educational resources were fantastic, and the user interface is so intuitive. </p>
+                   <p>{t("testimonialBeginner")}</p>
                     <div className='aboutUsLowerQuoteImage'>
                       <img src={LeftQuoteIcon} alt="" />
                     </div>
                   </div>
                   <div className='aboutUsSliderCardInfo'>
-                    <span>Sarah</span>
+                    <span>{t("testimonialAuthorSarah")}</span>
                     <div className='aboutUsRatingStarCard'>
                       <img src={RatingStarIcon} alt="" />
                       <img src={RatingStarIcon} alt="" />
@@ -118,13 +118,13 @@ const ArrowButtonNext:React.FC<{onClick: any}>  = ({onClick }) => {
                     <div className='aboutUsUpperQuoteImage'>
                       <img src={RightQuoteIcon} alt="" />
                     </div>
-                   <p>I was completely new to trading, and Tradex made it easy to learn the ropes. The educational resources were fantastic, and the user interface is so intuitive. </p>
+                   <p>{t("testimonialBeginner")}</p>
                     <div className='aboutUsLowerQuoteImage'>
                       <img src={LeftQuoteIcon} alt="" />
                     </div>
                   </div>
                   <div className='aboutUsSliderCardInfo'>
-                    <span>Sarah</span>
+                    <span>{t("testimonialAuthorSarah")}</span>
                     <div className='aboutUsRatingStarCard'>
                       <img src={RatingStarIcon} alt="" />
                       <img src={RatingStarIcon} alt="" />

@@ -47,6 +47,7 @@ const Download = () => {
 
   return (
     <div className="downloads">
+      <div aria-label={t("brandName")}><img src="/logo.svg" alt="" width="180" height="40" /><span>{t("brandName")}</span></div>
       <div onClick={() => navigation(-1)} className="go-back">
         <ArrowLeftIcon />
       </div>
@@ -128,7 +129,7 @@ const Download = () => {
             <img src="/downloads/IosLogo.svg" alt="iOSLogo" />
             <div className="elipse-ios"></div>
           </div>
-          <p>{t("iOS")}</p>
+          <p>{t("ios")}</p>
         </Col>
         <Col
           onClick={() => handleClick("Android")}

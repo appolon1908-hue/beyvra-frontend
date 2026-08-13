@@ -1,13 +1,12 @@
 import { createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { UserSliceState } from ".";
+import { beyvraProfileApi } from "api/generated/beyvra";
 
 // Thunks
 export const fetctUser = createAsyncThunk(
   "users/fetchById",
-  async (userId: number) => {
-    // EXAMPLE - IF WE FETCH
-    const response = await fetch(`https://reqres.in/api/users/${userId}`);
-    return await response.json();
+  async (token: string) => {
+    return { data: await beyvraProfileApi.legacyProfile(token) };
   }
 );
 

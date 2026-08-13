@@ -1,0 +1,33 @@
+.platform-overview { min-height:100svh; padding:clamp(96px,12vw,160px) 20px 80px; background:var(--color-canvas); color:var(--color-text); text-align:center; }
+.platform-overview__eyebrow { color:var(--color-brand); font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.platform-overview h1 { max-width:760px; margin:12px auto 20px; font-size:clamp(32px,5vw,56px); line-height:1.05; }
+.platform-overview__lead { max-width:680px; margin:0 auto; color:var(--color-text-secondary); font-size:18px; line-height:1.55; }
+.platform-overview__actions { display:flex; justify-content:center; gap:12px; margin:32px 0 64px; flex-wrap:wrap; }
+.platform-overview__actions a { min-height:52px; padding:0 22px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; font-weight:650; text-decoration:none; }
+.platform-overview__primary { background:var(--color-brand); color:var(--color-brand-contrast); }
+.platform-overview__secondary { border:1px solid var(--color-border-strong); color:var(--color-text); }
+.platform-overview__grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; max-width:1000px; margin:0 auto; text-align:left; }
+.platform-overview__grid article { padding:24px; border:1px solid var(--color-border); border-radius:16px; background:var(--color-surface-1); }
+.platform-overview__grid h2 { margin:0 0 8px; font-size:21px; }
+.platform-overview__grid p { margin:0; color:var(--color-text-secondary); line-height:1.5; }
+.platform-overview__disclosure { margin:40px auto 0; color:var(--color-text-muted); font-size:13px; }
+@media (max-width:700px) { .platform-overview__grid { grid-template-columns:1fr; } }
+
+/* Give wide monitors and headset browsers a useful reading width instead of
+   leaving the experience as a tiny desktop card in the middle of the view. */
+@media (min-width: 1920px) {
+  .platform-overview { padding-inline: clamp(40px, 8vw, 180px); }
+  .platform-overview h1 { max-width: 1100px; font-size: clamp(56px, 4vw, 76px); }
+  .platform-overview__lead { max-width: 860px; font-size: 21px; }
+  .platform-overview__grid { max-width: 1440px; gap: 24px; }
+  .platform-overview__grid article { padding: 32px; min-height: 180px; }
+}
+
+@media (min-width: 3200px) {
+  .platform-overview { padding-top: 220px; }
+  .platform-overview__grid { max-width: 1800px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+  .platform-overview__grid article { padding: 40px; min-height: 240px; }
+  .platform-overview__grid h2 { font-size: 28px; }
+  .platform-overview__grid p { font-size: 20px; }
+  .platform-overview__disclosure { font-size: 16px; }
+}

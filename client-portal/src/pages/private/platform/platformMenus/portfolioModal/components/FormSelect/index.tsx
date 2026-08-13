@@ -60,7 +60,7 @@ const FormSelect = ({
     } else {
       setSelectedItem(undefined);
     }
-  }, [selectedId]);
+  }, [data, selectedId]);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   

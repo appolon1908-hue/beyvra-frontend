@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { ITransaction } from "@interfaces";
 
-import getEnv from "utils/env";
+import { beyvraWalletApi } from "api/generated/beyvra";
 
 type FetchTransactionVariables = {
   transactionId: string;
@@ -21,23 +21,8 @@ type useSingleTransactionProps = {
 export async function fetchTransaction(
   data: FetchTransactionVariables
 ): Promise<ITransaction> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
-    const response = await fetch(
-      `${BASE_URL}/wallet/transactions/${data.transactionId}/`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${data.token}`,
-        },
-      }
-    );
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
+    return await beyvraWalletApi.transaction(data.token, data.transactionId) as ITransaction;
   } catch (error) {
     throw new Error(error as string);
   }

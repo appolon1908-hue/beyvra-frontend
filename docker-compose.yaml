@@ -1,14 +1,21 @@
 services:
   frontend:
+    image: ${FRONTEND_IMAGE:-front-frontend:local}
     build:
       context: ./client-portal
       dockerfile: Dockerfile.prod
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
         VITE_SOCKET_BASE_URL: ${VITE_SOCKET_BASE_URL:-AUTO}
+        VITE_PUBLIC_SITE_URL: ${VITE_PUBLIC_SITE_URL:-https://staging.beyvra.com}
+        VITE_BRAND_NAME: ${VITE_BRAND_NAME:-Beyvra}
+        VITE_REALTIME_V2_ENABLED: ${VITE_REALTIME_V2_ENABLED:-true}
+        VITE_REALTIME_V2_V1_FALLBACK_ENABLED: ${VITE_REALTIME_V2_V1_FALLBACK_ENABLED:-true}
     environment:
       VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
       VITE_SOCKET_BASE_URL: ${VITE_SOCKET_BASE_URL:-AUTO}
+      VITE_PUBLIC_SITE_URL: ${VITE_PUBLIC_SITE_URL:-https://staging.beyvra.com}
+      VITE_BRAND_NAME: ${VITE_BRAND_NAME:-Beyvra}
     networks:
       - trading-network
     ports:
@@ -25,7 +32,7 @@ services:
     profiles: ["edge"]
     restart: unless-stopped
     environment:
-      DOMAIN: ${DOMAIN:-localhost}
+      DOMAIN: ${DOMAIN:-staging.beyvra.com}
     ports:
       - "${HTTP_PORT:-80}:80"
       - "${HTTPS_PORT:-443}:443"

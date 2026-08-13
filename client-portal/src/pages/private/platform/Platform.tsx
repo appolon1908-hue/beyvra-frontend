@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Topbar from "../../../components/topbar/Topbar";
 import "./platform.scss";
@@ -34,10 +34,14 @@ import PlatformChartContainer from "./PlatformChartContainer";
 import useWebSocketTicket from "api/user/useWebSocketTicket";
 import { setWSTicket } from "@store/slices/user";
 import { useCookies } from "react-cookie";
+import { usePlatformConfig } from "api/platform/usePlatformConfig";
+import { stagingPlatformFeatures } from "config/platformFeatures";
+import { PlatformOverlayProvider, usePlatformOverlay } from "./PlatformOverlayContext";
 
 interface PlatformProps { }
 
-const Platform: React.FunctionComponent<PlatformProps> = () => {
+const PlatformContent: React.FunctionComponent<PlatformProps> = () => {
+  const { overlay } = usePlatformOverlay();
   const [windowDrawer, setWindowDrawer] = useState<WindowDrawer>(null)
   const [isWindowDrawerOpen, setIsWindowDrawerOen] = useState<boolean>(true)
 
@@ -54,13 +58,13 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
   const [currentDrawer, setCurrentDrawer] = useState<CurrentDrawerType>(null);
   const [leftSubDrawer, setLeftSubDrawer] = useState<LeftSubDrawer>(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [topbarHeight, setTopbarHeight] = useState(0);
   const [tradeFormHeight, setTradeFormHeight] = useState(0);
   const [mainSidebarWidth, setMainSidebarWidth] = useState(0);
   const [bottomSidebarHeight, setBottomSidebarHeight] = useState(0);
   const storedScale = localStorage.getItem("scale");
   const { togglePortfolioWindow } = useAppSelector(state => state.app)
   const [cookies] = useCookies(["access_token"]);
+  const { data: platformFeatures = stagingPlatformFeatures } = usePlatformConfig();
 
 
   const dispatch = useDispatch();
@@ -85,32 +89,39 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
     if (cookies.access_token) {
       webSocketTicketMutate(cookies.access_token);
     }
-  }, [cookies.access_token]);
+  }, [cookies.access_token, webSocketTicketMutate]);
 
   useEffect(() => {
+    if (overlay.type === "trade") {
+      setIsDrawerOpen(false);
+      setIsLeftSubDrawerOpen(false);
+      setCurrentDrawer(null);
+    }
+  }, [overlay.type]);
+
+  useLayoutEffect(() => {
     const topbarElement = document.getElementById("topbarContainer");
     const tradeFormElement = document.getElementById("tradeForm");
     const mainSidebarElement = document.getElementById("main_sidebar");
     const bottomSidebarElement = document.getElementById("bottom_sidebar");
 
-    if (topbarElement) {
-      setTopbarHeight(topbarElement.clientHeight);
-    }
+    const measure = () => {
+      setTradeFormHeight(tradeFormElement?.clientHeight ?? 0);
+      setBottomSidebarHeight(bottomSidebarElement?.clientHeight ?? 0);
+      setMainSidebarWidth(mainSidebarElement?.clientWidth ?? 0);
+    };
 
-    if (tradeFormElement && window.innerWidth <= 767) {
-      setTradeFormHeight(tradeFormElement.clientHeight);
-    }
-
-    if (bottomSidebarElement && window.innerWidth <= 767) {
-      setBottomSidebarHeight(bottomSidebarElement.clientHeight);
-    }
-
-    if (mainSidebarElement) {
-      setMainSidebarWidth(mainSidebarElement.clientWidth);
-    } else {
-      setMainSidebarWidth(0);
-    }
-  }, [window.innerWidth, storedScale]);
+    measure();
+    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : undefined;
+    [topbarElement, tradeFormElement, bottomSidebarElement, mainSidebarElement]
+      .filter(Boolean)
+      .forEach((element) => observer?.observe(element as Element));
+    window.addEventListener("resize", measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [storedScale]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -140,13 +151,15 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
         isLeftSubDrawerOpen={isLeftSubDrawerOpen}
         currentDrawer={currentDrawer}
         setCurrentDrawer={setCurrentDrawer}
+        features={platformFeatures}
         id={id ? id : ""}
       />
     );
   };
 
   return (
-    <div className="platformWrapper" data-theme={themeSelect}>
+    <main className="platformWrapper" data-theme={themeSelect} aria-labelledby="platform-page-title">
+      <h1 id="platform-page-title" className="platform-visually-hidden">Beyvra Demo Platform</h1>
       {/* <CustomModal/> */}
       {windowWidth >= 768 ? (
         <MainSidebar id="main_sidebar" />
@@ -162,9 +175,9 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
         }}
         open={isDrawerOpen}
         className={`${themeSelect} ml-106 leftMainDrawer`}
-        style={{ marginLeft: `${mainSidebarWidth}px` }}
+        style={{ marginLeft: `${mainSidebarWidth}px`, top: "64px", height: "calc(100dvh - 64px)" }}
         closeIcon={<CloseIcon />}
-        mask={false}
+        mask
         width={
           windowWidth <= 768 ? `calc(100% - ${mainSidebarWidth}px)` : `20.25rem`
         }
@@ -192,9 +205,9 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
         }}
         open={isLeftSubDrawerOpen}
         className={`ml-106 leftSubDrawer ${themeSelect}`}
-        style={{ marginLeft: `${mainSidebarWidth}px` }}
+        style={{ marginLeft: `${mainSidebarWidth}px`, top: "64px", height: "calc(100dvh - 64px)" }}
         closeIcon={<CloseIcon />}
-        mask={false}
+        mask
         width={
           windowWidth <= 768 ? `calc(100% - ${mainSidebarWidth}px)` : `20.25rem`
         }
@@ -286,7 +299,6 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
       <div className={isDrawerOpen ? "trade-section ml-378" : "trade-section"}>
 
         <Topbar
-          style={{ marginLeft: `${mainSidebarWidth}px` }}
           isDrawerOpen={isDrawerOpen}
           setIsRightDrawerOpen={setIsRightDrawerOpen}
           setIsRightDrawerContent={setIsRightDrawerContent}
@@ -297,13 +309,18 @@ const Platform: React.FunctionComponent<PlatformProps> = () => {
 
         <PlatformChartContainer
           themeSelect={themeSelect}
-          topbarHeight={topbarHeight}
           tradeFormHeight={tradeFormHeight}
           bottomSidebarHeight={bottomSidebarHeight}
         />
       </div>
-    </div>
+    </main>
   );
 };
+
+const Platform: React.FunctionComponent<PlatformProps> = () => (
+  <PlatformOverlayProvider>
+    <PlatformContent />
+  </PlatformOverlayProvider>
+);
 
 export default Platform;

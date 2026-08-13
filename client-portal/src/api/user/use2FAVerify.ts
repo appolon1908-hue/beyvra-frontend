@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import getEnv from "utils/env";
+import { beyvraAuthApi } from "api/generated/beyvra";
 import { LoginSuccess } from "./useLogin";
 
 type Props = {
@@ -13,27 +13,7 @@ type VerifyArgs = { loginToken?: string; token?: string; otp: string };
 type VerifyResponse = Partial<LoginSuccess> & { message?: string };
 
 export async function fetchVerify(data: VerifyArgs): Promise<VerifyResponse> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
-  try {
-    const response = await fetch(`${BASE_URL}/user/verify_mfa_code/`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        ...(data.token ? { Authorization: `Bearer ${data.token}` } : {}),
-      },
-      body: JSON.stringify({ otp: data.otp, ...(data.loginToken ? { login_token: data.loginToken } : {}) }),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      toast.error(result.detail);
-      throw new Error(`${result}`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(error as string);
-  }
+  return beyvraAuthApi.verifyMfa({ otp: data.otp, ...(data.loginToken ? { login_token: data.loginToken } : {}) }, data.token);
 }
 
 export const use2FAVerify = (props: Props) => {

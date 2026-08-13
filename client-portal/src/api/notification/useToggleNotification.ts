@@ -1,25 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { INotification } from "@interfaces";
-import getEnv from "utils/env";
+import { beyvraUserApi } from "api/generated/beyvra";
 
 export async function toggleSingeNotification(data: any, token: string): Promise<boolean> {
-  const BASE_URL = getEnv("VITE_API_BASE_URL");
   try {
-    const response = await fetch(`${BASE_URL}/notification/toggle_notification/`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`${result}`);
-    }
-    return result;
+    return await beyvraUserApi.toggleNotification(token, data) as boolean;
   } catch (error) {
     throw new Error(error as string);
   }
