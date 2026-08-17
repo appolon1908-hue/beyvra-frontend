@@ -1,4 +1,4 @@
-export type ErrorContext = "auth" | "trading" | "wallet" | "market" | "realtime" | "admin" | "generic";
+export type ErrorContext = "auth" | "registration" | "trading" | "wallet" | "market" | "realtime" | "admin" | "generic";
 export type ErrorSeverity = "info" | "warning" | "error";
 
 export type UserSafeError = {
@@ -29,6 +29,7 @@ const SAFE_ERRORS: Record<string, UserSafeError> = {
   MARKET_DATA_STALE: { title: "Market data unavailable", message: "Current market data is temporarily unavailable.", severity: "warning", retryable: true },
   PROVIDER_UNAVAILABLE: { title: "Service temporarily unavailable", message: "Please try again shortly.", severity: "warning", retryable: true },
   PROVIDER_NOT_AVAILABLE: { title: "Service temporarily unavailable", message: "Please try again shortly.", severity: "warning", retryable: true },
+  EMAIL_REGISTRATION_DISABLED: { title: "Registration temporarily unavailable", message: "Please try again shortly.", severity: "warning", retryable: true },
   STALE_PROVIDER_RESULT: { title: "Verification update required", message: "Please restart verification.", severity: "warning", retryable: false },
   INSUFFICIENT_AVAILABLE_BALANCE: { title: "Insufficient available balance", message: "Your available balance is not enough for this action.", severity: "error", retryable: false },
   ORDER_INVALID_STATE: { title: "Order cannot be changed", message: "This order can no longer be modified.", severity: "error", retryable: false },
@@ -60,6 +61,7 @@ function metadata(error: unknown): DiagnosticError {
 export function toUserSafeError(error: unknown, context: ErrorContext = "generic"): UserSafeError {
   const value = metadata(error);
   let code = value.code?.toUpperCase();
+  if (code && !SAFE_ERRORS[code]) code = undefined;
   if (!code) {
     if (value.status === 401) code = context === "auth" ? "INVALID_CREDENTIALS" : "AUTHENTICATION_REQUIRED";
     else if (value.status === 403) code = "AUTHORIZATION_DENIED";
@@ -72,6 +74,12 @@ export function toUserSafeError(error: unknown, context: ErrorContext = "generic
   const safe = SAFE_ERRORS[code ?? "UNKNOWN"] ?? SAFE_ERRORS.UNKNOWN;
   if (context === "auth" && code === "REQUEST_TIMEOUT") return { ...safe, title: "Sign-in is taking longer than expected" };
   if (context === "auth" && code === "PROVIDER_UNAVAILABLE") return { ...safe, title: "Sign-in temporarily unavailable" };
+  if (context === "registration" && ["REQUEST_TIMEOUT", "NETWORK_ERROR", "PROVIDER_UNAVAILABLE", "EMAIL_REGISTRATION_DISABLED"].includes(code ?? "")) {
+    return { ...safe, title: "Registration temporarily unavailable" };
+  }
+  if (context === "registration" && code === "IDEMPOTENCY_CONFLICT") {
+    return { ...safe, title: "Registration already in progress" };
+  }
   if (context === "realtime" && (code === "NETWORK_ERROR" || code === "PROVIDER_UNAVAILABLE")) {
     return { title: "Live updates temporarily unavailable", message: "Reconnecting…", severity: "warning", retryable: true };
   }

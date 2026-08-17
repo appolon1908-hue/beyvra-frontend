@@ -92,7 +92,7 @@ const SignUpForm = () => {
     setIsPending(true);
     beyvraAuthApi.registerDemo<{ registrationId?: string; maskedEmail?: string }>({ ...payload, displayName: `${payload.first_name} ${payload.last_name}`, legalAccepted: data.accepted_terms, locale: "en" })
       .then((result) => { if (result.registrationId) { setPendingRegistration({ id: result.registrationId, email: result.maskedEmail || payload.email }); toast.success("Check your email for a verification code."); } })
-      .catch((error) => { logInternalError(error, { endpoint: "auth.register_demo" }); toast.error(toUserSafeErrorText(error, "auth")); })
+      .catch((error) => { logInternalError(error, { endpoint: "auth.register_demo" }); toast.error(toUserSafeErrorText(error, "registration")); })
       .finally(() => setIsPending(false));
   };
 
