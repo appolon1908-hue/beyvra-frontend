@@ -54,6 +54,7 @@ const Transactions = lazy(() => import("./pages/private/transactions/Transaction
 const ResetPassword = lazy(() => import("pages/public/resetPassword/ResetPassword"));
 const EmailVerification = lazy(() => import("pages/public/emailVerification/EmailVerification"));
 const SessionExpired = lazy(() => import("pages/public/sessionExpired/SessionExpired"));
+const Logout = lazy(() => import("pages/public/logout/Logout"));
 const Home = lazy(() => import("pages/public/home/main/Home"));
 const StatusDetails = lazy(() => import("./pages/public/statusDetails/StatusDetails"));
 const IntegrationsAdmin = lazy(() => import("./pages/private/integrations/IntegrationsAdmin"));
@@ -151,7 +152,7 @@ const App: React.FunctionComponent = () => {
             <Route path="/forgot-password" element={<SignIn />} />
             <Route path="/verify-email" element={<EmailVerification />} />
             <Route path="/session-expired" element={<SessionExpired />} />
-            <Route path="/logout" element={<SignIn />} />
+            <Route path="/logout" element={<Logout />} />
             <Route path="/dashboard" element={<Navigate to="/platform" replace />} />
             <Route path="/terms" element={<ContentReview />} />
             <Route path="/privacy" element={<ContentReview />} />

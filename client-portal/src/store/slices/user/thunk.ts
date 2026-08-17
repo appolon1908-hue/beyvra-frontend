@@ -6,7 +6,7 @@ import { beyvraProfileApi } from "api/generated/beyvra";
 export const fetctUser = createAsyncThunk(
   "users/fetchById",
   async (token: string) => {
-    return { data: await beyvraProfileApi.legacyProfile(token) };
+    return { data: await beyvraProfileApi.profile(token) };
   }
 );
 

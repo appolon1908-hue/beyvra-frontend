@@ -20,14 +20,7 @@ import "./profileMenu.scss";
 import PortfolioModal from "../portfolioModal/PortfolioModal";
 
 
-import { useNavigate } from "react-router-dom";
-
-import { useCookies } from 'react-cookie';
-import { revokeSession } from "api/user/logout";
-import { useAppDispatch } from "@store/hooks";
-import { setUser } from "@store/slices/user";
-import { setWallets } from "@store/slices/wallet";
-import { writeCompatibilityValue } from "compat/storageKeys";
+import useLogout from "hooks/useLogout";
 
 interface ProfileMenuProps {
   setIsRightSubDrawerOpen: Dispatch<SetStateAction<boolean>>;
@@ -66,24 +59,8 @@ const ProfileMenu: React.FunctionComponent<ProfileMenuProps> = ({
   };
 
 
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-
-  const [cookies, , removeCookie] = useCookies(['access_token', 'refresh_token']);
-
-  const handleLogout = async () => {
-    try {
-      await revokeSession(cookies.access_token, cookies.refresh_token);
-    } catch (error) {
-      console.error("Unable to revoke the server session", error);
-    }
-    dispatch(setUser(null));
-    dispatch(setWallets([]));
-    removeCookie('access_token', { path: '/' });
-    removeCookie('refresh_token', { path: '/' });
-    writeCompatibilityValue(localStorage, 'beyvra:last-logout', Date.now().toString(), 'codestra:last-logout');
-    navigate("/signIn", { replace: true });
-  };
+  const { logout } = useLogout();
+  const handleLogout = () => { void logout(); };
 
 
   return (

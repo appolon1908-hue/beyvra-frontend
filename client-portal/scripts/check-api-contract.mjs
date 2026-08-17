@@ -36,9 +36,13 @@ for (const file of await sourceFiles(sourceRoot)) {
   const patterns = [
     /\$\{BASE_URL\}(\/[^`"']+)/g,
     /\$\{getEnv\(\s*["']VITE_API_BASE_URL["']\s*\)\}(\/[^`"']+)/g,
+    /codestraRequest(?:<[^>]+>)?\(\s*["']([^"']+)/g,
   ];
   for (const pattern of patterns) {
-    for (const match of source.matchAll(pattern)) endpoints.add(canonical(match[1]));
+    for (const match of source.matchAll(pattern)) {
+      const endpoint = match[1].startsWith("/") ? match[1] : `/${match[1]}`;
+      endpoints.add(canonical(endpoint));
+    }
   }
 }
 

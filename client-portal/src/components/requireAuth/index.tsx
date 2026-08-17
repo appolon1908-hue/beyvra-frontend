@@ -18,6 +18,7 @@ import { beyvraAuthApi } from "api/generated/beyvra";
 import { logInternalError } from "errors/userSafeError";
 import { writeCompatibilityValue } from "compat/storageKeys";
 import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
+import { ApiError } from "api/errors";
 
 
 const idleTimeLimit = 15 * 60 * 1000; // 15 minutes in milliseconds
@@ -50,20 +51,50 @@ const RequireAuth = () => {
       return () => controller.abort();
     }
     setBootstrap("BOOTING");
-    beyvraAuthApi.session<{ state?: string }>(cookies.access_token)
-      .then(async (payload) => {
+    const markReady = (payload: { state?: string }) => {
+      if (disposed) return;
+      setBootstrap(payload.state === "guest.ready" ? "GUEST_READY" : "USER_READY");
+    };
+    const bootstrapSession = async () => {
+      try {
+        markReady(await beyvraAuthApi.session<{ state?: string }>(cookies.access_token));
+      } catch (error: unknown) {
         if (disposed) return;
-        setBootstrap(payload.state === "guest.ready" ? "GUEST_READY" : "USER_READY");
-      })
-      .catch((error: unknown) => {
+        if (error instanceof ApiError && error.status === 401 && cookies.refresh_token) {
+          try {
+            const refreshed = await beyvraAuthApi.refresh<{ access: string }>(
+              { refresh: cookies.refresh_token },
+            );
+            if (!refreshed.access) throw new ApiError(401, "AUTHENTICATION_REQUIRED");
+            setCookie("access_token", refreshed.access, authCookieOptions());
+            markReady(await beyvraAuthApi.session<{ state?: string }>(refreshed.access));
+            return;
+          } catch (refreshError) {
+            if (disposed) return;
+            removeCookie("access_token", { path: "/" });
+            removeCookie("refresh_token", { path: "/" });
+            setBootstrap("EXPIRED");
+            logInternalError(refreshError, { endpoint: "auth.session_refresh" });
+            return;
+          }
+        }
+        if (error instanceof ApiError && error.status === 401) {
+          removeCookie("access_token", { path: "/" });
+          removeCookie("refresh_token", { path: "/" });
+          setBootstrap("EXPIRED");
+          return;
+        }
         if (disposed) return;
-        setBootstrap(error instanceof DOMException && error.name === "AbortError" ? "ERROR" : "ERROR");
+        setBootstrap("ERROR");
         setBootstrapError(BeyvraErrorMapper.text(error, "auth"));
         logInternalError(error, { endpoint: "auth.session_bootstrap" });
-      })
-      .finally(() => window.clearTimeout(timeout));
+      } finally {
+        window.clearTimeout(timeout);
+      }
+    };
+    void bootstrapSession();
     return () => { disposed = true; controller.abort(); window.clearTimeout(timeout); };
-  }, [cookies.access_token]);
+  }, [cookies.access_token, cookies.refresh_token, removeCookie, setCookie]);
 
   const { mutate: mutateKYC } = useKyc({
     onSuccess: (data) => {
@@ -161,10 +192,22 @@ const RequireAuth = () => {
         );
       };
 
-      const tokenPayload = JSON.parse(
-        atob(cookies?.access_token?.split(".")[1])
-      );
-      const tokenExpirationTime = new Date(tokenPayload?.exp * 1000);
+      let tokenPayload: { exp?: number } = {};
+      try {
+        tokenPayload = JSON.parse(atob(cookies.access_token.split(".")[1]));
+      } catch {
+        removeCookie("access_token", { path: "/" });
+        removeCookie("refresh_token", { path: "/" });
+        navigate("/session-expired", { replace: true, state: { from: location } });
+        return;
+      }
+      if (typeof tokenPayload.exp !== "number") {
+        removeCookie("access_token", { path: "/" });
+        removeCookie("refresh_token", { path: "/" });
+        navigate("/session-expired", { replace: true, state: { from: location } });
+        return;
+      }
+      const tokenExpirationTime = new Date(tokenPayload.exp * 1000);
       const currentTime = new Date();
       const timeUntilExpiration =
         tokenExpirationTime.getTime() - currentTime.getTime();

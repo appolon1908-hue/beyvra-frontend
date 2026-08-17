@@ -25,6 +25,50 @@ test.describe("public authentication recovery", () => {
     await page.getByRole("link", { name: "Sign in again" }).click();
     await expect(page).toHaveURL(/\/signIn\?tab=login/);
   });
+
+  test("logout revokes the refresh token and clears browser credentials", async ({ page, context, baseURL }) => {
+    const origin = new URL(baseURL ?? "http://127.0.0.1:8080");
+    await context.addCookies([
+      { name: "access_token", value: "test-access", domain: origin.hostname, path: "/", secure: origin.protocol === "https:", sameSite: "Strict" },
+      { name: "refresh_token", value: "test-refresh", domain: origin.hostname, path: "/", secure: origin.protocol === "https:", sameSite: "Strict" },
+    ]);
+    const revocation = page.waitForRequest((request) => request.url().includes("/api/v1/auth/token/logout/") && request.method() === "POST");
+    await page.route("**/api/v1/auth/token/logout/", (route) => route.fulfill({ status: 200, json: { detail: "Logged out" } }));
+
+    await page.goto("/logout", { waitUntil: "domcontentloaded" });
+    const request = await revocation;
+
+    expect(request.postDataJSON()).toEqual({ refresh: "test-refresh" });
+    await expect(page).toHaveURL(/\/signIn\?tab=login/);
+    const authCookies = (await context.cookies()).filter((cookie) => cookie.name === "access_token" || cookie.name === "refresh_token");
+    expect(authCookies).toEqual([]);
+  });
+
+  test("an expired access token refreshes before protected-route bootstrap fails", async ({ page, context, baseURL }) => {
+    const origin = new URL(baseURL ?? "http://127.0.0.1:8080");
+    const jwt = (payload: object) => `test.${Buffer.from(JSON.stringify(payload)).toString("base64url")}.signature`;
+    const expiredAccess = jwt({ exp: 1 });
+    const refreshedAccess = jwt({ exp: Math.floor(Date.now() / 1000) + 3600 });
+    await context.addCookies([
+      { name: "access_token", value: expiredAccess, domain: origin.hostname, path: "/", secure: origin.protocol === "https:", sameSite: "Strict" },
+      { name: "refresh_token", value: "valid-refresh", domain: origin.hostname, path: "/", secure: origin.protocol === "https:", sameSite: "Strict" },
+    ]);
+    await page.route("**/api/v1/auth/token/refresh/", (route) => route.fulfill({ status: 200, json: { access: refreshedAccess } }));
+    await page.route("**/api/v1/session", (route) => {
+      const authorization = route.request().headers().authorization;
+      return route.fulfill(
+        authorization === `Bearer ${refreshedAccess}`
+          ? { status: 200, json: { state: "user.ready" } }
+          : { status: 401, json: { code: "AUTHENTICATION_REQUIRED" } },
+      );
+    });
+
+    await page.goto("/platform", { waitUntil: "domcontentloaded" });
+
+    await expect(page.locator(".platformWrapper")).toBeVisible();
+    await expect(page.getByText("Session unavailable")).toHaveCount(0);
+    expect((await context.cookies()).find((cookie) => cookie.name === "access_token")?.value).toBe(refreshedAccess);
+  });
 });
 
 test.describe("authenticated critical UX", () => {

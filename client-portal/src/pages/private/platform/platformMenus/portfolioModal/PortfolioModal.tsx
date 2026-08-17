@@ -9,10 +9,8 @@ import useKyc from 'api/kyc/useKycInfo';
 import { useCookies } from 'react-cookie';
 import { IUserKYCProps } from '@interfaces';
 import { useAppDispatch, useAppSelector } from '@store/hooks';
-import { setUser } from '@store/slices/user';
-import { setWallets } from '@store/slices/wallet';
-import { useNavigate } from 'react-router-dom';
 import { setPortfolioWindow } from '@store/slices/app';
+import useLogout from 'hooks/useLogout';
 import PortfolioSideBar from './sidebar/SideBar';
 import Password from './password';
 import IKYC from '@interfaces/IKYC';
@@ -52,18 +50,8 @@ const PortfolioModal: React.FC<PortfolioModalProps> = ({ isModalOpen, setModalOp
   const [kycInfo, setKycInfo] = useState<string>("F")
   const dispatch = useAppDispatch()
 
-  const navigate = useNavigate()
-
-  const [, , removeCookie] = useCookies(["access_token", "refresh_token"]);
-
-
-  const handleLogout = () => {
-    dispatch(setUser(null));
-    dispatch(setWallets([]));
-    removeCookie("access_token");
-    removeCookie("refresh_token");
-    navigate("/");
-  };
+  const { logout } = useLogout()
+  const handleLogout = () => { void logout(); };
 
   const [selectedNav, setSelectedNav] = useState("personal_info")
   const [cookies] = useCookies(["access_token"])

@@ -49,6 +49,21 @@
 .platformWrapper .demo-order-form option,
 .platformWrapper .demo-order-form input { background-color: #20252b !important; color: #f3f6f4 !important; border: 1px solid #343b44; color-scheme: dark; }
 
+@media (max-width: 767px) {
+  .demo-account-page,
+  .demo-trades-page {
+    width: 100%;
+    padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+    overflow-x: hidden;
+  }
+
+  .demo-account-page section,
+  .demo-trades-page section {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 /* Beyvra platform shell: fixed rail, flexible chart and ticket. */
 @media (min-width: 1280px) {
   .platformWrapper {
@@ -627,6 +642,33 @@
   .platformWrapper .trade-assets-main-container .asset-drawer-backdrop { inset: 56px 0 64px; }
   .platformWrapper .trade-assets-main-container .trade-assets-dropdown-container { top: 0; left: 0; width: 100%; max-width: none; height: 100dvh; }
   .platformWrapper .leftMainDrawer { top: 0 !important; left: 0 !important; width: 100% !important; height: 100dvh !important; margin-left: 0 !important; }
+
+  /* Keep floating chart affordances in separate lanes on narrow screens. */
+  .platformWrapper .market-data-state {
+    top: 56px;
+    right: 8px;
+    left: 8px;
+    width: auto;
+    max-width: none;
+  }
+
+  .platformWrapper .trade-marker-summary {
+    top: 104px;
+    right: 8px;
+    max-width: calc(100% - 16px);
+  }
+
+  .platformWrapper .event-overlay-trigger {
+    top: 104px;
+    right: 8px;
+  }
+
+  .platformWrapper .chart-overlay-error {
+    top: 152px;
+    right: 8px;
+    left: 8px;
+    max-width: none;
+  }
 }
 // default mode-night
 .ml-106 {

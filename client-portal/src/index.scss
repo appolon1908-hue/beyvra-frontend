@@ -14,6 +14,90 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Application-wide layout safety rails. Individual screens still own their
+   visual layout, while these rules prevent long copy, media and form controls
+   from forcing a sibling outside its grid/flex track. */
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+}
+
+#root > div,
+main,
+section,
+article,
+header,
+footer,
+nav,
+aside,
+form,
+fieldset,
+[class*="container"],
+[class*="Container"],
+[class*="wrapper"],
+[class*="Wrapper"] {
+  min-width: 0;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+li,
+label,
+button,
+a {
+  overflow-wrap: anywhere;
+}
+
+table {
+  max-width: 100%;
+}
+
+@media (max-width: 767px) {
+  /* Third-party drawers/modals sometimes retain a desktop inline width. */
+  .ant-drawer-content-wrapper,
+  .ant-modal,
+  .ant-modal-content {
+    max-width: calc(100vw - 16px) !important;
+  }
+
+  .ant-modal {
+    margin-inline: auto;
+  }
+}
+
 
 /* Width of the entire scrollbar */
 ::-webkit-scrollbar {

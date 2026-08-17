@@ -1,10 +1,6 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useCookies } from "react-cookie";
-
-import { setUser } from "@store/slices/user";
-import { useAppDispatch, useAppSelector } from "@store/hooks";
-import { setWallets } from "@store/slices/wallet";
+import { useAppSelector } from "@store/hooks";
+import useLogout from "hooks/useLogout";
 
 import {
   CheckMark,
@@ -34,21 +30,13 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
   setIsRightSubDrawerOpen
 
 }) => {
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const [, , removeCookie] = useCookies(["access_token", "refresh_token"]);
+  const { logout } = useLogout();
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isUserModalOpen, setUserModalOpen] = useState<boolean>(false)
   const [isPortolioModalOpen, setPortfolioModalOpen] = useState<boolean>(false)
 
   const { themeSelect } = useAppSelector(state => state.themeBg)
-  const handleLogout = () => {
-    dispatch(setUser(null));
-    dispatch(setWallets([]));
-    removeCookie("access_token");
-    removeCookie("refresh_token");
-    navigate("/");
-  };
+  const handleLogout = () => { void logout(); };
 
   return (
     <div className={`${themeSelect} settingsMenu`}>

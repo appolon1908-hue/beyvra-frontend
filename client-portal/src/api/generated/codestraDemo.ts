@@ -132,16 +132,15 @@ export const codestraAuthApi = {
 };
 
 export const codestraProfileApi = {
-  profile: (token: string) => codestraRequest("v1/me/", { token }),
-  legacyProfile: <T>(token: string) => codestraRequest<T>("user/profile/", { token }),
+  profile: <T>(token: string) => codestraRequest<T>("v1/me/", { token }),
   update: (token: string, body: FormData | Record<string, unknown>) => codestraRequest("v1/me/", { method: "PATCH", token, body: body instanceof FormData ? body : JSON.stringify(body) }),
   changePassword: (token: string, body: unknown) => codestraRequest("v1/auth/password_change/", { method: "POST", token, body: JSON.stringify(body) }),
   disableWalkthrough: (token: string) => codestraRequest("v1/auth/disable_walkthrough/", { method: "PUT", token }),
 };
 
 export const codestraIntegrationsApi = {
-  crmConnections: <T>(token: string) => codestraRequest<T>("integrations/crm/connections", { token }),
-  importUsers: <T>(token: string, body: FormData, idempotencyKey: string) => codestraRequest<T>("integrations/users/imports", { method: "POST", token, body, idempotencyKey }),
+  crmConnections: <T>(token: string) => codestraRequest<T>("v1/integrations/crm/connections", { token }),
+  importUsers: <T>(token: string, body: FormData, idempotencyKey: string) => codestraRequest<T>("v1/users/imports", { method: "POST", token, body, idempotencyKey }),
 };
 
 export const codestraKycApi = {
