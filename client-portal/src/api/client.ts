@@ -24,6 +24,8 @@ export async function authenticatedRequest<T>(
   const timeout = globalThis.setTimeout(() => controller.abort(), timeoutMs);
   const sanitizedHeaders = new Headers(requestInit.headers);
   sanitizedHeaders.delete("Authorization");
+  sanitizedHeaders.delete("X-CSRFToken");
+  sanitizedHeaders.delete("X-Request-ID");
   const abortFromCaller = () => controller.abort();
   callerSignal?.addEventListener("abort", abortFromCaller, { once: true });
   try {
@@ -35,9 +37,9 @@ export async function authenticatedRequest<T>(
       headers: {
         Accept: "application/json",
         ...(requestInit.body ? { "Content-Type": "application/json" } : {}),
+        ...Object.fromEntries(sanitizedHeaders.entries()),
         ...(csrfToken ? { "X-CSRFToken": csrfToken } : {}),
         "X-Request-ID": requestId,
-        ...Object.fromEntries(sanitizedHeaders.entries()),
       },
     });
     const payload = await response.json().catch(() => ({}));
