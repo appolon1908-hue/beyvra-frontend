@@ -13,9 +13,12 @@ let csrfRequest: Promise<string> | null = null;
 
 export const getBffCsrfToken = async (): Promise<string> => {
   if (!csrfRequest) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 8_000);
     csrfRequest = fetch(getApiUrl("v1/auth/oidc/csrf/"), {
       credentials: "include",
       headers: { Accept: "application/json" },
+      signal: controller.signal,
     })
       .then(async (response) => {
         if (!response.ok) throw new Error("CSRF_BOOTSTRAP_FAILED");
@@ -26,7 +29,8 @@ export const getBffCsrfToken = async (): Promise<string> => {
       .catch((error) => {
         csrfRequest = null;
         throw error;
-      });
+      })
+      .finally(() => window.clearTimeout(timeout));
   }
   return csrfRequest;
 };

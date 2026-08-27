@@ -146,7 +146,7 @@ const App: React.FunctionComponent = () => {
             <Route path="/trading" element={<ContentReview />} />
             <Route path="/downloads" element={<Download />} />
             <Route path="/signIn" element={<SignIn />} />
-            <Route path="/login" element={<Navigate to="/signIn?tab=login" replace />} />
+            <Route path="/login" element={<SignIn />} />
             <Route path="/register" element={<Navigate to="/signIn?tab=registration" replace />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/password-reset" element={<PasswordResetRedirect />} />

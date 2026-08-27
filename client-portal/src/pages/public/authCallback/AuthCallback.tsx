@@ -6,12 +6,17 @@ import { beyvraAuthApi } from "api/generated/beyvra";
 import { authCookieOptions } from "security/authCookies";
 import { BFF_SESSION_MARKER } from "security/bffSession";
 
-const ALLOWED_DESTINATIONS = new Set([
-  "/platform",
-  "/platform/trades",
-  "/platform/profile",
-  "/platform/settings",
-]);
+const safeDestination = (value: string) => {
+  try {
+    const parsed = new URL(value, window.location.origin);
+    return parsed.origin === window.location.origin
+      && (parsed.pathname === "/platform" || parsed.pathname.startsWith("/platform/"))
+      ? `${parsed.pathname}${parsed.search}`
+      : "/platform";
+  } catch {
+    return "/platform";
+  }
+};
 
 const AuthCallback = () => {
   const [searchParams] = useSearchParams();
@@ -28,7 +33,7 @@ const AuthCallback = () => {
         // access and refresh tokens remain in Secure/HttpOnly backend cookies.
         setCookie("access_token", BFF_SESSION_MARKER, authCookieOptions(false));
         const requested = searchParams.get("next") || "/platform";
-        window.location.replace(ALLOWED_DESTINATIONS.has(requested) ? requested : "/platform");
+        window.location.replace(safeDestination(requested));
       })
       .catch(() => {
         if (!cancelled) setError("We could not establish your Beyvra session. Please try again.");

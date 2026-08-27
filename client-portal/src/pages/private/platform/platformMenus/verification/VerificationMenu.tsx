@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "@store/hooks";
 import { complianceDisplayState, ComplianceRequirement, useComplianceProfile, useComplianceRealtime, useComplianceRequirements } from "api/compliance/useCompliance";
 import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
 import { RightSubDrawerContent } from "../../types";
@@ -17,7 +18,8 @@ export const ComplianceStatusContent=({state,requirements,onContinue}:{state:key
 
 const VerificationMenu=(_props:VerificationMenuProps)=>{
   const [cookies]=useCookies(["access_token"]); const navigate=useNavigate();
-  useComplianceRealtime(cookies.access_token);
+  const userId = useAppSelector((state) => state.user.user?.id);
+  useComplianceRealtime(cookies.access_token, userId == null ? undefined : String(userId));
   const profile=useComplianceProfile(cookies.access_token); const requirements=useComplianceRequirements(cookies.access_token);
   if(profile.isLoading) return <div className="verificationsContainer max-w-3xl m-auto" role="status">Loading verification status…</div>;
   if(profile.error||!profile.data) return <div className="verificationsContainer max-w-3xl m-auto" role="alert">{BeyvraErrorMapper.text(profile.error,"generic")}</div>;
