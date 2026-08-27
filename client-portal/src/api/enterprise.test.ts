@@ -33,7 +33,13 @@ describe("enterprise API BFF boundary", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
-    await expect(enterpriseApi.createWatchlist("Primary")).rejects.toMatchObject({ code: "OFFLINE_MUTATION_BLOCKED" });
+    let blocked: unknown;
+    try {
+      enterpriseApi.createWatchlist("Primary");
+    } catch (error) {
+      blocked = error;
+    }
+    expect(blocked).toMatchObject({ code: "OFFLINE_MUTATION_BLOCKED" });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
