@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "source_only": true,
+  "backend_only": true,
+  "direct_browser_n8n_access": false,
+  "direct_browser_middleware_access": false,
+  "machine_credentials_in_frontend": false,
+  "allowed_intents": ["onboarding_assistance","compliance_reminder","support_escalation","report_request","alert_acknowledgement","notification_preferences","cancel_before_submission"],
+  "prohibited_intents": ["trade","order","wallet","ledger","payment","deposit","withdrawal","transfer","custody","chain","broker","provider","demo_order"],
+  "operation_states": ["accepted","queued","running","waiting_approval","submitted","unknown","reconciling","reconciled_success","reconciled_failure","rejected","cancelled"],
+  "success_state": "reconciled_success",
+  "safe_projection_fields": ["operation_id","operation_type","status","created_at","updated_at","summary","retryable","correlation_id","next_action"],
+  "forbidden_projection_fields": ["access_token","refresh_token","id_token","client_secret","provider_secret","raw_execution","raw_webhook","stack_trace"]
+}
