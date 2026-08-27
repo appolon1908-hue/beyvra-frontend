@@ -1,0 +1,95 @@
+{
+  "schema_version": "2.0",
+  "status": "SOURCE_ONLY",
+  "repository": "appolon1908-hue/beyvra-frontend",
+  "product": "beyvra",
+  "role": "browser_ui_and_safe_status_projection",
+  "backend_repository": "appolon1908-hue/beyvra-backend",
+  "backend_branch": "integration/n8n-automation-v2-20260827",
+  "n8n_direct_client": false,
+  "middleware_direct_client": false,
+  "service_credential_allowed": false,
+  "canonical_transport": {
+    "commands": "beyvra-backend-rest-only",
+    "status": "beyvra-backend-rest-and-ws-v2",
+    "snapshot_recovery": true,
+    "caller_tenant_authoritative": false
+  },
+  "allowed_user_intents": [
+    "beyvra.ui.onboarding_assistance.request",
+    "beyvra.ui.compliance_reminder.request",
+    "beyvra.ui.support_escalation.request",
+    "beyvra.ui.report.request",
+    "beyvra.ui.operations_alert.acknowledge",
+    "beyvra.ui.notification_preferences.update",
+    "beyvra.ui.operational_request.cancel_if_not_submitted"
+  ],
+  "visible_statuses": [
+    "REQUESTED",
+    "QUEUED",
+    "RUNNING",
+    "WAITING_APPROVAL",
+    "WAITING_TIMER",
+    "WAITING_RECONCILIATION",
+    "COMPLETED",
+    "FAILED",
+    "CANCELLED"
+  ],
+  "prohibited_direct_targets": [
+    "n8n",
+    "codestra-middleware",
+    "keycloak-token-endpoint-for-service-clients",
+    "odoo",
+    "broker-api",
+    "payment-provider",
+    "wallet-provider",
+    "postgresql",
+    "redis"
+  ],
+  "prohibited_actions": [
+    "trade.place",
+    "trade.modify",
+    "trade.cancel_live",
+    "trade.close",
+    "order.submit",
+    "wallet.balance.mutate",
+    "wallet.deposit",
+    "wallet.withdraw",
+    "wallet.transfer",
+    "ledger.post",
+    "payment.charge",
+    "payment.refund",
+    "withdrawal.approve",
+    "withdrawal.execute",
+    "custody.sign",
+    "chain.broadcast"
+  ],
+  "capabilities": {
+    "REAL_TRADING_EXECUTION": false,
+    "REAL_WALLET_DEPOSITS": false,
+    "REAL_WALLET_WITHDRAWALS": false,
+    "REAL_WALLET_TRANSFERS": false,
+    "PAYMENT_EXECUTION": false,
+    "CUSTODY_EXECUTION": false,
+    "CHAIN_BROADCAST": false
+  },
+  "invariants": {
+    "browser_tokens_are_human_user_tokens_only": true,
+    "n8n_machine_token_in_browser": false,
+    "middleware_machine_token_in_browser": false,
+    "frontend_can_choose_authoritative_tenant": false,
+    "client_side_approval_authoritative": false,
+    "backend_reconciliation_required_before_success": true,
+    "duplicate_realtime_event_has_no_duplicate_effect": true,
+    "reconnect_submits_new_automation_request": false,
+    "live_apply_authorized": false
+  },
+  "dependencies": {
+    "backend_branch": "integration/n8n-automation-v2-20260827",
+    "n8n_governance_pr": 1,
+    "n8n_contract_pr": 9,
+    "middleware_contract_pr": 15,
+    "keycloak_contract_pr": 10,
+    "n8n_branch": "automation/beyvra-operations-v2-20260827"
+  }
+}
