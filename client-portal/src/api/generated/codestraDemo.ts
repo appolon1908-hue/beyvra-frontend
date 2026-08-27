@@ -5,6 +5,7 @@
  */
 import { getApiUrl } from "utils/env";
 import { ApiError } from "api/errors";
+import { getBffCsrfToken, isBffSessionMarker, isUnsafeMethod } from "security/bffSession";
 
 export type DemoWallet = {
   available: string;
@@ -31,6 +32,7 @@ export async function codestraRequest<T>(path: string, options: RequestOptions =
   const timeout = window.setTimeout(() => controller.abort(), options.timeoutMs ?? 15_000);
   const requestId = crypto.randomUUID();
   try {
+    const csrfToken = isUnsafeMethod(options.method) ? await getBffCsrfToken() : undefined;
     const response = await fetch(getApiUrl(path), {
       ...options,
       credentials: "include",
@@ -38,7 +40,8 @@ export async function codestraRequest<T>(path: string, options: RequestOptions =
       headers: {
         Accept: "application/json",
         ...(options.body && !(options.body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
-        ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+        ...(options.token && !isBffSessionMarker(options.token) ? { Authorization: `Bearer ${options.token}` } : {}),
+        ...(csrfToken ? { "X-CSRFToken": csrfToken } : {}),
         ...(options.idempotencyKey ? { "Idempotency-Key": options.idempotencyKey } : {}),
         "X-Request-ID": requestId,
       },
@@ -107,9 +110,15 @@ export const codestraBankApi = {
 };
 
 export const codestraAuthApi = {
+  loginUrl: (next = "/platform") => `${getApiUrl("v1/auth/oidc/login/")}?next=${encodeURIComponent(next)}`,
+  registrationUrl: (next = "/platform") => `${getApiUrl("v1/auth/oidc/register/")}?next=${encodeURIComponent(next)}`,
+  passwordResetUrl: () => getApiUrl("v1/auth/oidc/password-reset/"),
+  logout: () => codestraRequest<{ detail: string; logoutUrl: string }>("v1/auth/oidc/logout/", { method: "POST", body: "{}" }),
+  refreshSession: () => codestraRequest<{ detail: string }>("v1/auth/token/refresh/", { method: "POST", body: "{}" }),
+  // Compatibility-only methods for builds where the server-side Keycloak flag
+  // has not yet been activated. Production removes these routes.
   login: <T>(body: unknown) => codestraRequest<T>("v1/auth/token/", { method: "POST", body: JSON.stringify(body) }),
   register: <T>(body: unknown) => codestraRequest<T>("v1/auth/create/", { method: "POST", body: JSON.stringify(body) }),
-  logout: (token: string, refresh: string) => codestraRequest<void>("v1/auth/token/logout/", { method: "POST", token, body: JSON.stringify({ refresh }) }),
   refresh: <T>(body: unknown) => codestraRequest<T>("v1/auth/token/refresh/", { method: "POST", body: JSON.stringify(body) }),
   forgotPassword: <T>(body: unknown) => codestraRequest<T>("v1/auth/password_reset/", { method: "POST", body: JSON.stringify(body) }),
   resetPassword: <T>(uidb64: string, token: string, body: unknown) => codestraRequest<T>(`v1/auth/password_reset_confirm/${uidb64}/${token}/`, { method: "POST", body: JSON.stringify(body) }),

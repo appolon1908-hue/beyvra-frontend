@@ -40,6 +40,9 @@ const ExpirationDates = lazy(() => import("pages/public/trading/expirationDates/
 // Lazy load components
 const Lender = lazy(() => import("./pages/private/lender/Lender"));
 const SignIn = lazy(() => import("./pages/public/signIn/SignIn"));
+const AuthCallback = lazy(() => import("./pages/public/authCallback/AuthCallback"));
+const AuthLogout = lazy(() => import("./pages/public/authCallback/AuthLogout"));
+const PasswordResetRedirect = lazy(() => import("./pages/public/authCallback/PasswordResetRedirect"));
 
 // added by me for test
 const WalkThrough = lazy(() => import("./pages/public/signIn/components/WalkThrough")); 
@@ -51,8 +54,6 @@ const Welcome = lazy(() => import("./pages/public/welcome/Welcome"));
 const LandingPage = lazy(() => import("./pages/public/landing/landingPage"));
 const Download = lazy(() => import("./pages/public/downloads/Download"));
 const Transactions = lazy(() => import("./pages/private/transactions/Transactions"));
-const ResetPassword = lazy(() => import("pages/public/resetPassword/ResetPassword"));
-const EmailVerification = lazy(() => import("pages/public/emailVerification/EmailVerification"));
 const SessionExpired = lazy(() => import("pages/public/sessionExpired/SessionExpired"));
 const Home = lazy(() => import("pages/public/home/main/Home"));
 const StatusDetails = lazy(() => import("./pages/public/statusDetails/StatusDetails"));
@@ -145,13 +146,14 @@ const App: React.FunctionComponent = () => {
             <Route path="/trading" element={<ContentReview />} />
             <Route path="/downloads" element={<Download />} />
             <Route path="/signIn" element={<SignIn />} />
-            <Route path="/login" element={<SignIn />} />
-            <Route path="/register" element={<SignIn />} />
-            <Route path="/password-reset" element={<ResetPassword />} />
-            <Route path="/forgot-password" element={<SignIn />} />
-            <Route path="/verify-email" element={<EmailVerification />} />
+            <Route path="/login" element={<Navigate to="/signIn?tab=login" replace />} />
+            <Route path="/register" element={<Navigate to="/signIn?tab=registration" replace />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/password-reset" element={<PasswordResetRedirect />} />
+            <Route path="/forgot-password" element={<PasswordResetRedirect />} />
+            <Route path="/verify-email" element={<Navigate to="/signIn?tab=login" replace />} />
             <Route path="/session-expired" element={<SessionExpired />} />
-            <Route path="/logout" element={<SignIn />} />
+            <Route path="/logout" element={<AuthLogout />} />
             <Route path="/dashboard" element={<Navigate to="/platform" replace />} />
             <Route path="/terms" element={<ContentReview />} />
             <Route path="/privacy" element={<ContentReview />} />
