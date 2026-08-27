@@ -20,6 +20,11 @@ export async function authenticatedRequest<T>(
   init: AuthenticatedRequestOptions = {},
 ): Promise<T> {
   const { timeoutMs = 15_000, requestId = crypto.randomUUID(), signal: callerSignal, ...requestInit } = init;
+  const unsafe = isUnsafeMethod(requestInit.method);
+  if (unsafe && typeof navigator !== "undefined" && navigator.onLine === false) {
+    throw new ApiError(0, "OFFLINE_MUTATION_BLOCKED", requestId);
+  }
+
   const controller = new AbortController();
   const timeout = globalThis.setTimeout(() => controller.abort(), timeoutMs);
   const sanitizedHeaders = new Headers(requestInit.headers);
@@ -29,9 +34,10 @@ export async function authenticatedRequest<T>(
   const abortFromCaller = () => controller.abort();
   callerSignal?.addEventListener("abort", abortFromCaller, { once: true });
   try {
-    const csrfToken = isUnsafeMethod(requestInit.method) ? await getBffCsrfToken() : undefined;
+    const csrfToken = unsafe ? await getBffCsrfToken() : undefined;
     const response = await fetch(getApiUrl(endpoint), {
       ...requestInit,
+      cache: "no-store",
       credentials: "include",
       signal: controller.signal,
       headers: {

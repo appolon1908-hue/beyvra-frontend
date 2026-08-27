@@ -1,5 +1,21 @@
-const SHELL_CACHE = "beyvra-shell-v1";
+const SHELL_CACHE = "beyvra-shell-v2";
 const SHELL_ASSETS = ["/", "/manifest.webmanifest", "/logo.svg"];
+const SENSITIVE_PREFIXES = [
+  "/api",
+  "/ws",
+  "/auth",
+  "/login",
+  "/logout",
+  "/register",
+  "/forgot-password",
+  "/password-reset",
+  "/session-expired",
+];
+
+const isSensitive = (url) =>
+  url.origin !== self.location.origin || SENSITIVE_PREFIXES.some((prefix) =>
+    url.pathname === prefix || url.pathname.startsWith(`${prefix}/`)
+  );
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL_ASSETS)));
@@ -8,7 +24,9 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== SHELL_CACHE).map((key) => caches.delete(key))))
+    caches.keys().then((keys) => Promise.all(
+      keys.filter((key) => key !== SHELL_CACHE).map((key) => caches.delete(key))
+    ))
   );
   self.clients.claim();
 });
@@ -18,10 +36,7 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (
     request.method !== "GET" ||
-    url.origin !== self.location.origin ||
-    url.pathname.startsWith("/api/") ||
-    url.pathname.startsWith("/ws/") ||
-    url.pathname.startsWith("/auth/")
+    isSensitive(url)
   ) return;
 
   if (request.mode === "navigate") {
@@ -32,10 +47,12 @@ self.addEventListener("fetch", (event) => {
   if (["style", "script", "image", "font"].includes(request.destination)) {
     event.respondWith(
       caches.match(request).then((cached) => cached || fetch(request).then((response) => {
-        if (response.ok) caches.open(SHELL_CACHE).then((cache) => cache.put(request, response.clone()));
+        const cacheControl = response.headers.get("Cache-Control") || "";
+        if (response.ok && !cacheControl.toLowerCase().includes("no-store")) {
+          caches.open(SHELL_CACHE).then((cache) => cache.put(request, response.clone()));
+        }
         return response;
       }))
     );
   }
 });
-

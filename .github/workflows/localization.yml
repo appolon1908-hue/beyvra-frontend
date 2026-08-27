@@ -70,3 +70,17 @@ jobs:
           observed_base=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/$base_ref" --jq .object.sha)
           test "$(jq -r .head.sha <<<"$observed")" = "$EXPECTED_HEAD_SHA"
           test "$observed_base" = "$EXPECTED_BASE_SHA"
+
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build production frontend image
+        run: docker build -f client-portal/Dockerfile.prod -t beyvra-frontend-review:${{ github.sha }} client-portal
+      - name: Scan production frontend image
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: beyvra-frontend-review:${{ github.sha }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"

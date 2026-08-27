@@ -1,0 +1,64 @@
+name: Publish immutable frontend candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish an immutable review candidate; this never deploys it
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  packages: write
+  attestations: write
+  id-token: write
+
+jobs:
+  publish:
+    if: inputs.publish
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.locked-image.outputs.ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v3
+      - id: image
+        run: echo "ref=ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+      - id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: client-portal
+          file: client-portal/Dockerfile.prod
+          push: true
+          tags: ${{ steps.image.outputs.ref }}
+          provenance: mode=max
+          sbom: true
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ github.sha }}
+      - id: locked-image
+        name: Lock candidate identity to the published digest
+        run: echo "ref=ghcr.io/${GITHUB_REPOSITORY,,}@${{ steps.build.outputs.digest }}" >> "$GITHUB_OUTPUT"
+      - name: Record rollback-oriented candidate manifest
+        env:
+          IMAGE: ${{ steps.locked-image.outputs.ref }}
+        run: |
+          jq -n \
+            --arg source_sha "$GITHUB_SHA" \
+            --arg image "$IMAGE" \
+            '{source_sha:$source_sha,image:$image,deployed:false,requires_previous_digest:true,requires_health_smoke:true,requires_automatic_abort:true}' \
+            > frontend-candidate.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: beyvra-frontend-candidate-${{ github.sha }}
+          path: frontend-candidate.json
+          if-no-files-found: error
+          retention-days: 30

@@ -25,6 +25,7 @@ describe("enterprise API BFF boundary", () => {
     expect(fetchMock).toHaveBeenCalledOnce();
     const [, init] = fetchMock.mock.calls[0];
     expect(init.credentials).toBe("include");
+    expect(init.cache).toBe("no-store");
     expect(new Headers(init.headers).has("Authorization")).toBe(false);
   });
 
@@ -33,14 +34,7 @@ describe("enterprise API BFF boundary", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
 
-    let blocked: unknown;
-    try {
-      enterpriseApi.createWatchlist("Primary");
-    } catch (error) {
-      blocked = error;
-    }
-    expect(blocked).toMatchObject({ code: "OFFLINE_MUTATION_BLOCKED" });
+    await expect(enterpriseApi.createWatchlist("Primary")).rejects.toMatchObject({ code: "OFFLINE_MUTATION_BLOCKED" });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
-

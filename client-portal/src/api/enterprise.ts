@@ -1,4 +1,4 @@
-import { authenticatedRequest, ApiError } from "api/client";
+import { authenticatedRequest } from "api/client";
 import { BFF_SESSION_MARKER } from "security/bffSession";
 
 export type EvidenceQuality = "EMPTY" | "COMPLETE" | "PARTIAL" | "UNAVAILABLE";
@@ -34,6 +34,16 @@ export interface PortfolioSummary {
   realized_pnl: string;
   positions: PortfolioPosition[];
   valuation_quality: EvidenceQuality;
+  as_of: string;
+  simulation: true;
+  live_trading_enabled: false;
+}
+
+export interface PortfolioPositions {
+  results: PortfolioPosition[];
+  count: number;
+  unpriced_instruments: string[];
+  quality: EvidenceQuality;
   as_of: string;
   simulation: true;
   live_trading_enabled: false;
@@ -75,6 +85,7 @@ export interface PortfolioAllocations {
 export interface PortfolioRisk {
   equity: string;
   gross_exposure: string;
+  net_exposure: string;
   gross_exposure_ratio: string | null;
   largest_position_ratio: string | null;
   cash_ratio: string | null;
@@ -82,8 +93,41 @@ export interface PortfolioRisk {
   value_at_risk: string | null;
   stress_loss: string | null;
   advanced_risk_reason: string;
+  methodology: {
+    gross_exposure: string;
+    net_exposure: string;
+    largest_position_ratio: string;
+    cash_ratio: string;
+    unpriced_positions_excluded: true;
+  };
+  unavailable_metrics: Array<{ metric: string; reason: string }>;
   valuation_quality: EvidenceQuality;
   simulation_available: boolean;
+  simulation: true;
+  live_trading_enabled: false;
+}
+
+export interface PortfolioEvidenceQuality {
+  overall_quality: EvidenceQuality;
+  valuation: {
+    quality: EvidenceQuality;
+    position_count: number;
+    priced_position_count: number;
+    unpriced_instruments: string[];
+  };
+  performance: {
+    quality: EvidenceQuality;
+    range: PerformanceRange;
+    snapshot_count: number;
+    latest_snapshot_at: string | null;
+  };
+  advanced_risk: {
+    quality: "UNAVAILABLE";
+    reason: string;
+    fabricated_values: false;
+  };
+  missing_evidence: string[];
+  as_of: string;
   simulation: true;
   live_trading_enabled: false;
 }
@@ -105,35 +149,29 @@ export interface Watchlist {
   updated_at: string;
 }
 
-const ensureOnlineMutation = () => {
-  if (typeof navigator !== "undefined" && navigator.onLine === false) {
-    throw new ApiError(0, "OFFLINE_MUTATION_BLOCKED");
-  }
-};
-
 const request = <T>(endpoint: string, init?: RequestInit) =>
   authenticatedRequest<T>(endpoint, BFF_SESSION_MARKER, init);
 
 export const enterpriseApi = {
   portfolioSummary: () => request<PortfolioSummary>("v1/portfolio/summary"),
+  portfolioPositions: () => request<PortfolioPositions>("v1/portfolio/positions"),
   portfolioPerformance: (range: PerformanceRange = "1M") =>
     request<PortfolioPerformance>(`v1/portfolio/performance?range=${range}`),
   portfolioAllocations: () => request<PortfolioAllocations>("v1/portfolio/allocations"),
   portfolioRisk: () => request<PortfolioRisk>("v1/portfolio/risk"),
+  portfolioEvidenceQuality: (range: PerformanceRange = "1M") =>
+    request<PortfolioEvidenceQuality>(`v1/portfolio/evidence-quality?range=${range}`),
   watchlists: () => request<{ results: Watchlist[] }>("v1/watchlists"),
   createWatchlist: (name: string) => {
-    ensureOnlineMutation();
     return request<Watchlist>("v1/watchlists", {
       method: "POST",
       body: JSON.stringify({ name }),
     });
   },
   addWatchlistItem: (watchlistId: string, instrument: string) => {
-    ensureOnlineMutation();
     return request<WatchlistItem>(`v1/watchlists/${watchlistId}/items`, {
       method: "POST",
       body: JSON.stringify({ instrument_id: instrument }),
     });
   },
 };
-

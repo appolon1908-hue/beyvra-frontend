@@ -25,7 +25,7 @@ FROM nginx:alpine AS production-stage
 ARG VCS_REF=unknown
 ARG BUILD_VERSION=unreleased
 ARG BUILD_DATE=unknown
-LABEL org.opencontainers.image.source="https://github.com/appolon1908-hue/trading-frontend" \
+LABEL org.opencontainers.image.source="https://github.com/appolon1908-hue/beyvra-frontend" \
       org.opencontainers.image.revision="$VCS_REF" \
       org.opencontainers.image.version="$BUILD_VERSION" \
       org.opencontainers.image.created="$BUILD_DATE"

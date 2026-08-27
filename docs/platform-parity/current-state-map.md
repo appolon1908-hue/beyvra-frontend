@@ -1,6 +1,14 @@
 # Beyvra platform parity — current-state map
 
-Date: 2026-08-03
+Date: 2026-08-03  
+Updated: 2026-08-27
+
+> Superseded boundaries: browser authentication now uses the same-origin
+> Keycloak BFF and HttpOnly cookies; the enterprise portfolio route is
+> `/platform/portfolio`; the unsupported `/lender` route is quarantined and is
+> not a Beyvra capability. Historical lender/loan source files remain
+> unreachable pending dependency and retention review. Financial and
+> authentication traffic is never cached or replayed offline.
 
 ## Repository and runtime
 
@@ -19,9 +27,9 @@ already recorded separately). No production services or data are in scope.
 Existing public routes include `/`, `/markets/*`, `/trading/*`, `/downloads`,
 `/signIn`, `/login`, `/register`, `/password-reset`, `/forgot-password`,
 `/verify-email`, `/session-expired`, `/logout`, `/prv`, and `/reg`. Protected
-routes include `/platform`, `/home`, `/transactions`, `/kyc-document`,
-`/statusDetails`, `/walkThrough`, `/welcome`, `/lender`, and
-`/admin/integrations`.
+routes include `/platform`, `/platform/portfolio`, `/home`, `/transactions`,
+`/kyc-document`, `/statusDetails`, `/walkThrough`, `/welcome`, and
+`/admin/integrations`. `/lender` is intentionally absent.
 
 The platform is a single protected workspace with a sidebar, Ant Design drawers,
 top bar, asset selector, Lightweight Charts workspace, and TradeForm. Existing
@@ -30,8 +38,9 @@ settings/security surfaces.
 
 ## Existing contracts
 
-- Authentication uses access/refresh cookies and existing login/register/reset/
-  verification hooks. Logout calls the server token-revocation endpoint.
+- Authentication uses the same-origin BFF cookie, CSRF protection on unsafe
+  requests, and server-owned refresh/logout behavior. Browser code does not
+  read, decode, store or attach access/refresh tokens.
 - Market REST: `trades/assets/`, `trades/market/history/`, and the newer
   `/api/v1/market/*` normalized endpoints.
 - Realtime REST: `/api/v1/assets`, `/api/v1/market/snapshot`, `/api/v1/market/candles`,
@@ -48,8 +57,8 @@ settings/security surfaces.
 
 The backend defaults to demo trading enabled and live trading, market ingestion,
 and external financial streams disabled unless explicitly configured. Deposits,
-withdrawals, rewards, referrals, tournaments, MT4/MT5, CFD, copy trading and
-other unsupported financial surfaces must remain hidden in staging.
+withdrawals, rewards, referrals, tournaments, MT4/MT5, CFD, copy trading,
+lending and other unsupported financial surfaces must remain hidden in staging.
 
 ## Known gaps
 
