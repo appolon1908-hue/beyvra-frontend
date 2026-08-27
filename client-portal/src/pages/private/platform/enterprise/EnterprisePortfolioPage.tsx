@@ -5,8 +5,11 @@ import type { EChartsOption } from "echarts";
 import { Link } from "react-router-dom";
 import {
   enterpriseApi,
+  type AllocationBucket,
   type EvidenceQuality,
+  type PerformancePoint,
   type PerformanceRange,
+  type PortfolioPosition,
 } from "api/enterprise";
 import "./enterprisePortfolio.scss";
 
@@ -117,7 +120,7 @@ export default function EnterprisePortfolioPage() {
       xAxis: {
         type: "category",
         boundaryGap: false,
-        data: points.map((point) => new Date(point.period_end).toLocaleDateString(undefined, { month: "short", day: "numeric" })),
+        data: points.map((point: PerformancePoint) => new Date(point.period_end).toLocaleDateString(undefined, { month: "short", day: "numeric" })),
         axisLine: { lineStyle: { color: "#293548" } },
         axisLabel: { color: "#8fa1bb", hideOverlap: true },
       },
@@ -131,7 +134,7 @@ export default function EnterprisePortfolioPage() {
         type: "line",
         smooth: 0.22,
         symbol: "none",
-        data: points.map((point) => Number(point.closing_value)),
+        data: points.map((point: PerformancePoint) => Number(point.closing_value)),
         lineStyle: { width: 3 },
         areaStyle: { color: { type: "linear", x: 0, y: 0, x2: 0, y2: 1, colorStops: [
           { offset: 0, color: "rgba(101,229,194,.32)" },
@@ -160,7 +163,7 @@ export default function EnterprisePortfolioPage() {
         radius: ["54%", "76%"],
         center: ["50%", "43%"],
         label: { show: false },
-        data: buckets.map((bucket) => ({ name: bucket.asset_class, value: Number(bucket.market_value) })),
+        data: buckets.map((bucket: AllocationBucket) => ({ name: bucket.asset_class, value: Number(bucket.market_value) })),
         emptyCircleStyle: { color: "#182235" },
       }],
       graphic: buckets.length ? undefined : [{
@@ -246,7 +249,7 @@ export default function EnterprisePortfolioPage() {
               <table className="enterprise-chart-data">
                 <caption>Performance data</caption>
                 <thead><tr><th>Date</th><th>Closing value</th><th>P&amp;L</th></tr></thead>
-                <tbody>{performance.data.results.map((point) => <tr key={point.period_end}><td>{new Date(point.period_end).toLocaleDateString()}</td><td>{money(point.closing_value, currency)}</td><td>{money(point.pnl, currency)}</td></tr>)}</tbody>
+                <tbody>{performance.data.results.map((point: PerformancePoint) => <tr key={point.period_end}><td>{new Date(point.period_end).toLocaleDateString()}</td><td>{money(point.closing_value, currency)}</td><td>{money(point.pnl, currency)}</td></tr>)}</tbody>
               </table>
             </>
           )}
@@ -270,7 +273,7 @@ export default function EnterprisePortfolioPage() {
                 <thead><tr><th>Instrument</th><th>Quantity</th><th>Market value</th><th>Unrealized P&amp;L</th><th>Price quality</th></tr></thead>
                 <tbody>
                   {positions.data.results.length === 0 && <tr><td colSpan={5}>No simulation positions yet.</td></tr>}
-                  {positions.data.results.map((position) => <tr key={position.id}>
+                  {positions.data.results.map((position: PortfolioPosition) => <tr key={position.id}>
                     <td><strong>{position.symbol}</strong><small>{position.asset_class}</small></td>
                     <td>{position.quantity}</td>
                     <td>{money(position.market_value, currency)}</td>
