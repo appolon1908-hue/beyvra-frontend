@@ -1,12 +1,36 @@
 {
-  "name": "Beyvra",
+  "name": "Beyvra Trading Workspace",
   "short_name": "Beyvra",
-  "description": "Beyvra demo trading workspace",
-  "start_url": "/",
+  "description": "Evidence-led simulation trading and portfolio workspace",
+  "id": "/platform",
+  "start_url": "/platform",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#070b14",
   "theme_color": "#070b14",
+  "categories": [
+    "finance",
+    "productivity"
+  ],
+  "shortcuts": [
+    {
+      "name": "Portfolio",
+      "short_name": "Portfolio",
+      "url": "/platform/portfolio"
+    },
+    {
+      "name": "Trade",
+      "short_name": "Trade",
+      "url": "/platform"
+    }
+  ],
   "icons": [
-    { "src": "/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
   ]
 }

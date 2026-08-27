@@ -38,13 +38,11 @@ const EconomicCalendar = lazy(() => import("pages/public/trading/economicCalenda
 const ExpirationDates = lazy(() => import("pages/public/trading/expirationDates/Index"))
 
 // Lazy load components
-const Lender = lazy(() => import("./pages/private/lender/Lender"));
 const SignIn = lazy(() => import("./pages/public/signIn/SignIn"));
 const AuthCallback = lazy(() => import("./pages/public/authCallback/AuthCallback"));
 const AuthLogout = lazy(() => import("./pages/public/authCallback/AuthLogout"));
 const PasswordResetRedirect = lazy(() => import("./pages/public/authCallback/PasswordResetRedirect"));
 
-// added by me for test
 const WalkThrough = lazy(() => import("./pages/public/signIn/components/WalkThrough")); 
 const WelcomeSteps = lazy(() => import("./pages/private/welcomeSteps/steps/WelcomeSteps"));
 
@@ -58,6 +56,7 @@ const SessionExpired = lazy(() => import("pages/public/sessionExpired/SessionExp
 const Home = lazy(() => import("pages/public/home/main/Home"));
 const StatusDetails = lazy(() => import("./pages/public/statusDetails/StatusDetails"));
 const IntegrationsAdmin = lazy(() => import("./pages/private/integrations/IntegrationsAdmin"));
+const EnterprisePortfolioPage = lazy(() => import("./pages/private/platform/enterprise/EnterprisePortfolioPage"));
 
 
 const App: React.FunctionComponent = () => {
@@ -79,10 +78,6 @@ const App: React.FunctionComponent = () => {
     localStorage.setItem("scale", scale.toString());
   };
 
-  // ADDED BY ME
-
-
-
   return (
     <div data-theme={"dark"} style={{ backgroundColor: '#000000' }}>
       <Suspense fallback={<div className="fullLoadingBackground"><Loading /></div>}>
@@ -97,7 +92,7 @@ const App: React.FunctionComponent = () => {
               <Route path="/platform/market" element={<Platform />} />
               <Route path="/platform/trades" element={<DemoTradesPage />} />
               <Route path="/platform/trades/:tradeId" element={<DemoTradesPage />} />
-              <Route path="/platform/portfolio" element={<Platform />} />
+              <Route path="/platform/portfolio" element={<EnterprisePortfolioPage />} />
               <Route path="/platform/analytics" element={<Platform />} />
               <Route path="/platform/learn" element={<Platform />} />
               <Route path="/platform/help" element={<Platform />} />
@@ -113,7 +108,6 @@ const App: React.FunctionComponent = () => {
                 <Route path="/welcome" element={<Welcome />} />
               </Route>
               <Route path="transactions" element={<Transactions />} />
-              <Route path="/lender" element={<Lender />} />
               <Route path="/statusDetails" element={<StatusDetails />} />
               <Route path="/walkThrough" element={<WalkThrough />} />
               <Route path="/admin/integrations" element={<IntegrationsAdmin />} />

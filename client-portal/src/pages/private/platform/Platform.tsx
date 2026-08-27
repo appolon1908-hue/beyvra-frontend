@@ -33,7 +33,7 @@ import { setPortfolioWindow } from "@store/slices/app";
 import PlatformChartContainer from "./PlatformChartContainer";
 import useWebSocketTicket from "api/user/useWebSocketTicket";
 import { setWSTicket } from "@store/slices/user";
-import { useCookies } from "react-cookie";
+import { BFF_SESSION_MARKER } from "security/bffSession";
 import { usePlatformConfig } from "api/platform/usePlatformConfig";
 import { stagingPlatformFeatures } from "config/platformFeatures";
 import { PlatformOverlayProvider, usePlatformOverlay } from "./PlatformOverlayContext";
@@ -63,7 +63,6 @@ const PlatformContent: React.FunctionComponent<PlatformProps> = () => {
   const [bottomSidebarHeight, setBottomSidebarHeight] = useState(0);
   const storedScale = localStorage.getItem("scale");
   const { togglePortfolioWindow } = useAppSelector(state => state.app)
-  const [cookies] = useCookies(["access_token"]);
   const { data: platformFeatures = stagingPlatformFeatures } = usePlatformConfig();
 
 
@@ -86,10 +85,8 @@ const PlatformContent: React.FunctionComponent<PlatformProps> = () => {
     },
   });
   useEffect(() => {
-    if (cookies.access_token) {
-      webSocketTicketMutate(cookies.access_token);
-    }
-  }, [cookies.access_token, webSocketTicketMutate]);
+    webSocketTicketMutate(BFF_SESSION_MARKER);
+  }, [webSocketTicketMutate]);
 
   useEffect(() => {
     if (overlay.type === "trade") {
@@ -224,7 +221,6 @@ const PlatformContent: React.FunctionComponent<PlatformProps> = () => {
           setIsDrawerOpen(false);
           setIsWindowDrawerOen(false)
           dispatch(setPortfolioWindow(false))
-          console.log("trigger")
         }}
         open={togglePortfolioWindow}
         className={`${themeSelect} ml-106 windowDrawer`}

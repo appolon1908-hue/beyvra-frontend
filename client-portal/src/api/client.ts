@@ -1,6 +1,6 @@
 import { getApiUrl } from "utils/env";
 import { ApiError } from "api/errors";
-import { getBffCsrfToken, isBffSessionMarker, isUnsafeMethod } from "security/bffSession";
+import { getBffCsrfToken, isUnsafeMethod } from "security/bffSession";
 export { ApiError } from "api/errors";
 
 export type AuthenticatedRequestOptions = RequestInit & {
@@ -9,14 +9,21 @@ export type AuthenticatedRequestOptions = RequestInit & {
   requestId?: string;
 };
 
+/**
+ * The legacy token argument is retained while callers migrate, but it is
+ * deliberately ignored. Browser authentication is exclusively the same-origin
+ * BFF cookie and unsafe methods are protected with the BFF CSRF token.
+ */
 export async function authenticatedRequest<T>(
   endpoint: string,
-  token: string,
+  _legacyToken: string,
   init: AuthenticatedRequestOptions = {},
 ): Promise<T> {
   const { timeoutMs = 15_000, requestId = crypto.randomUUID(), signal: callerSignal, ...requestInit } = init;
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+  const timeout = globalThis.setTimeout(() => controller.abort(), timeoutMs);
+  const sanitizedHeaders = new Headers(requestInit.headers);
+  sanitizedHeaders.delete("Authorization");
   const abortFromCaller = () => controller.abort();
   callerSignal?.addEventListener("abort", abortFromCaller, { once: true });
   try {
@@ -28,10 +35,9 @@ export async function authenticatedRequest<T>(
       headers: {
         Accept: "application/json",
         ...(requestInit.body ? { "Content-Type": "application/json" } : {}),
-        ...(token && !isBffSessionMarker(token) ? { Authorization: `Bearer ${token}` } : {}),
         ...(csrfToken ? { "X-CSRFToken": csrfToken } : {}),
         "X-Request-ID": requestId,
-        ...requestInit.headers,
+        ...Object.fromEntries(sanitizedHeaders.entries()),
       },
     });
     const payload = await response.json().catch(() => ({}));
@@ -53,7 +59,7 @@ export async function authenticatedRequest<T>(
     }
     throw error;
   } finally {
-    window.clearTimeout(timeout);
+    globalThis.clearTimeout(timeout);
     callerSignal?.removeEventListener("abort", abortFromCaller);
   }
 }
