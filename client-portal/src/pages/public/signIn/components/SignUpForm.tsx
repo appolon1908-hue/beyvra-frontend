@@ -13,7 +13,7 @@ const SignUpForm = () => {
         <h2>Create your Beyvra account</h2>
         <p>
           Registration, email verification, password setup, and MFA are handled
-          by the Codestra identity service. Beyvra never receives your password.
+          by the secure identity service. Beyvra never receives your password.
         </p>
       </div>
       <p className="info-text">
