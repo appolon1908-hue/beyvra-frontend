@@ -9,7 +9,7 @@ import { useAppSelector } from "@store/hooks";
 import { statusAndTypesList } from "../../constants";
 import { useCookies } from "react-cookie";
 import useTransactions, { TransactionResultType } from "api/wallet/useTransactions";
-import moment from "moment";
+import { format } from "date-fns";
 const { RangePicker } = DatePicker
 export const TransactionPart: FC = () => {
   const { wallets } = useAppSelector((state) => state.wallet);
@@ -48,7 +48,7 @@ export const TransactionPart: FC = () => {
         asset: item.currency.symbol,
         price: `${item.amount}$`,
         tradeType: 'Buy',
-        date: moment(item.request_date).format('DD MMM YYYY'),
+        date: format(new Date(item.request_date), 'dd MMM yyyy'),
         fee: `${item.network_fee}$`,
         tranasactionID: item.txid || '-',
         status: item.status,

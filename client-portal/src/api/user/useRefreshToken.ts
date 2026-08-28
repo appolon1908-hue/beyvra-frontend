@@ -1,37 +1,41 @@
 import { useMutation } from "@tanstack/react-query";
 import { beyvraAuthApi } from "api/generated/beyvra";
+import { logInternalError } from "errors/userSafeError";
+import { ApiError } from "api/errors";
+import type { BaseMutationHookOptions, TokenRefreshResponse } from "api/types";
 
-interface TokenRefreshSuccess {
-  access: string;
+interface TokenRefreshVariables {
   refresh: string;
 }
 
-type RefreshTokenVariables = {
-  refresh: string;
-};
-
-type useRefreshTokenProps = {
-  onSuccess?: (
-    data: TokenRefreshSuccess,
-    variables: RefreshTokenVariables,
-    context: unknown
-  ) => void;
-  onError?: (
-    error: unknown,
-    variables: RefreshTokenVariables,
-    context: unknown
-  ) => void;
-  [index: string]: any;
-};
-
-export async function fethRefreshToken(
-  data: RefreshTokenVariables
-): Promise<TokenRefreshSuccess> {
-  return beyvraAuthApi.refresh<TokenRefreshSuccess>(data);
+/**
+ * Fetches a new access token using refresh token
+ * @param data - Refresh token request
+ * @returns New access and refresh tokens
+ */
+export async function fetchRefreshToken(
+  data: TokenRefreshVariables
+): Promise<TokenRefreshResponse> {
+  try {
+    return await beyvraAuthApi.refresh<TokenRefreshResponse>(data);
+  } catch (error) {
+    logInternalError(error, { endpoint: "auth.refresh" });
+    throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN");
+  }
 }
 
-export const useRefreshToken = (props: useRefreshTokenProps) => {
-  const receivedProps = props || ({} as useRefreshTokenProps);
+type UseRefreshTokenProps = BaseMutationHookOptions<TokenRefreshResponse, TokenRefreshVariables>;
+
+/**
+ * Hook to refresh authentication token
+ * @example
+ * const { mutate } = useRefreshToken({
+ *   onSuccess: (tokens) => setCookie("access_token", tokens.access)
+ * });
+ * mutate({ refresh: refreshToken });
+ */
+export const useRefreshToken = (props?: UseRefreshTokenProps) => {
+  const receivedProps = props || ({} as UseRefreshTokenProps);
 
   const {
     onSuccess: onSuccessOverride,
@@ -39,10 +43,9 @@ export const useRefreshToken = (props: useRefreshTokenProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, unknown, RefreshTokenVariables>({
-    mutationFn: fethRefreshToken,
+  return useMutation<TokenRefreshResponse, Error, TokenRefreshVariables>({
+    mutationFn: fetchRefreshToken,
     onSuccess: (data, variables, context) => {
-      /* Add On success actions here if needed */
       if (onSuccessOverride) {
         onSuccessOverride(data, variables, context);
       }
@@ -57,3 +60,4 @@ export const useRefreshToken = (props: useRefreshTokenProps) => {
 };
 
 export default useRefreshToken;
+

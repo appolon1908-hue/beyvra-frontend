@@ -56,7 +56,7 @@ export const AreaChart = ({chartData, liveLoading = false, bidOngoing=false, tim
             },
       });
 
-      let areaSeries = chart.addAreaSeries({
+      const areaSeries = chart.addAreaSeries({
           topColor: "#0c2c3b",
           bottomColor: 'transparent',
           lineColor: "#1973FA",
@@ -93,9 +93,9 @@ export const AreaChart = ({chartData, liveLoading = false, bidOngoing=false, tim
                 // @ts-ignore
                 textElement2.style.top = `${(lastPriceCoordinate  - textElement2.offsetHeight  / 2) + 0}px`;
                 textElement1.style.left = `${timeCoordinate + 0}px`;
-                let containerWidth = document.getElementById("chart-container")?.clientWidth;
+                const containerWidth = document.getElementById("chart-container")?.clientWidth;
                 // @ts-ignore
-                let getDistance = containerWidth - timeCoordinate;
+                const getDistance = containerWidth - timeCoordinate;
                 // @ts-ignore
                 lineWidthChild.style.width = `${getDistance - 65}px`; 
                 // @ts-ignore
@@ -119,9 +119,9 @@ export const AreaChart = ({chartData, liveLoading = false, bidOngoing=false, tim
           if (priceCoordinate && timeCoordinate) {
               textElement2.style.top = `${(priceCoordinate - textElement1.offsetHeight  / 2) + 0}px`;
               textElement2.style.left = `${timeCoordinate + 0}px`;
-              let containerWidth = document.getElementById("chart-container")?.clientWidth;
+              const containerWidth = document.getElementById("chart-container")?.clientWidth;
               // @ts-ignore
-              let getDistance = containerWidth - timeCoordinate;
+              const getDistance = containerWidth - timeCoordinate;
               // @ts-ignore
               lineWidthChild.style.width = `${getDistance - 65}px`; 
 
@@ -166,7 +166,7 @@ export const AreaChart = ({chartData, liveLoading = false, bidOngoing=false, tim
           time: newTime
         };
        
-        let selectedData = tradeType === "up"? [...additionalDataArray, ...tradeUpData] : [...additionalDataArray, ...tradeDownData];
+        const selectedData = tradeType === "up"? [...additionalDataArray, ...tradeUpData] : [...additionalDataArray, ...tradeDownData];
         // Simulate real-time data update every second
      
         const interval = setInterval(() => {
@@ -179,7 +179,7 @@ export const AreaChart = ({chartData, liveLoading = false, bidOngoing=false, tim
             clearInterval(interval);
           }
           const randNumber = Number(`0.${Math.floor(Math.random() * 9)}`);
-          let newDataValue =   Math.round((determineDirectionOfChart(constantValue, randNumber)) * 100)/100;
+          const newDataValue =   Math.round((determineDirectionOfChart(constantValue, randNumber)) * 100)/100;
           newData = {
             value: secondaryCount > 0? selectedData[secondaryCount].value : newDataValue,
             time: Number((newTime + 2).toFixed(3))

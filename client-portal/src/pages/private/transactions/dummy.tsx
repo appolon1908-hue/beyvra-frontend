@@ -5,8 +5,8 @@ import {
   methodIconHandler,
 } from "./helpers";
 import { ITransaction } from "@interfaces";
-import moment from "moment";
 
+import { format } from "date-fns";
 export const columns: TableColumnsType<ITransaction> = [
   {
     title: "Date and Time",
@@ -14,9 +14,9 @@ export const columns: TableColumnsType<ITransaction> = [
     key: "created_at",
     render: (value) => (
       <>
-        {moment(value).format("Do MMM YYYY")}
+          {format(new Date(value), "do MMM yyyy")}
         <br />
-        {moment(value).format("hh:mm:ss")}
+          {format(new Date(value), "HH:mm:ss")}
       </>
     ),
   },

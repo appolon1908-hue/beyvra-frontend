@@ -31,13 +31,14 @@ const WelcomeSteps = () => {
 
   const dispatch = useAppDispatch();
 
-  const { mutate } = useUpdateUser({
+  const { mutate, isPending: isSkipping } = useUpdateUser({
     onSuccess: (data) => {
       dispatch(setUser(data));
+      navigate('/platform');
     },
   });
   const setStep = () => {
-   let newStep = step + 1;
+   const newStep = step + 1;
     setWelcomeStep(newStep);
     if(newStep === 10){
       setTradeOngoing(true);
@@ -54,13 +55,13 @@ const WelcomeSteps = () => {
 
 
   const onSkipWalkthrough = () => {
+    if (isSkipping) return;
     mutate({
       data: {
-        is_walkthrough_completed: true,
+        is_walkthrough: false,
       },
       token: cookies.access_token,
     });
-    navigate('/platform');
    
   //  setWelcomeStep(0);
   };

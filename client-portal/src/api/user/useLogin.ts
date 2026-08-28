@@ -4,21 +4,9 @@ import { toast } from "react-toastify";
 import { ApiError } from "api/errors";
 import { beyvraAuthApi } from "api/generated/beyvra";
 import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
+import type { BaseMutationHookOptions } from "api/types";
 
-export async function fetchLogin(data: ISignInForm): Promise<LoginSuccess> {
-  try {
-    return await beyvraAuthApi.login<LoginSuccess>(data);
-  } catch (error) {
-    logInternalError(error, { endpoint: "auth.login" });
-    toast.error(toUserSafeErrorText(error, "auth"));
-    throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN");
-  }
-}
-
-/** @deprecated Use fetchLogin. */
-export const fethLogin = fetchLogin;
-
-export interface LoginSuccess {
+export interface LoginResponse {
   access?: string;
   refresh?: string;
   user?: IUser;
@@ -26,16 +14,38 @@ export interface LoginSuccess {
   login_token?: string;
 }
 
-type useLoginProps = {
-  onSuccess?: (
-    data: LoginSuccess,
-    variables: ISignInForm,
-    context: unknown
-  ) => void;
-  onError?: (error: unknown, variables: ISignInForm, context: unknown) => void;
-};
-export const useLogin = (props: useLoginProps) => {
-  const receivedProps = props || ({} as useLoginProps);
+// Backward compatibility alias
+export type LoginSuccess = LoginResponse;
+/**
+ * Authenticates user with email and password
+ * @param data - Login credentials
+ * @returns Access token, refresh token, and user info
+ * @throws ApiError on authentication failure
+ */
+export async function fetchLogin(data: ISignInForm): Promise<LoginResponse> {
+  try {
+    return await beyvraAuthApi.login<LoginResponse>(data);
+  } catch (error) {
+    logInternalError(error, { endpoint: "auth.login" });
+    toast.error(toUserSafeErrorText(error, "auth"));
+    throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN");
+  }
+}
+
+type UseLoginProps = BaseMutationHookOptions<LoginResponse, ISignInForm>;
+
+/**
+ * Hook for user login
+ * @example
+ * const { mutate, isPending } = useLogin({
+ *   onSuccess: (response) => {
+ *     setCookie("access_token", response.access);
+ *   }
+ * });
+ * mutate({ email: "user@example.com", password: "..." });
+ */
+export const useLogin = (props?: UseLoginProps) => {
+  const receivedProps = props || ({} as UseLoginProps);
 
   const {
     onSuccess: onSuccessOverride,
@@ -43,10 +53,9 @@ export const useLogin = (props: useLoginProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<LoginSuccess, Error, ISignInForm>({
+  return useMutation<LoginResponse, Error, ISignInForm>({
     mutationFn: fetchLogin,
     onSuccess: (data, variables, context) => {
-      /* Add On success actions here if needed */
       if (onSuccessOverride) {
         onSuccessOverride(data, variables, context);
       }
@@ -61,3 +70,4 @@ export const useLogin = (props: useLoginProps) => {
 };
 
 export default useLogin;
+

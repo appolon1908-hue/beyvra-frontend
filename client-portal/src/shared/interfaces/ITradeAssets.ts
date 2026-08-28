@@ -5,4 +5,4 @@ export default interface ITradeAssets {
     value?: string;
     profit?: string;
     symbol?: string
-};
+}

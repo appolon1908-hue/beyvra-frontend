@@ -77,12 +77,16 @@
     useEffect(() => {
       if (market && typeof market === "object") {
         const transformedMarket: TransformedMarket = {};
-        Object.keys(market).forEach((key) => {
+          const marketKeys = Object.keys(market as Record<string, unknown>);
+          marketKeys.forEach((key) => {
           transformedMarket[key] = [];
-  
-          market[key].forEach((item: any) => {
+
+            const marketKey = (market as Record<string, unknown>)[key];
+            if (!Array.isArray(marketKey)) return;
+
+            marketKey.forEach((item: any) => {
             // Check if the timestamp exists in the initial data
-            const initialDataTimestampExists = market[key].some(
+              const initialDataTimestampExists = marketKey.some(
               (initialItem: { time: any }) => initialItem.time === item.timestamp
             );
   

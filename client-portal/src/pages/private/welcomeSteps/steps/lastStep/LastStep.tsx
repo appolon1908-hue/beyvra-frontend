@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import './lastStep.scss'
 import useDisableWalkThrough from 'api/user/useDisableWalkthrough';
 import { useAppDispatch, useAppSelector } from '@store/hooks';
@@ -54,9 +54,7 @@ const LastStep = ({onReset}: any) => {
         </div>
         <div className='lastStepModalButtonContainer'>
             <button className='lastStepCancelButton' onClick={()=> onReset(1)}>{t("cancel")}</button>
-            <Link to={'/platform'}>
             <button className='lastStepFinishButton' onClick={handleFinishWalkThrough} disabled={isPending}>{isPending ? t("loading") : t("finish")}</button>
-            </Link>
         </div>
        </div>
     </div>

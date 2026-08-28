@@ -35,20 +35,21 @@ const WalkThrough: React.FC<WalkThroughProps> = ({ className, tradeFormHeight })
   const [cookies] = useCookies(["access_token"]);
   const dispatch = useAppDispatch();
 
-  const { mutate } = useUpdateUser({
+  const { mutate, isPending: isSkipping } = useUpdateUser({
     onSuccess: (data) => {
       dispatch(setUser(data));
+      setStep(0);
     },
   });
 
   const onSkipWalkthrough = () => {
+    if (isSkipping) return;
     mutate({
       data: {
-        is_walkthrough_completed: true,
+        is_walkthrough: false,
       },
       token: cookies.access_token,
     });
-    setStep(0);
   };
 
   return (

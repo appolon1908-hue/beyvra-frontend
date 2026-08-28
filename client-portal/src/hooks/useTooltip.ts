@@ -61,4 +61,4 @@ export function useTooltip({ ref, tooltipRef }: UseTooltipProps) {
     onMouseEnter,
     onMouseLeave,
   };
-};
+}

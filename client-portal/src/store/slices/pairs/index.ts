@@ -5,7 +5,7 @@ import { forex } from "pages/private/platform/platformMenus/assets/assetsData";
 export interface AssetPairSliceState {
     assetPairs: ITradeAssets[],
     selectedAsset: ITradeAssets
-};
+}
 
 const defaultAssetPair: ITradeAssets = forex[0];
 

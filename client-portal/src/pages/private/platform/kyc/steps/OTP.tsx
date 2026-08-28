@@ -46,7 +46,7 @@ const OTPVerification: React.FC<OTPProps> = ({ handleNext }) => {
   const handleInputChange = (i: number, e: any) => {
     if (e <= "9" && e >= "0") {
       setOtp((otp) => {
-        let temp = [...otp];
+        const temp = [...otp];
         temp[i] = e;
         return temp;
       });
@@ -62,7 +62,7 @@ const OTPVerification: React.FC<OTPProps> = ({ handleNext }) => {
           }
         } else {
           setOtp((otp) => {
-            let temp = [...otp];
+            const temp = [...otp];
             temp[i] = "";
             return temp;
           });

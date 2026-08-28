@@ -6,7 +6,6 @@ import { useNewsArticle } from 'api/news/useNewsArticle';
 import { useCookies } from 'react-cookie';
 import { INews } from '@interfaces';
 import './newsModal.scss';
-import moment from 'moment';
 
 export interface NewsModalProps {
   open: boolean;

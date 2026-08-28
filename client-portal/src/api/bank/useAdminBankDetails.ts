@@ -1,42 +1,40 @@
 import { useMutation } from "@tanstack/react-query";
 import { beyvraBankApi } from "api/generated/beyvra";
+import { logInternalError } from "errors/userSafeError";
+import { ApiError } from "api/errors";
+import type { BaseMutationHookOptions, BankDetailsResponse } from "api/types";
 
-async function withdrawWireTransferFetcher(token: string): Promise<boolean> {
+/**
+ * Fetches bank account details
+ * @param token - Authentication token
+ * @returns Bank details information
+ * @throws ApiError on request failure
+ */
+async function fetchBankDetails(token: string): Promise<BankDetailsResponse> {
   try {
-    return beyvraBankApi.details(token);
+    const result = await beyvraBankApi.details(token);
+    if (!result || typeof result !== "object") {
+      throw new ApiError(500, "INVALID_RESPONSE", undefined);
+    }
+    return result as BankDetailsResponse;
   } catch (error) {
-    throw new Error(error as string);
+    logInternalError(error, { endpoint: "bank.details" });
+    throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN");
   }
 }
 
-type Props = {
-  onSuccess?: (
-    data: {
-      data: [
-        {
-          id: number;
-          created_at: string;
-          updated_at: string;
-          bank_name: string;
-          account_number: string;
-          account_holder_name: string;
-          last_name: string;
-          routing_number: string;
-          swift_code: string;
-          iban: string;
-          country: string;
-        }
-      ];
-    },
-    variables: unknown,
-    context: unknown
-  ) => void;
-  onError?: (error: unknown, variables: unknown, context: unknown) => void;
-  [index: string]: any;
-};
+type UseAdminBankDetailsProps = BaseMutationHookOptions<BankDetailsResponse, string>;
 
-export const useAdminBankDetails = (props: Props) => {
-  const receivedProps = props;
+/**
+ * Hook to fetch bank account details
+ * @example
+ * const { mutate } = useAdminBankDetails({
+ *   onSuccess: (data) => console.log(data.data)
+ * });
+ * mutate(accessToken);
+ */
+export const useAdminBankDetails = (props?: UseAdminBankDetailsProps) => {
+  const receivedProps = props || ({} as UseAdminBankDetailsProps);
 
   const {
     onSuccess: onSuccessOverride,
@@ -44,10 +42,9 @@ export const useAdminBankDetails = (props: Props) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, unknown, any>({
-    mutationFn: withdrawWireTransferFetcher,
+  return useMutation<BankDetailsResponse, Error, string>({
+    mutationFn: fetchBankDetails,
     onSuccess: (data, variables, context) => {
-      /* Add On success actions here if needed */
       if (onSuccessOverride) {
         onSuccessOverride(data, variables, context);
       }

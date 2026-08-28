@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import { Button } from "antd";
-import moment from "moment";
 
 import { useNews } from "api/news/useNews";
 import Loading from "components/loading";

@@ -4,6 +4,7 @@ import { ApiError } from "api/errors";
 import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 import { beyvraAuthApi } from "api/generated/beyvra";
 import type { IUser } from "@interfaces";
+import type { BaseMutationHookOptions } from "api/types";
 
 export interface RegisterResponse {
   access: string;
@@ -11,6 +12,12 @@ export interface RegisterResponse {
   user: IUser;
 }
 
+/**
+ * Registers a new user account
+ * @param data - Registration form data
+ * @returns Access token, refresh token, and user info
+ * @throws ApiError on registration failure
+ */
 export async function fetchRegister(data: Record<string, string>): Promise<RegisterResponse> {
   try {
     return await beyvraAuthApi.register<RegisterResponse>(data);
@@ -21,16 +28,20 @@ export async function fetchRegister(data: Record<string, string>): Promise<Regis
   }
 }
 
-/** @deprecated Use fetchRegister. */
-export const fethRegister = fetchRegister;
+type UseRegisterProps = BaseMutationHookOptions<RegisterResponse, Record<string, string>>;
 
-type useRegisterProps = {
-  onSuccess?: (data: RegisterResponse, variables: Record<string, string>, context: unknown) => void;
-  onError?: (error: Error, variables: Record<string, string>, context: unknown) => void;
-  [index: string]: any;
-};
-export const useRegister = (props: useRegisterProps) => {
-  const receivedProps = props || ({} as useRegisterProps);
+/**
+ * Hook for user registration
+ * @example
+ * const { mutate, isPending } = useRegister({
+ *   onSuccess: (response) => {
+ *     setCookie("access_token", response.access);
+ *   }
+ * });
+ * mutate({ email: "user@example.com", password: "...", ... });
+ */
+export const useRegister = (props?: UseRegisterProps) => {
+  const receivedProps = props || ({} as UseRegisterProps);
 
   const {
     onSuccess: onSuccessOverride,

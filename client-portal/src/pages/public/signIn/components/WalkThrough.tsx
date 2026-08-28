@@ -3,22 +3,32 @@ import "./WalkThrough.scss";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import useDisableWalkThrough from "api/user/useDisableWalkthrough";
+import { useAppDispatch } from "@store/hooks";
+import { setUser } from "@store/slices/user";
+import { toUserSafeErrorText } from "errors/userSafeError";
 
 const WalkThrough = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const totalSteps = 10;
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [cookies, , removeCookie] = useCookies(["access_token", "step"]);
 
   const { mutate: completeWalkthrough, isPending } = useDisableWalkThrough({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      dispatch(setUser(data));
       removeCookie("step", { path: "/" });
       navigate("/platform", { replace: true });
+    },
+    onError: (err) => {
+      setError(toUserSafeErrorText(err, "auth"));
     },
   });
 
   const handleComplete = () => {
     if (!cookies.access_token || isPending) return;
+    setError(null);
     completeWalkthrough({ token: cookies.access_token });
   };
 

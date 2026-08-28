@@ -35,7 +35,7 @@ const urlsForDownload: UrlMappings = {
 
 const Download = () => {
   const { t } = useTranslation();
-  let navigation = useNavigate();
+  const navigation = useNavigate();
   const [activeTab, setActiveTab] = useState("anydesk");
 
   const handleClick = (value: string) => {

@@ -32,8 +32,8 @@ export const notificationSlice = createSlice({
       return state;
     },
     updateNotificationList: (state, action: PayloadAction<INotification>) => {
-      let newNotificationData = [...state.notificationList];
-      let newData: any = newNotificationData.map((obj: INotification) => {
+      const newNotificationData = [...state.notificationList];
+      const newData: any = newNotificationData.map((obj: INotification) => {
         if (obj.id === action?.payload?.id) {
           return action?.payload;
         }

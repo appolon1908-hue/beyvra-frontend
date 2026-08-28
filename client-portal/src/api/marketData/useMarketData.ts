@@ -1,38 +1,69 @@
 import { useMutation } from "@tanstack/react-query";
 import { beyvraMarketApi } from "api/generated/beyvra";
+import { logInternalError } from "errors/userSafeError";
+import { ApiError } from "api/errors";
+import type { BaseMutationHookOptions, MarketDataResponse } from "api/types";
 
-type FetcherDataOptions = {
-  token: string;
-  options?: {
-    start?: string;
-    symbols?: string;
-    timeFrame?: string;
-    end?: string
-  }
+export interface MarketDataOptions {
+  start?: string;
+  symbols?: string;
+  timeFrame?: string;
+  end?: string;
 }
 
-export async function marketDataFetcher({
+export interface FetchMarketDataInput {
+  token: string;
+  options?: MarketDataOptions;
+}
+
+/**
+ * Fetches market data from data provider
+ * @param input - Token and market data options
+ * @returns Market data response
+ * @throws ApiError on request failure
+ */
+export async function fetchMarketData({
   token,
-  options
-}: FetcherDataOptions) {
+  options,
+}: FetchMarketDataInput): Promise<MarketDataResponse> {
   try {
     const start = options?.start ?? "2024-02-20";
     const end = options?.end ?? "2024-03-20";
     const symbols = options?.symbols ?? "BTC%2FUSD";
     const timeFrame = options?.timeFrame ?? "minute";
-    return beyvraMarketApi.alpaca<Record<string, any>>(token, { start, end, symbol_or_symbols: symbols, timeframe: timeFrame });
+    
+    const result = await beyvraMarketApi.alpaca<MarketDataResponse>(token, {
+      start,
+      end,
+      symbol_or_symbols: symbols,
+      timeframe: timeFrame,
+    });
+    
+    if (!result || typeof result !== "object") {
+      throw new ApiError(500, "INVALID_RESPONSE", undefined);
+    }
+    return result;
   } catch (error) {
-    throw new Error(error as string);
+    logInternalError(error, { endpoint: "market.data" });
+    throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN");
   }
 }
 
-type useMarketDataProps = {
-  onSuccess?: (data: unknown, variables: unknown, context: unknown) => void;
-  onError?: (error: unknown, variables: unknown, context: unknown) => void;
-  [index: string]: any;
-};
-export const useMarketData = (props: useMarketDataProps) => {
-  const receivedProps = props || ({} as useMarketDataProps);
+type UseMarketDataProps = BaseMutationHookOptions<MarketDataResponse, FetchMarketDataInput>;
+
+/**
+ * Hook to fetch market data
+ * @example
+ * const { mutate } = useMarketData({
+ *   onSuccess: (data) => console.log(data)
+ * });
+ * mutate({
+ *   token: accessToken,
+ *   options: { symbols: "BTC/USD" }
+ * });
+ */
+export const useMarketData = (props?: UseMarketDataProps) => {
+  const receivedProps = props || ({} as UseMarketDataProps);
 
   const {
     onSuccess: onSuccessOverride,
@@ -40,10 +71,9 @@ export const useMarketData = (props: useMarketDataProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation({
-    mutationFn: marketDataFetcher,
+  return useMutation<MarketDataResponse, Error, FetchMarketDataInput>({
+    mutationFn: fetchMarketData,
     onSuccess: (data, variables, context) => {
-      /* Add On success actions here if needed */
       if (onSuccessOverride) {
         onSuccessOverride(data, variables, context);
       }
@@ -58,3 +88,4 @@ export const useMarketData = (props: useMarketDataProps) => {
 };
 
 export default useMarketData;
+

@@ -1,36 +1,48 @@
 import { useMutation } from "@tanstack/react-query";
-import { IWallet } from "@interfaces";
+import type { IWallet } from "@interfaces";
 import { beyvraWalletApi } from "api/generated/beyvra";
+import { logInternalError } from "errors/userSafeError";
+import { ApiError } from "api/errors";
+import type { BaseMutationHookOptions, PaginatedResponse } from "api/types";
 
-type WalletsResponse = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: IWallet[];
-};
+export type WalletResponse = PaginatedResponse<IWallet>;
 
-type useWalletProps = {
-  onSuccess?: (data: WalletsResponse, variables: unknown, context: unknown) => void;
-  onError?: (error: unknown, variables: unknown, context: unknown) => void;
-  [index: string]: any;
-};
-
-export async function fethWallet(token: string): Promise<WalletsResponse> {
+/**
+ * Fetches user wallet information
+ * @param token - Authentication token
+ * @returns Paginated list of user wallets
+ * @throws ApiError on request failure
+ */
+export async function fetchWallet(token: string): Promise<WalletResponse> {
   try {
-    const result = await beyvraWalletApi.wallets(token) as any;
+    const result = await beyvraWalletApi.wallets(token);
+    if (!result || typeof result !== "object") {
+      throw new ApiError(500, "INVALID_RESPONSE", undefined);
+    }
     return {
-      count: result.count || 0,
-      next: result.next || null,
-      previous: result.previous || null,
-      results: result.results || [],
+      count: (result as Record<string, unknown>).count as number || 0,
+      next: (result as Record<string, unknown>).next as string | null || null,
+      previous: (result as Record<string, unknown>).previous as string | null || null,
+      results: ((result as Record<string, unknown>).results as IWallet[]) || [],
     };
   } catch (error) {
-    throw new Error(error as string);
+    logInternalError(error, { endpoint: "wallet.list" });
+    throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN");
   }
 }
 
-export const useWallet = (props: useWalletProps) => {
-  const receivedProps = props || ({} as useWalletProps);
+type UseWalletProps = BaseMutationHookOptions<WalletResponse, string>;
+
+/**
+ * Hook to fetch user wallets
+ * @example
+ * const { mutate } = useWallet({
+ *   onSuccess: (data) => console.log(data.results)
+ * });
+ * mutate(accessToken);
+ */
+export const useWallet = (props?: UseWalletProps) => {
+  const receivedProps = props || ({} as UseWalletProps);
 
   const {
     onSuccess: onSuccessOverride,
@@ -38,8 +50,8 @@ export const useWallet = (props: useWalletProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, unknown, any>({
-    mutationFn: (token: string) => fethWallet(token),
+  return useMutation<WalletResponse, Error, string>({
+    mutationFn: fetchWallet,
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {
         onSuccessOverride(data, variables, context);

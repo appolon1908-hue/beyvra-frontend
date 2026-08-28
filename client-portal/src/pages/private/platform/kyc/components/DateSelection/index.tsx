@@ -68,7 +68,7 @@ const DateSelection: React.FC<dateSelectionProps> = ({setFormData, formData}) =>
 
     const buildDays = (length: number) => {
        
-        let daysArry: any = [];
+        const daysArry: any = [];
         let d = 1;
         while(d <= 31){
             daysArry.push({value: d, label: `${d}`});
@@ -81,7 +81,7 @@ const DateSelection: React.FC<dateSelectionProps> = ({setFormData, formData}) =>
 
     //check leap year
     const checkLeapYear = (year: number) => {
-        let v: any = (year / 4) * 1;
+        const v: any = (year / 4) * 1;
         //check if the result is an integer or a float using regExp
         if(/^[0-9]+$/.test(v)){
             (monthValue == 2) ?

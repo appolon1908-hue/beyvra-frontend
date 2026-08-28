@@ -19,7 +19,7 @@ type UserData = {
 export async function fetcUpdateUser(
   data: UserData,
   token: string
-): Promise<boolean> {
+): Promise<IUser> {
   try {
     const formData = new FormData();
 
@@ -33,7 +33,7 @@ export async function fetcUpdateUser(
       }
     });
 
-    return await beyvraProfileApi.update(token, formData) as boolean;
+    return await beyvraProfileApi.update(token, formData) as IUser;
   } catch (error) {
     throw new Error(error as string);
   }
@@ -48,7 +48,7 @@ export const useUpdateUser = (props: useUpdateUserProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, unknown, any>({
+  return useMutation<IUser, unknown, { data: UserData; token: string }>({
     mutationFn: (variables) => fetcUpdateUser(variables.data, variables.token),
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {

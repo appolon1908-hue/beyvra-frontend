@@ -1,22 +1,40 @@
 import { useMutation } from "@tanstack/react-query";
-import { IUser } from "@interfaces";
+import type { IUser } from "@interfaces";
 import { beyvraProfileApi } from "api/generated/beyvra";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
+import { ApiError } from "api/errors";
+import type { BaseMutationHookOptions, ProfileResponse } from "api/types";
 
-export async function fethProfile(token: string): Promise<boolean> {
+/**
+ * Fetches user profile data
+ * @param token - Authentication token
+ * @returns User profile information
+ */
+export async function fetchProfile(token: string): Promise<IUser> {
   try {
-    return await beyvraProfileApi.profile(token) as boolean;
+    const response = await beyvraProfileApi.profile(token);
+    if (!response) {
+      throw new ApiError(500, "INVALID_RESPONSE", undefined);
+    }
+    return response as IUser;
   } catch (error) {
-    throw new Error(error as string);
+    logInternalError(error, { endpoint: "user.profile" });
+    throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN");
   }
 }
 
-type useProfileProps = {
-  onSuccess?: (data: IUser, variables: unknown, context: unknown) => void;
-  onError?: (error: unknown, variables: unknown, context: unknown) => void;
-  [index: string]: any;
-};
-export const useProfile = (props: useProfileProps) => {
-  const receivedProps = props || ({} as useProfileProps);
+type UseProfileProps = BaseMutationHookOptions<IUser, string>;
+
+/**
+ * Hook to fetch user profile
+ * @example
+ * const { mutate } = useProfile({
+ *   onSuccess: (user) => console.log(user.email)
+ * });
+ * mutate(accessToken);
+ */
+export const useProfile = (props?: UseProfileProps) => {
+  const receivedProps = props || ({} as UseProfileProps);
 
   const {
     onSuccess: onSuccessOverride,
@@ -24,8 +42,8 @@ export const useProfile = (props: useProfileProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<any, unknown, any>({
-    mutationFn: (token: string) => fethProfile(token),
+  return useMutation<IUser, Error, string>({
+    mutationFn: fetchProfile,
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {
         onSuccessOverride(data, variables, context);
@@ -41,3 +59,4 @@ export const useProfile = (props: useProfileProps) => {
 };
 
 export default useProfile;
+

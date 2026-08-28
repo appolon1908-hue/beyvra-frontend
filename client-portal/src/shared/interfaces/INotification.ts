@@ -5,4 +5,4 @@ export default interface INotification {
     is_enabled?: boolean;
     name?: string;
     updated_at?: string;
-};
+}
