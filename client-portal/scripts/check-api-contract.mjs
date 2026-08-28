@@ -3,7 +3,9 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const sourceRoot = fileURLToPath(new URL("../src/", import.meta.url));
+const endpointsFile = fileURLToPath(new URL("../src/api/endpoints.ts", import.meta.url));
 const schemaUrl = process.env.API_SCHEMA_URL ?? "http://127.0.0.1:8080/api/schema/";
+const schemaFile = process.env.API_SCHEMA_FILE;
 
 async function sourceFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -16,16 +18,22 @@ async function sourceFiles(directory) {
 
 function canonical(path) {
   const normalized = path.includes("queryParams") ? path.split("${")[0] : path;
-  return normalized
+  const withoutHost = normalized
     .split("?")[0]
     .replace(/\$\{[^}]+\}/g, "{}")
     .replace(/\{[^}]+\}/g, "{}")
-    .replace(/\/$/, "") || "/";
+    .replace(/\/$/, "");
+  const withLeadingSlash = withoutHost.startsWith("/") ? withoutHost : `/${withoutHost}`;
+  return withLeadingSlash || "/";
 }
 
-const schemaResponse = await fetch(schemaUrl, { redirect: "follow" });
-if (!schemaResponse.ok) throw new Error(`Schema request failed: ${schemaResponse.status}`);
-const schema = await schemaResponse.text();
+const schema = schemaFile
+  ? await readFile(schemaFile, "utf8")
+  : await (async () => {
+      const schemaResponse = await fetch(schemaUrl, { redirect: "follow" });
+      if (!schemaResponse.ok) throw new Error(`Schema request failed: ${schemaResponse.status}`);
+      return schemaResponse.text();
+    })();
 const backendPaths = new Set(
   [...schema.matchAll(/^  (\/api\/[^:]+):$/gm)].map((match) => canonical(match[1].slice(4))),
 );
@@ -39,6 +47,17 @@ for (const file of await sourceFiles(sourceRoot)) {
   ];
   for (const pattern of patterns) {
     for (const match of source.matchAll(pattern)) endpoints.add(canonical(match[1]));
+  }
+}
+
+const configuredEndpoints = await readFile(endpointsFile, "utf8");
+const endpointPatterns = [
+  /["']((?:v1|notification|portfolio|trades)\/[^"'`$]*)["']/g,
+  /`((?:v1|notification|portfolio|trades)\/[^`]*)`/g,
+];
+for (const pattern of endpointPatterns) {
+  for (const match of configuredEndpoints.matchAll(pattern)) {
+    endpoints.add(canonical(match[1]));
   }
 }
 

@@ -22,7 +22,7 @@ export const apiEndpoints = {
     webhookDeliveries: (webhookId: string) => `notification/webhooks/${webhookId}/deliveries/`,
   },
   market: {
-    history: "v1/market/trades",
+    history: (instrumentId: string) => `v1/market/trades/${encodeURIComponent(instrumentId)}`,
     snapshot: "v1/market/quotes",
     candles: "v1/market/candles",
   },
