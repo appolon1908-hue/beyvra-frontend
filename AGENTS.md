@@ -46,6 +46,7 @@ Run these from the app directory unless stated otherwise:
 - For local login, the backend flow is: submit credentials -> backend validates -> return MFA/login token if required -> backend sets HttpOnly cookies -> frontend fetches session/me data and enters the app.
 - For logout, always use the backend logout route matching the active auth mode (`/api/v1/auth/oidc/logout/` or `/api/v1/auth/token/logout/`); never implement custom session teardown in the frontend.
 - Keep auth-related changes aligned with the backend contract, not with a frontend-only login abstraction.
+- Follow [docs/REALTIME-OWNERSHIP-BOUNDARY.md](docs/REALTIME-OWNERSHIP-BOUNDARY.md): browser realtime clients subscribe and render trusted data only; user-originated mutations use authenticated REST APIs.
 
 ## Recommended workflow for agents
 

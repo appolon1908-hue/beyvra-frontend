@@ -76,6 +76,7 @@ Release is blocked until frontend code and tests prove all of the following:
 - login, registration, logout, MFA, and password-reset tests
 - WCAG 2.2 AA evidence
 - numeric, measured performance budgets enforced as blocking thresholds
+- the realtime ownership boundary in [docs/REALTIME-OWNERSHIP-BOUNDARY.md](docs/REALTIME-OWNERSHIP-BOUNDARY.md): browser clients are subscribe-only for trusted channels and user mutations use authenticated REST APIs
 
 ## Financial browser safety gates
 
