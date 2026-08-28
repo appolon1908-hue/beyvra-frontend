@@ -38,6 +38,19 @@ record the resulting digest. Mutable tags are not production evidence.
 
 ## Local production-style rehearsal
 
+The container serves the SPA on port `8080` by default. It requires the external
+`trading-network` Docker network, which provides the backend/BFF upstream named
+`nginx`. Create or connect that network before starting the full edge profile.
+`VITE_REALTIME_V2_ENABLED` defaults to `false`; enable it only after the realtime
+ownership, transport-routing, and end-to-end release gates are approved. Realtime
+V2 to V1 fallback defaults to `false`; any downgrade path must be an explicit
+deployment decision with rollback evidence.
+
+For production browser builds, `VITE_API_BASE_URL` must remain same-origin,
+normally `/api`. Do not configure the browser to call `api.beyvra.com` directly.
+The edge/BFF owns upstream routing. The Nginx entrypoint injects runtime values
+into `index.html`; no populated `.env` file is required or should be committed.
+
 The frontend container binds to loopback by default so the host edge remains the only
 public ingress:
 
