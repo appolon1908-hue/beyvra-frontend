@@ -1,13 +1,41 @@
-version: "3.8"
 services:
-  server:
+  frontend:
+    image: ${FRONTEND_IMAGE:-beyvra-frontend:local}
     build:
       context: ./
       dockerfile: Dockerfile.prod
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+        VITE_SOCKET_BASE_URL: ${VITE_SOCKET_BASE_URL:-AUTO}
+        VITE_PUBLIC_SITE_URL: ${VITE_PUBLIC_SITE_URL:-https://staging.beyvra.com}
+        VITE_BRAND_NAME: ${VITE_BRAND_NAME:-Beyvra}
+        VITE_REALTIME_V2_ENABLED: ${VITE_REALTIME_V2_ENABLED:-false}
+        VITE_REALTIME_V2_V1_FALLBACK_ENABLED: ${VITE_REALTIME_V2_V1_FALLBACK_ENABLED:-false}
+        VCS_REF: ${VCS_REF:-unknown}
+        BUILD_VERSION: ${BUILD_VERSION:-unreleased}
+        BUILD_DATE: ${BUILD_DATE:-unknown}
     ports:
-      - ${SERVER_PORT}:80
+      - "127.0.0.1:${SERVER_PORT:-8080}:8080"
     environment:
-      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
-      - VITE_SOCKET_BASE_URL=${VITE_SOCKET_BASE_URL}
-      - VITE_PUBLIC_SITE_URL=${VITE_PUBLIC_SITE_URL}
-      - VITE_BRAND_NAME=${VITE_BRAND_NAME:-Beyvra}
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
+      VITE_SOCKET_BASE_URL: ${VITE_SOCKET_BASE_URL:-AUTO}
+      VITE_PUBLIC_SITE_URL: ${VITE_PUBLIC_SITE_URL:-https://staging.beyvra.com}
+      VITE_BRAND_NAME: ${VITE_BRAND_NAME:-Beyvra}
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+      - /var/cache/nginx:size=32m,mode=0755
+      - /var/run:size=8m,mode=0755
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 128
+    stop_grace_period: 10s
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 15s
+      timeout: 3s
+      start_period: 10s
+      retries: 5
