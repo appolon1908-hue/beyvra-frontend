@@ -7,9 +7,9 @@ This document tracks the product and delivery sequence for frontend work before 
 ```text
 docs/frontend-production-authority
 → feature/frontend-h1-safety-bff
+→ feature/frontend-h2-market-explorer
 → feature/frontend-h3-safe-order-ticket
 → feature/frontend-h4-orders-activity
-→ feature/frontend-h2-market-explorer
 → feature/frontend-h5-account-projections
 → feature/frontend-h6-realtime-recovery
 → test/frontend-production-certification
@@ -29,9 +29,9 @@ until its listed predecessor is merged and its acceptance condition passes.
 | --- | --- | --- | --- |
 | 0 | `docs/frontend-production-authority` | Roadmap, production gates, runtime-evidence templates | Documentation PR approved |
 | 1 | `feature/frontend-h1-safety-bff` | Same-origin API client, CSRF, timeouts, session handling, protected routes, global errors | Auth/BFF/security tests pass |
-| 2 | `feature/frontend-h3-safe-order-ticket` | Preview, confirmation, idempotency, expiration, buying power, fees, duplicate prevention | Order safety E2E passes |
-| 3 | `feature/frontend-h4-orders-activity` | Lifecycle, executions, cancel/replace, event timeline, reconciliation | State-transition tests pass |
-| 4 | `feature/frontend-h2-market-explorer` | Instruments, search, sessions, freshness, stale/unavailable data | Market-data contract tests pass |
+| 2 | `feature/frontend-h2-market-explorer` | Instruments, search, sessions, freshness, stale/unavailable data | Market-data contract tests pass |
+| 3 | `feature/frontend-h3-safe-order-ticket` | Preview, confirmation, idempotency, expiration, buying power, fees, duplicate prevention | Order safety E2E passes |
+| 4 | `feature/frontend-h4-orders-activity` | Lifecycle, executions, cancel/replace, event timeline, reconciliation | State-transition tests pass |
 | 5 | `feature/frontend-h5-account-projections` | Balances, buying power, positions, transactions, evidence states | No client financial recalculation |
 | 6 | `feature/frontend-h6-realtime-recovery` | Tickets, subscriptions, sequences, reconnect, snapshot recovery | Gap/recovery E2E passes |
 | 7 | `test/frontend-production-certification` | Authentication, financial safety, accessibility, browser testing | Production gate report generated |
@@ -104,6 +104,9 @@ until its listed predecessor is merged and its acceptance condition passes.
 
 ### H6. Realtime recovery
 
+- App gateway: `POST /api/v1/realtime/ticket` plus its documented WebSocket route.
+- Centrifugo: `POST /api/v1/realtime/v2/connection-token`, `POST /api/v1/realtime/v2/subscription-token`, and `/ws/v2/` only when that public route is Centrifugo.
+- Recovery uses a channel-specific registry `snapshot_provider` and server-issued cursor or sequence contract. `GET /api/v1/realtime/resume` and `GET /api/v1/realtime/snapshot` are backend work required before they may become dependencies.
 - short-lived tickets
 - sequence tracking
 - duplicate rejection
@@ -229,21 +232,16 @@ until its listed predecessor is merged and its acceptance condition passes.
 ## Execution order
 
 ```text
-PR #25
-→ PR #27
-→ H1 Safety Foundation
-→ H2 Market Explorer
-→ H3 Order Ticket
-→ H4 Orders and Activity
-→ H5 Account Projections
-→ H6 Realtime Recovery
-→ H7 Critical Tests
-→ M1 Portfolio V2
-→ M2 Watchlists and Alerts
-→ M3 Compliance and Security
-→ M4 Operator Console
-→ M5 Chart V2
-→ Low-priority enhancements
+docs/frontend-production-authority
+→ feature/frontend-h1-safety-bff
+→ feature/frontend-h2-market-explorer
+→ feature/frontend-h3-safe-order-ticket
+→ feature/frontend-h4-orders-activity
+→ feature/frontend-h5-account-projections
+→ feature/frontend-h6-realtime-recovery
+→ test/frontend-production-certification
+→ medium-priority-stack
+→ low-priority-stack
 ```
 
 ## Delivery priority
