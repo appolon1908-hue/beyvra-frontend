@@ -1,0 +1,123 @@
+name: Frontend production container
+
+on:
+  pull_request:
+    paths:
+      - "client-portal/**"
+      - "docker-compose.yaml"
+      - "DEPLOYMENT.md"
+      - ".github/workflows/frontend-container-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-container-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout exact head
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: client-portal/package-lock.json
+
+      - name: Install dependencies
+        working-directory: client-portal
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: client-portal
+        run: npm run typecheck
+
+      - name: Lint
+        working-directory: client-portal
+        run: npm run lint
+
+      - name: Authoritative production build
+        working-directory: client-portal
+        run: npm run build
+
+      - name: Validate Compose model
+        run: |
+          docker compose config >/tmp/beyvra-compose.yml
+          test -s /tmp/beyvra-compose.yml
+
+      - name: Build production image
+        run: |
+          docker build \
+            --file client-portal/Dockerfile.prod \
+            --build-arg VCS_REF="${GITHUB_SHA}" \
+            --build-arg BUILD_VERSION="pr-${GITHUB_RUN_NUMBER}" \
+            --build-arg BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --build-arg VITE_API_BASE_URL=/api \
+            --build-arg VITE_SOCKET_BASE_URL=AUTO \
+            --build-arg VITE_PUBLIC_SITE_URL=https://staging.beyvra.com \
+            --tag beyvra-frontend:${GITHUB_SHA} \
+            client-portal
+
+      - name: Run hardened container
+        run: |
+          docker run -d \
+            --name beyvra-frontend-ci \
+            --read-only \
+            --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+            --tmpfs /var/cache/nginx:rw,noexec,nosuid,size=32m \
+            --tmpfs /var/run:rw,noexec,nosuid,size=8m \
+            --cap-drop ALL \
+            --security-opt no-new-privileges:true \
+            --pids-limit 128 \
+            -p 127.0.0.1:18080:8080 \
+            beyvra-frontend:${GITHUB_SHA}
+
+      - name: Smoke test health and SPA
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18080/healthz >/dev/null; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              docker logs beyvra-frontend-ci
+              exit 1
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:18080/healthz | grep -qx ok
+          curl --fail --silent http://127.0.0.1:18080/ >/tmp/index.html
+          grep -qi '<html' /tmp/index.html
+
+      - name: Verify runtime hardening
+        run: |
+          user="$(docker inspect --format '{{.Config.User}}' beyvra-frontend-ci)"
+          readonly="$(docker inspect --format '{{.HostConfig.ReadonlyRootfs}}' beyvra-frontend-ci)"
+          no_new_privs="$(docker inspect --format '{{json .HostConfig.SecurityOpt}}' beyvra-frontend-ci)"
+          cap_drop="$(docker inspect --format '{{json .HostConfig.CapDrop}}' beyvra-frontend-ci)"
+
+          test -n "$user"
+          test "$user" != "0"
+          test "$user" != "root"
+          test "$readonly" = "true"
+          echo "$no_new_privs" | grep -q 'no-new-privileges'
+          echo "$cap_drop" | grep -q 'ALL'
+
+      - name: Verify realtime ticket query redaction config
+        run: |
+          grep -q '"$request_method $uri $server_protocol"' client-portal/nginx-default.conf
+          if grep -q '\$request_uri' client-portal/nginx-default.conf; then
+            echo 'request_uri would expose query strings in access logs' >&2
+            exit 1
+          fi
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker logs beyvra-frontend-ci || true
