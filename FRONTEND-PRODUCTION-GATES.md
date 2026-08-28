@@ -40,19 +40,6 @@ npm run test:e2e
 npm audit --audit-level=critical
 ```
 
-For the non-E2E local and CI gate bundle, run:
-
-```text
-npm run production:gate
-```
-
-For contract drift, use the same backend candidate that will serve the frontend:
-
-```text
-API_SCHEMA_FILE=../beyvra-backend/contracts/openapi/beyvra-v1.yaml npm run test:contract
-API_SCHEMA_URL=https://staging-api.example.com/api/schema/ npm run test:contract
-```
-
 Additional mandatory checks:
 
 - Gitleaks

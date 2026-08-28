@@ -1,17 +1,10 @@
-import { execFileSync, execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 const acceptedAdvisories = new Set(["https://github.com/advisories/GHSA-qwww-vcr4-c8h2"]);
 
-function npmAuditJson() {
-  if (process.platform === "win32") {
-    return execSync("npm audit --omit=dev --json", { encoding: "utf8" });
-  }
-  return execFileSync("npm", ["audit", "--omit=dev", "--json"], { encoding: "utf8" });
-}
-
 let report;
 try {
-  report = JSON.parse(npmAuditJson());
+  report = JSON.parse(execFileSync("npm", ["audit", "--omit=dev", "--json"], { encoding: "utf8" }));
 } catch (error) {
   if (!error.stdout) throw error;
   report = JSON.parse(error.stdout.toString());
