@@ -5,18 +5,38 @@ This document tracks the product and delivery sequence for frontend work before 
 ## Dependency chain
 
 ```text
-Frontend PR #25
-→ Frontend PR #27
-→ frontend-safety-foundation-v1
-→ market-explorer-v1
-→ order-ticket-v1
-→ orders-activity-v1
-→ account-financial-projections-v1
-→ realtime-recovery-v1
-→ frontend-critical-gates-v1
+docs/frontend-production-authority
+→ feature/frontend-h1-safety-bff
+→ feature/frontend-h3-safe-order-ticket
+→ feature/frontend-h4-orders-activity
+→ feature/frontend-h2-market-explorer
+→ feature/frontend-h5-account-projections
+→ feature/frontend-h6-realtime-recovery
+→ test/frontend-production-certification
+→ medium-priority-stack
+→ low-priority-stack
 ```
 
-Each PR must include exact base/head, backend-contract dependency, CI result, and independent review.
+`docs/frontend-production-authority` is the documentation base for this stack. Each
+PR must include exact base/head, backend-contract dependency, CI result, independent
+review, and the gate evidence record defined in
+[FRONTEND-PRODUCTION-GATES.md](FRONTEND-PRODUCTION-GATES.md).
+
+The stack is ordered by dependency and release risk. A later branch must not merge
+until its listed predecessor is merged and its acceptance condition passes.
+
+| Step | Branch | Scope | Acceptance condition |
+| --- | --- | --- | --- |
+| 0 | `docs/frontend-production-authority` | Roadmap, production gates, runtime-evidence templates | Documentation PR approved |
+| 1 | `feature/frontend-h1-safety-bff` | Same-origin API client, CSRF, timeouts, session handling, protected routes, global errors | Auth/BFF/security tests pass |
+| 2 | `feature/frontend-h3-safe-order-ticket` | Preview, confirmation, idempotency, expiration, buying power, fees, duplicate prevention | Order safety E2E passes |
+| 3 | `feature/frontend-h4-orders-activity` | Lifecycle, executions, cancel/replace, event timeline, reconciliation | State-transition tests pass |
+| 4 | `feature/frontend-h2-market-explorer` | Instruments, search, sessions, freshness, stale/unavailable data | Market-data contract tests pass |
+| 5 | `feature/frontend-h5-account-projections` | Balances, buying power, positions, transactions, evidence states | No client financial recalculation |
+| 6 | `feature/frontend-h6-realtime-recovery` | Tickets, subscriptions, sequences, reconnect, snapshot recovery | Gap/recovery E2E passes |
+| 7 | `test/frontend-production-certification` | Authentication, financial safety, accessibility, browser testing | Production gate report generated |
+| 8 | `medium-priority-stack` | Portfolio, watchlists, compliance, operators, charts | Each capability independently gated |
+| 9 | `low-priority-stack` | Personalization, education, analytics, notifications | Core safety is not weakened |
 
 ## High priority
 

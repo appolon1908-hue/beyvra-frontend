@@ -2,6 +2,42 @@
 
 This document records the runtime evidence required before go/no-go for simulation launch.
 
+## Evidence state model
+
+Each requirement must be tracked through these states independently. Configuration
+being present is not evidence that a test passed, and a staging pass is not proof of
+production cutover.
+
+| State | Meaning |
+| --- | --- |
+| Configuration present | Required setting, route, capability, or deployment configuration is present and inspected. |
+| Automated test passed | A repeatable automated test passed against the exact commit. |
+| Staging smoke test passed | The deployed staging revision passed a realistic smoke test. |
+| Production cutover verified | The production deployment was verified after cutover using the recorded revision and digest. |
+
+## Evidence record template
+
+```text
+REQUIREMENT=
+CONFIGURATION_PRESENT=PASS|FAIL|NOT_RUN
+AUTOMATED_TEST=PASS|FAIL|NOT_RUN
+STAGING_SMOKE=PASS|FAIL|NOT_RUN
+PRODUCTION_CUTOVER=PASS|FAIL|NOT_RUN
+COMMIT_SHA=
+CONTAINER_DIGEST=
+ENVIRONMENT=
+DEPLOYMENT_REVISION=
+TEST_COMMAND=
+TEST_RUN_URL=
+TIMESTAMP_UTC=
+RESPONSIBLE_REVIEWER=
+EVIDENCE_URLS=
+```
+
+Each row must contain exact immutable build identity, environment and deployment
+revision, test command and run URL, UTC timestamp, responsible reviewer, status, and
+attached evidence. `PASS` is not valid when an earlier state is missing.
+
 ## Required runtime evidence
 
 - backend auth mode verified
@@ -16,6 +52,9 @@ This document records the runtime evidence required before go/no-go for simulati
 - no bearer or refresh token persistence in browser storage
 - no sensitive financial values fabricated or persisted locally
 - no unauthorized redirect handling accepted
+- order-preview expiration and idempotent submission verified
+- `If-Match` conflict handling verified
+- WebSocket gap recovery verified
 
 ## Evidence checklist
 
@@ -45,4 +84,13 @@ PASSWORD_RESET_CONSUME=PASS
 
 ## Approval gate
 
-Simulation launch is allowed only when runtime evidence, production-gate checks, and security validations are complete and reviewed by independent reviewers.
+Simulation launch is blocked until frontend code proves same-origin `/api` BFF use,
+absence of browser-stored bearer tokens, absence of authentication and financial
+response caching, disabled offline financial mutation replay, order-preview expiration,
+idempotent submission, `If-Match` conflict handling, WebSocket gap recovery, login,
+registration, logout, MFA, password-reset, WCAG 2.2 AA, and measured numeric
+performance-budget tests. Runtime evidence, production-gate checks, and security
+validations must then be complete at all four evidence states and reviewed by
+independent reviewers.
+
+**Current status: documentation prepared, code and runtime verification pending.**

@@ -2,6 +2,29 @@
 
 This document captures readiness checks for frontend production simulation and launch.
 
+## Gate evidence record
+
+Every gate must have a completed record before approval. A gate is `PASS` only when
+the required code proof and runtime evidence are attached.
+
+```text
+GATE_NAME=
+STATUS=PASS|FAIL|BLOCKED|NOT_RUN
+COMMIT_SHA=
+CONTAINER_DIGEST=
+ENVIRONMENT=
+DEPLOYMENT_REVISION=
+TEST_COMMAND=
+TEST_RUN_URL=
+TIMESTAMP_UTC=
+RESPONSIBLE_REVIEWER=
+EVIDENCE_URLS=
+```
+
+The record must use an exact immutable commit SHA and container digest, identify the
+environment and deployment revision, link the command and run, include a UTC timestamp
+and named reviewer, and attach the evidence used for the decision.
+
 ## Required CI
 
 ```text
@@ -38,6 +61,21 @@ Additional mandatory checks:
 - protected deep links survive authentication
 - malicious external redirects are rejected
 - multi-tab logout clears authenticated UI state
+
+## Mandatory release blockers
+
+Release is blocked until frontend code and tests prove all of the following:
+
+- same-origin BFF access through `/api`
+- no browser-stored bearer, refresh, or ID tokens
+- no caching of authentication or financial responses
+- no offline financial mutation replay
+- order-preview expiration and idempotent submission
+- `If-Match` conflict handling
+- WebSocket gap detection and recovery
+- login, registration, logout, MFA, and password-reset tests
+- WCAG 2.2 AA evidence
+- numeric, measured performance budgets enforced as blocking thresholds
 
 ## Financial browser safety gates
 
@@ -100,7 +138,9 @@ TRACKING_HOST_TLS=PASS
 
 ## Performance budgets
 
-Values must be established from measured staging baselines rather than invented.
+Values may remain blank only while staging measurement is in progress. Before
+production approval, every value must be numeric, approved, and enforced as a
+blocking threshold in CI or the deployment gate.
 
 ```text
 INITIAL_JS_BUDGET_KB=
@@ -112,6 +152,8 @@ API_P95_TARGET_MS=
 ORDER_PREVIEW_P95_TARGET_MS=
 REALTIME_RECOVERY_TARGET_MS=
 ```
+
+Blank or non-blocking performance thresholds are a production release failure.
 
 ## Accessibility gate
 
