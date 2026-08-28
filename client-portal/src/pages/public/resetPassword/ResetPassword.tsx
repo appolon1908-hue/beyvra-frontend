@@ -16,7 +16,7 @@ const ResetPassword: React.FunctionComponent<ResetPasswordProps> = () => {
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
-  const uidb64 = queryParams.get("uidb64") || undefined;
+  const uidb64 = queryParams.get("uidb64") || queryParams.get("uid") || undefined;
   const token = queryParams.get("token") || undefined;
 
   const [passwordVisible, setPasswordVisible] = useState(false);
