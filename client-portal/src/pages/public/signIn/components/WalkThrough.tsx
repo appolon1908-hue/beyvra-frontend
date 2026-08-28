@@ -1,6 +1,5 @@
 import { useState } from "react";
 import "./WalkThrough.scss";
-import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import useDisableWalkThrough from "api/user/useDisableWalkthrough";
 
@@ -8,18 +7,16 @@ const WalkThrough = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const totalSteps = 10;
   const navigate = useNavigate();
-  const [cookies, , removeCookie] = useCookies(["access_token", "step"]);
 
   const { mutate: completeWalkthrough, isPending } = useDisableWalkThrough({
     onSuccess: () => {
-      removeCookie("step", { path: "/" });
       navigate("/platform", { replace: true });
     },
   });
 
   const handleComplete = () => {
-    if (!cookies.access_token || isPending) return;
-    completeWalkthrough({ token: cookies.access_token });
+    if (isPending) return;
+    completeWalkthrough();
   };
 
   const handleNext = () => {

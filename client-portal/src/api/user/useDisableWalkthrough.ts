@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import {  IUser } from "@interfaces";
 import { beyvraProfileApi } from "api/generated/beyvra";
 
-export async function disableUserWalkThrough(token: string): Promise<IUser> {
+export async function disableUserWalkThrough(token?: string): Promise<IUser> {
   try {
     return await beyvraProfileApi.disableWalkthrough(token) as IUser;
   } catch (error) {
@@ -24,8 +24,8 @@ export const useDisableWalkThrough = (props: useDisableWalkThroughProps) => {
     ...rest
   } = receivedProps;
 
-  return useMutation<IUser, Error, { token: string }>({
-    mutationFn: (variables) => disableUserWalkThrough(variables.token),
+  return useMutation<IUser, Error, { token?: string } | void>({
+    mutationFn: (variables) => disableUserWalkThrough(variables?.token),
     onSuccess: (data, variables, context) => {
       if (onSuccessOverride) {
         onSuccessOverride(data, variables, context);

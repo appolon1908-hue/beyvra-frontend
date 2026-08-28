@@ -145,7 +145,7 @@ export const codestraProfileApi = {
   legacyProfile: <T>(token: string) => codestraRequest<T>("user/profile/", { token }),
   update: (token: string, body: FormData | Record<string, unknown>) => codestraRequest("v1/me/", { method: "PATCH", token, body: body instanceof FormData ? body : JSON.stringify(body) }),
   changePassword: (token: string, body: unknown) => codestraRequest("v1/auth/password_change/", { method: "POST", token, body: JSON.stringify(body) }),
-  disableWalkthrough: (token: string) => codestraRequest("v1/auth/disable_walkthrough/", { method: "PUT", token }),
+  disableWalkthrough: (token?: string) => codestraRequest("v1/auth/disable_walkthrough/", { method: "PUT", token }),
 };
 
 export const codestraIntegrationsApi = {
