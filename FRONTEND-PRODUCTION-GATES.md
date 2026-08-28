@@ -33,8 +33,9 @@ npm run typecheck
 npm run lint
 npm run build
 npm run test
+npm run test:contract
+npm run test:realtime
 npm run test:chart
-npm run test:enterprise
 npm run test:e2e
 npm audit --audit-level=critical
 ```
@@ -133,9 +134,14 @@ KLYROW_SECURITY_SMTP_STARTTLS=PASS
 KLYROW_SECURITY_SMTP_AUTH=PASS
 KLYROW_SANDBOX_DELIVERY=PASS
 INBOUND_ROUTE_RECONCILIATION=PASS
-LIVE_DELIVERY_KILL_SWITCH=DISABLED
+EXTERNAL_DELIVERY_ENABLED=false
+DELIVERY_KILL_SWITCH=ENABLED
 TRACKING_HOST_TLS=PASS
 ```
+
+The email environment must document the actual variable names used by the deployment.
+The required state is unambiguous: external delivery is disabled and the delivery kill
+switch is enabled until explicit approval.
 
 ## Performance budgets
 

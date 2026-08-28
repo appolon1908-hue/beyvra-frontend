@@ -25,8 +25,9 @@ Run these from the app directory unless stated otherwise:
 - Dev server: `cd client-portal && npm run dev` (Vite runs on port 8080)
 - Type-check: `cd client-portal && npm run typecheck`
 - Lint: `cd client-portal && npm run lint`
-- Production build: `cd client-portal && npm run build:prod`
-- Full app validation: `cd client-portal && npm test`
+- Release build: `cd client-portal && npm run build`
+- Raw Vite production build for targeted debugging: `cd client-portal && npm run build:prod`
+- Baseline compile/build check: `cd client-portal && npm test` (not full certification)
 - Targeted checks:
   - `cd client-portal && npm run test:errors`
   - `cd client-portal && npm run test:realtime`
@@ -35,7 +36,7 @@ Run these from the app directory unless stated otherwise:
 
 ## Important repo-specific notes
 
-- The production build includes project-specific checks before Vite runs: error safety validation, brand/public identity validation, type-checking, and i18n validation. Do not bypass these when validating changes.
+- `npm run build` includes error-safety validation, brand/public identity validation, type-checking, and i18n validation before Vite runs. Do not use `build:prod` as release validation because it bypasses those checks.
 - Route code is intentionally split between public marketing pages and private platform pages, with lazy loading used for large sections.
 - The app is sensitive to user-safe messaging and public identity consistency; when changing text, review the checks in [client-portal/scripts](client-portal/scripts) and the identity docs in [docs](docs).
 - For deployment details, follow [DEPLOYMENT.md](DEPLOYMENT.md) and the Docker setup under [client-portal](client-portal).
@@ -60,15 +61,14 @@ Run these from the app directory unless stated otherwise:
 Add the complete frontend dependency sequence:
 
 ```text
-Frontend PR #25
-→ Frontend PR #27
-→ frontend-safety-foundation-v1
-→ market-explorer-v1
-→ order-ticket-v1
-→ orders-activity-v1
-→ account-financial-projections-v1
-→ realtime-recovery-v1
-→ frontend-critical-gates-v1
+docs/frontend-production-authority
+→ feature/frontend-h1-safety-bff
+→ feature/frontend-h2-market-explorer
+→ feature/frontend-h3-safe-order-ticket
+→ feature/frontend-h4-orders-activity
+→ feature/frontend-h5-account-projections
+→ feature/frontend-h6-realtime-recovery
+→ test/frontend-production-certification
 ```
 
 Each PR requires exact base/head, backend-contract dependency, CI result, and independent review.
@@ -83,8 +83,9 @@ npm run typecheck
 npm run lint
 npm run build
 npm run test
+npm run test:contract
+npm run test:realtime
 npm run test:chart
-npm run test:enterprise
 npm run test:e2e
 npm audit --audit-level=critical
 ```
@@ -177,7 +178,8 @@ KLYROW_SECURITY_SMTP_STARTTLS=PASS
 KLYROW_SECURITY_SMTP_AUTH=PASS
 KLYROW_SANDBOX_DELIVERY=PASS
 INBOUND_ROUTE_RECONCILIATION=PASS
-LIVE_DELIVERY_KILL_SWITCH=DISABLED
+EXTERNAL_DELIVERY_ENABLED=false
+DELIVERY_KILL_SWITCH=ENABLED
 TRACKING_HOST_TLS=PASS
 ```
 
@@ -187,7 +189,7 @@ These are required feature and validation workstreams before external simulation
 
 ### H1. Frontend safety foundation
 
-- Branch: `feature/beyvra/frontend-safety-foundation-v1`
+- Branch: `feature/frontend-h1-safety-bff`
 - Required backend and client-side safety foundation: one same-origin BFF API client, `credentials: "include"`, CSRF for unsafe requests, bounded request timeouts, request cancellation, normalized API errors, request/correlation ID display, `cache: "no-store"`, global offline mutation blocking, no bearer-token storage or attachment, session-expiration handling, multi-tab logout, and protected deep-link restoration.
 - Connect: `GET /api/v1/platform/config` and `GET /api/v1/platform/capabilities`.
 - Required components: `CapabilityGuard`, `AuthenticatedRoute`, `MfaRequiredBoundary`, `OfflineMutationGuard`, `MaintenanceBoundary`, `DegradedModeNotice`, `ApiErrorState`, `UnavailableState`, `PartialDataNotice`, and `RequestIdSupportReference`.
@@ -195,14 +197,14 @@ These are required feature and validation workstreams before external simulation
 
 ### H2. Market explorer and canonical instrument selection
 
-- Branch: `feature/beyvra/market-explorer-v1`
+- Branch: `feature/frontend-h2-market-explorer`
 - Connect: `GET /api/v1/instruments`, `GET /api/v1/instruments/{id}`, `GET /api/v1/markets/status`, `GET /api/v1/market/snapshot`, and `GET /api/v1/market/capabilities`.
 - Required behavior: debounced search, cursor pagination, asset-class and venue filters, market-open/closed states, price freshness indicators, canonical UUID selection, delayed/stale/gapped/unavailable handling, mobile instrument drawer, keyboard navigation, and clear simulation disclosure.
 - Rules: never use ticker symbol as the only identifier; reject ambiguous symbols; never show stale prices as tradable; preserve canonical identity after symbol changes.
 
 ### H3. Safe order ticket
 
-- Branch: `feature/beyvra/order-ticket-v1`
+- Branch: `feature/frontend-h3-safe-order-ticket`
 - Connect: `POST /api/v1/orders/preview`, `POST /api/v1/orders`, `POST /api/v1/orders/{id}/cancel`, `POST /api/v1/orders/{id}/replace`, and `GET /api/v1/orders/{id}`.
 - Required flow: account selection -> instrument selection -> order entry -> server preview -> confirmation -> idempotent submission -> server receipt -> order-state tracking.
 - Required controls: decimal-string inputs, backend-supported order types and time-in-force values only, quote age and expiration, buying power before and after, fees or explicit unavailable state, compliance and risk decisions, duplicate-click protection, stable `Idempotency-Key`, preview version via `If-Match`, preview invalidation when economic fields change, offline blocking, unknown-outcome state, cancel confirmation, and replace through a new preview.
@@ -210,27 +212,28 @@ These are required feature and validation workstreams before external simulation
 
 ### H4. Orders, executions and activity
 
-- Branch: `feature/beyvra/orders-activity-v1`
+- Branch: `feature/frontend-h4-orders-activity`
 - Routes: `/platform/orders`, `/platform/orders/:orderId`, `/platform/executions`, and `/platform/activity`.
 - Connect: `GET /api/v1/orders`, `GET /api/v1/orders/{id}`, `GET /api/v1/orders/{id}/events`, `GET /api/v1/executions`, and `GET /api/v1/accounts/{id}/transactions`.
 - Build: open orders, order history, status filters, partial fills, execution list, immutable event timeline, cancel/replace relationships, rejection explanations, unknown and reconciliation-required warnings, cursor pagination, and request ID for support.
 
 ### H5. Account and financial projections
 
-- Branch: `feature/beyvra/account-financial-projections-v1`
+- Branch: `feature/frontend-h5-account-projections`
 - Connect: `GET /api/v1/accounts`, `GET /api/v1/accounts/{id}`, `GET /api/v1/accounts/{id}/balances`, `GET /api/v1/accounts/{id}/buying-power`, `GET /api/v1/accounts/{id}/transactions`, and `GET /api/v1/accounts/{id}/statements`.
 - Display separately: cash, settled cash, unsettled cash, reserved cash, available cash, buying power, equity, and market value.
 - Missing evidence must display as unavailable, never as `0.00`.
 
 ### H6. Realtime recovery
 
-- Branch: `feature/beyvra/realtime-recovery-v1`
-- Connect: `POST /api/v1/realtime/ticket`, `GET /api/v1/realtime/resume`, and `GET /api/v1/realtime/snapshot`.
+- Branch: `feature/frontend-h6-realtime-recovery`
+- Transport contract: use either the app gateway (`POST /api/v1/realtime/ticket` and its documented WebSocket route) or Centrifugo (`POST /api/v1/realtime/v2/connection-token`, `POST /api/v1/realtime/v2/subscription-token`, and `/ws/v2/` only when it is routed to Centrifugo). One public route must represent one protocol.
+- Recovery contract: use each authorized channel's registry `snapshot_provider` and a server-issued cursor/sequence contract. `GET /api/v1/realtime/resume` and `GET /api/v1/realtime/snapshot` are backend prerequisites, not current frontend API dependencies.
 - Must support short-lived tickets, sequence tracking, duplicate rejection, gap detection, resume after reconnect, `SNAPSHOT_REQUIRED` recovery, bounded exponential backoff, session-expiration shutdown, logout disconnection, and connection-health display.
 
 ### H7. Critical testing
 
-- Branch: `test/beyvra/frontend-critical-gates-v1`
+- Branch: `test/frontend-production-certification`
 - Mandatory end-to-end coverage: login, registration, logout and recovery, protected deep links, session expiration, administrator MFA, capability failure, order preview and submission, duplicate submission, stale preview, partial fill, cancel and replace, unknown outcome, cross-tenant denial, offline mutation blocking, realtime gap recovery, mobile order flow, sensitive-cache inspection, and keyboard-only trading.
 - These are mandatory gates before external simulation users are allowed.
 
@@ -295,21 +298,16 @@ These are required feature and validation workstreams before external simulation
 ## Branch execution order
 
 ```text
-PR #25
-→ PR #27
-→ H1 Safety Foundation
-→ H2 Market Explorer
-→ H3 Order Ticket
-→ H4 Orders and Activity
-→ H5 Account Projections
-→ H6 Realtime Recovery
-→ H7 Critical Tests
-→ M1 Portfolio V2
-→ M2 Watchlists and Alerts
-→ M3 Compliance and Security
-→ M4 Operator Console
-→ M5 Chart V2
-→ Low-priority enhancements
+docs/frontend-production-authority
+→ feature/frontend-h1-safety-bff
+→ feature/frontend-h2-market-explorer
+→ feature/frontend-h3-safe-order-ticket
+→ feature/frontend-h4-orders-activity
+→ feature/frontend-h5-account-projections
+→ feature/frontend-h6-realtime-recovery
+→ test/frontend-production-certification
+→ medium-priority-stack
+→ low-priority-stack
 ```
 
 ## Required CI for every branch
@@ -320,8 +318,9 @@ npm run typecheck
 npm run lint
 npm run build
 npm run test
+npm run test:contract
+npm run test:realtime
 npm run test:chart
-npm run test:enterprise
 npm run test:e2e
 npm audit --audit-level=critical
 ```

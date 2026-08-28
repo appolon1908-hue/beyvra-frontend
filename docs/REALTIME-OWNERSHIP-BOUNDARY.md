@@ -51,7 +51,9 @@ applying live deltas for that channel until snapshot recovery completes.
 
 ## Canonical channel and event contract
 
-News channel identity uses Beyvra canonical instrument UUIDs, never provider symbols:
+### Target V2 canonical contract
+
+News channel identity will use Beyvra canonical instrument UUIDs, never provider symbols:
 
 ```text
 news.market
@@ -72,6 +74,13 @@ sequence, `source`, `server_time`, and one canonical `data` object. News article
 `article_id`, `canonical_url`, and `affected_instruments`; the frontend must not accept
 legacy aliases such as `news_id`, `article_url`, or `instrument_refs` as trusted
 production payloads.
+
+This is a migration target, not the current backend contract. Frontend implementation
+must not switch to these channels or a `data`-only envelope until the backend release
+publishes `news.instrument.{instrument_uuid}`, stops `news.{symbol}` publication,
+emits the canonical envelope, updates its registry and AsyncAPI/OpenAPI definitions,
+and passes contract-drift tests. Until then, the frontend uses only channels and
+envelopes advertised by the deployed backend registry.
 
 ## REST-only business mutations
 
