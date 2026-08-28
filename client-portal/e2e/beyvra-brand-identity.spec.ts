@@ -18,8 +18,7 @@ test("authenticated practice platform has no visible legacy identity", async ({ 
     data: {},
   });
   expect(response.ok()).toBeTruthy();
-  const { access } = await response.json();
-  await context.addCookies([{ name: "access_token", value: access, url: origin }]);
+  await context.addCookies((await request.storageState()).cookies);
   await page.goto("/platform", { waitUntil: "domcontentloaded" });
   await expect(page.locator("body")).not.toContainText(legacyVisible);
 });

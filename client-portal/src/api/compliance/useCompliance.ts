@@ -39,8 +39,8 @@ export const complianceDisplayState = (profile: ComplianceProfile): "Verificatio
   return "Verification required";
 };
 
-export function useComplianceProfile(token?: string) { return useQuery({ queryKey:["compliance-profile"], queryFn:()=>authenticatedRequest<ComplianceProfile>(apiEndpoints.compliance.profile,token!), enabled:Boolean(token), staleTime:15_000 }); }
-export function useComplianceRequirements(token?: string) { return useQuery({ queryKey:["compliance-requirements"], queryFn:()=>authenticatedRequest<{results:ComplianceRequirement[]}>(apiEndpoints.compliance.requirements,token!), enabled:Boolean(token), staleTime:15_000 }); }
+export function useComplianceProfile(token = "") { return useQuery({ queryKey:["compliance-profile"], queryFn:()=>authenticatedRequest<ComplianceProfile>(apiEndpoints.compliance.profile, token), staleTime:15_000 }); }
+export function useComplianceRequirements(token = "") { return useQuery({ queryKey:["compliance-requirements"], queryFn:()=>authenticatedRequest<{results:ComplianceRequirement[]}>(apiEndpoints.compliance.requirements, token), staleTime:15_000 }); }
 export function useComplianceRealtime(token?: string) {
   const queryClient = useQueryClient();
   useEffect(() => {

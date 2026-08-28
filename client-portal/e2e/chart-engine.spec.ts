@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { guestAccess } from "./support/session";
+import { expectGuestSession } from "./support/session";
 
 const candle = (minute: number) => ({ open_time: `2026-08-07T00:${String(minute).padStart(2, "0")}:00Z`, close_time: `2026-08-07T00:${String(minute + 1).padStart(2, "0")}:00Z`, open: "100.00", high: "102.00", low: "99.00", close: "101.00", volume: "4.00", complete: true, sequence: 184200 + minute });
 
@@ -11,7 +11,7 @@ test("ECharts workspace, indicators, and drawings remain local and long-lived", 
   const apiOrigin = process.env.E2E_API_ORIGIN ?? origin;
   await page.setViewportSize({ width: 1024, height: 768 });
   void apiOrigin;
-  await guestAccess(context, baseURL);
+  await expectGuestSession(context, baseURL);
   await page.route("**/api/v1/instruments/BTC-USD/market-data-capabilities", (route) => { capabilityRequests += 1; return route.fulfill({ json: { instrument_id: "BTC-USD", timeframes: [{ interval: "5s", available: false, reason: "GENUINE_5S_SOURCE_UNAVAILABLE" }, { interval: "1m", available: true, source: "isolated-test-adapter", mode: "native" }] } }); });
   await page.route("**/api/v1/market-data/snapshot?**", (route) => { snapshotRequests += 1; return route.fulfill({ json: { instrument_id: "BTC-USD", interval: "1m", sequence: 184202, server_time: "2026-08-07T00:03:00Z", market_status: "OPEN", quote: { bid: "100.90", ask: "101.10", mid: "101.00", occurred_at: new Date().toISOString() }, candles: Array.from({ length: 40 }, (_, index) => candle(index)) } }); });
   await page.route("**/api/v1/demo/trades", (route) => route.fulfill({ json: [

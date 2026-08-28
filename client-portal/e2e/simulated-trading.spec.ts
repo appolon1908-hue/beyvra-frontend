@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test";
-import { guestAccess } from "./support/session";
+import { expectGuestSession } from "./support/session";
 
 test("canonical simulation preview, idempotent order, settlement, and real-mode denial", async ({ request, context, baseURL }) => {
   const origin = baseURL ?? "http://127.0.0.1:8080";
-  const access = await guestAccess(context, baseURL);
-  const simulation = { Authorization: `Bearer ${access}`, "Content-Type": "application/json", "X-Beyvra-Simulation-Mode": "true" };
+  await expectGuestSession(context, baseURL);
+  const simulation = { "X-Beyvra-Simulation-Mode": "true" };
   const order = { instrument: "BTC-USD", side: "BUY", order_type: "MARKET", quantity: "0.001" };
 
   const preview = await request.post(`${origin}/api/v1/trading/orders/preview`, { headers: simulation, data: order });
@@ -35,7 +35,7 @@ test("canonical simulation preview, idempotent order, settlement, and real-mode 
   expect((await accounts.json()).results[0]).toMatchObject({ simulation: true, currency: "USD" });
 
   const realModeAttempt = await request.post(`${origin}/api/v1/trading/orders`, {
-    headers: { Authorization: `Bearer ${access}`, "Content-Type": "application/json", "Idempotency-Key": `real-${Date.now()}` },
+    headers: { "Idempotency-Key": `real-${Date.now()}` },
     data: order,
   });
   expect(realModeAttempt.status()).toBe(503);

@@ -10,7 +10,7 @@ export type AuthenticatedRequestOptions = RequestInit & {
 
 export async function authenticatedRequest<T>(
   endpoint: string,
-  token: string,
+  _token = "",
   init: AuthenticatedRequestOptions = {},
 ): Promise<T> {
   const { timeoutMs = 15_000, requestId = crypto.randomUUID(), signal: callerSignal, ...requestInit } = init;
@@ -26,7 +26,6 @@ export async function authenticatedRequest<T>(
       headers: {
         Accept: "application/json",
         ...(requestInit.body ? { "Content-Type": "application/json" } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         "X-Request-ID": requestId,
         ...requestInit.headers,
       },

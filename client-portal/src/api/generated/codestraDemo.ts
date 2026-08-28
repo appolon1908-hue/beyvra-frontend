@@ -21,6 +21,7 @@ export type ApiFailure = {
 };
 
 type RequestOptions = Omit<RequestInit, "headers"> & {
+  /** Compatibility-only; auth is carried by same-origin HttpOnly cookies. */
   token?: string;
   idempotencyKey?: string;
   timeoutMs?: number;
@@ -38,7 +39,6 @@ export async function codestraRequest<T>(path: string, options: RequestOptions =
       headers: {
         Accept: "application/json",
         ...(options.body && !(options.body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
-        ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
         ...(options.idempotencyKey ? { "Idempotency-Key": options.idempotencyKey } : {}),
         "X-Request-ID": requestId,
       },

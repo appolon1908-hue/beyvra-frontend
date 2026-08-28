@@ -19,13 +19,7 @@ export default async function globalSetup(config: FullConfig) {
     if (!response.ok()) {
       throw new Error(`Guest session bootstrap failed (${response.status()}) at ${baseURL}`);
     }
-    const payload = await response.json() as { access?: string };
-    if (!payload.access) throw new Error("Guest session response did not contain an access credential");
-    const origin = new URL(baseURL).origin;
-    await fs.writeFile(storagePath, JSON.stringify({ cookies: [
-      { name: "access_token", value: payload.access, domain: new URL(origin).hostname, path: "/", expires: -1, httpOnly: false, secure: origin.startsWith("https:"), sameSite: "Strict" },
-      { name: "codestra_guest_session", value: payload.access, domain: new URL(origin).hostname, path: "/", expires: -1, httpOnly: false, secure: origin.startsWith("https:"), sameSite: "Strict" },
-    ], origins: [] }));
+    await context.storageState({ path: storagePath });
   } catch (error) {
     throw new Error(`Playwright auth setup failed for ${baseURL}: ${error instanceof Error ? error.message : String(error)}`);
   } finally {

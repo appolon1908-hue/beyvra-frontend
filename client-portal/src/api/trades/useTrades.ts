@@ -15,7 +15,7 @@ export interface TradeRecord {
   simulation: true;
 }
 
-export function useTrades(token: string, status: "open" | "pending" | "completed") {
+export function useTrades(token = "", status: "open" | "pending" | "completed") {
   return useQuery({
     queryKey: ["trades", status],
     queryFn: async () => {
@@ -46,7 +46,6 @@ export function useTrades(token: string, status: "open" | "pending" | "completed
       });
       return payload.results;
     },
-    enabled: Boolean(token),
     refetchInterval: status === "completed" ? 30_000 : 5_000,
   });
 }

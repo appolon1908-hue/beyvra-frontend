@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCookies } from "react-cookie";
 import { authenticatedRequest } from "api/client";
 import { apiEndpoints } from "api/endpoints";
 import { DemoConfiguration } from "./types";
@@ -14,11 +13,9 @@ const fallback: DemoConfiguration = {
 };
 
 export function useDemoConfig() {
-  const [cookies] = useCookies(["access_token"]);
   return useQuery({
     queryKey: ["demo-config"],
-    enabled: Boolean(cookies.access_token),
-    queryFn: () => authenticatedRequest<DemoConfiguration>(apiEndpoints.demo.config, cookies.access_token, { timeoutMs: 10_000 }),
+    queryFn: () => authenticatedRequest<DemoConfiguration>(apiEndpoints.demo.config, "", { timeoutMs: 10_000 }),
     placeholderData: fallback,
     staleTime: 5 * 60_000,
     retry: 1,

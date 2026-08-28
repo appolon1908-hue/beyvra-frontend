@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCookies } from "react-cookie";
 import { authenticatedRequest } from "api/client";
 import { apiEndpoints } from "api/endpoints";
 import { DemoConfiguration } from "api/demo/types";
@@ -20,14 +19,12 @@ export type WorkspaceBootstrap = {
 };
 
 export function useWorkspaceBootstrap() {
-  const [cookies] = useCookies(["access_token"]);
   return useQuery({
     queryKey: ["workspace-bootstrap"],
-    enabled: Boolean(cookies.access_token),
     staleTime: 60_000,
     retry: 1,
     queryFn: async () => {
-      const payload = await authenticatedRequest<WorkspaceBootstrap>(apiEndpoints.workspace.bootstrap, cookies.access_token, { timeoutMs: 10_000 });
+      const payload = await authenticatedRequest<WorkspaceBootstrap>(apiEndpoints.workspace.bootstrap, "", { timeoutMs: 10_000 });
       const rules: DemoConfiguration = {
         durations: payload.tradingRules.durations,
         minAmount: Number(payload.tradingRules.minAmount),

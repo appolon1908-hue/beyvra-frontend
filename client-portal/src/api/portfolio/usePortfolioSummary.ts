@@ -23,11 +23,10 @@ export interface PortfolioSummary {
   wallets: Array<{ id: number; name: string; balance: number; currency: string; is_real: boolean }>;
 }
 
-export function usePortfolioSummary(token: string) {
+export function usePortfolioSummary(token = "") {
   return useQuery({
     queryKey: ["portfolio-summary"],
     queryFn: () => authenticatedRequest<PortfolioSummary>(apiEndpoints.portfolio.summary, token),
-    enabled: Boolean(token),
     refetchInterval: 30_000,
   });
 }

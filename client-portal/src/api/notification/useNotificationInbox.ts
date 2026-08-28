@@ -31,7 +31,7 @@ export function useNotificationInbox(token?: string) {
     queryFn: async ({ pageParam }) => {
       const response = await authenticatedRequest<InboxResponse>(
         `${apiEndpoints.notifications.inbox}?page=${pageParam}`,
-        token!,
+        token ?? "",
       );
       if (Array.isArray(response)) {
         return { results: response, nextPage: undefined };
@@ -42,7 +42,6 @@ export function useNotificationInbox(token?: string) {
       return { results: response.results, nextPage };
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
-    enabled: Boolean(token),
     refetchInterval: false,
   });
 }
@@ -51,7 +50,7 @@ export function useMarkNotificationRead(token?: string) {
   const client = useQueryClient();
   return useMutation({
     mutationFn: (eventId: string) => authenticatedRequest(
-      apiEndpoints.notifications.read(eventId), token!, { method: "POST" }
+      apiEndpoints.notifications.read(eventId), token ?? "", { method: "POST" }
     ),
     onSuccess: () => client.invalidateQueries({ queryKey: notificationInboxKey }),
   });
@@ -61,7 +60,7 @@ export function useMarkAllNotificationsRead(token?: string) {
   const client = useQueryClient();
   return useMutation({
     mutationFn: () => authenticatedRequest(
-      apiEndpoints.notifications.readAll, token!, { method: "POST" }
+      apiEndpoints.notifications.readAll, token ?? "", { method: "POST" }
     ),
     onSuccess: () => client.invalidateQueries({ queryKey: notificationInboxKey }),
   });
@@ -72,8 +71,7 @@ export function useNotificationSocket(token?: string) {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    if (!token) return;
-    const realtime = getUnifiedRealtimeClient(token, async () => (await webSocketTicketFetcher(token)).ws_ticket);
+    const realtime = getUnifiedRealtimeClient(token ?? "", async () => (await webSocketTicketFetcher(token ?? "")).ws_ticket);
     const unsubscribe = realtime.subscribe("notification", (message) => {
       if (message.type === "system.status") setConnected((message.data as Record<string, unknown>)?.status === "connected");
       else {

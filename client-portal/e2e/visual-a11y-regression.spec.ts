@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { guestAccess, openGuestPlatform } from "./support/session";
+import { expectGuestSession, openGuestPlatform } from "./support/session";
 
 const viewports = [
   { width: 375, height: 812 },
@@ -16,7 +16,7 @@ test.describe("deterministic staging visual and accessibility coverage", () => {
       await page.setViewportSize(viewport);
       await openGuestPlatform(page);
       const origin = baseURL ?? "http://127.0.0.1:8080";
-      const access = await guestAccess(context, baseURL);
+      await expectGuestSession(context, baseURL);
       await expect(page.getByText("Loading market history…")).toHaveCount(0, { timeout: 15_000 });
       await expect(page.locator("body")).not.toContainText(/TradX|Tradex|Markets\.com|fund your account|live trading/i);
       const axe = await new AxeBuilder({ page })
@@ -40,9 +40,9 @@ test.describe("deterministic staging visual and accessibility coverage", () => {
         await page.keyboard.press("Escape");
       }
       if (viewport.width >= 1440) {
-        const order = await request.post(`${origin}/api/v1/demo/orders`, { headers: { Authorization: `Bearer ${access}`, "Content-Type": "application/json", "Idempotency-Key": `visual-order-${Date.now()}` }, data: { symbol: "BTCUSDT", amount: "100", duration: 5, direction: "up" } });
+        const order = await request.post(`${origin}/api/v1/demo/orders`, { headers: { "Idempotency-Key": `visual-order-${Date.now()}` }, data: { symbol: "BTCUSDT", amount: "100", duration: 5, direction: "up" } });
         if (order.ok()) {
-          await expect.poll(async () => (await request.get(`${origin}/api/v1/demo/trades`, { headers: { Authorization: `Bearer ${access}` } })).ok()).toBe(true);
+          await expect.poll(async () => (await request.get(`${origin}/api/v1/demo/trades`)).ok()).toBe(true);
           await page.screenshot({ path: `test-results/visual/${viewport.width}x${viewport.height}-OPEN-marker.png`, fullPage: false });
         } else {
           expect([409, 503]).toContain(order.status());
