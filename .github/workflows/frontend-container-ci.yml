@@ -25,6 +25,13 @@ jobs:
       - name: Checkout exact head
         uses: actions/checkout@v5
 
+      - name: Checkout Beyvra backend contract source
+        uses: actions/checkout@v5
+        with:
+          repository: appolon1908-hue/beyvra-backend
+          ref: ${{ vars.BACKEND_CONTRACT_REF || 'main' }}
+          path: beyvra-backend
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -43,6 +50,35 @@ jobs:
       - name: Lint
         working-directory: client-portal
         run: npm run lint
+
+      - name: User-safe error and generated client tests
+        working-directory: client-portal
+        run: npm run test:errors
+
+      - name: Realtime client tests
+        working-directory: client-portal
+        run: npm run test:realtime
+
+      - name: Chart workspace tests
+        working-directory: client-portal
+        run: npm run test:chart
+
+      - name: Dependency audit gate
+        working-directory: client-portal
+        run: npm run audit:gate
+
+      - name: API contract drift check
+        working-directory: client-portal
+        env:
+          API_SCHEMA_FILE: ${{ github.workspace }}/beyvra-backend/contracts/openapi/beyvra-v1.yaml
+        run: npm run test:contract
+
+      - name: Staging API contract drift check
+        if: ${{ vars.API_SCHEMA_URL != '' }}
+        working-directory: client-portal
+        env:
+          API_SCHEMA_URL: ${{ vars.API_SCHEMA_URL }}
+        run: npm run test:contract
 
       - name: Authoritative production build
         working-directory: client-portal

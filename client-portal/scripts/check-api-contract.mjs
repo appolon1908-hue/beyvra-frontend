@@ -34,8 +34,23 @@ const schema = schemaFile
       if (!schemaResponse.ok) throw new Error(`Schema request failed: ${schemaResponse.status}`);
       return schemaResponse.text();
     })();
+
+function openApiPaths(source) {
+  try {
+    const parsed = JSON.parse(source);
+    if (parsed && typeof parsed === "object" && parsed.paths && typeof parsed.paths === "object") {
+      return Object.keys(parsed.paths);
+    }
+  } catch {
+    // Fall through to the lightweight YAML path extractor used by the checked-in contract.
+  }
+  return [...source.matchAll(/^  (\/api\/[^:]+):$/gm)].map((match) => match[1]);
+}
+
 const backendPaths = new Set(
-  [...schema.matchAll(/^  (\/api\/[^:]+):$/gm)].map((match) => canonical(match[1].slice(4))),
+  openApiPaths(schema)
+    .filter((path) => path.startsWith("/api/"))
+    .map((path) => canonical(path.slice(4))),
 );
 
 const endpoints = new Set();
