@@ -1,5 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
+import { ApiError } from "api/errors";
+import { beyvraAuthApi } from "api/generated/beyvra";
 
 import { useAppDispatch, useAppSelector } from "@store/hooks";
 import { UserSliceState, setUser, setUserLoading, setWSTicket } from "@store/slices/user";
@@ -27,6 +29,8 @@ const useInitializeData = () => {
   const dispatch = useAppDispatch();
   const [cookies] = useCookies(["access_token","selectedAccount"]);
   const initializedNotificationsFor = useRef<string | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
+  const authToken = cookies.access_token ?? "";
 
   // Fetch user data
   const { user } = useAppSelector(
@@ -81,34 +85,47 @@ const useInitializeData = () => {
     },
   });
   
+  useEffect(() => {
+    let disposed = false;
+    beyvraAuthApi.session<{ state?: string }>()
+      .then(() => {
+        if (!disposed) setSessionReady(true);
+      })
+      .catch((error: unknown) => {
+        if (!disposed && error instanceof ApiError && (error.status === 401 || error.status === 403)) {
+          setSessionReady(false);
+        }
+      });
+    return () => { disposed = true; };
+  }, []);
 
   // Effect to fetch user data on login initialization
   useEffect(() => {
-    if (cookies.access_token && (!user || Object.keys(user).length === 0)) {
+    if (sessionReady && (!user || Object.keys(user).length === 0)) {
       setUserLoading(true);
-      profileMutate(cookies.access_token);
+      profileMutate(authToken);
     }
-  }, [cookies.access_token, profileMutate, user]);
+  }, [authToken, profileMutate, sessionReady, user]);
 
   // Effect to fetch wallet data on login initializatio
   useEffect(() => {
-    if (cookies.access_token && (!wallets || wallets.length === 0)) {
+    if (sessionReady && (!wallets || wallets.length === 0)) {
       setWalletsLoading(true);
-      walletMutate(cookies.access_token);
+      walletMutate(authToken);
     }
-  }, [cookies.access_token, walletMutate, wallets]);
+  }, [authToken, sessionReady, walletMutate, wallets]);
 
   // Effect to fetch wallet data on login initializatio
   useEffect(() => {
     if (
-      cookies.access_token &&
-      initializedNotificationsFor.current !== cookies.access_token
+      sessionReady &&
+      initializedNotificationsFor.current !== (authToken || "cookie-session")
     ) {
-      initializedNotificationsFor.current = cookies.access_token;
+      initializedNotificationsFor.current = authToken || "cookie-session";
       dispatch(setNotificationLoading(true));
-      notificationListMutate(cookies.access_token);
+      notificationListMutate(authToken);
     }
-  }, [cookies.access_token, dispatch, notificationListMutate]);
+  }, [authToken, dispatch, notificationListMutate, sessionReady]);
 
 
 

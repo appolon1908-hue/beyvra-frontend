@@ -73,9 +73,9 @@ export const codestraDemoApi = {
 export type RealtimeV2Token = { token: string; channel?: string; expires_in: number; gateway?: string };
 
 export const codestraRealtimeV2Api = {
-  connectionToken: (token: string) =>
+  connectionToken: (token?: string) =>
     codestraRequest<RealtimeV2Token>("v1/realtime/v2/connection-token", { method: "POST", token }),
-  subscriptionToken: (token: string, channel: string) =>
+  subscriptionToken: (token: string | undefined, channel: string) =>
     codestraRequest<RealtimeV2Token>("v1/realtime/v2/subscription-token", {
       method: "POST", token, body: JSON.stringify({ channel }),
     }),
@@ -108,8 +108,13 @@ export const codestraBankApi = {
 
 export const codestraAuthApi = {
   login: <T>(body: unknown) => codestraRequest<T>("v1/auth/token/", { method: "POST", body: JSON.stringify(body) }),
-  register: <T>(body: unknown) => codestraRequest<T>("v1/auth/create/", { method: "POST", body: JSON.stringify(body) }),
-  logout: (token: string, refresh: string) => codestraRequest<void>("v1/auth/token/logout/", { method: "POST", token, body: JSON.stringify({ refresh }) }),
+  register: <T>(body: unknown) => codestraRequest<T>("v1/auth/register", { method: "POST", body: JSON.stringify(body) }),
+  logout: (token?: string, refresh?: string) =>
+    codestraRequest<void>("v1/auth/token/logout/", {
+      method: "POST",
+      token,
+      body: JSON.stringify(refresh ? { refresh } : {}),
+    }),
   refresh: <T>(body: unknown) => codestraRequest<T>("v1/auth/token/refresh/", { method: "POST", body: JSON.stringify(body) }),
   forgotPassword: <T>(body: unknown) => codestraRequest<T>("v1/auth/password_reset/", { method: "POST", body: JSON.stringify(body) }),
   resetPassword: <T>(uidb64: string, token: string, body: unknown) => codestraRequest<T>(`v1/auth/password_reset_confirm/${uidb64}/${token}/`, { method: "POST", body: JSON.stringify(body) }),
@@ -125,6 +130,10 @@ export const codestraAuthApi = {
   guestDemo: <T>(idempotencyKey?: string) => codestraRequest<T>("v1/demo/sessions", { method: "POST", idempotencyKey, body: "{}" }),
   registerDemo: <T>(body: unknown) => codestraRequest<T>("v1/auth/register", { method: "POST", body: JSON.stringify(body) }),
   verifyRegistration: <T>(body: unknown) => codestraRequest<T>("v1/auth/email-verification/verify", { method: "POST", body: JSON.stringify(body) }),
+  oidcConfig: <T>() => codestraRequest<T>("v1/auth/oidc/config/"),
+  oidcLogin: <T>(body: unknown) => codestraRequest<T>("v1/auth/oidc/login/", { method: "POST", body: JSON.stringify(body) }),
+  oidcRegister: <T>(body: unknown) => codestraRequest<T>("v1/auth/oidc/register/", { method: "POST", body: JSON.stringify(body) }),
+  oidcLogout: <T>() => codestraRequest<T>("v1/auth/oidc/logout/", { method: "POST", body: "{}" }),
   providers: <T>() => codestraRequest<T>("v1/auth/providers"),
   googleStart: <T>(body: unknown) => codestraRequest<T>("v1/auth/google/start", { method: "POST", body: JSON.stringify(body) }),
   googleCredential: <T>(ticket: string) => codestraRequest<T>("v1/auth/google/credential", { method: "POST", body: JSON.stringify({ ticket }) }),

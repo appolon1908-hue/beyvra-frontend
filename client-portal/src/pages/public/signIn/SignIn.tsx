@@ -13,9 +13,7 @@ import { GlobalStates, setSignInTab } from "@store/slices/global";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { beyvraAuthApi } from "api/generated/beyvra";
-import { useCookies } from "react-cookie";
 import { toast } from "react-toastify";
-import { authCookieOptions } from "security/authCookies";
 
 interface SignInProps { }
 
@@ -28,7 +26,6 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
   const dispatch = useDispatch()
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [, setCookie] = useCookies(["access_token", "refresh_token", "step"]);
   const requestedTab = searchParams.get("tab");
 
   useEffect(() => {
@@ -49,13 +46,8 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
     let cancelled = false;
     (async () => {
       try {
-        const result = await beyvraAuthApi.googleCredential<{ access?: string; refresh?: string; user?: { is_walkthrough?: boolean } }>(ticket);
-        if (!result.access || !result.refresh) throw new Error("GOOGLE_TICKET_INVALID");
+        const result = await beyvraAuthApi.googleCredential<{ user?: { is_walkthrough?: boolean } }>(ticket);
         if (cancelled) return;
-        const cookieOptions = authCookieOptions();
-        setCookie("access_token", result.access, cookieOptions);
-        setCookie("refresh_token", result.refresh, cookieOptions);
-        setCookie("step", "", cookieOptions);
         searchParams.delete("google_ticket");
         setSearchParams(searchParams, { replace: true });
         window.location.assign(result.user?.is_walkthrough ? "/walkThrough" : "/platform");
@@ -64,7 +56,7 @@ const SignIn: React.FunctionComponent<SignInProps> = () => {
       }
     })();
     return () => { cancelled = true; };
-  }, [searchParams, setCookie, setSearchParams]);
+  }, [searchParams, setSearchParams]);
 
   const items: TabsProps["items"] = [
     {

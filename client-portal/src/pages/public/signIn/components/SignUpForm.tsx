@@ -7,10 +7,10 @@ import CountryCode from "../../../../helpers/CountryCode.json";
 import Select, { type StylesConfig } from "react-select";
 //import WalkThrough from "./WalkThrough";
 import { useNavigate } from "react-router-dom";
-import { getApiUrl } from "utils/env";
 import { beyvraAuthApi } from "api/generated/beyvra";
 import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 import GoogleAuthButton from "./GoogleAuthButton";
+import { beginOidcAuthIfEnabled } from "api/auth/oidc";
 
 
 import "./WalkThrough.scss";
@@ -65,6 +65,7 @@ const SignUpForm = () => {
   const [pendingRegistration, setPendingRegistration] = useState<{ id: string; email: string } | null>(null);
   const [otp, setOtp] = useState("");
   const [otpPending, setOtpPending] = useState(false);
+  const [authModePending, setAuthModePending] = useState(false);
   const { handleSubmit, register, setError, watch, formState: { errors } } = useForm<SignUpFormData>();
   const acceptedTerms = watch("accepted_terms", false);
   const navigate = useNavigate();
@@ -76,7 +77,18 @@ const SignUpForm = () => {
 
   const [isPending, setIsPending] = useState(false);
 
-  const onSubmit: SubmitHandler<SignUpFormData> = (data) => {
+  const onSubmit: SubmitHandler<SignUpFormData> = async (data) => {
+    setAuthModePending(true);
+    try {
+      const oidcStarted = await beginOidcAuthIfEnabled("register", data.accepted_terms);
+      if (oidcStarted) return;
+    } catch {
+      toast.error("Secure registration could not be started. Please try again.");
+      return;
+    } finally {
+      setAuthModePending(false);
+    }
+
     const localPhone = data.phone_number.replace(/\D/g, "");
     if (`${countryCode.value}${localPhone}`.replace(/\D/g, "").length > 15) {
       setError("phone_number", { message: "The full international number cannot exceed 15 digits" });
@@ -91,7 +103,13 @@ const SignUpForm = () => {
     };
     setIsPending(true);
     beyvraAuthApi.registerDemo<{ registrationId?: string; maskedEmail?: string }>({ ...payload, displayName: `${payload.first_name} ${payload.last_name}`, legalAccepted: data.accepted_terms, locale: "en" })
-      .then((result) => { if (result.registrationId) { setPendingRegistration({ id: result.registrationId, email: result.maskedEmail || payload.email }); toast.success("Check your email for a verification code."); } })
+      .then((result) => {
+        if (!result.registrationId) {
+          throw new Error("REGISTRATION_VERIFICATION_REQUIRED");
+        }
+        setPendingRegistration({ id: result.registrationId, email: result.maskedEmail || payload.email });
+        toast.success("Check your email for a verification code.");
+      })
       .catch((error) => { logInternalError(error, { endpoint: "auth.register_demo" }); toast.error(toUserSafeErrorText(error, "auth")); })
       .finally(() => setIsPending(false));
   };
@@ -131,7 +149,9 @@ const SignUpForm = () => {
       setOtpPending(true);
       try {
         await beyvraAuthApi.verifyRegistration({ registrationId: pendingRegistration.id, code: otp });
-        toast.success("Your demo account is ready. Sign in to continue."); navigate("/signIn?tab=login", { replace: true });
+        const session = await beyvraAuthApi.session<{ user?: { is_walkthrough?: boolean } }>();
+        toast.success("Your account is ready.");
+        navigate(session.user?.is_walkthrough ? "/walkThrough" : "/platform", { replace: true });
       } catch (error) { logInternalError(error, { endpoint: "auth.verify_registration" }); toast.error(toUserSafeErrorText(error, "auth")); }
       finally { setOtpPending(false); }
     };
@@ -196,7 +216,10 @@ const SignUpForm = () => {
             id="email"
             placeholder="Email"
             autoComplete="email"
-            {...register("email", { required: "Email is required" })}
+            {...register("email", {
+              required: "Email is required",
+              pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Enter a valid email address" },
+            })}
           />
         </Form.Item>
         <div style={{ display: "flex", width: "100%" }}>
@@ -222,10 +245,13 @@ const SignUpForm = () => {
               id="phone_number"
               placeholder="Phone number"
               autoComplete="tel-national"
-              inputMode="numeric"
+              inputMode="tel"
               {...register("phone_number", {
                 required: "Phone number is required",
-                pattern: { value: /^\d{6,14}$/, message: "Enter 6 to 14 digits without the country code" },
+                validate: (value) => {
+                  const digits = value.replace(/\D/g, "");
+                  return digits.length >= 6 && digits.length <= 14 || "Enter 6 to 14 digits without the country code";
+                },
               })}
             />
           </Form.Item>
@@ -244,6 +270,9 @@ const SignUpForm = () => {
               required: "Password is required",
               minLength: { value: 8, message: "Use at least 8 characters" },
               maxLength: { value: 20, message: "Use no more than 20 characters" },
+              validate: (value) =>
+                evaluatePasswordStrength(value) !== "Weak" ||
+                "Use a stronger password with letters, numbers, and a symbol",
             })}
           />
         </Form.Item>
@@ -251,12 +280,15 @@ const SignUpForm = () => {
           <span style={{ color: "white", fontSize: 12 }}>
             {"Password strength: " + strength}
           </span>
-          <span
+          <button
+            type="button"
+            aria-pressed={show}
+            aria-label={show ? "Hide password" : "Show password"}
             onClick={() => setShow(!show)}
-            style={{ color: "white", fontSize: 12, cursor: "pointer" }}
+            style={{ background: "transparent", color: "white", fontSize: 12, cursor: "pointer" }}
           >
             {show ? "Hide password" : "Show password"}
-          </span>
+          </button>
         </div>
 
         <Form.Item validateStatus={errors.confirm_password ? "error" : undefined} help={errors.confirm_password?.message}>
@@ -291,7 +323,8 @@ const SignUpForm = () => {
           type="primary"
           htmlType="submit"
           className="login"
-          loading={isPending}
+          loading={isPending || authModePending}
+          disabled={!acceptedTerms}
         >
           Register
         </Button>

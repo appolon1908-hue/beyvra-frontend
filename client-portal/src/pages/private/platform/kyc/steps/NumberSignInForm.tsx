@@ -6,13 +6,11 @@ import { useDispatch } from "react-redux";
 import { useAppSelector } from "@store/hooks";
 import { See, UnSee } from "assets/icons";
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { ISignInForm } from '@interfaces';
-import { useCookies } from 'react-cookie';
 import useLogin from 'api/user/useLogin';
 import FormInput from '../components/FormInput';
 import KYCButton from '../components/Button';
-import { authCookieOptions } from 'security/authCookies';
 
 interface SignInFormProps {
   setForgotPasswordView: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,8 +23,6 @@ const NumberSignInForm: React.FC<SignInFormProps> = ({ handleNext }) => {
     (state: { global: GlobalStates }) => state.global
   );
 
-  const [, setCookie] = useCookies(["step", "access_token", "refresh_token",]);
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     phone_number: '',
     password: ''
@@ -34,11 +30,7 @@ const NumberSignInForm: React.FC<SignInFormProps> = ({ handleNext }) => {
 
   const { handleSubmit, register, formState: { errors } } = useForm<ISignInForm>();
   const { mutate, isPending } = useLogin({
-    onSuccess: (data) => {
-      const cookieOptions = authCookieOptions();
-      setCookie("access_token", data.access, cookieOptions);
-      setCookie("refresh_token", data.refresh, cookieOptions);
-      setCookie("step", '', cookieOptions)
+    onSuccess: () => {
       handleNext("next")
       // data?.user.is_walkthrough ? navigate('/platform') : navigate("/welcome");
 

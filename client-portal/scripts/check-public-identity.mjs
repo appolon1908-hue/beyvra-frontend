@@ -15,10 +15,12 @@ const internalCompatibility = new Set(["src/api/generated/codestraDemo.ts"]);
 const internalCompatibilityLines = /codestra(?:\.chart\.|:last-logout)/i;
 const files = activePatterns.flatMap((pattern) => globSync(pattern));
 const failures = [];
+const normalizePath = (file) => file.replace(/\\/g, "/");
 
 for (const file of new Set(files)) {
+  const normalizedFile = normalizePath(file);
   if (file.includes(".test.")) continue;
-  if (internalCompatibility.has(file)) continue;
+  if (internalCompatibility.has(normalizedFile)) continue;
   const lines = readFileSync(file, "utf8").split("\n");
   lines.forEach((line, index) => {
     if (forbidden.test(line) && !internalCompatibilityLines.test(line)) failures.push(`${file}:${index + 1}`);

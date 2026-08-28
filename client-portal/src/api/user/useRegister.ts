@@ -3,12 +3,11 @@ import { toast } from "react-toastify";
 import { ApiError } from "api/errors";
 import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 import { beyvraAuthApi } from "api/generated/beyvra";
-import type { IUser } from "@interfaces";
 
 export interface RegisterResponse {
-  access: string;
-  refresh: string;
-  user: IUser;
+  status?: string;
+  registrationId?: string;
+  maskedEmail?: string;
 }
 
 export async function fetchRegister(data: Record<string, string>): Promise<RegisterResponse> {

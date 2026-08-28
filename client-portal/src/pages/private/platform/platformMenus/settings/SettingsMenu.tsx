@@ -21,6 +21,8 @@ import { RightSubDrawerContent } from "../../types";
 import Modal from "../../../../../components/modal/Modal";
 import ProfileModal from "components/profileModal";
 import PortfolioModal from "pages/private/platform/platformMenus/portfolioModal/PortfolioModal";
+import { revokeSession } from "api/user/logout";
+import { writeCompatibilityValue } from "compat/storageKeys";
 
 interface SettingsMenuProps {
   setIsRightSubDrawerContent: Dispatch<SetStateAction<RightSubDrawerContent>>;
@@ -36,18 +38,24 @@ const SettingsMenu: React.FunctionComponent<SettingsMenuProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [, , removeCookie] = useCookies(["access_token", "refresh_token"]);
+  const [cookies, , removeCookie] = useCookies(["access_token", "refresh_token"]);
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const [isUserModalOpen, setUserModalOpen] = useState<boolean>(false)
   const [isPortolioModalOpen, setPortfolioModalOpen] = useState<boolean>(false)
 
   const { themeSelect } = useAppSelector(state => state.themeBg)
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await revokeSession(cookies.access_token, cookies.refresh_token);
+    } catch (error) {
+      console.error("Unable to revoke the server session", error);
+    }
     dispatch(setUser(null));
     dispatch(setWallets([]));
-    removeCookie("access_token");
-    removeCookie("refresh_token");
-    navigate("/");
+    removeCookie("access_token", { path: "/" });
+    removeCookie("refresh_token", { path: "/" });
+    writeCompatibilityValue(localStorage, "beyvra:last-logout", Date.now().toString(), "codestra:last-logout");
+    navigate("/signIn?tab=login", { replace: true });
   };
 
   return (

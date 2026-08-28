@@ -1,5 +1,4 @@
 import { Checkbox, Form, Button } from "antd";
-import { useCookies } from "react-cookie";
 import { beyvraAuthApi } from "api/generated/beyvra";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,10 +6,9 @@ import { ISignInForm } from "@interfaces";
 import { LoginSuccess, useLogin } from "api/user/useLogin";
 import { useState } from "react";
 import use2FAVerify from "api/user/use2FAVerify";
-import { authCookieOptions } from "security/authCookies";
 import GoogleAuthButton from "./GoogleAuthButton";
-import { getApiUrl } from "utils/env";
 import { toast } from "react-toastify";
+import { beginOidcAuthIfEnabled } from "api/auth/oidc";
 // import { useEffect } from "react";
 
 interface SignInFormProps {
@@ -28,18 +26,13 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
   const [otp, setOTP] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [guestPending, setGuestPending] = useState(false);
-  const [, setCookie] = useCookies(["step", "access_token", "refresh_token",]);
+  const [authModePending, setAuthModePending] = useState(false);
 
   const { handleSubmit, register, formState: { errors } } = useForm<ISignInForm>();
   const destination = new URLSearchParams(location.search).get("redirect") || (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
 
   const finishLogin = (data: LoginSuccess) => {
-    if (!data.access || !data.refresh || !data.user) return;
-    const cookieOptions = authCookieOptions(rememberMe);
-    setCookie("access_token", data.access, cookieOptions);
-    setCookie("refresh_token", data.refresh, cookieOptions);
-    setCookie("step", "", cookieOptions);
-    navigate(destination || (data.user.is_walkthrough ? "/walkThrough" : "/platform"), { replace: true });
+    navigate(destination || (data.user?.is_walkthrough ? "/walkThrough" : "/platform"), { replace: true });
   };
   const { mutate, isPending } = useLogin({
     onSuccess: (data) => {
@@ -61,17 +54,23 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
     onError: () => { },
   });
 
-  const onSubmit = handleSubmit((data) => mutate(data));
+  const onSubmit = handleSubmit(async (data) => {
+    setAuthModePending(true);
+    try {
+      const oidcStarted = await beginOidcAuthIfEnabled("login");
+      if (!oidcStarted) mutate(data);
+    } catch {
+      toast.error("Secure sign-in could not be started. Please try again.");
+    } finally {
+      setAuthModePending(false);
+    }
+  });
 
   const beginGuestDemo = async () => {
     if (guestPending) return;
     setGuestPending(true);
     try {
-      const session = await beyvraAuthApi.guestDemo<{ access: string; expiresIn: number }>(crypto.randomUUID());
-      setCookie("access_token", session.access, {
-        ...authCookieOptions(false),
-        maxAge: session.expiresIn,
-      });
+      await beyvraAuthApi.guestDemo(crypto.randomUUID());
       navigate(destination || "/platform", { replace: true });
     } catch {
       toast.error("Demo access is temporarily unavailable. Please try again.");
@@ -166,7 +165,7 @@ const SignInForm: React.FunctionComponent<SignInFormProps> = ({
           className="login"
           type="primary"
           htmlType="submit"
-          loading={isPending}
+          loading={isPending || authModePending}
         >
           Log In
         </Button>

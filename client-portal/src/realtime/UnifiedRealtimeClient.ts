@@ -29,6 +29,10 @@ export class RealtimeSequenceTracker {
   clear(channel: string): void {
     this.sequences.delete(channel);
   }
+
+  reset(channel: string, sequence = 0): void {
+    this.sequences.set(channel, sequence);
+  }
 }
 
 /** One authenticated socket per browser runtime, with reference-counted subscriptions. */
@@ -41,11 +45,12 @@ export class UnifiedRealtimeClient {
   private readonly listeners = new Map<string, Set<Listener>>();
   private readonly channels = new Set<string>();
   private readonly recovery = new Map<string, SnapshotRecovery>();
+  private readonly recovering = new Set<string>();
   private readonly sequenceTracker = new RealtimeSequenceTracker();
   private readonly useV2 = import.meta.env.VITE_REALTIME_V2_ENABLED !== "false";
   private v2Failed = false;
 
-  constructor(private readonly identityToken: string, private readonly ticket: TicketFactory) {}
+  constructor(private readonly identityToken: string | undefined, private readonly ticket: TicketFactory) {}
 
   subscribe(channel: string, listener: Listener, recoverSnapshot?: SnapshotRecovery): () => void {
     const channelListeners = this.listeners.get(channel) || new Set<Listener>();
@@ -84,7 +89,7 @@ export class UnifiedRealtimeClient {
     try {
       const useV2Transport = this.useV2 && !this.v2Failed;
       const wsTicket = useV2Transport
-        ? (await beyvraRealtimeV2Api.connectionToken(this.identityToken)).token
+        ? (await beyvraRealtimeV2Api.connectionToken()).token
         : await this.ticket();
       if (this.closed || !this.channels.size) return;
       const socket = useV2Transport
@@ -141,7 +146,7 @@ export class UnifiedRealtimeClient {
         // Subscription authorization is performed by the private middleware
         // proxy. Keep the signed token endpoint available for SDK consumers,
         // but do not put bearer material on the wire when proxy auth is enabled.
-        await beyvraRealtimeV2Api.subscriptionToken(this.tokenForApi(), channel);
+        await beyvraRealtimeV2Api.subscriptionToken(undefined, channel);
         this.send({ id: crypto.randomUUID(), subscribe: { channel, recover: true } });
       } catch {
         this.dispatch("system.status", { type: "error", code: "SUBSCRIPTION_TOKEN_FAILED", channel });
@@ -149,25 +154,39 @@ export class UnifiedRealtimeClient {
     }
   }
 
-  private tokenForApi(): string {
-    // The legacy facade supplies the bearer token as its identity key. V2 token
-    // acquisition is only enabled explicitly and remains cookie-authenticated
-    // by the shared API client as an additional safeguard.
-    return this.identityToken;
-  }
-
   private dispatch(channel: string, message: UnifiedRealtimeMessage): void {
     this.listeners.get(channel)?.forEach((listener) => listener(message));
   }
 
   private async dispatchWithRecovery(channel: string, message: UnifiedRealtimeMessage): Promise<void> {
+    if (this.recovering.has(channel)) return;
     const gap = this.sequenceTracker.observe(channel, message.sequence);
     if (gap) {
+      this.recovering.add(channel);
       this.dispatch("system.status", { type: "sequence.gap", channel, ...gap });
-      const snapshot = await this.recovery.get(channel)?.();
-      if (snapshot) this.dispatch(channel, { ...snapshot, type: snapshot.type || "snapshot.recovered", channel });
+      try {
+        const snapshot = await this.recovery.get(channel)?.();
+        const baseline = this.sequenceFromRecovery(snapshot);
+        this.sequenceTracker.reset(channel, baseline);
+        if (snapshot) this.dispatch(channel, { ...snapshot, type: snapshot.type || "snapshot.recovered", channel });
+        this.dispatch("system.status", { type: "sequence.recovered", channel, sequence: baseline });
+      } catch {
+        this.dispatch("system.status", { type: "sequence.recovery_failed", channel });
+      } finally {
+        this.recovering.delete(channel);
+      }
+      return;
     }
     this.dispatch(channel, message);
+  }
+
+  private sequenceFromRecovery(snapshot: UnifiedRealtimeMessage | void): number {
+    if (!snapshot) return 0;
+    for (const key of ["sequence", "as_of_sequence", "current_sequence"]) {
+      const value = snapshot[key];
+      if (typeof value === "number" && Number.isFinite(value) && value >= 0) return value;
+    }
+    return 0;
   }
 
   private send(message: unknown): void {
