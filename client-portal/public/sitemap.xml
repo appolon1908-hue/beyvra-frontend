@@ -1,4 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://beyvra.com/</loc></url>
+  <url><loc>https://beyvra.com/</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://beyvra.com/platform-overview</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://beyvra.com/signIn</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://beyvra.com/privacy</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://beyvra.com/cookies</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://beyvra.com/terms</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://beyvra.com/demo-disclosure</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://beyvra.com/accessibility</loc><lastmod>2026-08-29</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://beyvra.com/learn/demo-trading-platform</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://beyvra.com/learn/paper-trading-app</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://beyvra.com/learn/crypto-demo-trading</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://beyvra.com/learn/forex-demo-account</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://beyvra.com/learn/stock-market-simulator</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://beyvra.com/learn/indices-demo-trading</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://beyvra.com/learn/commodities-demo-trading</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://beyvra.com/learn/trading-charts</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://beyvra.com/learn/trading-watchlists</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://beyvra.com/learn/market-news-workspace</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://beyvra.com/learn/portfolio-analytics-demo</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://beyvra.com/learn/trading-risk-controls</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://beyvra.com/learn/trading-education-basics</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://beyvra.com/learn/technical-analysis-practice</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://beyvra.com/learn/risk-management-for-traders</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://beyvra.com/learn/mobile-trading-demo</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://beyvra.com/learn/secure-trading-login</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://beyvra.com/learn/market-data-demo</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://beyvra.com/learn/economic-calendar-trading</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://beyvra.com/learn/trading-simulator-comparison</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://beyvra.com/learn/client-market-workspace</loc><lastmod>2026-08-29</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>
 </urlset>

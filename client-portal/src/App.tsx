@@ -19,6 +19,7 @@ import ForexProfitCalculator from "pages/public/trading/ForexProfitCalculator";
 import KYC from "pages/private/platform/kyc";
 import LocaleMetadata from "components/LocaleMetadata";
 import { applyGeoLocaleHint } from "./i18n/geoLocale";
+import ConsentManager from "pages/public/seo/ConsentManager";
 
 const DisabledFeatureRoute = () => <Navigate to="/" replace />;
 
@@ -59,6 +60,8 @@ const StatusDetails = lazy(() => import("./pages/public/statusDetails/StatusDeta
 const IntegrationsAdmin = lazy(() => import("./pages/private/integrations/IntegrationsAdmin"));
 const AdminPortal = lazy(() => import("./pages/private/admin/AdminPortal"));
 const ContractorPortal = lazy(() => import("./pages/private/contractor/ContractorPortal"));
+const SeoLandingPage = lazy(() => import("pages/public/seo/SeoLandingPage"));
+const LegalPage = lazy(() => import("pages/public/seo/LegalPage"));
 
 
 const App: React.FunctionComponent = () => {
@@ -89,6 +92,7 @@ const App: React.FunctionComponent = () => {
       <Suspense fallback={<div className="fullLoadingBackground"><Loading /></div>}>
         <Router>
           <LocaleMetadata />
+          <ConsentManager />
           <Routes>
             <Route element={<RequireAuth allowedPortals={["client"]} />}>
               <Route path="/client" element={<Navigate to="/platform" replace />} />
@@ -140,6 +144,7 @@ const App: React.FunctionComponent = () => {
             <Route path="/markets/ipos" element={<Ipo />} />
             <Route path="/markets/crypto" element={<Crypto />} />
             <Route path="/platform-overview" element={<PlatformOverview />} />
+            <Route path="/learn/:slug" element={<SeoLandingPage />} />
             <Route path="/trading/tradingPlatform" element={<ContentReview />} />
             <Route path="/trading/MobileTrading" element={<ContentReview />} />
             <Route path="/trading/metaTradingFour" element={<DisabledFeatureRoute />} />
@@ -165,11 +170,11 @@ const App: React.FunctionComponent = () => {
             <Route path="/session-expired" element={<SessionExpired />} />
             <Route path="/logout" element={<SignIn />} />
             <Route path="/dashboard" element={<Navigate to="/platform" replace />} />
-            <Route path="/terms" element={<ContentReview />} />
-            <Route path="/privacy" element={<ContentReview />} />
-            <Route path="/cookies" element={<ContentReview />} />
-            <Route path="/demo-disclosure" element={<ContentReview />} />
-            <Route path="/accessibility" element={<ContentReview />} />
+            <Route path="/terms" element={<LegalPage />} />
+            <Route path="/privacy" element={<LegalPage />} />
+            <Route path="/cookies" element={<LegalPage />} />
+            <Route path="/demo-disclosure" element={<LegalPage />} />
+            <Route path="/accessibility" element={<LegalPage />} />
             <Route path="*" element={<NotFoundPage />} />
             
             

@@ -53,6 +53,9 @@ export const apiEndpoints = {
     detail: (articleId: string) => `v1/news/${encodeURIComponent(articleId)}`,
     calendar: "v1/economic-calendar",
   },
+  public: {
+    intake: "v1/public/intake",
+  },
   // These capabilities are intentionally not advertised until a matching
   // backend contract exists. Demo configuration is served by demo.config.
   realtime: {},
