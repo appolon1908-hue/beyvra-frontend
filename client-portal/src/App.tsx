@@ -57,6 +57,8 @@ const SessionExpired = lazy(() => import("pages/public/sessionExpired/SessionExp
 const Home = lazy(() => import("pages/public/home/main/Home"));
 const StatusDetails = lazy(() => import("./pages/public/statusDetails/StatusDetails"));
 const IntegrationsAdmin = lazy(() => import("./pages/private/integrations/IntegrationsAdmin"));
+const AdminPortal = lazy(() => import("./pages/private/admin/AdminPortal"));
+const ContractorPortal = lazy(() => import("./pages/private/contractor/ContractorPortal"));
 
 
 const App: React.FunctionComponent = () => {
@@ -88,7 +90,8 @@ const App: React.FunctionComponent = () => {
         <Router>
           <LocaleMetadata />
           <Routes>
-            <Route element={<RequireAuth />}>
+            <Route element={<RequireAuth allowedPortals={["client"]} />}>
+              <Route path="/client" element={<Navigate to="/platform" replace />} />
               <Route path="/platform" element={<Platform />} />
               <Route path="/platform/assets" element={<Platform />} />
               <Route path="/platform/inzone" element={<Platform />} />
@@ -115,7 +118,16 @@ const App: React.FunctionComponent = () => {
               <Route path="/lender" element={<Lender />} />
               <Route path="/statusDetails" element={<StatusDetails />} />
               <Route path="/walkThrough" element={<WalkThrough />} />
+            </Route>
+            <Route element={<RequireAuth allowedPortals={["admin"]} />}>
+              <Route path="/admin" element={<AdminPortal />} />
               <Route path="/admin/integrations" element={<IntegrationsAdmin />} />
+            </Route>
+            <Route element={<RequireAuth allowedPortals={["contractor"]} />}>
+              <Route path="/contractor" element={<ContractorPortal />} />
+              <Route path="/contractor/work" element={<ContractorPortal />} />
+              <Route path="/contractor/customers" element={<ContractorPortal />} />
+              <Route path="/contractor/status" element={<ContractorPortal />} />
             </Route>
             <Route path="/" element={<LandingPage />} />
             <Route path="/markets" element={<Navigate to="/markets/Commodities" replace />} />

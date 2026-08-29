@@ -18,12 +18,22 @@ import { writeCompatibilityValue } from "compat/storageKeys";
 import { BeyvraErrorMapper } from "errors/BeyvraErrorMapper";
 import { ApiError } from "api/errors";
 
+type Portal = "client" | "admin" | "contractor";
+type SessionPayload = {
+  state?: string;
+  portal?: Portal;
+  allowedPortals?: Portal[];
+};
+
+type RequireAuthProps = {
+  allowedPortals?: Portal[];
+};
 
 const idleTimeLimit = 15 * 60 * 1000; // 15 minutes in milliseconds
 const kycTimeLimit = 10 * 60 * 1000; // 10 minutes in milliseconds
 let timeoutId: NodeJS.Timeout;
 
-const RequireAuth = () => {
+const RequireAuth = ({ allowedPortals }: RequireAuthProps) => {
   let location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -35,6 +45,8 @@ const RequireAuth = () => {
   const [isIdle, setIsIdle] = useState(false);
   const [bootstrap, setBootstrap] = useState<"BOOTING" | "ANONYMOUS" | "GUEST_READY" | "USER_READY" | "EXPIRED" | "ERROR">("BOOTING");
   const [bootstrapError, setBootstrapError] = useState("");
+  const [sessionPortal, setSessionPortal] = useState<Portal>("client");
+  const [sessionAllowedPortals, setSessionAllowedPortals] = useState<Portal[]>(["client"]);
   const isLegacyGuestDemo = Boolean(cookies.access_token && (() => {
     try { return JSON.parse(atob(cookies.access_token.split(".")[1])).guest_demo === true; } catch { return false; }
   })());
@@ -45,9 +57,13 @@ const RequireAuth = () => {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 8_000);
     setBootstrap("BOOTING");
-    beyvraAuthApi.session<{ state?: string }>()
+    beyvraAuthApi.session<SessionPayload>()
       .then(async (payload) => {
         if (disposed) return;
+        const nextPortal = payload.portal ?? "client";
+        const nextAllowed = payload.allowedPortals?.length ? payload.allowedPortals : [nextPortal];
+        setSessionPortal(nextPortal);
+        setSessionAllowedPortals(nextAllowed);
         setBootstrap(payload.state === "guest.ready" ? "GUEST_READY" : "USER_READY");
       })
       .catch((error: unknown) => {
@@ -144,6 +160,9 @@ const RequireAuth = () => {
   if (bootstrap === "ANONYMOUS") {
     const destination = `${location.pathname}${location.search}`;
     return <Navigate to={`/login?redirect=${encodeURIComponent(destination)}`} replace state={{ from: location }} />;
+  }
+  if (allowedPortals?.length && !allowedPortals.some((portal) => sessionAllowedPortals.includes(portal))) {
+    return <Navigate to={`/${sessionPortal === "client" ? "platform" : sessionPortal}`} replace />;
   }
 
   return (
