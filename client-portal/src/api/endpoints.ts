@@ -43,6 +43,11 @@ export const apiEndpoints = {
     requirements: "v1/compliance/requirements",
     kycSessions: "v1/compliance/kyc/sessions",
   },
+  adminPortal: {
+    summary: "v1/admin/portal/summary",
+    users: "v1/admin/portal/users",
+    events: "v1/admin/portal/events",
+  },
   news: {
     list: "v1/news",
     detail: (articleId: string) => `v1/news/${encodeURIComponent(articleId)}`,

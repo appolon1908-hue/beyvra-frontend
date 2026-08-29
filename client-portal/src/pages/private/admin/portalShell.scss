@@ -28,6 +28,12 @@
   text-transform: uppercase;
 }
 
+.portal-shell__subline {
+  margin: 10px 0 0;
+  color: #b7c4cf;
+  font-size: 14px;
+}
+
 .portal-shell__button,
 .portal-shell__tile {
   color: #f4f7fa;
@@ -44,12 +50,62 @@
   background: #111820;
 }
 
+.portal-shell__notice,
+.portal-shell__metrics,
+.portal-shell__panel {
+  max-width: 1120px;
+  margin: 0 auto 20px;
+}
+
+.portal-shell__notice {
+  border: 1px solid #665322;
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: #171305;
+  color: #ffd982;
+}
+
+.portal-shell__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.portal-shell__metric,
+.portal-shell__panel {
+  border: 1px solid #26333d;
+  border-radius: 8px;
+  background: #10161d;
+}
+
+.portal-shell__metric {
+  min-height: 112px;
+  display: grid;
+  align-content: space-between;
+  gap: 8px;
+  padding: 16px;
+}
+
+.portal-shell__metric span,
+.portal-shell__metric small,
+.portal-shell__activity-row span,
+.portal-shell__activity-row time,
+.portal-shell__empty {
+  color: #9fb0c0;
+}
+
+.portal-shell__metric strong {
+  color: #f4f7fa;
+  font-size: 28px;
+  line-height: 1;
+}
+
 .portal-shell__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
   max-width: 1120px;
-  margin: 0 auto;
+  margin: 0 auto 20px;
 }
 
 .portal-shell__tile {
@@ -68,6 +124,67 @@
   background: #14202a;
 }
 
+.portal-shell__panel {
+  padding: 18px;
+}
+
+.portal-shell__panel-heading,
+.portal-shell__activity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.portal-shell__panel-heading {
+  margin-bottom: 14px;
+}
+
+.portal-shell__panel-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.portal-shell__panel-heading a {
+  color: #9ccaff;
+  text-decoration: none;
+}
+
+.portal-shell__activity {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid #26333d;
+  border-radius: 8px;
+  background: #26333d;
+}
+
+.portal-shell__activity-row {
+  min-height: 64px;
+  background: #0d1319;
+  padding: 12px;
+}
+
+.portal-shell__activity-row > div {
+  display: grid;
+  gap: 4px;
+}
+
+.portal-shell__activity-row > div:last-child {
+  justify-items: end;
+  text-align: right;
+}
+
+.portal-shell__activity-row strong,
+.portal-shell__activity-row span,
+.portal-shell__activity-row time {
+  overflow-wrap: anywhere;
+}
+
+.portal-shell__empty {
+  margin: 0;
+}
+
 @media (max-width: 640px) {
   .portal-shell__header {
     align-items: stretch;
@@ -76,5 +193,15 @@
 
   .portal-shell__header h1 {
     font-size: 30px;
+  }
+
+  .portal-shell__activity-row {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .portal-shell__activity-row > div:last-child {
+    justify-items: start;
+    text-align: left;
   }
 }
