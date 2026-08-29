@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { beyvraAuthApi } from "api/generated/beyvra";
+import { beginOidcPasswordResetIfEnabled } from "api/auth/oidc";
 import { ApiError } from "api/errors";
 import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 
@@ -27,7 +28,12 @@ type ForgotPasswordVariables = {
 };
 
 export async function fetchForgotPassword(data: ForgotPasswordVariables): Promise<ForgotPassResponse> {
-  try { return await beyvraAuthApi.forgotPassword<ForgotPassResponse>(data); }
+  try {
+    if (await beginOidcPasswordResetIfEnabled()) {
+      return { detail: "Redirecting to Beyvra identity password reset." };
+    }
+    return await beyvraAuthApi.forgotPassword<ForgotPassResponse>(data);
+  }
   catch (error) { logInternalError(error, { endpoint: "auth.forgot_password" }); toast.error(toUserSafeErrorText(error, "auth")); throw error instanceof ApiError ? error : new ApiError(500, "UNKNOWN"); }
 }
 

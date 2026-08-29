@@ -1,4 +1,5 @@
 import { beyvraAuthApi } from "api/generated/beyvra";
+import { getApiUrl } from "utils/env";
 
 export type AuthAction = "login" | "register";
 
@@ -16,6 +17,10 @@ export type OidcConfig = {
     oidc?: { enabled?: boolean };
     google?: { enabled?: boolean };
   };
+  passwordResetAuthority?: string;
+  password_reset_authority?: string;
+  passwordResetUrl?: string;
+  password_reset_url?: string;
   oidc?: {
     enabled?: boolean;
     loginUrl?: string;
@@ -24,6 +29,8 @@ export type OidcConfig = {
     register_url?: string;
     registrationUrl?: string;
     registration_url?: string;
+    passwordResetUrl?: string;
+    password_reset_url?: string;
   };
 };
 
@@ -97,5 +104,22 @@ export async function beginOidcAuthIfEnabled(action: AuthAction, legalAccepted =
   const redirectUrl = responseRedirectUrl(result);
   if (!redirectUrl) throw new Error(result.code || "OIDC_AUTH_FAILED");
   window.location.assign(redirectUrl);
+  return true;
+}
+
+export async function beginOidcPasswordResetIfEnabled(): Promise<boolean> {
+  const config = await fetchOidcConfig();
+  if (!isOidcEnabled(config)) return false;
+
+  const authority = String(config?.passwordResetAuthority || config?.password_reset_authority || "").toLowerCase();
+  if (authority && authority !== "keycloak") return false;
+
+  const resetUrl =
+    config?.passwordResetUrl ||
+    config?.password_reset_url ||
+    config?.oidc?.passwordResetUrl ||
+    config?.oidc?.password_reset_url ||
+    getApiUrl("v1/auth/oidc/password-reset/");
+  window.location.assign(resetUrl);
   return true;
 }

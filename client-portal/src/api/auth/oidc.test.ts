@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { beginOidcAuthIfEnabled, isOidcEnabled } from "./oidc";
+import { beginOidcAuthIfEnabled, beginOidcPasswordResetIfEnabled, isOidcEnabled } from "./oidc";
 
 const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status,
@@ -42,5 +42,17 @@ describe("OIDC auth mode helper", () => {
 
     await expect(beginOidcAuthIfEnabled("login")).resolves.toBe(false);
     expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("redirects password reset to the backend identity authority when OIDC is enabled", async () => {
+    const assign = vi.fn();
+    const fetch = vi.fn().mockResolvedValue(response({ enabled: true, passwordResetAuthority: "keycloak" }));
+    vi.stubGlobal("fetch", fetch);
+    vi.stubGlobal("window", { ...globalThis, location: { assign }, setTimeout, clearTimeout });
+
+    await expect(beginOidcPasswordResetIfEnabled()).resolves.toBe(true);
+
+    expect(String(fetch.mock.calls[0][0])).toContain("v1/auth/oidc/config/");
+    expect(assign).toHaveBeenCalledWith("/api/v1/auth/oidc/password-reset/");
   });
 });
