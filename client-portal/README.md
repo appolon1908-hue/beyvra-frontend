@@ -1,50 +1,87 @@
-# Tradx Portal Frontend
-### Installation Instructions
-1. Clone this repository and cd into 'client-portal' folder
-2. Create .env file by copying .env.example file. Read insunctions inside it to set variables.
-3. Start containers (start project). (execute in git bash for windows users)
-```
-./start.sh
-```
-5. Stop containers (stop project). (execute in git bash for windows users)
-```
-./stop.sh
-```
-### Developer Notes
-Run commands inside docker contanier
-```
-docker compose exec server npm install axios
-docker compose exec server npm run build
-```
+# Beyvra Client Portal
 
-# React + TypeScript + Vite
+React, TypeScript, and Vite browser application for the authenticated Beyvra platform.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The repository-level authority, API boundary, security model, deployment process, and production gates are documented in [`../README.md`](../README.md). This directory owns frontend presentation and interaction only; `appolon1908-hue/beyvra-backend` remains authoritative for accounts, balances, positions, orders, executions, permissions, risk, compliance, audit, and provider state.
 
-Currently, two official plugins are available:
+## Requirements
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node.js compatible with the committed lockfile and Vite toolchain
+- npm
+- an approved HTTPS Beyvra API or same-origin `/api` proxy
+- an approved `wss://` realtime endpoint when realtime is enabled
 
-## Expanding the ESLint configuration
+## Configure
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
- ``` pull again
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+```bash
+cp .env.example .env
+npm ci
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Public configuration includes:
+
+```text
+VITE_API_BASE_URL=/api
+VITE_SOCKET_BASE_URL=AUTO
+VITE_PUBLIC_SITE_URL=https://staging.beyvra.com
+VITE_BRAND_NAME=Beyvra
+```
+
+Do not place an OIDC client secret, provider credential, database URL, private service URL, password, or bearer token in a `VITE_*` variable. Vite configuration is delivered to the browser.
+
+## Develop
+
+```bash
+npm run dev
+```
+
+The development server uses port `8080` by default.
+
+## Validate
+
+```bash
+npm run lint
+npm run typecheck
+npm run errors:check
+npm run brand:check
+npm run i18n:check
+npm run test:errors
+npm run test:realtime
+npm run test:chart
+npm run test:contract
+npm run build
+npm run test:e2e
+npm run audit:gate
+```
+
+The contract, realtime, chart, browser, accessibility, localization, safe-error, brand, and dependency gates must pass on the exact release commit. A local build is not production evidence.
+
+## Authentication
+
+Human authentication starts through the same-origin backend/edge route:
+
+```text
+GET /api/v1/auth/oidc/login/?next=/platform
+```
+
+The redirect must use the canonical issuer `https://auth.codestra.co/realms/codestra` and Authorization Code Flow with PKCE S256. The portal must not store provider or identity secrets and must not use browser-controlled claims as authorization.
+
+## API and realtime
+
+- API calls use the same-origin `/api` boundary by default.
+- The canonical public backend authority is `https://api.beyvra.com`.
+- Realtime is an enhancement, not the source of record; the application must recover authoritative state from the API after disconnects or gaps.
+- The UI must present loading, stale, degraded, unavailable, indeterminate, and reconciliation states explicitly.
+- Browser code must not call broker/provider APIs, databases, Odoo, n8n, or private infrastructure endpoints directly.
+
+## Production image
+
+```bash
+npm ci
+npm run build
+docker build -f Dockerfile.prod -t beyvra-frontend:local .
+```
+
+Production uses an immutable registry digest, non-secret runtime configuration, TLS at the approved edge, a reviewed CSP, and staging acceptance before promotion. See [`../DEPLOYMENT.md`](../DEPLOYMENT.md).
+
+Deploying this portal never enables live trading. Capability activation is a separate backend-enforced and explicitly approved change.
