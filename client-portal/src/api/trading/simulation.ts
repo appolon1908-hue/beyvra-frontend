@@ -31,6 +31,7 @@ export type SimulationOrder = {
   quantity: string;
   filled_quantity: string;
   state: SimulationOrderState;
+  version: string;
   simulation: true;
 };
 
@@ -65,10 +66,10 @@ export function createSimulationOrder(token: string, order: SimulationOrderReque
   });
 }
 
-export function cancelSimulationOrder(token: string, orderId: string) {
+export function cancelSimulationOrder(token: string, orderId: string, expectedVersion: string, idempotencyKey: string = crypto.randomUUID()) {
   return authenticatedRequest<SimulationOrder>(apiEndpoints.simulationTrading.cancel(orderId), token, {
     method: "POST",
-    headers: simulationHeaders,
+    headers: { ...simulationHeaders, "Idempotency-Key": idempotencyKey, "If-Match": expectedVersion },
     body: "{}",
   });
 }

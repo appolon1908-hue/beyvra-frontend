@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createSimulationOrder, previewSimulationOrder } from "./simulation";
+import { cancelSimulationOrder, createSimulationOrder, previewSimulationOrder } from "./simulation";
 
 const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status,
@@ -35,5 +35,22 @@ describe("canonical simulation trading client", () => {
     const init = fetch.mock.calls[0][1] as RequestInit;
     expect(new Headers(init.headers).get("Idempotency-Key")).toBe("same-key");
     expect(String(fetch.mock.calls[0][0])).toContain("v1/trading/orders");
+  });
+
+  it("cancels with durable idempotency and optimistic concurrency controls", async () => {
+    const fetch = vi.fn().mockResolvedValue(response({
+      id: "order-1", instrument: "BTC-USD", side: "BUY", order_type: "MARKET",
+      quantity: "1", filled_quantity: "0", state: "CANCELLED",
+      version: "2026-09-02T00:00:00+00:00", simulation: true,
+    }));
+    vi.stubGlobal("fetch", fetch);
+
+    await cancelSimulationOrder("token", "order-1", "version-1", "cancel-key");
+
+    const init = fetch.mock.calls[0][1] as RequestInit;
+    const headers = new Headers(init.headers);
+    expect(init.method).toBe("POST");
+    expect(headers.get("Idempotency-Key")).toBe("cancel-key");
+    expect(headers.get("If-Match")).toBe("version-1");
   });
 });
