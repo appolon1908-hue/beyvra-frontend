@@ -86,6 +86,11 @@ TEMPLATE_MARKERS = {
     "Quick summary",
 }
 
+SECRET_INDICATOR = re.compile(
+    r"(?i)(password|passwd|secret|private[_-]?key|api[_-]?key|client[_-]?secret|"
+    r"access[_-]?token|refresh[_-]?token|bearer|credential|database[_-]?url|dsn)"
+)
+
 
 def fail(message: str) -> None:
     print(f"ERROR: {message}", file=sys.stderr)
@@ -212,12 +217,17 @@ def validate_environment(text: str) -> None:
         stripped = line.strip()
         if not stripped or stripped.startswith("#") or "=" not in stripped:
             continue
-        name, value = stripped.split("=", 1)
-        if name.startswith("VITE_") and re.search(
-            r"(?i)(password|secret|private[_-]?key|access[_-]?token|refresh[_-]?token|bearer)",
-            value,
-        ):
-            fail(f"public Vite variable appears to contain secret material: {name}")
+        raw_name, raw_value = stripped.split("=", 1)
+        name = raw_name.strip()
+        value = raw_value.strip()
+        if not name.startswith("VITE_"):
+            continue
+        normalized_name = name.lower().replace("-", "_")
+        if SECRET_INDICATOR.search(normalized_name) or SECRET_INDICATOR.search(value):
+            fail(
+                "public Vite configuration contains a secret-bearing variable "
+                f"name or value: {name}"
+            )
 
 
 def validate_compose(text: str) -> None:
@@ -268,11 +278,7 @@ def validate_playwright(config: str, setup: str, root_text: str, portal_text: st
     for documentation in (root_text, portal_text):
         require(
             documentation,
-            (
-                "does not start",
-                "E2E_BASE_URL",
-                "POST /api/v1/demo/sessions",
-            ),
+            ("does not start", "E2E_BASE_URL", "POST /api/v1/demo/sessions"),
             "Playwright documentation",
         )
 
