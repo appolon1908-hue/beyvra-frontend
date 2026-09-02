@@ -22,3 +22,5 @@ jobs:
           python-version: '3.12'
       - name: Validate repository authority README
         run: python3 scripts/validate_frontend_readme.py
+      - name: Validate frontend API endpoint discovery
+        run: node client-portal/scripts/check-api-contract.mjs --source-only
