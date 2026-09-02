@@ -90,15 +90,15 @@ export const codestraUserApi = {
 };
 
 export const codestraWalletApi = {
-  wallets: (token: string) => codestraRequest("wallet/wallets/", { token }),
-  create: <T>(token: string, body: unknown) => codestraRequest<T>("wallet/wallets/", { method: "POST", token, body: JSON.stringify(body) }),
-  update: <T>(token: string, id: string | number, body: unknown) => codestraRequest<T>(`wallet/wallets/${id}/`, { method: "PUT", token, body: JSON.stringify(body) }),
-  archive: <T>(token: string, id: string | number) => codestraRequest<T>(`wallet/${id}/archive/`, { method: "PUT", token }),
-  transaction: (token: string, id: string) => codestraRequest(`wallet/transactions/${id}/`, { token }),
-  refillLegacy: (token: string, id: string | number) => codestraRequest(`wallet/wallets/${id}/refill/`, { method: "POST", token }),
+  wallets: (token: string) => codestraRequest("v1/wallets/", { token }),
+  create: <T>(token: string, body: unknown) => codestraRequest<T>("v1/wallets/", { method: "POST", token, body: JSON.stringify(body) }),
+  update: <T>(token: string, asset: string | number, body: unknown) => codestraRequest<T>(`v1/wallets/${encodeURIComponent(asset)}`, { method: "POST", token, body: JSON.stringify(body) }),
+  archive: <T>(_token: string, _id: string | number) => Promise.reject<T>(new ApiError(503, "FEATURE_DISABLED")),
+  transaction: <T>(_token: string, _id: string) => Promise.reject<T>(new ApiError(503, "FEATURE_DISABLED")),
+  refillLegacy: <T>(_token: string, _id: string | number) => Promise.reject<T>(new ApiError(503, "FEATURE_DISABLED")),
   tradeAssets: <T>(token: string) => codestraRequest<T>("trades/assets/", { token }),
-  currencies: <T>(token: string) => codestraRequest<T>("wallet/currencies/", { token }),
-  paymentMethods: <T>(token: string) => codestraRequest<T>("payment/methods/", { token }),
+  currencies: <T>(_token: string) => Promise.reject<T>(new ApiError(503, "FEATURE_DISABLED")),
+  paymentMethods: <T>(_token: string) => Promise.reject<T>(new ApiError(503, "FEATURE_DISABLED")),
 };
 
 export const codestraBankApi = {
@@ -133,15 +133,14 @@ export const codestraAuthApi = {
 
 export const codestraProfileApi = {
   profile: (token: string) => codestraRequest("v1/me/", { token }),
-  legacyProfile: <T>(token: string) => codestraRequest<T>("user/profile/", { token }),
   update: (token: string, body: FormData | Record<string, unknown>) => codestraRequest("v1/me/", { method: "PATCH", token, body: body instanceof FormData ? body : JSON.stringify(body) }),
   changePassword: (token: string, body: unknown) => codestraRequest("v1/auth/password_change/", { method: "POST", token, body: JSON.stringify(body) }),
   disableWalkthrough: (token: string) => codestraRequest("v1/auth/disable_walkthrough/", { method: "PUT", token }),
 };
 
 export const codestraIntegrationsApi = {
-  crmConnections: <T>(token: string) => codestraRequest<T>("integrations/crm/connections", { token }),
-  importUsers: <T>(token: string, body: FormData, idempotencyKey: string) => codestraRequest<T>("integrations/users/imports", { method: "POST", token, body, idempotencyKey }),
+  crmConnections: <T>(token: string) => codestraRequest<T>("v1/integrations/crm/connections", { token }),
+  importUsers: <T>(token: string, body: FormData, idempotencyKey: string) => codestraRequest<T>("v1/users/imports", { method: "POST", token, body, idempotencyKey }),
 };
 
 export const codestraKycApi = {

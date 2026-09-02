@@ -22,7 +22,6 @@ export const apiEndpoints = {
     webhookDeliveries: (webhookId: string) => `notification/webhooks/${webhookId}/deliveries/`,
   },
   market: {
-    history: "v1/market/trades",
     snapshot: "v1/market/quotes",
     candles: "v1/market/candles",
   },
