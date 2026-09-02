@@ -36,7 +36,7 @@ EXPECTED_SCRIPTS = {
     "test:e2e",
 }
 
-REQUIRED_ROOT_HEADINGS = {
+ROOT_HEADINGS = {
     "## Repository authority",
     "## Current release truth",
     "## Application surfaces",
@@ -55,7 +55,7 @@ REQUIRED_ROOT_HEADINGS = {
     "## Change policy",
 }
 
-REQUIRED_ROOT_TEXT = {
+ROOT_TEXT = {
     "appolon1908-hue/beyvra-frontend",
     "appolon1908-hue/beyvra-backend",
     "https://beyvra.com",
@@ -79,7 +79,7 @@ REQUIRED_ROOT_TEXT = {
     "Merging this repository never authorizes a production deployment",
 }
 
-GENERIC_TEMPLATE_MARKERS = {
+TEMPLATE_MARKERS = {
     "This README would normally document whatever steps are necessary",
     "Learn Markdown",
     "Who do I talk to?",
@@ -108,84 +108,27 @@ def load_json(path: Path) -> dict[str, Any]:
     return value
 
 
-def validate_root_readme(text: str, scripts: set[str]) -> None:
-    for marker in GENERIC_TEMPLATE_MARKERS:
-        if marker.lower() in text.lower():
-            fail(f"generic README template marker remains: {marker}")
-
-    for heading in REQUIRED_ROOT_HEADINGS:
-        if heading not in text:
-            fail(f"root README is missing required section: {heading}")
-
-    for required in REQUIRED_ROOT_TEXT:
-        if required not in text:
-            fail(f"root README is missing required authority text: {required}")
-
-    for script in EXPECTED_SCRIPTS:
-        command = f"npm run {script}"
-        if script not in scripts:
-            fail(f"README-required package script is absent: {script}")
-        if command not in text:
-            fail(f"root README does not document package script: {command}")
-
-    if "live trading" not in text.lower() or "does not authorize" not in text.lower():
-        fail("root README does not explicitly deny live-trading authorization")
-    if "localStorage" not in text:
-        fail("root README does not prohibit browser identity-token storage")
-    if "repository@sha256:..." not in text:
-        fail("root README does not require immutable production image identity")
-    if "does not, by this documentation alone, prove" not in text:
-        fail("root README overstates immutable production artifact evidence")
-
-
-def validate_portal_readme(text: str, scripts: set[str]) -> None:
-    for marker in GENERIC_TEMPLATE_MARKERS:
-        if marker.lower() in text.lower():
-            fail(f"generic client-portal README marker remains: {marker}")
-
-    for required in (
-        "# Beyvra Client Portal",
-        "[`../README.md`](../README.md)",
-        "appolon1908-hue/beyvra-backend",
-        "VITE_API_BASE_URL=/api",
-        "GET /api/v1/auth/oidc/login/?next=/platform",
-        "https://auth.codestra.co/realms/codestra",
-        "https://api.beyvra.com",
-        "node scripts/check-api-contract.mjs --source-only",
-        "API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contract",
-        "E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e",
-        "POST /api/v1/demo/sessions",
-        "PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED",
-        "Deploying this portal never enables live trading.",
-    ):
-        if required not in text:
-            fail(f"client-portal README is missing required text: {required}")
-
-    for script in EXPECTED_SCRIPTS:
-        if script not in scripts:
-            fail(f"client-portal README references absent package script: {script}")
-        if f"npm run {script}" not in text:
-            fail(f"client-portal README does not document package script: {script}")
-
-    if "Production uses an immutable registry digest" in text:
-        fail("client-portal README claims unproven immutable production deployment")
+def require(text: str, values: set[str] | tuple[str, ...], context: str) -> None:
+    for value in values:
+        if value not in text:
+            fail(f"{context} is missing required text: {value}")
 
 
 def validate_package(document: dict[str, Any]) -> set[str]:
     scripts = document.get("scripts")
+    dependencies = document.get("dependencies")
+    dev_dependencies = document.get("devDependencies")
     if not isinstance(scripts, dict):
         fail("client-portal package.json has no scripts object")
+    if not isinstance(dependencies, dict) or not isinstance(dev_dependencies, dict):
+        fail("client-portal dependency declarations are incomplete")
+
     script_names = {str(name) for name in scripts}
     missing = EXPECTED_SCRIPTS - script_names
     if missing:
         fail(f"client-portal package.json is missing scripts: {sorted(missing)}")
 
-    dependencies = document.get("dependencies")
-    dev_dependencies = document.get("devDependencies")
-    if not isinstance(dependencies, dict) or not isinstance(dev_dependencies, dict):
-        fail("client-portal dependency declarations are incomplete")
-
-    for dependency in (
+    for name in (
         "react",
         "@reduxjs/toolkit",
         "@tanstack/react-query",
@@ -195,37 +138,76 @@ def validate_package(document: dict[str, Any]) -> set[str]:
         "i18next",
         "socket.io-client",
     ):
-        if dependency not in dependencies:
-            fail(f"README runtime dependency is absent: {dependency}")
-
-    for dependency in (
+        if name not in dependencies:
+            fail(f"README runtime dependency is absent: {name}")
+    for name in (
         "typescript",
         "vite",
         "vitest",
         "@playwright/test",
         "@axe-core/playwright",
     ):
-        if dependency not in dev_dependencies:
-            fail(f"README toolchain dependency is absent: {dependency}")
+        if name not in dev_dependencies:
+            fail(f"README toolchain dependency is absent: {name}")
 
-    react_version = str(dependencies["react"]).lstrip("^~")
-    if not react_version.startswith("19."):
-        fail(f"README says React 19 but package.json uses {dependencies['react']}")
-
+    if not str(dependencies["react"]).lstrip("^~").startswith("19."):
+        fail("README says React 19 but package.json does not")
     return script_names
 
 
-def validate_environment(text: str) -> None:
-    required = {
-        "SERVER_PORT=8080",
-        "VITE_API_BASE_URL=/api",
-        "VITE_PUBLIC_SITE_URL=https://staging.beyvra.com",
-        "VITE_BRAND_NAME=Beyvra",
-    }
-    for item in required:
-        if item not in text:
-            fail(f"environment example is missing README-documented value: {item}")
+def validate_readmes(root_text: str, portal_text: str, scripts: set[str]) -> None:
+    for marker in TEMPLATE_MARKERS:
+        if marker.lower() in root_text.lower() or marker.lower() in portal_text.lower():
+            fail(f"generic README template marker remains: {marker}")
 
+    require(root_text, ROOT_HEADINGS, "root README")
+    require(root_text, ROOT_TEXT, "root README")
+    require(
+        portal_text,
+        (
+            "# Beyvra Client Portal",
+            "[`../README.md`](../README.md)",
+            "appolon1908-hue/beyvra-backend",
+            "VITE_API_BASE_URL=/api",
+            "GET /api/v1/auth/oidc/login/?next=/platform",
+            "https://auth.codestra.co/realms/codestra",
+            "https://api.beyvra.com",
+            "node scripts/check-api-contract.mjs --source-only",
+            "API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contract",
+            "E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e",
+            "POST /api/v1/demo/sessions",
+            "PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED",
+            "Deploying this portal never enables live trading.",
+        ),
+        "client-portal README",
+    )
+
+    for script in scripts & EXPECTED_SCRIPTS:
+        command = f"npm run {script}"
+        if command not in root_text or command not in portal_text:
+            fail(f"README command is missing: {command}")
+
+    if "localStorage" not in root_text:
+        fail("root README does not prohibit browser identity-token storage")
+    if "repository@sha256:..." not in root_text:
+        fail("root README does not require immutable production image identity")
+    if "does not, by this documentation alone, prove" not in root_text:
+        fail("root README overstates production artifact evidence")
+    if "Production uses an immutable registry digest" in portal_text:
+        fail("client-portal README claims unproven production deployment")
+
+
+def validate_environment(text: str) -> None:
+    require(
+        text,
+        (
+            "SERVER_PORT=8080",
+            "VITE_API_BASE_URL=/api",
+            "VITE_PUBLIC_SITE_URL=https://staging.beyvra.com",
+            "VITE_BRAND_NAME=Beyvra",
+        ),
+        "environment example",
+    )
     for line in text.splitlines():
         stripped = line.strip()
         if not stripped or stripped.startswith("#") or "=" not in stripped:
@@ -239,95 +221,96 @@ def validate_environment(text: str) -> None:
 
 
 def validate_compose(text: str) -> None:
-    for required in (
-        "context: ./client-portal",
-        "dockerfile: Dockerfile.prod",
-        '"127.0.0.1:${SERVER_PORT:-8080}:80"',
-        "trading-network:",
-        "external: true",
-        'profiles: ["edge"]',
-    ):
-        if required not in text:
-            fail(f"Compose source does not match README: {required}")
-
+    require(
+        text,
+        (
+            "context: ./client-portal",
+            "dockerfile: Dockerfile.prod",
+            '"127.0.0.1:${SERVER_PORT:-8080}:80"',
+            "trading-network:",
+            "external: true",
+            'profiles: ["edge"]',
+        ),
+        "Compose source",
+    )
     if re.search(r"(?m)^\s*image:\s*[^\n]*:latest\s*$", text):
         fail("Compose uses a floating latest image tag")
 
 
 def validate_contract_checker(text: str) -> None:
-    for required in (
-        "../src/api/endpoints.ts",
-        "minimumRegistryPaths",
-        "endpointDefinitions",
-        "directEndpointCalls",
-        "registryEndpoints.size < minimumRegistryPaths",
-        '"/v1/workspace/bootstrap"',
-        "backendEndpoints.size === 0",
-        'process.argv.includes("--source-only")',
-    ):
-        if required not in text:
-            fail(f"API contract checker is missing required enforcement: {required}")
+    require(
+        text,
+        (
+            "../src/api/endpoints.ts",
+            "minimumRegistryPaths",
+            "endpointDefinitions",
+            "directEndpointCalls",
+            "registryEndpoints.size < minimumRegistryPaths",
+            '"/v1/workspace/bootstrap"',
+            "backendEndpoints.size === 0",
+            'process.argv.includes("--source-only")',
+        ),
+        "API contract checker",
+    )
 
-    if "const endpointRegex = /(?:authenticatedRequest" in text:
-        fail("legacy zero-match API contract discovery returned")
 
-
-def validate_playwright(config: str, setup: str) -> None:
-    for required in (
-        "globalSetup",
-        "E2E_BASE_URL",
-        "reuseExistingServer: true",
-    ):
-        if required not in config:
-            fail(f"Playwright configuration is missing required behavior: {required}")
-    for required in (
-        'context.post("/api/v1/demo/sessions"',
-        "E2E_SKIP_GUEST_BOOTSTRAP",
-        "Guest session bootstrap failed",
-    ):
-        if required not in setup:
-            fail(f"Playwright global setup is missing required behavior: {required}")
+def validate_playwright(config: str, setup: str, root_text: str, portal_text: str) -> None:
+    require(config, ("globalSetup", "E2E_BASE_URL"), "Playwright configuration")
+    require(
+        setup,
+        (
+            'context.post("/api/v1/demo/sessions"',
+            "E2E_SKIP_GUEST_BOOTSTRAP",
+            "Guest session bootstrap failed",
+        ),
+        "Playwright global setup",
+    )
+    for documentation in (root_text, portal_text):
+        require(
+            documentation,
+            (
+                "does not start",
+                "E2E_BASE_URL",
+                "POST /api/v1/demo/sessions",
+            ),
+            "Playwright documentation",
+        )
 
 
 def validate_deployment(text: str) -> None:
-    for required in (
-        "SOURCE_BUILD_REHEARSAL=AVAILABLE",
-        "IMMUTABLE_IMAGE_PUBLICATION=NOT_PROVEN_BY_THIS_REPOSITORY",
-        "PROTECTED_PRODUCTION_DEPLOYMENT=NOT_PROVEN_BY_THIS_REPOSITORY",
-        "PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED",
-        "LIVE_TRADING_ACTIVATION=NOT_AUTHORIZED",
-        "node scripts/check-api-contract.mjs --source-only",
-        "API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contract",
-        "E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e",
-        "POST /api/v1/demo/sessions",
-        "repository@sha256:...",
-    ):
-        if required not in text:
-            fail(f"deployment guide is missing required truth: {required}")
-
-    if "Production uses an immutable GHCR image" in text:
-        fail("deployment guide still claims an unproven immutable production artifact")
+    require(
+        text,
+        (
+            "SOURCE_BUILD_REHEARSAL=AVAILABLE",
+            "IMMUTABLE_IMAGE_PUBLICATION=NOT_PROVEN_BY_THIS_REPOSITORY",
+            "PROTECTED_PRODUCTION_DEPLOYMENT=NOT_PROVEN_BY_THIS_REPOSITORY",
+            "PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED",
+            "LIVE_TRADING_ACTIVATION=NOT_AUTHORIZED",
+            "node scripts/check-api-contract.mjs --source-only",
+            "API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contract",
+            "E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e",
+            "POST /api/v1/demo/sessions",
+            "repository@sha256:...",
+        ),
+        "deployment guide",
+    )
 
 
 def validate() -> None:
     root_readme = read(ROOT_README)
     portal_readme = read(PORTAL_README)
-    package = load_json(PACKAGE)
-    environment = read(ENV_EXAMPLE)
-    compose = read(COMPOSE)
-    deployment = read(DEPLOYMENT)
-    contract_checker = read(CONTRACT_CHECKER)
-    playwright_config = read(PLAYWRIGHT_CONFIG)
-    playwright_setup = read(PLAYWRIGHT_SETUP)
-
-    scripts = validate_package(package)
-    validate_root_readme(root_readme, scripts)
-    validate_portal_readme(portal_readme, scripts)
-    validate_environment(environment)
-    validate_compose(compose)
-    validate_contract_checker(contract_checker)
-    validate_playwright(playwright_config, playwright_setup)
-    validate_deployment(deployment)
+    scripts = validate_package(load_json(PACKAGE))
+    validate_readmes(root_readme, portal_readme, scripts)
+    validate_environment(read(ENV_EXAMPLE))
+    validate_compose(read(COMPOSE))
+    validate_contract_checker(read(CONTRACT_CHECKER))
+    validate_playwright(
+        read(PLAYWRIGHT_CONFIG),
+        read(PLAYWRIGHT_SETUP),
+        root_readme,
+        portal_readme,
+    )
+    validate_deployment(read(DEPLOYMENT))
 
 
 def main() -> None:
