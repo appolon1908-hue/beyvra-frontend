@@ -23,6 +23,7 @@ A frontend merge, successful build, image tag, or working URL does not authorize
 REPOSITORY_AUTHORITY=DEFINED
 APPLICATION_SOURCE=PRESENT
 PRODUCTION_RELEASE=NOT_CERTIFIED_BY_THIS_README
+PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED
 LIVE_TRADING_ACTIVATION=NOT_AUTHORIZED_BY_THIS_REPOSITORY
 PROVIDER_CREDENTIALS_ALLOWED_IN_BROWSER=NO
 BACKEND_BUSINESS_AUTHORITY=BEYVRA_BACKEND
@@ -163,7 +164,7 @@ Never place passwords, signing keys, API keys, OIDC client secrets, provider cre
 
 ## Validation
 
-Run from `client-portal/`:
+Run source-only checks from `client-portal/`:
 
 ```bash
 npm ci
@@ -175,23 +176,38 @@ npm run i18n:check
 npm run test:errors
 npm run test:realtime
 npm run test:chart
-npm run test:contract
+node scripts/check-api-contract.mjs --source-only
 npm run build
-npm run test:e2e
 npm run audit:gate
 ```
 
+The full API contract gate requires an accepted `beyvra-backend` schema endpoint:
+
+```bash
+API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contract
+```
+
+`test:contract` parses the real `src/api/endpoints.ts` registry plus direct request literals, refuses zero or unexpectedly low endpoint discovery, and compares those paths with the backend OpenAPI schema. A source-only parser pass does not replace the full backend comparison.
+
+The Playwright suite is an integrated frontend/backend test and does not start either service. It requires a running frontend at `E2E_BASE_URL`, a same-origin `/api` path to an approved non-production backend, and `POST /api/v1/demo/sessions` for guest-session setup:
+
+```bash
+E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e
+```
+
+`E2E_SKIP_GUEST_BOOTSTRAP=true` is allowed only for a deliberately unauthenticated test subset; it must not be used as authenticated or order-flow acceptance evidence.
+
 Important script groups:
 
-- `test:contract` verifies the generated frontend API contract;
+- `test:contract` performs the live backend-schema comparison described above;
 - `test:realtime` verifies the unified realtime client;
 - `test:chart` exercises the chart engine, workspace integration, performance, indicators, drawings, trade markers, and events;
-- `test:e2e` runs Playwright browser tests;
+- `test:e2e` runs Playwright against the explicitly supplied integrated origin;
 - `errors:check` prevents unsafe public error output;
 - `brand:check` prevents stale public product identity;
 - `audit:gate` is the dependency-security gate.
 
-The repository currently has a localization workflow under `.github/workflows/`. A production release must also have protected CI that runs the complete validation set above against the exact pull-request head and merge result. Local success alone is not release evidence.
+The repository currently has localization and README-authority workflows under `.github/workflows/`. The README-authority workflow also runs endpoint discovery in source-only mode. A production release must still have protected CI that runs every applicable source and integration gate against the exact pull-request head and merge result. Local success alone is not release evidence.
 
 ## Container build
 
@@ -216,7 +232,7 @@ The root Compose definition:
 - includes a health check;
 - optionally starts a Caddy edge through the `edge` profile.
 
-A production declaration must use an immutable registry reference such as `repository@sha256:...`, not a floating `latest` tag or a locally named image.
+A production declaration must use an immutable registry reference such as `repository@sha256:...`, not a floating `latest` tag or a locally named image. The current repository does not, by this documentation alone, prove that such an artifact has been published or deployed.
 
 ## Staging deployment
 
@@ -228,11 +244,13 @@ cp .env.staging.example .env.staging
 docker compose --env-file .env.staging --profile edge up -d --build
 ```
 
-For a real release candidate:
+This command builds a local rehearsal image. It is not immutable registry publication or production evidence.
+
+For a real release candidate, a separate protected process must:
 
 1. build from an accepted, protected Git commit;
 2. publish an immutable image digest with SBOM and provenance;
-3. deploy that exact digest to isolated staging;
+3. deploy that exact digest to isolated staging without rebuilding;
 4. configure the canonical API and OIDC boundaries;
 5. run browser, contract, identity, realtime, order-safety, accessibility, and failure-path tests;
 6. capture release identity and rollback evidence;
@@ -258,6 +276,8 @@ Production is blocked until all applicable gates pass:
 12. **Recovery** — previous compatible frontend digest, API compatibility, configuration, database recovery ownership, and tested rollback/read-back are documented.
 13. **Activation approval** — production deployment and live-trading capability activation are separate, explicit changes. Deploying the website does not activate live trading.
 
+These are required release controls, not claims that the current branch has already satisfied them. `DEPLOYMENT.md` records `PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED`.
+
 ## Security rules
 
 - Never commit `.env` files, credentials, private keys, access tokens, refresh tokens, customer exports, financial records, or secret-bearing logs.
@@ -281,7 +301,7 @@ Production is blocked until all applicable gates pass:
 ├── deploy/                  # Caddy and deployment support
 ├── docs/                    # UX, identity, chart and platform documentation
 ├── docker-compose.yaml      # loopback-first frontend and optional edge
-└── DEPLOYMENT.md            # staging and deployment procedure
+└── DEPLOYMENT.md            # staging rehearsal and release requirements
 ```
 
 ## Change policy
