@@ -69,20 +69,21 @@ const ProfileMenu: React.FunctionComponent<ProfileMenuProps> = ({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [cookies, , removeCookie] = useCookies(['access_token', 'refresh_token']);
+  const [, , removeCookie] = useCookies(['access_token', 'refresh_token']);
 
   const handleLogout = async () => {
     try {
-      await revokeSession(cookies.access_token, cookies.refresh_token);
+      const logoutUrl = await revokeSession();
+      dispatch(setUser(null));
+      dispatch(setWallets([]));
+      removeCookie('access_token', { path: '/' });
+      removeCookie('refresh_token', { path: '/' });
+      writeCompatibilityValue(localStorage, 'beyvra:last-logout', Date.now().toString(), 'codestra:last-logout');
+      window.location.assign(logoutUrl);
     } catch (error) {
       console.error("Unable to revoke the server session", error);
+      navigate("/logout", { replace: true });
     }
-    dispatch(setUser(null));
-    dispatch(setWallets([]));
-    removeCookie('access_token', { path: '/' });
-    removeCookie('refresh_token', { path: '/' });
-    writeCompatibilityValue(localStorage, 'beyvra:last-logout', Date.now().toString(), 'codestra:last-logout');
-    navigate("/signIn", { replace: true });
   };
 
 
