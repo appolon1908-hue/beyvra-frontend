@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./i18n";
 
 import "./index.scss";
+import "./horizon.scss";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <Providers>

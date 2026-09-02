@@ -1,30 +1,32 @@
 :root {
   --color-canvas: #07090c;
   --color-canvas-elevated: #0c0f13;
-  --color-surface-1: #111419;
-  --color-surface-2: #171b21;
-  --color-surface-3: #20262e;
-  --color-border: #2b323b;
-  --color-border-strong: #3a444f;
-  --color-text: #ffffff;
-  --color-text-secondary: #a7afba;
-  --color-text-muted: #737d89;
-  --color-brand: #6aff41;
-  --color-brand-hover: #59ec35;
-  --color-brand-pressed: #48d928;
-  --color-brand-contrast: #071006;
+  --color-surface-1: #0f1217;
+  --color-surface-2: #171b22;
+  --color-surface-3: #202630;
+  --color-border: rgb(255 255 255 / 0.14);
+  --color-border-strong: rgb(255 255 255 / 0.28);
+  --color-text: #f4f6f8;
+  --color-text-secondary: #a7b0bc;
+  --color-text-muted: #737e8c;
+  --color-brand: #7dd3fc;
+  --color-brand-hover: #68c4ef;
+  --color-brand-pressed: #54b5df;
+  --color-brand-contrast: #071018;
   --color-positive: #20c77a;
   --color-negative: #ff5865;
-  --color-demo: #4c8dff;
+  --color-demo: #8ea5ff;
   --color-warning: #ffb547;
   --color-danger: #ff4558;
   --color-info: #58a6ff;
   --color-overlay: rgb(0 0 0 / 72%);
   --focus-ring: 0 0 0 2px var(--color-canvas), 0 0 0 4px var(--color-brand);
-  --font-ui: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --radius-sm: 10px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --font-ui: "Inter Variable", Inter, "Helvetica Neue", Arial, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Inter Variable", Inter, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -33,9 +35,9 @@
   --space-6: 24px;
   --space-7: 32px;
   --space-8: 40px;
-  --header-height: 80px;
+  --header-height: 72px;
 }
 
 @media (max-width: 767px) {
-  :root { --header-height: 56px; }
+  :root { --header-height: 64px; }
 }
