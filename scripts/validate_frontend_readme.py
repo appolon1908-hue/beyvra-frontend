@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed when Beyvra frontend authority documentation regresses."""
+"""Fail closed when Beyvra frontend authority documentation or release wiring regresses."""
 
 from __future__ import annotations
 
@@ -15,7 +15,14 @@ PORTAL_README = ROOT / "client-portal" / "README.md"
 PACKAGE = ROOT / "client-portal" / "package.json"
 ENV_EXAMPLE = ROOT / "client-portal" / ".env.example"
 COMPOSE = ROOT / "docker-compose.yaml"
+DOCKERFILE = ROOT / "client-portal" / "Dockerfile.prod"
 DEPLOYMENT = ROOT / "DEPLOYMENT.md"
+PROMOTION = ROOT / "docs" / "PRODUCTION-READONLY-PROMOTION.md"
+READINESS = ROOT / "docs" / "PRODUCTION-READINESS-2026-09-03.md"
+DEPLOY_SCRIPT = ROOT / "operations" / "deploy_immutable_frontend.sh"
+VERIFY_SCRIPT = ROOT / "operations" / "verify_frontend_release.py"
+CI_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
+DEPLOY_WORKFLOW = ROOT / ".github" / "workflows" / "deploy.yml"
 CONTRACT_CHECKER = ROOT / "client-portal" / "scripts" / "check-api-contract.mjs"
 PLAYWRIGHT_CONFIG = ROOT / "client-portal" / "playwright.config.ts"
 PLAYWRIGHT_SETUP = ROOT / "client-portal" / "e2e" / "global-setup.ts"
@@ -34,49 +41,6 @@ EXPECTED_SCRIPTS = {
     "test:chart",
     "test:contract",
     "test:e2e",
-}
-
-ROOT_HEADINGS = {
-    "## Repository authority",
-    "## Current release truth",
-    "## Application surfaces",
-    "## Current browser application",
-    "## Request and identity boundary",
-    "## Frontend and backend responsibility split",
-    "## Runtime and toolchain",
-    "## Local development",
-    "## Configuration",
-    "## Validation",
-    "## Container build",
-    "## Staging deployment",
-    "## Production gates",
-    "## Security rules",
-    "## Repository layout",
-    "## Change policy",
-}
-
-ROOT_TEXT = {
-    "appolon1908-hue/beyvra-frontend",
-    "appolon1908-hue/beyvra-backend",
-    "https://beyvra.com",
-    "https://platform.beyvra.com",
-    "https://admin.beyvra.com",
-    "https://api.beyvra.com",
-    "https://auth.codestra.co/realms/codestra",
-    "https://staging.beyvra.com",
-    "REPOSITORY_AUTHORITY=DEFINED",
-    "PRODUCTION_RELEASE=NOT_CERTIFIED_BY_THIS_README",
-    "PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED",
-    "LIVE_TRADING_ACTIVATION=NOT_AUTHORIZED_BY_THIS_REPOSITORY",
-    "PROVIDER_CREDENTIALS_ALLOWED_IN_BROWSER=NO",
-    "GET /api/v1/auth/oidc/login/?next=/platform",
-    "Authorization Code Flow with PKCE S256",
-    "Frontend API calls default to the same-origin `/api` boundary.",
-    "node scripts/check-api-contract.mjs --source-only",
-    "API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contract",
-    "E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e",
-    "POST /api/v1/demo/sessions",
-    "Merging this repository never authorizes a production deployment",
 }
 
 TEMPLATE_MARKERS = {
@@ -117,6 +81,12 @@ def require(text: str, values: set[str] | tuple[str, ...], context: str) -> None
     for value in values:
         if value not in text:
             fail(f"{context} is missing required text: {value}")
+
+
+def reject(text: str, patterns: tuple[str, ...], context: str) -> None:
+    for pattern in patterns:
+        if re.search(pattern, text, re.MULTILINE):
+            fail(f"{context} contains prohibited pattern: {pattern}")
 
 
 def validate_package(document: dict[str, Any]) -> set[str]:
@@ -160,13 +130,45 @@ def validate_package(document: dict[str, Any]) -> set[str]:
     return script_names
 
 
-def validate_readmes(root_text: str, portal_text: str, scripts: set[str]) -> None:
+def validate_documentation(scripts: set[str]) -> None:
+    root_text = read(ROOT_README)
+    portal_text = read(PORTAL_README)
+    deployment_text = read(DEPLOYMENT)
+    promotion_text = read(PROMOTION)
+    readiness_text = read(READINESS)
+
     for marker in TEMPLATE_MARKERS:
-        if marker.lower() in root_text.lower() or marker.lower() in portal_text.lower():
+        if any(
+            marker.lower() in text.lower()
+            for text in (root_text, portal_text, deployment_text)
+        ):
             fail(f"generic README template marker remains: {marker}")
 
-    require(root_text, ROOT_HEADINGS, "root README")
-    require(root_text, ROOT_TEXT, "root README")
+    require(
+        root_text,
+        (
+            "## Repository authority",
+            "## Current release truth",
+            "## Request and identity boundary",
+            "## Container architecture",
+            "## Immutable release flow",
+            "## Production gates",
+            "## Active-mode boundary",
+            "appolon1908-hue/beyvra-frontend",
+            "appolon1908-hue/beyvra-backend",
+            "https://auth.codestra.co/realms/codestra",
+            "GET /api/v1/auth/oidc/login/?next=/platform",
+            "Authorization Code Flow with PKCE S256",
+            "Identity tokens must not be stored in `localStorage`.",
+            "FRONTEND_IMAGE=repository@sha256:...",
+            "has no `build:` directive",
+            "staging-readonly",
+            "production-readonly",
+            "capped at one percent",
+            "LIVE_TRADING_ACTIVATION=NOT_AUTHORIZED_BY_THIS_REPOSITORY",
+        ),
+        "root README",
+    )
     require(
         portal_text,
         (
@@ -174,17 +176,43 @@ def validate_readmes(root_text: str, portal_text: str, scripts: set[str]) -> Non
             "[`../README.md`](../README.md)",
             "appolon1908-hue/beyvra-backend",
             "VITE_API_BASE_URL=/api",
+            "VITE_SOCKET_BASE_URL=AUTO",
             "GET /api/v1/auth/oidc/login/?next=/platform",
             "https://auth.codestra.co/realms/codestra",
-            "https://api.beyvra.com",
             "node scripts/check-api-contract.mjs --source-only",
             "API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contract",
             "E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e",
             "POST /api/v1/demo/sessions",
-            "PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED",
             "Deploying this portal never enables live trading.",
         ),
         "client-portal README",
+    )
+    require(
+        deployment_text,
+        (
+            "IMMUTABLE_IMAGE_PUBLICATION=WORKFLOW_CONTROLLED",
+            "PRODUCTION_READONLY_PROMOTION=EXACT_DIGEST_ONLY",
+            "PRODUCTION_CANARY_LIMIT_PERCENT=1",
+            "FRONTEND_IMAGE=repository@sha256:...",
+            "contains no `build:` directive",
+            "staging-readonly",
+            "production-readonly",
+            "publish_image=false",
+            "CANARY_TRAFFIC_PERCENT",
+            "EXTERNAL_CANARY_ROUTING_VERIFIED",
+            "DEPLOYMENT_READ_ONLY",
+        ),
+        "deployment guide",
+    )
+    require(
+        promotion_text + readiness_text,
+        (
+            "staging-readonly",
+            "production-readonly",
+            "repository@sha256",
+            "Active trading / real money: NOT AUTHORIZED",
+        ),
+        "production-readiness documentation",
     )
 
     for script in scripts & EXPECTED_SCRIPTS:
@@ -192,24 +220,19 @@ def validate_readmes(root_text: str, portal_text: str, scripts: set[str]) -> Non
         if command not in root_text or command not in portal_text:
             fail(f"README command is missing: {command}")
 
-    if "localStorage" not in root_text:
-        fail("root README does not prohibit browser identity-token storage")
-    if "repository@sha256:..." not in root_text:
-        fail("root README does not require immutable production image identity")
-    if "does not, by this documentation alone, prove" not in root_text:
-        fail("root README overstates production artifact evidence")
-    if "Production uses an immutable registry digest" in portal_text:
-        fail("client-portal README claims unproven production deployment")
-
 
 def validate_environment(text: str) -> None:
     require(
         text,
         (
-            "SERVER_PORT=8080",
+            "PORT=8080",
             "VITE_API_BASE_URL=/api",
+            "VITE_SOCKET_BASE_URL=AUTO",
             "VITE_PUBLIC_SITE_URL=https://staging.beyvra.com",
             "VITE_BRAND_NAME=Beyvra",
+            "VITE_REALTIME_V2_ENABLED=true",
+            "VITE_REALTIME_V2_V1_FALLBACK_ENABLED=false",
+            "VITE_DEPLOYMENT_READ_ONLY=true",
         ),
         "environment example",
     )
@@ -234,22 +257,66 @@ def validate_compose(text: str) -> None:
     require(
         text,
         (
-            "context: ./client-portal",
-            "dockerfile: Dockerfile.prod",
-            '"127.0.0.1:${SERVER_PORT:-8080}:80"',
-            "trading-network:",
+            "image: ${FRONTEND_IMAGE:?FRONTEND_IMAGE must be an immutable repository@sha256 digest}",
+            "pull_policy: never",
+            'user: "101:101"',
+            "read_only: true",
+            "no-new-privileges:true",
+            "cap_drop:",
+            "- ALL",
+            "127.0.0.1:${PORT:?PORT is required}:8080",
+            "VITE_API_BASE_URL: /api",
+            "VITE_SOCKET_BASE_URL: AUTO",
+            'VITE_REALTIME_V2_ENABLED: "true"',
+            'VITE_REALTIME_V2_V1_FALLBACK_ENABLED: "false"',
+            'VITE_DEPLOYMENT_READ_ONLY: "true"',
+            "BEYVRA_SOURCE_SHA: ${SOURCE_SHA:?SOURCE_SHA is required}",
+            "BEYVRA_IMAGE_DIGEST: ${FRONTEND_IMAGE}",
+            "BACKEND_UPSTREAM: ${BACKEND_UPSTREAM:?BACKEND_UPSTREAM is required}",
             "external: true",
-            'profiles: ["edge"]',
+            "name: ${BACKEND_NETWORK:?BACKEND_NETWORK is required}",
         ),
         "Compose source",
     )
-    if re.search(r"(?m)^\s*image:\s*[^\n]*:latest\s*$", text):
-        fail("Compose uses a floating latest image tag")
+    reject(
+        text,
+        (
+            r"^\s*build:\s*",
+            r"^\s*image:\s*[^\n]*:latest\s*$",
+            r"dockerfile:\s*Dockerfile\.prod",
+            r"context:\s*\./client-portal",
+            r"SERVER_PORT",
+            r"profiles:\s*\[\s*[\"']edge[\"']\s*\]",
+        ),
+        "Compose source",
+    )
 
 
-def validate_contract_checker(text: str) -> None:
+def validate_dockerfile(text: str) -> None:
     require(
         text,
+        (
+            "ARG NODE_IMAGE=",
+            "ARG NGINX_IMAGE=",
+            "FROM ${NODE_IMAGE} AS build-stage",
+            "FROM ${NGINX_IMAGE} AS production-stage",
+            "npm ci",
+            "apk upgrade --no-cache",
+            "org.opencontainers.image.revision",
+            "EXPOSE 8080",
+            "USER 101",
+            'ENTRYPOINT ["/usr/local/bin/beyvra-entrypoint"]',
+        ),
+        "production Dockerfile",
+    )
+
+
+def validate_contract_and_browser() -> None:
+    contract = read(CONTRACT_CHECKER)
+    playwright = read(PLAYWRIGHT_CONFIG)
+    setup = read(PLAYWRIGHT_SETUP)
+    require(
+        contract,
         (
             "../src/api/endpoints.ts",
             "minimumRegistryPaths",
@@ -262,10 +329,7 @@ def validate_contract_checker(text: str) -> None:
         ),
         "API contract checker",
     )
-
-
-def validate_playwright(config: str, setup: str, root_text: str, portal_text: str) -> None:
-    require(config, ("globalSetup", "E2E_BASE_URL"), "Playwright configuration")
+    require(playwright, ("globalSetup", "E2E_BASE_URL"), "Playwright configuration")
     require(
         setup,
         (
@@ -275,53 +339,89 @@ def validate_playwright(config: str, setup: str, root_text: str, portal_text: st
         ),
         "Playwright global setup",
     )
-    for documentation in (root_text, portal_text):
-        require(
-            documentation,
-            ("does not start", "E2E_BASE_URL", "POST /api/v1/demo/sessions"),
-            "Playwright documentation",
-        )
 
 
-def validate_deployment(text: str) -> None:
+def validate_release_authority() -> None:
+    ci = read(CI_WORKFLOW)
+    workflow = read(DEPLOY_WORKFLOW)
+    deploy = read(DEPLOY_SCRIPT)
+    verifier = read(VERIFY_SCRIPT)
+
     require(
-        text,
+        ci,
         (
-            "SOURCE_BUILD_REHEARSAL=AVAILABLE",
-            "IMMUTABLE_IMAGE_PUBLICATION=NOT_PROVEN_BY_THIS_REPOSITORY",
-            "PROTECTED_PRODUCTION_DEPLOYMENT=NOT_PROVEN_BY_THIS_REPOSITORY",
-            "PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED",
-            "LIVE_TRADING_ACTIVATION=NOT_AUTHORIZED",
-            "node scripts/check-api-contract.mjs --source-only",
-            "API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contract",
-            "E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e",
-            "POST /api/v1/demo/sessions",
-            "repository@sha256:...",
+            "exact-head-base-ci:",
+            "gitleaks/gitleaks-action@v2",
+            "aquasecurity/trivy-action@0.35.0",
+            "npm run audit:gate",
+            "test ! -e client-portal/deploy.sh",
+            "docker compose -f docker-compose.yaml config --images",
         ),
-        "deployment guide",
+        "CI workflow",
+    )
+    require(
+        workflow,
+        (
+            "staging-readonly",
+            "production-readonly",
+            "publish_image:",
+            "frontend_image:",
+            "provenance: mode=max",
+            "sbom: true",
+            "Production promotion must reuse a staging-certified digest.",
+            "environment:",
+            "DEPLOY_KNOWN_HOSTS",
+            "CANARY_TRAFFIC_PERCENT",
+            "EXTERNAL_CANARY_ROUTING_VERIFIED",
+        ),
+        "deployment workflow",
+    )
+    require(
+        deploy,
+        (
+            "@sha256:[0-9a-f]{64}$",
+            "SOURCE_SHA",
+            "BACKEND_SOURCE_SHA",
+            "BACKEND_IMAGE",
+            "CANARY_TRAFFIC_PERCENT",
+            "CANARY_TRAFFIC_PERCENT > 1",
+            "EXTERNAL_CANARY_ROUTING_VERIFIED",
+            "--no-build",
+            "previous.env",
+            "rollback()",
+            "verify_frontend_release.py",
+        ),
+        "deployment script",
+    )
+    require(
+        verifier,
+        (
+            "/__release.json",
+            "/__runtime-config.json",
+            "/api/v1/system/version",
+            "/api/v1/system/capabilities",
+            "/api/v1/trading/orders",
+            "DEPLOYMENT_READ_ONLY",
+            "content-security-policy",
+            "strict-transport-security",
+        ),
+        "release verifier",
     )
 
 
 def validate() -> None:
-    root_readme = read(ROOT_README)
-    portal_readme = read(PORTAL_README)
     scripts = validate_package(load_json(PACKAGE))
-    validate_readmes(root_readme, portal_readme, scripts)
+    validate_documentation(scripts)
     validate_environment(read(ENV_EXAMPLE))
     validate_compose(read(COMPOSE))
-    validate_contract_checker(read(CONTRACT_CHECKER))
-    validate_playwright(
-        read(PLAYWRIGHT_CONFIG),
-        read(PLAYWRIGHT_SETUP),
-        root_readme,
-        portal_readme,
-    )
-    validate_deployment(read(DEPLOYMENT))
+    validate_dockerfile(read(DOCKERFILE))
+    validate_contract_and_browser()
+    validate_release_authority()
 
 
 def main() -> None:
     validate()
-    print("Beyvra frontend README authority: PASS")
+    print("Beyvra frontend README and release authority: PASS")
 
 
 if __name__ == "__main__":

@@ -1,55 +1,47 @@
+name: beyvra-frontend
+
 services:
-  frontend:
-    image: ${FRONTEND_IMAGE:-front-frontend:local}
-    build:
-      context: ./client-portal
-      dockerfile: Dockerfile.prod
-      args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
-        VITE_SOCKET_BASE_URL: ${VITE_SOCKET_BASE_URL:-AUTO}
-        VITE_PUBLIC_SITE_URL: ${VITE_PUBLIC_SITE_URL:-https://staging.beyvra.com}
-        VITE_BRAND_NAME: ${VITE_BRAND_NAME:-Beyvra}
-        VITE_REALTIME_V2_ENABLED: ${VITE_REALTIME_V2_ENABLED:-true}
-        VITE_REALTIME_V2_V1_FALLBACK_ENABLED: ${VITE_REALTIME_V2_V1_FALLBACK_ENABLED:-true}
-    environment:
-      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
-      VITE_SOCKET_BASE_URL: ${VITE_SOCKET_BASE_URL:-AUTO}
-      VITE_PUBLIC_SITE_URL: ${VITE_PUBLIC_SITE_URL:-https://staging.beyvra.com}
-      VITE_BRAND_NAME: ${VITE_BRAND_NAME:-Beyvra}
-    networks:
-      - trading-network
-    ports:
-      - "127.0.0.1:${SERVER_PORT:-8080}:80"
+  client-portal:
+    image: ${FRONTEND_IMAGE:?FRONTEND_IMAGE must be an immutable repository@sha256 digest}
+    pull_policy: never
     restart: unless-stopped
+    user: "101:101"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,uid=101,gid=101,mode=1777
+    ports:
+      - 127.0.0.1:${PORT:?PORT is required}:8080
+    environment:
+      VITE_API_BASE_URL: /api
+      VITE_SOCKET_BASE_URL: AUTO
+      VITE_PUBLIC_SITE_URL: https://${PUBLIC_SERVER_NAME:?PUBLIC_SERVER_NAME is required}
+      VITE_BRAND_NAME: ${VITE_BRAND_NAME:-Beyvra}
+      VITE_GEOIP_ENDPOINT: ${VITE_GEOIP_ENDPOINT:-}
+      VITE_REALTIME_V2_ENABLED: "true"
+      VITE_REALTIME_V2_V1_FALLBACK_ENABLED: "false"
+      VITE_DEPLOYMENT_READ_ONLY: "true"
+      BEYVRA_SOURCE_SHA: ${SOURCE_SHA:?SOURCE_SHA is required}
+      BEYVRA_IMAGE_DIGEST: ${FRONTEND_IMAGE}
+      BEYVRA_RELEASE_ID: ${CHANGE_ID:?CHANGE_ID is required}
+      BEYVRA_BUILD_TIMESTAMP: ${BUILD_TIMESTAMP:-unknown}
+      PUBLIC_SERVER_NAME: ${PUBLIC_SERVER_NAME}
+      BACKEND_UPSTREAM: ${BACKEND_UPSTREAM:?BACKEND_UPSTREAM is required}
+    networks:
+      - backend
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/"]
+      test:
+        - CMD-SHELL
+        - wget -q -O /dev/null http://127.0.0.1:8080/healthz
       interval: 15s
       timeout: 5s
-      retries: 5
-
-  edge:
-    image: caddy:2.10-alpine
-    profiles: ["edge"]
-    restart: unless-stopped
-    environment:
-      DOMAIN: ${DOMAIN:-staging.beyvra.com}
-    ports:
-      - "${HTTP_PORT:-80}:80"
-      - "${HTTPS_PORT:-443}:443"
-    volumes:
-      - ${CADDYFILE:-./deploy/Caddyfile.staging}:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    networks:
-      - trading-network
-    depends_on:
-      frontend:
-        condition: service_healthy
-
-volumes:
-  caddy_data:
-  caddy_config:
+      retries: 10
+      start_period: 10s
 
 networks:
-  trading-network:
+  backend:
     external: true
+    name: ${BACKEND_NETWORK:?BACKEND_NETWORK is required}
