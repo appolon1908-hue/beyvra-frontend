@@ -1,0 +1,410 @@
+name: Publish and deploy immutable Beyvra frontend
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Full protected-main source SHA to certify
+        required: true
+        type: string
+      target:
+        description: Protected read-only environment
+        required: true
+        default: staging-readonly
+        type: choice
+        options:
+          - staging-readonly
+          - production-readonly
+      publish_image:
+        description: Build and publish a new frontend image
+        required: true
+        default: true
+        type: boolean
+      frontend_image:
+        description: Existing frontend repository@sha256 digest for promotion
+        required: false
+        default: ""
+        type: string
+      deploy:
+        description: Deploy after producing the release manifest
+        required: true
+        default: false
+        type: boolean
+      change_id:
+        description: Auditable change identifier
+        required: true
+        type: string
+
+concurrency:
+  group: beyvra-frontend-${{ inputs.target }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+  actions: read
+  checks: read
+
+jobs:
+  eligibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      source_sha: ${{ steps.verify.outputs.source_sha }}
+      node_base_image: ${{ steps.verify.outputs.node_base_image }}
+      nginx_base_image: ${{ steps.verify.outputs.nginx_base_image }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_SHA: ${{ inputs.source_sha }}
+      NODE_BASE_IMAGE: ${{ vars.NODE_BASE_IMAGE }}
+      NGINX_BASE_IMAGE: ${{ vars.NGINX_BASE_IMAGE }}
+    steps:
+      - name: Require workflow and source authority from protected main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - id: verify
+        name: Verify source authority and required checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          git fetch origin main
+          git cat-file -e "${SOURCE_SHA}^{commit}"
+          git merge-base --is-ancestor "$SOURCE_SHA" origin/main
+
+          if [[ "${{ inputs.publish_image }}" == "true" ]]; then
+            test "$SOURCE_SHA" = "$(git rev-parse origin/main)"
+            digest_pattern='@sha256:[0-9a-f]{64}$'
+            [[ "$NODE_BASE_IMAGE" =~ $digest_pattern ]]
+            [[ "$NGINX_BASE_IMAGE" =~ $digest_pattern ]]
+          fi
+
+          checks="$(
+            gh api \
+              "repos/${GITHUB_REPOSITORY}/commits/${SOURCE_SHA}/check-runs?per_page=100"
+          )"
+          for required in container secrets validate; do
+            jq -e --arg name "$required" \
+              '.check_runs | any(.name == $name and .conclusion == "success")' \
+              <<<"$checks" >/dev/null
+          done
+
+          for path in \
+            docker-compose.yaml \
+            operations/deploy_immutable_frontend.sh \
+            operations/verify_frontend_release.py; do
+            git show "${SOURCE_SHA}:${path}" >/dev/null
+          done
+
+          if [[ "${{ inputs.target }}" == "production-readonly" \
+                && "${{ inputs.publish_image }}" == "true" ]]; then
+            echo "Production promotion must reuse a staging-certified digest." >&2
+            exit 1
+          fi
+
+          printf 'source_sha=%s\n' "$SOURCE_SHA" >>"$GITHUB_OUTPUT"
+          printf 'node_base_image=%s\n' "$NODE_BASE_IMAGE" >>"$GITHUB_OUTPUT"
+          printf 'nginx_base_image=%s\n' "$NGINX_BASE_IMAGE" >>"$GITHUB_OUTPUT"
+
+  publish:
+    needs: eligibility
+    if: inputs.publish_image
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      frontend_image: ${{ steps.refs.outputs.frontend_image }}
+      built_at: ${{ steps.metadata.outputs.built_at }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.eligibility.outputs.source_sha }}
+          fetch-depth: 0
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - id: metadata
+        name: Define immutable artifact metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          repository="ghcr.io/${GITHUB_REPOSITORY,,}"
+          built_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          printf 'repository=%s\n' "$repository" >>"$GITHUB_OUTPUT"
+          printf 'built_at=%s\n' "$built_at" >>"$GITHUB_OUTPUT"
+
+      - id: image
+        name: Build and publish frontend
+        uses: docker/build-push-action@v7
+        with:
+          context: ./client-portal
+          file: ./client-portal/Dockerfile.prod
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.metadata.outputs.repository }}:${{ needs.eligibility.outputs.source_sha }}
+          build-args: |
+            NODE_IMAGE=${{ needs.eligibility.outputs.node_base_image }}
+            NGINX_IMAGE=${{ needs.eligibility.outputs.nginx_base_image }}
+            VCS_REF=${{ needs.eligibility.outputs.source_sha }}
+            BUILD_VERSION=${{ inputs.change_id }}
+            BUILD_DATE=${{ steps.metadata.outputs.built_at }}
+            VITE_API_BASE_URL=/api
+            VITE_SOCKET_BASE_URL=AUTO
+            VITE_REALTIME_V2_ENABLED=true
+            VITE_REALTIME_V2_V1_FALLBACK_ENABLED=false
+            VITE_DEPLOYMENT_READ_ONLY=true
+          provenance: mode=max
+          sbom: true
+
+      - id: refs
+        name: Record registry digest
+        shell: bash
+        run: |
+          frontend_image="${{ steps.metadata.outputs.repository }}@${{ steps.image.outputs.digest }}"
+          printf 'frontend_image=%s\n' "$frontend_image" >>"$GITHUB_OUTPUT"
+
+  resolve:
+    needs:
+      - eligibility
+      - publish
+    if: >-
+      always() &&
+      needs.eligibility.result == 'success' &&
+      (inputs.publish_image == false || needs.publish.result == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      frontend_image: ${{ steps.resolve.outputs.frontend_image }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.eligibility.outputs.source_sha }}
+          fetch-depth: 0
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - id: resolve
+        name: Resolve and verify exact candidate
+        shell: bash
+        env:
+          PUBLISHED_IMAGE: ${{ needs.publish.outputs.frontend_image }}
+          PROVIDED_IMAGE: ${{ inputs.frontend_image }}
+          SOURCE_SHA: ${{ needs.eligibility.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ inputs.publish_image }}" == "true" ]]; then
+            frontend_image="$PUBLISHED_IMAGE"
+          else
+            frontend_image="$PROVIDED_IMAGE"
+          fi
+          [[ "$frontend_image" =~ @sha256:[0-9a-f]{64}$ ]]
+          docker pull "$frontend_image"
+          revision="$(
+            docker image inspect \
+              --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' \
+              "$frontend_image"
+          )"
+          test "$revision" = "$SOURCE_SHA"
+          printf 'frontend_image=%s\n' "$frontend_image" >>"$GITHUB_OUTPUT"
+
+          jq -n \
+            --arg source_sha "$SOURCE_SHA" \
+            --arg frontend_image "$frontend_image" \
+            --arg target "${{ inputs.target }}" \
+            --arg change_id "${{ inputs.change_id }}" \
+            --arg generated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{
+              schema_version: 1,
+              source_repository: env.GITHUB_SERVER_URL + "/" + env.GITHUB_REPOSITORY,
+              source_sha: $source_sha,
+              frontend_image: $frontend_image,
+              target: $target,
+              change_id: $change_id,
+              generated_at: $generated_at,
+              deployment_read_only: true,
+              legacy_realtime_fallback_enabled: false
+            }' > release-manifest.json
+          sha256sum release-manifest.json > release-manifest.json.sha256
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: beyvra-frontend-release-${{ needs.eligibility.outputs.source_sha }}
+          path: |
+            release-manifest.json
+            release-manifest.json.sha256
+          if-no-files-found: error
+          retention-days: 90
+
+  deploy:
+    needs:
+      - eligibility
+      - resolve
+    if: inputs.deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment:
+      name: ${{ inputs.target }}
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+      GHCR_USER: ${{ secrets.GHCR_USER }}
+      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+      PUBLIC_SERVER_NAME: ${{ vars.PUBLIC_SERVER_NAME }}
+      VERIFICATION_BASE_URL: ${{ vars.VERIFICATION_BASE_URL }}
+      BACKEND_NETWORK: ${{ vars.BACKEND_NETWORK }}
+      BACKEND_UPSTREAM: ${{ vars.BACKEND_UPSTREAM }}
+      BACKEND_SOURCE_SHA: ${{ vars.BACKEND_SOURCE_SHA }}
+      BACKEND_IMAGE: ${{ vars.BACKEND_IMAGE }}
+      PORT: ${{ vars.PORT }}
+      CANARY_TRAFFIC_PERCENT: ${{ vars.CANARY_TRAFFIC_PERCENT }}
+      EXTERNAL_CANARY_ROUTING_VERIFIED: ${{ vars.EXTERNAL_CANARY_ROUTING_VERIFIED }}
+      FRONTEND_IMAGE: ${{ needs.resolve.outputs.frontend_image }}
+      SOURCE_SHA: ${{ needs.eligibility.outputs.source_sha }}
+      CHANGE_ID: ${{ inputs.change_id }}
+      DEPLOYMENT_TARGET: ${{ inputs.target }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.eligibility.outputs.source_sha }}
+          fetch-depth: 0
+
+      - name: Validate protected environment inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            DEPLOY_HOST DEPLOY_USER DEPLOY_SSH_KEY DEPLOY_KNOWN_HOSTS
+            GHCR_USER GHCR_TOKEN DEPLOY_PATH PUBLIC_SERVER_NAME
+            VERIFICATION_BASE_URL BACKEND_NETWORK BACKEND_UPSTREAM
+            BACKEND_SOURCE_SHA BACKEND_IMAGE PORT CANARY_TRAFFIC_PERCENT
+            FRONTEND_IMAGE SOURCE_SHA CHANGE_ID
+          )
+          for name in "${required[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              printf 'Protected environment value is missing: %s\n' "$name" >&2
+              exit 1
+            fi
+          done
+          [[ "$DEPLOY_PATH" =~ ^/[A-Za-z0-9._/-]+$ ]]
+          [[ "$PUBLIC_SERVER_NAME" =~ ^[A-Za-z0-9.-]+$ ]]
+          [[ "$BACKEND_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$BACKEND_IMAGE" =~ @sha256:[0-9a-f]{64}$ ]]
+          [[ "$FRONTEND_IMAGE" =~ @sha256:[0-9a-f]{64}$ ]]
+
+      - name: Package reviewed deployment authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -czf release-bundle.tgz \
+            docker-compose.yaml \
+            operations/deploy_immutable_frontend.sh \
+            operations/verify_frontend_release.py
+          if tar -tzf release-bundle.tgz \
+            | grep -E '(^/|(^|/)\.\.(/|$))' >/dev/null; then
+            echo "Unsafe archive path detected." >&2
+            exit 1
+          fi
+
+          {
+            printf 'FRONTEND_IMAGE=%q\n' "$FRONTEND_IMAGE"
+            printf 'SOURCE_SHA=%q\n' "$SOURCE_SHA"
+            printf 'BACKEND_SOURCE_SHA=%q\n' "$BACKEND_SOURCE_SHA"
+            printf 'BACKEND_IMAGE=%q\n' "$BACKEND_IMAGE"
+            printf 'CHANGE_ID=%q\n' "$CHANGE_ID"
+            printf 'DEPLOYMENT_TARGET=%q\n' "$DEPLOYMENT_TARGET"
+            printf 'PUBLIC_SERVER_NAME=%q\n' "$PUBLIC_SERVER_NAME"
+            printf 'PUBLIC_BASE_URL=%q\n' "https://${PUBLIC_SERVER_NAME}"
+            printf 'VERIFICATION_BASE_URL=%q\n' "$VERIFICATION_BASE_URL"
+            printf 'BACKEND_NETWORK=%q\n' "$BACKEND_NETWORK"
+            printf 'BACKEND_UPSTREAM=%q\n' "$BACKEND_UPSTREAM"
+            printf 'PORT=%q\n' "$PORT"
+            printf 'CANARY_TRAFFIC_PERCENT=%q\n' "$CANARY_TRAFFIC_PERCENT"
+            printf 'EXTERNAL_CANARY_ROUTING_VERIFIED=%q\n' \
+              "${EXTERNAL_CANARY_ROUTING_VERIFIED:-false}"
+            printf 'BUILD_TIMESTAMP=%q\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > release.env
+          chmod 600 release.env
+
+      - name: Configure exact SSH host authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Authenticate server to GHCR
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GHCR_USER" =~ ^[A-Za-z0-9_.-]+$ ]]
+          remote="${DEPLOY_USER}@${DEPLOY_HOST}"
+          printf '%s' "$GHCR_TOKEN" \
+            | ssh "$remote" \
+                "docker login ghcr.io --username '$GHCR_USER' --password-stdin"
+
+      - name: Deploy paired candidate with automatic rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote="${DEPLOY_USER}@${DEPLOY_HOST}"
+          incoming="/tmp/beyvra-frontend-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          scp release-bundle.tgz "${remote}:${incoming}.tgz"
+          scp release.env "${remote}:${incoming}.env"
+          ssh "$remote" "bash -se" <<REMOTE
+          set -euo pipefail
+          mkdir -p '$DEPLOY_PATH' '$DEPLOY_PATH/releases/$CHANGE_ID'
+          tar -xzf '${incoming}.tgz' -C '$DEPLOY_PATH'
+          install -m 600 '${incoming}.env' \
+            '$DEPLOY_PATH/releases/$CHANGE_ID/workflow.env'
+          rm -f '${incoming}.tgz' '${incoming}.env'
+          cd '$DEPLOY_PATH'
+          set -a
+          . 'releases/$CHANGE_ID/workflow.env'
+          set +a
+          ./operations/deploy_immutable_frontend.sh
+          REMOTE
+
+      - name: Collect non-secret release evidence
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          remote="${DEPLOY_USER}@${DEPLOY_HOST}"
+          scp -r \
+            "${remote}:${DEPLOY_PATH}/releases/${CHANGE_ID}/." \
+            evidence/ || true
+          rm -f evidence/workflow.env evidence/*/workflow.env
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: beyvra-frontend-deployment-${{ inputs.target }}-${{ inputs.change_id }}
+          path: evidence
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Remove local SSH material
+        if: always()
+        run: rm -rf ~/.ssh release.env

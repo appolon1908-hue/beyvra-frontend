@@ -1,4 +1,5 @@
 import { getApiUrl } from "utils/env";
+import { assertMutationsAllowed } from "security/deploymentMode";
 
 export const BFF_SESSION_MARKER = "beyvra-bff-session";
 export const BFF_GUEST_MARKER = "beyvra-bff-guest";
@@ -12,6 +13,8 @@ export const isUnsafeMethod = (method?: string) =>
 let csrfRequest: Promise<string> | null = null;
 
 export const getBffCsrfToken = async (): Promise<string> => {
+  assertMutationsAllowed();
+
   if (!csrfRequest) {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 8_000);

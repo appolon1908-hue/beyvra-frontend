@@ -1,126 +1,229 @@
-# Beyvra frontend deployment and release requirements
+# Beyvra frontend immutable deployment authority
 
 ## Current truth
 
 ```text
-SOURCE_BUILD_REHEARSAL=AVAILABLE
-LOCAL_COMPOSE_REHEARSAL=AVAILABLE
-IMMUTABLE_IMAGE_PUBLICATION=NOT_PROVEN_BY_THIS_REPOSITORY
-PROTECTED_PRODUCTION_DEPLOYMENT=NOT_PROVEN_BY_THIS_REPOSITORY
-PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED
-LIVE_TRADING_ACTIVATION=NOT_AUTHORIZED
+SOURCE_VALIDATION=AVAILABLE
+IMMUTABLE_IMAGE_PUBLICATION=WORKFLOW_CONTROLLED
+STAGING_READONLY_DEPLOYMENT=PROTECTED_ENVIRONMENT_CONTROLLED
+PRODUCTION_READONLY_PROMOTION=EXACT_DIGEST_ONLY
+PRODUCTION_CANARY_LIMIT_PERCENT=1
+ACTIVE_TRADING_ACTIVATION=NOT_AUTHORIZED
 ```
 
-This document separates source-side build and staging rehearsal from a certified production release. A local image, successful Compose start, reachable URL, or merged pull request is not an immutable production artifact and does not authorize deployment or live trading.
+This document defines the repository-controlled release path. A merge, local image, mutable tag, successful source build, or reachable URL is not production certification.
 
-## Build and validate source
+## Release class
 
-Run from the repository root:
+The current release class is **read-only**. It must keep all of the following disabled:
+
+- live trading;
+- real-money operations;
+- external broker execution;
+- deposits and withdrawals;
+- payment processing;
+- transactional email;
+- legacy realtime fallback;
+- any other externally effectful mutation.
+
+A separate reviewed activation release is required to change this boundary.
+
+## Source validation
+
+Run from `client-portal/`:
 
 ```sh
-cd client-portal
 npm ci
+npm run build
 npm run lint
 npm run typecheck
-npm run build:prod
-docker build -f Dockerfile.prod -t beyvra-frontend:rehearsal .
-```
-
-`beyvra-frontend:rehearsal` is a local test tag only. It must not be recorded as a production release or used as proof of registry publication, provenance, vulnerability acceptance, or rollback readiness.
-
-The Nginx entrypoint may inject approved public runtime configuration into `index.html`. Never commit a populated `.env` file or inject a password, signing key, provider credential, database connection, identity token, or private service address into browser configuration.
-
-The generated application is a single-page app; Nginx routes unknown browser paths to `index.html`.
-
-## API-contract prerequisite
-
-Validate source endpoint discovery without a backend:
-
-```sh
+npm run errors:check
+npm run brand:check
+npm run i18n:check
+npm run test:errors
+npm run test:realtime
+npm run test:chart
 node scripts/check-api-contract.mjs --source-only
+npm run audit:gate
 ```
 
-The full contract gate requires the accepted `beyvra-backend` OpenAPI schema to be reachable. Supply its exact schema URL:
+The complete backend contract check requires an approved staging schema:
 
 ```sh
 API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contract
 ```
 
-`test:contract` parses the real frontend endpoint registry plus direct request literals and compares them with the backend schema. It fails when no frontend endpoints or no backend paths are discovered. A source-only pass does not replace the full schema comparison.
-
-## Playwright integration prerequisite
-
-`npm run test:e2e` does not start the frontend or backend. It requires:
-
-- a running Beyvra frontend at `E2E_BASE_URL`;
-- the same-origin `/api` route connected to an approved non-production backend;
-- `POST /api/v1/demo/sessions` available for the Playwright guest-session bootstrap;
-- test data and capabilities appropriate to the selected suite;
-- no live provider or real-money trading capability.
-
-Run against an integrated staging origin:
+Playwright requires a running integrated staging origin:
 
 ```sh
 E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e
 ```
 
-For a deliberately unauthenticated subset that does not require a guest session, the global setup can be bypassed explicitly:
+Authenticated browser acceptance requires `POST /api/v1/demo/sessions`. `E2E_SKIP_GUEST_BOOTSTRAP=true` is valid only for a deliberately unauthenticated subset.
 
-```sh
-E2E_SKIP_GUEST_BOOTSTRAP=true \
-E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN \
-npm run test:e2e -- --grep '@public'
+## Canonical artifact build
+
+`.github/workflows/deploy.yml` is the only release image publication authority. It accepts a full protected-main source SHA, verifies required CI, and builds the image once from immutable Node and Nginx base-image digests.
+
+The build publishes:
+
+- an immutable frontend `repository@sha256:...` digest;
+- OCI source and revision labels;
+- an SBOM;
+- provenance/attestation;
+- a checksummed release manifest.
+
+Production promotion rejects image rebuilding and accepts only the staging-certified digest.
+
+## Canonical runtime
+
+The root `docker-compose.yaml` is the only release Compose authority. It:
+
+- requires `FRONTEND_IMAGE=repository@sha256:...`;
+- contains no `build:` directive;
+- uses `pull_policy: never` after the reviewed deploy script pulls and verifies the digest;
+- runs as user `101:101`;
+- uses a read-only root filesystem;
+- drops all Linux capabilities;
+- enables `no-new-privileges`;
+- writes generated public configuration only under `/tmp`;
+- binds the candidate to host loopback;
+- joins only the named backend Docker network.
+
+Do not deploy with mutable tags, server-side image builds, duplicate Compose files, or `git pull && docker compose --build`.
+
+## Protected environments
+
+Create and restrict these GitHub environments to `main`:
+
+- `staging-readonly`
+- `production-readonly`
+
+Each environment requires deployment approval and its own secrets and variables.
+
+### Required environment secrets
+
+- `DEPLOY_HOST`
+- `DEPLOY_USER`
+- `DEPLOY_SSH_KEY`
+- `DEPLOY_KNOWN_HOSTS`
+- `GHCR_USER`
+- `GHCR_TOKEN`
+
+### Repository build variables
+
+- `NODE_BASE_IMAGE`
+- `NGINX_BASE_IMAGE`
+
+Both values must be immutable `repository@sha256:...` references.
+
+### Deployment variables
+
+- `DEPLOY_PATH`
+- `PUBLIC_SERVER_NAME`
+- `VERIFICATION_BASE_URL`
+- `BACKEND_NETWORK`
+- `BACKEND_UPSTREAM`
+- `BACKEND_SOURCE_SHA`
+- `BACKEND_IMAGE`
+- `PORT`
+- `CANARY_TRAFFIC_PERCENT`
+- `EXTERNAL_CANARY_ROUTING_VERIFIED`
+
+`BACKEND_IMAGE` must be the exact staging-certified backend digest. `BACKEND_SOURCE_SHA` must be the corresponding full protected-main SHA.
+
+## Stage the paired candidate
+
+First certify the backend in `staging-readonly`. Record its exact source SHA and backend image digest in the frontend staging environment.
+
+Then dispatch **Publish and deploy immutable Beyvra frontend** from protected `main` with:
+
+```text
+source_sha=<exact current protected-main frontend SHA>
+target=staging-readonly
+publish_image=true
+deploy=true
+change_id=<unique audited identifier>
 ```
 
-Do not use `E2E_SKIP_GUEST_BOOTSTRAP=true` to claim authenticated, order, portfolio, or session acceptance.
+The workflow must produce and retain:
 
-## Local or isolated staging HTTPS rehearsal
+- exact frontend source SHA;
+- exact frontend image digest;
+- exact paired backend source SHA and image digest;
+- runtime configuration readback;
+- security-header results;
+- backend readiness and capability readback;
+- mutation-rejection evidence;
+- running image verification;
+- release manifest and checksum.
 
-Copy `.env.staging.example` to `.env.staging`, replace placeholders with approved non-secret values or external secret references, ensure the external `trading-network` exists, and start the edge profile:
+## Required staging certification
 
-```sh
-cp .env.staging.example .env.staging
-docker compose --env-file .env.staging --profile edge up -d --build
-curl --fail https://YOUR_STAGING_DOMAIN/
+The unchanged candidate must pass:
+
+1. `/healthz` frontend health;
+2. `/__release.json` exact frontend SHA and digest;
+3. `/__runtime-config.json` same-origin `/api`, `AUTO` WebSocket routing, realtime v2 enabled, legacy fallback disabled, and deployment read-only;
+4. CSP, HSTS, MIME-sniffing, referrer, and permissions-policy checks;
+5. `/api/v1/system/version` exact paired backend SHA and digest;
+6. `/api/v1/system/capabilities` fail-closed trading and money state;
+7. `POST /api/v1/trading/orders` rejected with `DEPLOYMENT_READ_ONLY`;
+8. API contract and browser acceptance against the exact candidate;
+9. monitoring continuity;
+10. zero movement in live-trading, money, payment, email, withdrawal, and external-execution counters.
+
+## Rollback rehearsal
+
+Before production promotion, rehearse a controlled candidate-verification failure in staging. `operations/deploy_immutable_frontend.sh` must restore the previously recorded immutable frontend digest and full source SHA, then re-run release verification through the restored frontend.
+
+Record:
+
+- previous and candidate digests;
+- rollback start and completion timestamps;
+- recovery time;
+- session and static-asset integrity;
+- frontend health and release identity;
+- paired backend identity and readiness;
+- monitoring continuity;
+- zero live-effect movement.
+
+Do not promote when the previous candidate is not a complete immutable tuple.
+
+## Production read-only canary
+
+Dispatch the same workflow from protected `main` with:
+
+```text
+source_sha=<same staging-certified frontend SHA>
+target=production-readonly
+publish_image=false
+frontend_image=<same staging-certified repository@sha256 digest>
+deploy=true
+change_id=<unique production change identifier>
 ```
 
-`deploy/Caddyfile.public` can obtain a public certificate when DNS points to the rehearsal host. `deploy/Caddyfile.staging` issues an internal certificate and must not be used for public clients. Ports 80 and 443 must be free or owned by the approved existing edge.
+The protected environment must set `CANARY_TRAFFIC_PERCENT` to `0` or `1`. Promotion fails when the value exceeds one percent or when `EXTERNAL_CANARY_ROUTING_VERIFIED` is not `true`.
 
-This Compose command builds locally. It does **not** demonstrate immutable registry publication or production promotion.
+The repository deployment script never changes Caddy, Kong, DNS, load-balancer weights, or external routing. An independently protected ingress operation must route and verify the canary.
 
-## Required production artifact controls
+## Stop and rollback conditions
 
-Before any production deployment is represented as approved, a separate release process must prove all of the following on one unchanged protected commit:
+Stop and restore the previous exact candidate on any:
 
-1. exact pull-request head and merge-result CI pass;
-2. the accepted main-branch commit is recorded;
-3. the image is built from that commit in protected automation;
-4. the registry returns an immutable `repository@sha256:...` digest;
-5. source revision, version, and source repository labels match the accepted commit;
-6. SBOM, provenance/attestation, checksums, and vulnerability disposition are retained;
-7. the exact digest is deployed to isolated staging without rebuilding;
-8. API contract, OIDC/PKCE, browser, accessibility, realtime, degraded-state, and order-safety acceptance pass;
-9. the previous compatible digest and configuration are recorded and rollback is rehearsed;
-10. production approval names the exact digest and change record;
-11. post-deployment readback proves the running digest and release identity;
-12. live-trading and provider capabilities remain separate backend-controlled approvals.
+- source or image-digest mismatch;
+- frontend health failure;
+- backend readiness or capability failure;
+- API contract failure;
+- security-header regression;
+- accepted state-changing request;
+- monitoring loss;
+- error-rate or latency regression beyond the approved canary threshold;
+- movement in any live-effect counter;
+- inability to prove the previous immutable candidate.
 
-The current repository source describes these controls but does not, by itself, prove that an immutable image has been published or deployed to production.
+## Active-mode boundary
 
-## Content Security Policy and public edge
+This runbook does not authorize active trading, real money, provider execution, payments, deposits, withdrawals, transactional email, or legacy realtime fallback.
 
-Serve the approved artifact behind TLS and deploy a reviewed Content Security Policy only after enumerating every required third-party origin. TradingView, analytics, support widgets, market/news providers, and any other external origin must be approved individually; do not add wildcard origins merely to make a test pass.
-
-## Rollback
-
-A production release packet must identify:
-
-- previous and candidate immutable image digests;
-- compatible public runtime configuration;
-- edge/CSP version;
-- backend API compatibility range;
-- rollback command or deployment action;
-- health, version, and post-rollback readback;
-- owner and approval record.
-
-A frontend rollback must not alter databases, provider credentials, trading capabilities, or financial records unless a separately approved backend/data change requires its own recovery procedure.
+Enabling those capabilities requires a separate reviewed release, complete financial-command and idempotency certification, protected server-side integration setup, recorded approvals from legal, compliance, and risk owners, an explicit change record, and independent rollback evidence.

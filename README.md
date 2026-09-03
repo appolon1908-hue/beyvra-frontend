@@ -2,138 +2,72 @@
 
 Production-oriented React and TypeScript browser application for the Beyvra trading platform.
 
-This repository contains the user-facing portal, charting workspace, authentication entry points, generated API client integration, realtime presentation, accessibility checks, container packaging, and staging deployment material. It is not the authority for balances, positions, orders, executions, market-data truth, risk decisions, compliance decisions, payments, or provider operations.
-
 ## Repository authority
 
-`appolon1908-hue/beyvra-frontend` is the principal source repository for Beyvra browser experiences and frontend release artifacts.
+`appolon1908-hue/beyvra-frontend` is the principal source repository for Beyvra browser experiences and frontend release artifacts. `appolon1908-hue/beyvra-backend` remains authoritative for authentication enforcement, accounts, balances, positions, orders, executions, risk, compliance, audit, reconciliation, market-data normalization, and provider operations.
 
-Related authorities:
-
-- `appolon1908-hue/beyvra-backend` owns server-side business rules, persistence, authorization enforcement, accounts, balances, positions, orders, executions, market-data normalization, risk, compliance, audit, reconciliation, and provider adapters.
-- `appolon1908-hue/Keycloak` owns the Codestra identity realm, browser clients, service clients, scopes, audiences, and token issuance.
-- `appolon1908-hue/Caddy` and `appolon1908-hue/Kong` own the shared TLS and API-gateway boundaries where they are used.
-- Infrastructure and production deployment evidence remain separate from application source.
-
-A frontend merge, successful build, image tag, or working URL does not authorize production deployment or live trading.
+A frontend merge, successful build, image tag, or reachable URL does not by itself authorize production deployment or live trading.
 
 ## Current release truth
 
 ```text
 REPOSITORY_AUTHORITY=DEFINED
-APPLICATION_SOURCE=PRESENT
-PRODUCTION_RELEASE=NOT_CERTIFIED_BY_THIS_README
-PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED
+PRODUCTION_RELEASE=REQUIRES_EXACT_SHA_AND_DIGEST_CERTIFICATION
+PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED_BY_SOURCE_ALONE
+DEPLOYMENT_MODE=READ_ONLY_UNTIL_SEPARATE_ACTIVATION
 LIVE_TRADING_ACTIVATION=NOT_AUTHORIZED_BY_THIS_REPOSITORY
 PROVIDER_CREDENTIALS_ALLOWED_IN_BROWSER=NO
-BACKEND_BUSINESS_AUTHORITY=BEYVRA_BACKEND
 ```
 
-Production status must be established by exact-commit CI, an immutable image digest, staging acceptance, API and identity evidence, rollback proof, and a separately approved production change.
+The repository contains an immutable release workflow and a read-only deployment authority. Runtime production status must still be established from workflow and server evidence for the exact protected-main commit and image digest.
 
 ## Application surfaces
 
-The source and platform route registry use the following boundaries:
-
 | Surface | Canonical address | Responsibility |
 |---|---|---|
-| Public site | `https://beyvra.com` | Public Beyvra experience and entry to the platform |
+| Public application | `https://beyvra.com` | Public and authenticated Beyvra browser experience |
 | Trading portal | `https://platform.beyvra.com` | Authenticated customer trading workspace |
 | Administration | `https://admin.beyvra.com` | Authorized administration and operations surface |
-| API | `https://api.beyvra.com` | Beyvra backend and versioned API authority |
+| Backend API | `https://api.beyvra.com` | Backend and versioned API authority |
 | Identity | `https://auth.codestra.co/realms/codestra` | Canonical OIDC issuer |
-| Staging | `https://staging.beyvra.com` | Non-production integration and release acceptance |
+| Staging | `https://staging.beyvra.com` | Isolated release certification |
 
-These addresses are contracts and deployment targets. Their presence in source is not, by itself, proof that a particular commit or image is currently deployed or production-certified.
-
-## Current browser application
-
-The executable frontend is under `client-portal/`.
-
-It includes:
-
-- authenticated platform navigation and protected routes;
-- portfolio, account, order, activity, and market presentation;
-- a charting workspace based on ECharts and Lightweight Charts;
-- drawings, indicators, trade markers, events, and chart-performance tests;
-- Redux Toolkit and TanStack Query state/data layers;
-- generated API-client contract checks;
-- Socket.IO realtime presentation with bounded reconnect behavior;
-- internationalization tooling and catalog validation;
-- user-safe error handling and public-identity checks;
-- Playwright browser and accessibility testing;
-- production Nginx packaging and optional Caddy staging edge.
-
-The frontend may display only state returned by approved backend APIs. It must not calculate authoritative buying power, fill status, fees, risk approval, compliance approval, or account eligibility locally.
+The executable browser application is under `client-portal/`.
 
 ## Request and identity boundary
 
-The intended request path is:
+The production browser path is same-origin:
 
 ```text
 Browser
-  -> same-origin Beyvra frontend/BFF route
-  -> public HTTPS API edge
-  -> Beyvra backend
-  -> authoritative database, workers, and approved adapters
+  -> Beyvra frontend origin
+  -> /api and /ws reverse-proxy paths
+  -> exact paired Beyvra backend candidate
 ```
 
-Human login starts through the same-origin route:
+Human login starts through:
 
 ```text
 GET /api/v1/auth/oidc/login/?next=/platform
 ```
 
-The backend/edge redirects to the canonical Codestra issuer and uses Authorization Code Flow with PKCE S256. The browser must not receive a Keycloak client secret, provider credential, database credential, or infrastructure token. Access and refresh-token handling must remain server-controlled or use the approved secure session design; do not add identity tokens to `localStorage` or public Vite configuration.
+The identity flow uses Authorization Code Flow with PKCE S256. Browser code must never receive provider credentials, database credentials, signing keys, OIDC client secrets, or private infrastructure tokens. Identity tokens must not be stored in `localStorage`.
 
-Frontend API calls default to the same-origin `/api` boundary. The public upstream authority is `https://api.beyvra.com`; browser code must not call databases, broker/provider administration APIs, Odoo, n8n, or internal service ports directly.
+Frontend API calls default to the same-origin `/api` boundary. Browser code must not call broker APIs, databases, Odoo, n8n, or internal service ports directly.
 
-## Frontend and backend responsibility split
+## Responsibility split
 
-### Frontend owns
+The frontend owns rendering, interaction, responsive behavior, accessibility, typed requests, loading and degraded states, charts, navigation, and safe session-expiration UX.
 
-- rendering, interaction, responsive behavior, and accessibility;
-- local form and view state;
-- typed API requests and safe response presentation;
-- loading, empty, stale, degraded, partial, and unavailable states;
-- protected navigation and session-expiration UX;
-- duplicate-click prevention as a user-experience guard;
-- charts, watchlists, tables, filters, and operator/customer workflows;
-- telemetry that contains no secrets or prohibited financial/customer payloads.
-
-### Backend owns
-
-- authentication and authorization enforcement;
-- tenant/account ownership and entitlements;
-- instrument identity and market-data authority;
-- balances, buying power, positions, orders, executions, fees, and ledgers;
-- preview, confirmation, submission, cancellation, replacement, and reconciliation rules;
-- idempotency, optimistic concurrency, audit, inbox/outbox, retries, and dead letters;
-- risk, suitability, compliance, limits, approvals, and trading halts;
-- provider credentials, provider calls, read-back, and unknown-outcome handling;
-- every decision that can move money, create market exposure, or alter authoritative records.
+The backend owns authorization, tenant/account ownership, balances, buying power, positions, orders, executions, fees, ledgers, idempotency, reconciliation, risk, compliance, audit, provider calls, and every decision that can move money or create market exposure.
 
 Client-side validation and disabled buttons are defense in depth, never authorization.
 
 ## Runtime and toolchain
 
-The current portal uses:
+The portal uses React 19, TypeScript, Vite, Redux Toolkit, TanStack Query, Ant Design, ECharts, Lightweight Charts, i18next, Vitest, Playwright, and unprivileged Nginx.
 
-- React 19;
-- TypeScript;
-- Vite;
-- Redux Toolkit;
-- TanStack Query;
-- Ant Design;
-- ECharts and Lightweight Charts;
-- i18next;
-- Socket.IO client;
-- Vitest;
-- Playwright and axe-core;
-- Nginx for the production static container;
-- optional Caddy for isolated staging/rehearsal ingress.
-
-Use the committed lockfile and `npm ci`; do not resolve a new dependency graph during release deployment.
+Use the committed lockfile and `npm ci`. Do not resolve a new dependency graph during release deployment.
 
 ## Local development
 
@@ -147,27 +81,29 @@ npm run dev
 
 The development server listens on port `8080` by default.
 
-## Configuration
+## Public configuration
 
-The checked-in example uses non-secret browser configuration:
+Only non-secret browser configuration is allowed:
 
-| Variable | Purpose | Safe default/example |
-|---|---|---|
-| `VITE_API_BASE_URL` | Same-origin API prefix | `/api` |
-| `VITE_SOCKET_BASE_URL` | Approved realtime endpoint or automatic derivation | `AUTO` or an approved `wss://` staging endpoint |
-| `VITE_PUBLIC_SITE_URL` | Public origin used by the build | `https://staging.beyvra.com` for staging |
-| `VITE_BRAND_NAME` | Public product name | `Beyvra` |
-| `VITE_REALTIME_V2_ENABLED` | Enables the reviewed realtime-v2 client | release-controlled |
-| `VITE_REALTIME_V2_V1_FALLBACK_ENABLED` | Enables reviewed compatibility fallback | release-controlled |
+| Variable | Required production value |
+|---|---|
+| `VITE_API_BASE_URL` | `/api` |
+| `VITE_SOCKET_BASE_URL` | `AUTO` |
+| `VITE_PUBLIC_SITE_URL` | Exact public HTTPS origin |
+| `VITE_BRAND_NAME` | `Beyvra` |
+| `VITE_REALTIME_V2_ENABLED` | `true` |
+| `VITE_REALTIME_V2_V1_FALLBACK_ENABLED` | `false` |
+| `VITE_DEPLOYMENT_READ_ONLY` | `true` for the current release class |
 
-Never place passwords, signing keys, API keys, OIDC client secrets, provider credentials, database URLs, private service addresses, or bearer tokens in `VITE_*` variables. Vite variables are part of the public browser bundle.
+Never place passwords, API keys, signing keys, bearer tokens, provider credentials, database URLs, private service addresses, or customer data in `VITE_*` variables.
 
 ## Validation
 
-Run source-only checks from `client-portal/`:
+Run from `client-portal/`:
 
 ```bash
 npm ci
+npm run build
 npm run lint
 npm run typecheck
 npm run errors:check
@@ -177,135 +113,115 @@ npm run test:errors
 npm run test:realtime
 npm run test:chart
 node scripts/check-api-contract.mjs --source-only
-npm run build
 npm run audit:gate
 ```
 
-The full API contract gate requires an accepted `beyvra-backend` schema endpoint:
+The full API contract gate requires an accepted backend schema:
 
 ```bash
 API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contract
 ```
 
-`test:contract` parses the real `src/api/endpoints.ts` registry plus direct request literals, refuses zero or unexpectedly low endpoint discovery, and compares those paths with the backend OpenAPI schema. A source-only parser pass does not replace the full backend comparison.
-
-The Playwright suite is an integrated frontend/backend test and does not start either service. It requires a running frontend at `E2E_BASE_URL`, a same-origin `/api` path to an approved non-production backend, and `POST /api/v1/demo/sessions` for guest-session setup:
+Playwright requires a running integrated staging origin and does not start either application:
 
 ```bash
 E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e
 ```
 
-`E2E_SKIP_GUEST_BOOTSTRAP=true` is allowed only for a deliberately unauthenticated test subset; it must not be used as authenticated or order-flow acceptance evidence.
+Authenticated browser acceptance requires `POST /api/v1/demo/sessions`. `E2E_SKIP_GUEST_BOOTSTRAP=true` is allowed only for an explicitly unauthenticated test subset.
 
-Important script groups:
+## Container architecture
 
-- `test:contract` performs the live backend-schema comparison described above;
-- `test:realtime` verifies the unified realtime client;
-- `test:chart` exercises the chart engine, workspace integration, performance, indicators, drawings, trade markers, and events;
-- `test:e2e` runs Playwright against the explicitly supplied integrated origin;
-- `errors:check` prevents unsafe public error output;
-- `brand:check` prevents stale public product identity;
-- `audit:gate` is the dependency-security gate.
+`client-portal/Dockerfile.prod` produces the immutable frontend image. The runtime stage:
 
-The repository currently has localization and README-authority workflows under `.github/workflows/`. The README-authority workflow also runs endpoint discovery in source-only mode. A production release must still have protected CI that runs every applicable source and integration gate against the exact pull-request head and merge result. Local success alone is not release evidence.
+- runs as unprivileged user `101` on port `8080`;
+- supports a read-only root filesystem;
+- generates public runtime configuration only under `/tmp`;
+- exposes `/healthz`, `/__runtime-config.json`, and `/__release.json`;
+- applies CSP, HSTS, MIME-sniffing protection, referrer policy, and permissions policy;
+- proxies `/api` and `/ws` to the paired backend over the named private Docker network;
+- omits query strings from access logs.
 
-## Container build
+The root `docker-compose.yaml` is the only release Compose authority. It accepts only an immutable `FRONTEND_IMAGE=repository@sha256:...`, has no `build:` directive, binds the candidate to host loopback, drops Linux capabilities, enables `no-new-privileges`, and requires an existing backend network.
 
-From the repository root:
+Server-side builds, floating image tags, `git pull && docker compose --build`, and duplicate production Compose files are prohibited.
 
-```bash
-cd client-portal
-npm ci
-npm run build
+## Immutable release flow
 
-docker build \
-  --file Dockerfile.prod \
-  --tag beyvra-frontend:local \
-  .
-```
+The workflow `.github/workflows/deploy.yml` implements two protected targets:
 
-The root Compose definition:
+- `staging-readonly`
+- `production-readonly`
 
-- builds `client-portal/Dockerfile.prod`;
-- publishes the frontend on host loopback only at `127.0.0.1:${SERVER_PORT:-8080}:80`;
-- requires the external `trading-network` network;
-- includes a health check;
-- optionally starts a Caddy edge through the `edge` profile.
+A staging release must:
 
-A production declaration must use an immutable registry reference such as `repository@sha256:...`, not a floating `latest` tag or a locally named image. The current repository does not, by this documentation alone, prove that such an artifact has been published or deployed.
+1. select the exact current protected-main source SHA;
+2. verify the required source, secret, container, and exact-head checks;
+3. build the frontend image once from immutable Node and Nginx base-image digests;
+4. publish SBOM and provenance;
+5. resolve the registry `repository@sha256:...` digest;
+6. prove the image source label matches the selected SHA;
+7. deploy without rebuilding;
+8. verify the frontend release identity and exact paired backend identity;
+9. prove read-only capability state and mutation rejection;
+10. retain non-secret release and rollback evidence.
 
-## Staging deployment
+Production promotion must reuse the same staging-certified frontend digest. The workflow rejects rebuilding for `production-readonly`.
 
-Follow `DEPLOYMENT.md`. The minimum source-side rehearsal is:
+## Staging and production execution
 
-```bash
-cp .env.staging.example .env.staging
-# Replace every placeholder with approved non-secret values or protected secret references.
-docker compose --env-file .env.staging --profile edge up -d --build
-```
+Follow [`docs/PRODUCTION-READONLY-PROMOTION.md`](docs/PRODUCTION-READONLY-PROMOTION.md). The protected environments provide server credentials and deployment variables; no populated environment file or private key belongs in this repository.
 
-This command builds a local rehearsal image. It is not immutable registry publication or production evidence.
+The deployment script `operations/deploy_immutable_frontend.sh`:
 
-For a real release candidate, a separate protected process must:
+- validates all source SHAs and image digests;
+- requires the exact paired backend SHA and digest;
+- records the previous immutable frontend candidate;
+- starts the candidate with `--no-build`;
+- verifies runtime identity, configuration, security headers, backend identity, capabilities, and write rejection;
+- automatically restores and re-verifies the previous exact frontend candidate if certification fails;
+- never changes Caddy, Kong, DNS, or external traffic weights.
 
-1. build from an accepted, protected Git commit;
-2. publish an immutable image digest with SBOM and provenance;
-3. deploy that exact digest to isolated staging without rebuilding;
-4. configure the canonical API and OIDC boundaries;
-5. run browser, contract, identity, realtime, order-safety, accessibility, and failure-path tests;
-6. capture release identity and rollback evidence;
-7. promote the identical digest only after approval.
-
-Do not use the internal-development Caddy certificate profile for public clients.
+A production read-only canary is capped at one percent and requires independent ingress verification. The repository does not silently route traffic.
 
 ## Production gates
 
-Production is blocked until all applicable gates pass:
+Production remains blocked unless all applicable gates are `PASS` for one unchanged candidate:
 
-1. **Source authority** — protected main, exact-head review, merge-result CI, clean dependency graph, and no competing frontend authority.
-2. **API contract** — generated client matches the accepted `beyvra-backend` OpenAPI contract; no invented or unimplemented endpoints are presented as available.
-3. **Identity and session safety** — canonical issuer, PKCE S256, allowlisted redirects, protected deep links, CSRF/session controls, multi-tab logout, expiry handling, and no browser token/secret storage.
-4. **Capability truth** — the UI reads backend capabilities and renders simulation, live-trading, deposit, withdrawal, maintenance, and degraded states exactly as returned. The frontend cannot enable a capability.
-5. **Order safety** — preview → confirm → submit, idempotency, preview invalidation, duplicate-click protection, buying-power/fee visibility, cancel/replace state handling, and unknown-outcome reconciliation are proven end to end.
-6. **Financial controls** — no real-money provider or trading activation without legal, compliance, risk, security, and business approval plus backend enforcement.
-7. **Quality** — lint, type checking, unit/component, contract, chart, realtime, browser, accessibility, localization, public-error, and production-build gates pass on the release commit.
-8. **Security** — dependency audit, secret scan, SAST, container scan, CSP review, secure headers, non-root runtime, minimal image, and public-bundle inspection pass.
-9. **Artifact integrity** — immutable digest, source revision label, SBOM, provenance/attestation, vulnerability decision, and checksums are recorded.
-10. **Staging acceptance** — real API and identity integration, migrations, test accounts, mobile/desktop browsers, degraded dependencies, retries, stale data, offline behavior, and no-effect financial/provider tests pass.
-11. **Observability** — release identity, frontend errors, latency, API failures, auth failures, realtime state, and user-safe incident correlation are visible without leaking secrets or prohibited customer data.
-12. **Recovery** — previous compatible frontend digest, API compatibility, configuration, database recovery ownership, and tested rollback/read-back are documented.
-13. **Activation approval** — production deployment and live-trading capability activation are separate, explicit changes. Deploying the website does not activate live trading.
+1. protected-main source and exact-head CI;
+2. build, lint, type, unit, chart, realtime, contract, browser, accessibility, and localization checks;
+3. secret, dependency, and high/critical container scans;
+4. exact frontend source SHA and image digest readback;
+5. exact paired backend source SHA and image digest readback;
+6. same-origin API and WebSocket routing;
+7. secure response headers and immutable public assets;
+8. fail-closed frontend and backend capabilities;
+9. rejection of every state-changing operation in read-only mode;
+10. monitoring continuity and zero movement in live-effect counters;
+11. rollback to the previous exact image and successful identity readback;
+12. approval for the exact digest and canary target.
 
-These are required release controls, not claims that the current branch has already satisfied them. `DEPLOYMENT.md` records `PRODUCTION_DEPLOYMENT_STATUS=NOT_CERTIFIED`.
+## Active-mode boundary
 
-## Security rules
+The current release authority does not enable live trading, real money, broker execution, deposits, withdrawals, payments, transactional email, external execution, or legacy realtime fallback.
 
-- Never commit `.env` files, credentials, private keys, access tokens, refresh tokens, customer exports, financial records, or secret-bearing logs.
-- Never trust a browser role, account ID, price, fee, balance, or order state without backend validation.
-- Never call a live provider from browser code.
-- Never represent an accepted HTTP request as a completed trade without authoritative backend/provider state.
-- Never retry an ambiguous effectful operation from the UI as though it were known to have failed.
-- Redact authorization headers, cookies, identity codes, financial payloads, and personal data from telemetry.
-- Keep production, staging, test, and development configuration distinct.
+Those capabilities require a separate reviewed backend and frontend activation release, complete financial-command and idempotency certification, provider authorization, legal/compliance/risk approval, and an explicit production decision.
 
 ## Repository layout
 
 ```text
 .
-├── client-portal/           # React/Vite browser application
-│   ├── src/                 # UI, API client, charts, realtime, state and routes
-│   ├── e2e/                 # Playwright browser acceptance
-│   ├── scripts/             # contract, identity, i18n, error and audit gates
-│   ├── Dockerfile.prod      # production static image
-│   └── package.json         # application commands and dependency authority
-├── deploy/                  # Caddy and deployment support
-├── docs/                    # UX, identity, chart and platform documentation
-├── docker-compose.yaml      # loopback-first frontend and optional edge
-└── DEPLOYMENT.md            # staging rehearsal and release requirements
+├── client-portal/                  # React/Vite application and immutable image
+├── operations/                    # Candidate deployment and verification
+├── docs/                          # Production-readiness and promotion runbooks
+├── scripts/                       # Repository authority validation
+├── docker-compose.yaml            # Digest-only runtime authority
+├── .github/workflows/ci.yml       # Required source/container checks
+└── .github/workflows/deploy.yml   # Immutable staging and production promotion
 ```
 
 ## Change policy
 
-Use short-lived branches and pull requests. Keep each change reviewable, update tests and documentation with behavior, and preserve backward-compatible API handling during coordinated backend/frontend releases.
+Use short-lived branches and pull requests. Keep each change reviewable, update tests and documentation with behavior, preserve backend/frontend contract compatibility, and never weaken a release gate merely to make CI green.
 
-Merging this repository never authorizes a production deployment, a provider credential, a financial mutation, or live trading.
+Merging this repository never authorizes a provider credential, financial mutation, live trading, or real-money operation.
