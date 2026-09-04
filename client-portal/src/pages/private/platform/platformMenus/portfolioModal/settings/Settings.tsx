@@ -19,6 +19,7 @@ import TradingMenu from '../../trading/TradingMenu';
 import EmailVerify from './EmailVerify';
 import PhoneVerify from './PhoneVerify';
 import useNotificationList from 'api/notification/useNotificationList';
+import EmailPreferencesPanel from '../../notifications/EmailPreferencesPanel';
 
 const Settings = () => {
     const [cookies] = useCookies(["access_token"]);
@@ -200,7 +201,9 @@ const Settings = () => {
                             infoText={notificationData?.name === "Push Notifications" ? "Why should I receive them?" : ""}
                         />
                     ))}
-
+                </div>
+                <div className="notificationsMenuSection" style={{ paddingLeft: 16, paddingRight: 16 }}>
+                    <EmailPreferencesPanel />
                 </div>
             </DropDownOptions>
             <DropDownOptions

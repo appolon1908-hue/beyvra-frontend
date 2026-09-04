@@ -7,7 +7,6 @@ import useNotificationToggle from "api/notification/useToggleNotification";
 import Toggle from "../../../../../components/toggle/Toggle";
 import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 
-import EmailPreferencesPanel from "./EmailPreferencesPanel";
 import "./notificationsMenu.scss";
 
 interface NotificationsMenuProps {}
@@ -73,10 +72,6 @@ const NotificationsMenu: React.FunctionComponent<
             }
           />
         ))}
-      </div>
-
-      <div className="notificationsMenuSection">
-        <EmailPreferencesPanel />
       </div>
     </div>
   );
