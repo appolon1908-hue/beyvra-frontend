@@ -44,6 +44,7 @@ permissions:
   packages: write
   id-token: write
   attestations: write
+  artifact-metadata: write
   actions: read
   checks: read
 
@@ -58,8 +59,14 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       SOURCE_SHA: ${{ inputs.source_sha }}
-      NODE_BASE_IMAGE: ${{ vars.NODE_BASE_IMAGE }}
-      NGINX_BASE_IMAGE: ${{ vars.NGINX_BASE_IMAGE }}
+      TARGET: ${{ inputs.target }}
+      PUBLISH_IMAGE: ${{ inputs.publish_image }}
+      PROVIDED_FRONTEND_IMAGE: ${{ inputs.frontend_image }}
+      DEPLOY_REQUESTED: ${{ inputs.deploy }}
+      CHANGE_ID_INPUT: ${{ inputs.change_id }}
+      # Exact bases resolved and clean-scanned by protected-main CI.
+      NODE_BASE_IMAGE: "docker.io/library/node:22-bookworm-slim@sha256:83f487e0a63425e5b4d146fb5e5be574bcbe1b7b843d3ebafdd95eaf7767a7e5"
+      NGINX_BASE_IMAGE: "docker.io/nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6"
     steps:
       - name: Require workflow and source authority from protected main
         uses: actions/checkout@v7
@@ -74,13 +81,14 @@ jobs:
           set -euo pipefail
           test "$GITHUB_REF" = "refs/heads/main"
           [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$CHANGE_ID_INPUT" =~ ^[A-Za-z0-9._-]+$ ]]
           git fetch origin main
           git cat-file -e "${SOURCE_SHA}^{commit}"
           git merge-base --is-ancestor "$SOURCE_SHA" origin/main
 
-          if [[ "${{ inputs.publish_image }}" == "true" ]]; then
+          digest_pattern='@sha256:[0-9a-f]{64}$'
+          if [[ "$PUBLISH_IMAGE" == "true" ]]; then
             test "$SOURCE_SHA" = "$(git rev-parse origin/main)"
-            digest_pattern='@sha256:[0-9a-f]{64}$'
             [[ "$NODE_BASE_IMAGE" =~ $digest_pattern ]]
             [[ "$NGINX_BASE_IMAGE" =~ $digest_pattern ]]
           fi
@@ -102,11 +110,23 @@ jobs:
             git show "${SOURCE_SHA}:${path}" >/dev/null
           done
 
-          if [[ "${{ inputs.target }}" == "production-readonly" \
-                && "${{ inputs.publish_image }}" == "true" ]]; then
-            echo "Production promotion must reuse a staging-certified digest." >&2
-            exit 1
-          fi
+          case "$TARGET" in
+            staging-readonly)
+              test "$PUBLISH_IMAGE" = "true"
+              test "$DEPLOY_REQUESTED" = "true"
+              test -z "$PROVIDED_FRONTEND_IMAGE"
+              test "$SOURCE_SHA" = "$(git rev-parse origin/main)"
+              ;;
+            production-readonly)
+              test "$PUBLISH_IMAGE" = "false"
+              test "$DEPLOY_REQUESTED" = "true"
+              [[ "$PROVIDED_FRONTEND_IMAGE" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
+              ;;
+            *)
+              echo "Unsupported read-only deployment target." >&2
+              exit 1
+              ;;
+          esac
 
           printf 'source_sha=%s\n' "$SOURCE_SHA" >>"$GITHUB_OUTPUT"
           printf 'node_base_image=%s\n' "$NODE_BASE_IMAGE" >>"$GITHUB_OUTPUT"
@@ -167,11 +187,22 @@ jobs:
           provenance: mode=max
           sbom: true
 
+      - id: attest
+        name: Sign exact frontend build provenance
+        uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d
+        with:
+          subject-name: ${{ steps.metadata.outputs.repository }}
+          subject-digest: ${{ steps.image.outputs.digest }}
+          push-to-registry: true
+          create-storage-record: false
+
       - id: refs
         name: Record registry digest
         shell: bash
         run: |
+          set -euo pipefail
           frontend_image="${{ steps.metadata.outputs.repository }}@${{ steps.image.outputs.digest }}"
+          [[ "$frontend_image" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
           printf 'frontend_image=%s\n' "$frontend_image" >>"$GITHUB_OUTPUT"
 
   resolve:
@@ -186,6 +217,9 @@ jobs:
     timeout-minutes: 15
     outputs:
       frontend_image: ${{ steps.resolve.outputs.frontend_image }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PUBLISH_IMAGE: ${{ inputs.publish_image }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -199,7 +233,7 @@ jobs:
           password: ${{ github.token }}
 
       - id: resolve
-        name: Resolve and verify exact candidate
+        name: Resolve and verify exact signed candidate
         shell: bash
         env:
           PUBLISHED_IMAGE: ${{ needs.publish.outputs.frontend_image }}
@@ -207,12 +241,13 @@ jobs:
           SOURCE_SHA: ${{ needs.eligibility.outputs.source_sha }}
         run: |
           set -euo pipefail
-          if [[ "${{ inputs.publish_image }}" == "true" ]]; then
+          if [[ "$PUBLISH_IMAGE" == "true" ]]; then
             frontend_image="$PUBLISHED_IMAGE"
           else
             frontend_image="$PROVIDED_IMAGE"
           fi
-          [[ "$frontend_image" =~ @sha256:[0-9a-f]{64}$ ]]
+          [[ "$frontend_image" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
+
           docker pull "$frontend_image"
           revision="$(
             docker image inspect \
@@ -220,6 +255,14 @@ jobs:
               "$frontend_image"
           )"
           test "$revision" = "$SOURCE_SHA"
+
+          gh attestation verify "oci://${frontend_image}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/deploy.yml" \
+            --source-ref refs/heads/main \
+            --format json \
+            > frontend-attestation-verification.json
+
           printf 'frontend_image=%s\n' "$frontend_image" >>"$GITHUB_OUTPUT"
 
           jq -n \
@@ -236,7 +279,14 @@ jobs:
               target: $target,
               change_id: $change_id,
               generated_at: $generated_at,
+              signed_provenance_verified: true,
               deployment_read_only: true,
+              live_trading_authorized: false,
+              real_money_authorized: false,
+              payments_authorized: false,
+              withdrawals_authorized: false,
+              transactional_email_authorized: false,
+              external_execution_authorized: false,
               legacy_realtime_fallback_enabled: false
             }' > release-manifest.json
           sha256sum release-manifest.json > release-manifest.json.sha256
@@ -247,6 +297,7 @@ jobs:
           path: |
             release-manifest.json
             release-manifest.json.sha256
+            frontend-attestation-verification.json
           if-no-files-found: error
           retention-days: 90
 
@@ -308,6 +359,14 @@ jobs:
           [[ "$BACKEND_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
           [[ "$BACKEND_IMAGE" =~ @sha256:[0-9a-f]{64}$ ]]
           [[ "$FRONTEND_IMAGE" =~ @sha256:[0-9a-f]{64}$ ]]
+          case "$DEPLOYMENT_TARGET" in
+            staging-readonly) ;;
+            production-readonly)
+              [[ "$CANARY_TRAFFIC_PERCENT" =~ ^(0|1)$ ]]
+              [[ "$EXTERNAL_CANARY_ROUTING_VERIFIED" == "true" ]]
+              ;;
+            *) exit 1 ;;
+          esac
 
       - name: Package reviewed deployment authority
         shell: bash
