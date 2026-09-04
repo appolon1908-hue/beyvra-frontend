@@ -1,0 +1,103 @@
+{
+  "schema_version": "2.1",
+  "status": "SOURCE_ONLY_PENDING_BACKEND_PROTECTED_MERGE",
+  "repository": "appolon1908-hue/beyvra-frontend",
+  "product": "beyvra",
+  "role": "browser_ui_and_safe_reconciled_status_projection",
+  "session_boundary": "same_origin_bff_http_only_cookie",
+  "browser_token_storage_allowed": false,
+  "backend_contract": {
+    "repository": "appolon1908-hue/beyvra-backend",
+    "pull_request": 89,
+    "candidate_sha": "b46a276ed1cd8c74c240f4bec9cf10307739d24f",
+    "state": "PENDING_PROTECTED_MERGE",
+    "required_before_runtime_ui": true
+  },
+  "direct_clients": {
+    "n8n": false,
+    "middleware": false,
+    "keycloak_admin": false,
+    "kong_admin": false,
+    "odoo": false,
+    "broker": false,
+    "provider": false,
+    "database": false
+  },
+  "canonical_transport": {
+    "commands": "same-origin-beyvra-backend-rest-only",
+    "status_snapshots": "same-origin-beyvra-backend-rest",
+    "status_deltas": "backend-authorized-subscribe-only-realtime",
+    "snapshot_recovery_required": true,
+    "caller_tenant_authoritative": false,
+    "reconnect_submits_new_request": false
+  },
+  "allowed_user_intents": [
+    "onboarding_assistance",
+    "compliance_reminder",
+    "support_escalation",
+    "report_request",
+    "alert_acknowledgement",
+    "notification_preferences",
+    "cancel_before_submission"
+  ],
+  "allowed_operation_types": [
+    "onboarding.case.create",
+    "compliance.reminder.request",
+    "support.escalation.create",
+    "security.alert.create",
+    "report.request.create",
+    "notification.request",
+    "crm.projection.request",
+    "webhook.reconciliation.request",
+    "operation.status.read"
+  ],
+  "visible_statuses": [
+    "accepted",
+    "queued",
+    "running",
+    "waiting_approval",
+    "submitted",
+    "unknown",
+    "reconciling",
+    "reconciled_success",
+    "reconciled_failure",
+    "rejected",
+    "cancelled"
+  ],
+  "success_state": "reconciled_success",
+  "prohibited_actions": [
+    "trade",
+    "order",
+    "wallet",
+    "ledger",
+    "payment",
+    "deposit",
+    "withdrawal",
+    "transfer",
+    "custody",
+    "chain",
+    "broker",
+    "provider",
+    "demo_order"
+  ],
+  "capabilities": {
+    "REAL_TRADING_EXECUTION": false,
+    "REAL_WALLET_DEPOSITS": false,
+    "REAL_WALLET_WITHDRAWALS": false,
+    "REAL_WALLET_TRANSFERS": false,
+    "PAYMENT_EXECUTION": false,
+    "CUSTODY_EXECUTION": false,
+    "CHAIN_BROADCAST": false,
+    "LIVE_APPLY_AUTHORIZED": false
+  },
+  "invariants": {
+    "machine_credentials_in_browser": false,
+    "browser_can_select_authoritative_tenant": false,
+    "client_side_approval_authoritative": false,
+    "backend_reconciliation_required_before_success": true,
+    "unknown_operation_type_rejected_during_decode": true,
+    "duplicate_or_stale_event_has_no_duplicate_effect": true,
+    "sequence_gap_requires_snapshot_recovery": true,
+    "source_merge_authorizes_deployment": false
+  }
+}
