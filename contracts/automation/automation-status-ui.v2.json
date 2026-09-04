@@ -23,6 +23,17 @@
     "notification_preferences",
     "cancel_before_submission"
   ],
+  "allowed_operation_types": [
+    "onboarding.case.create",
+    "compliance.reminder.request",
+    "support.escalation.create",
+    "security.alert.create",
+    "report.request.create",
+    "notification.request",
+    "crm.projection.request",
+    "webhook.reconciliation.request",
+    "operation.status.read"
+  ],
   "prohibited_intents": [
     "trade",
     "order",
@@ -63,6 +74,12 @@
     "correlation_id",
     "next_action"
   ],
+  "projection_decode_policy": {
+    "operation_type": "exact_allowlist_reject_unknown",
+    "status": "exact_allowlist_reject_unknown",
+    "forbidden_fields": "reject",
+    "unknown_safe_fields": "discard"
+  },
   "forbidden_projection_fields": [
     "access_token",
     "refresh_token",

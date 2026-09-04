@@ -40,6 +40,17 @@
     "notification_preferences",
     "cancel_before_submission"
   ],
+  "allowed_operation_types": [
+    "onboarding.case.create",
+    "compliance.reminder.request",
+    "support.escalation.create",
+    "security.alert.create",
+    "report.request.create",
+    "notification.request",
+    "crm.projection.request",
+    "webhook.reconciliation.request",
+    "operation.status.read"
+  ],
   "visible_statuses": [
     "accepted",
     "queued",
@@ -84,6 +95,7 @@
     "browser_can_select_authoritative_tenant": false,
     "client_side_approval_authoritative": false,
     "backend_reconciliation_required_before_success": true,
+    "unknown_operation_type_rejected_during_decode": true,
     "duplicate_or_stale_event_has_no_duplicate_effect": true,
     "sequence_gap_requires_snapshot_recovery": true,
     "source_merge_authorizes_deployment": false
