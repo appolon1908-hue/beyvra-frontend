@@ -32,11 +32,19 @@ manifest_dir="$(dirname "$manifest")"
 
 source_sha="$(jq -r .source_sha "$manifest")"
 frontend_image="$(jq -r .frontend_image "$manifest")"
+backend_source_sha="$(jq -r .backend_source_sha "$manifest")"
+backend_image="$(jq -r .backend_image "$manifest")"
+backend_certification_run_id="$(
+  jq -r .backend_certification_run_id "$manifest"
+)"
 target="$(jq -r .target "$manifest")"
 change_id="$(jq -r .change_id "$manifest")"
 
 [[ "$source_sha" =~ ^[0-9a-f]{40}$ ]]
 [[ "$frontend_image" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
+[[ "$backend_source_sha" =~ ^[0-9a-f]{40}$ ]]
+[[ "$backend_image" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
+[[ "$backend_certification_run_id" =~ ^[0-9]+$ ]]
 [[ "$change_id" =~ ^[A-Za-z0-9._-]+$ ]]
 case "$target" in
   staging-readonly|production-readonly) ;;
@@ -49,6 +57,7 @@ test "$source_sha" = "$DEPLOY_HEAD_SHA"
 
 jq -e '
   .signed_provenance_verified == true and
+  .paired_backend_certification_verified == true and
   .deployment_read_only == true and
   .live_trading_authorized == false and
   .real_money_authorized == false and
@@ -65,5 +74,9 @@ jq -e 'type == "array" and length > 0' "$attestation_evidence" >/dev/null
 
 printf 'source_sha=%s\n' "$source_sha" >>"$GITHUB_OUTPUT"
 printf 'frontend_image=%s\n' "$frontend_image" >>"$GITHUB_OUTPUT"
+printf 'backend_source_sha=%s\n' "$backend_source_sha" >>"$GITHUB_OUTPUT"
+printf 'backend_image=%s\n' "$backend_image" >>"$GITHUB_OUTPUT"
+printf 'backend_certification_run_id=%s\n' \
+  "$backend_certification_run_id" >>"$GITHUB_OUTPUT"
 printf 'target=%s\n' "$target" >>"$GITHUB_OUTPUT"
 printf 'change_id=%s\n' "$change_id" >>"$GITHUB_OUTPUT"
