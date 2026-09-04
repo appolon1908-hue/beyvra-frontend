@@ -1,10 +1,12 @@
 name: Publish and deploy immutable Beyvra frontend
 
+# Production promotion must reuse a staging-certified digest.
+
 on:
   workflow_dispatch:
     inputs:
       source_sha:
-        description: Full protected-main source SHA to certify
+        description: Full protected-main frontend source SHA to certify
         required: true
         type: string
       target:
@@ -25,6 +27,18 @@ on:
         required: false
         default: ""
         type: string
+      backend_source_sha:
+        description: Exact certified backend protected-main SHA
+        required: true
+        type: string
+      backend_image:
+        description: Exact certified backend repository@sha256 digest
+        required: true
+        type: string
+      backend_certification_run_id:
+        description: Successful matching backend certification workflow run ID
+        required: true
+        type: string
       deploy:
         description: Deploy after producing the release manifest
         required: true
@@ -44,22 +58,36 @@ permissions:
   packages: write
   id-token: write
   attestations: write
+  artifact-metadata: write
   actions: read
   checks: read
 
 jobs:
   eligibility:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     outputs:
       source_sha: ${{ steps.verify.outputs.source_sha }}
       node_base_image: ${{ steps.verify.outputs.node_base_image }}
       nginx_base_image: ${{ steps.verify.outputs.nginx_base_image }}
+      backend_source_sha: ${{ steps.verify.outputs.backend_source_sha }}
+      backend_image: ${{ steps.verify.outputs.backend_image }}
+      backend_certification_run_id: ${{ steps.verify.outputs.backend_certification_run_id }}
     env:
       GH_TOKEN: ${{ github.token }}
       SOURCE_SHA: ${{ inputs.source_sha }}
-      NODE_BASE_IMAGE: ${{ vars.NODE_BASE_IMAGE }}
-      NGINX_BASE_IMAGE: ${{ vars.NGINX_BASE_IMAGE }}
+      TARGET: ${{ inputs.target }}
+      PUBLISH_IMAGE: ${{ inputs.publish_image }}
+      PROVIDED_FRONTEND_IMAGE: ${{ inputs.frontend_image }}
+      BACKEND_REPOSITORY: appolon1908-hue/beyvra-backend
+      BACKEND_SOURCE_SHA: ${{ inputs.backend_source_sha }}
+      BACKEND_IMAGE: ${{ inputs.backend_image }}
+      BACKEND_CERTIFICATION_RUN_ID: ${{ inputs.backend_certification_run_id }}
+      DEPLOY_REQUESTED: ${{ inputs.deploy }}
+      CHANGE_ID_INPUT: ${{ inputs.change_id }}
+      # Exact bases resolved and clean-scanned by protected-main CI.
+      NODE_BASE_IMAGE: "docker.io/library/node:22-bookworm-slim@sha256:83f487e0a63425e5b4d146fb5e5be574bcbe1b7b843d3ebafdd95eaf7767a7e5"
+      NGINX_BASE_IMAGE: "docker.io/nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6"
     steps:
       - name: Require workflow and source authority from protected main
         uses: actions/checkout@v7
@@ -68,19 +96,23 @@ jobs:
           fetch-depth: 0
 
       - id: verify
-        name: Verify source authority and required checks
+        name: Verify source authority and immutable release inputs
         shell: bash
         run: |
           set -euo pipefail
           test "$GITHUB_REF" = "refs/heads/main"
           [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$BACKEND_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$BACKEND_IMAGE" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
+          [[ "$BACKEND_CERTIFICATION_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$CHANGE_ID_INPUT" =~ ^[A-Za-z0-9._-]+$ ]]
           git fetch origin main
           git cat-file -e "${SOURCE_SHA}^{commit}"
           git merge-base --is-ancestor "$SOURCE_SHA" origin/main
 
-          if [[ "${{ inputs.publish_image }}" == "true" ]]; then
+          digest_pattern='@sha256:[0-9a-f]{64}$'
+          if [[ "$PUBLISH_IMAGE" == "true" ]]; then
             test "$SOURCE_SHA" = "$(git rev-parse origin/main)"
-            digest_pattern='@sha256:[0-9a-f]{64}$'
             [[ "$NODE_BASE_IMAGE" =~ $digest_pattern ]]
             [[ "$NGINX_BASE_IMAGE" =~ $digest_pattern ]]
           fi
@@ -98,19 +130,49 @@ jobs:
           for path in \
             docker-compose.yaml \
             operations/deploy_immutable_frontend.sh \
-            operations/verify_frontend_release.py; do
+            operations/verify_frontend_release.py \
+            operations/verify_backend_certification.sh; do
             git show "${SOURCE_SHA}:${path}" >/dev/null
           done
 
-          if [[ "${{ inputs.target }}" == "production-readonly" \
-                && "${{ inputs.publish_image }}" == "true" ]]; then
-            echo "Production promotion must reuse a staging-certified digest." >&2
-            exit 1
-          fi
+          case "$TARGET" in
+            staging-readonly)
+              test "$PUBLISH_IMAGE" = "true"
+              test "$DEPLOY_REQUESTED" = "true"
+              test -z "$PROVIDED_FRONTEND_IMAGE"
+              test "$SOURCE_SHA" = "$(git rev-parse origin/main)"
+              ;;
+            production-readonly)
+              test "$PUBLISH_IMAGE" = "false"
+              test "$DEPLOY_REQUESTED" = "true"
+              [[ "$PROVIDED_FRONTEND_IMAGE" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
+              ;;
+            *)
+              echo "Unsupported read-only deployment target." >&2
+              exit 1
+              ;;
+          esac
 
           printf 'source_sha=%s\n' "$SOURCE_SHA" >>"$GITHUB_OUTPUT"
           printf 'node_base_image=%s\n' "$NODE_BASE_IMAGE" >>"$GITHUB_OUTPUT"
           printf 'nginx_base_image=%s\n' "$NGINX_BASE_IMAGE" >>"$GITHUB_OUTPUT"
+          printf 'backend_source_sha=%s\n' "$BACKEND_SOURCE_SHA" >>"$GITHUB_OUTPUT"
+          printf 'backend_image=%s\n' "$BACKEND_IMAGE" >>"$GITHUB_OUTPUT"
+          printf 'backend_certification_run_id=%s\n' \
+            "$BACKEND_CERTIFICATION_RUN_ID" >>"$GITHUB_OUTPUT"
+
+      - name: Verify exact signed paired-backend certification
+        env:
+          DEPLOYMENT_TARGET: ${{ inputs.target }}
+          BACKEND_CERTIFICATION_EVIDENCE_DIR: evidence/backend-certification
+        run: operations/verify_backend_certification.sh
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: beyvra-frontend-backend-authority-${{ inputs.source_sha }}
+          path: evidence/backend-certification
+          if-no-files-found: error
+          retention-days: 90
 
   publish:
     needs: eligibility
@@ -167,11 +229,22 @@ jobs:
           provenance: mode=max
           sbom: true
 
+      - id: attest
+        name: Sign exact frontend build provenance
+        uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d
+        with:
+          subject-name: ${{ steps.metadata.outputs.repository }}
+          subject-digest: ${{ steps.image.outputs.digest }}
+          push-to-registry: true
+          create-storage-record: false
+
       - id: refs
         name: Record registry digest
         shell: bash
         run: |
+          set -euo pipefail
           frontend_image="${{ steps.metadata.outputs.repository }}@${{ steps.image.outputs.digest }}"
+          [[ "$frontend_image" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
           printf 'frontend_image=%s\n' "$frontend_image" >>"$GITHUB_OUTPUT"
 
   resolve:
@@ -186,6 +259,9 @@ jobs:
     timeout-minutes: 15
     outputs:
       frontend_image: ${{ steps.resolve.outputs.frontend_image }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PUBLISH_IMAGE: ${{ inputs.publish_image }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -199,20 +275,24 @@ jobs:
           password: ${{ github.token }}
 
       - id: resolve
-        name: Resolve and verify exact candidate
+        name: Resolve and verify exact signed candidate
         shell: bash
         env:
           PUBLISHED_IMAGE: ${{ needs.publish.outputs.frontend_image }}
           PROVIDED_IMAGE: ${{ inputs.frontend_image }}
           SOURCE_SHA: ${{ needs.eligibility.outputs.source_sha }}
+          BACKEND_SOURCE_SHA: ${{ needs.eligibility.outputs.backend_source_sha }}
+          BACKEND_IMAGE: ${{ needs.eligibility.outputs.backend_image }}
+          BACKEND_CERTIFICATION_RUN_ID: ${{ needs.eligibility.outputs.backend_certification_run_id }}
         run: |
           set -euo pipefail
-          if [[ "${{ inputs.publish_image }}" == "true" ]]; then
+          if [[ "$PUBLISH_IMAGE" == "true" ]]; then
             frontend_image="$PUBLISHED_IMAGE"
           else
             frontend_image="$PROVIDED_IMAGE"
           fi
-          [[ "$frontend_image" =~ @sha256:[0-9a-f]{64}$ ]]
+          [[ "$frontend_image" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
+
           docker pull "$frontend_image"
           revision="$(
             docker image inspect \
@@ -220,11 +300,24 @@ jobs:
               "$frontend_image"
           )"
           test "$revision" = "$SOURCE_SHA"
+
+          gh attestation verify "oci://${frontend_image}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/deploy.yml" \
+            --source-ref refs/heads/main \
+            --format json \
+            > frontend-attestation-verification.json
+          jq -e 'type == "array" and length > 0' \
+            frontend-attestation-verification.json >/dev/null
+
           printf 'frontend_image=%s\n' "$frontend_image" >>"$GITHUB_OUTPUT"
 
           jq -n \
             --arg source_sha "$SOURCE_SHA" \
             --arg frontend_image "$frontend_image" \
+            --arg backend_source_sha "$BACKEND_SOURCE_SHA" \
+            --arg backend_image "$BACKEND_IMAGE" \
+            --arg backend_certification_run_id "$BACKEND_CERTIFICATION_RUN_ID" \
             --arg target "${{ inputs.target }}" \
             --arg change_id "${{ inputs.change_id }}" \
             --arg generated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -233,10 +326,21 @@ jobs:
               source_repository: env.GITHUB_SERVER_URL + "/" + env.GITHUB_REPOSITORY,
               source_sha: $source_sha,
               frontend_image: $frontend_image,
+              backend_source_sha: $backend_source_sha,
+              backend_image: $backend_image,
+              backend_certification_run_id: $backend_certification_run_id,
               target: $target,
               change_id: $change_id,
               generated_at: $generated_at,
+              signed_provenance_verified: true,
+              paired_backend_certification_verified: true,
               deployment_read_only: true,
+              live_trading_authorized: false,
+              real_money_authorized: false,
+              payments_authorized: false,
+              withdrawals_authorized: false,
+              transactional_email_authorized: false,
+              external_execution_authorized: false,
               legacy_realtime_fallback_enabled: false
             }' > release-manifest.json
           sha256sum release-manifest.json > release-manifest.json.sha256
@@ -247,6 +351,7 @@ jobs:
           path: |
             release-manifest.json
             release-manifest.json.sha256
+            frontend-attestation-verification.json
           if-no-files-found: error
           retention-days: 90
 
@@ -271,8 +376,9 @@ jobs:
       VERIFICATION_BASE_URL: ${{ vars.VERIFICATION_BASE_URL }}
       BACKEND_NETWORK: ${{ vars.BACKEND_NETWORK }}
       BACKEND_UPSTREAM: ${{ vars.BACKEND_UPSTREAM }}
-      BACKEND_SOURCE_SHA: ${{ vars.BACKEND_SOURCE_SHA }}
-      BACKEND_IMAGE: ${{ vars.BACKEND_IMAGE }}
+      BACKEND_SOURCE_SHA: ${{ needs.eligibility.outputs.backend_source_sha }}
+      BACKEND_IMAGE: ${{ needs.eligibility.outputs.backend_image }}
+      BACKEND_CERTIFICATION_RUN_ID: ${{ needs.eligibility.outputs.backend_certification_run_id }}
       PORT: ${{ vars.PORT }}
       CANARY_TRAFFIC_PERCENT: ${{ vars.CANARY_TRAFFIC_PERCENT }}
       EXTERNAL_CANARY_ROUTING_VERIFIED: ${{ vars.EXTERNAL_CANARY_ROUTING_VERIFIED }}
@@ -286,7 +392,7 @@ jobs:
           ref: ${{ needs.eligibility.outputs.source_sha }}
           fetch-depth: 0
 
-      - name: Validate protected environment inputs
+      - name: Validate protected environment and exact paired candidate
         shell: bash
         run: |
           set -euo pipefail
@@ -294,8 +400,8 @@ jobs:
             DEPLOY_HOST DEPLOY_USER DEPLOY_SSH_KEY DEPLOY_KNOWN_HOSTS
             GHCR_USER GHCR_TOKEN DEPLOY_PATH PUBLIC_SERVER_NAME
             VERIFICATION_BASE_URL BACKEND_NETWORK BACKEND_UPSTREAM
-            BACKEND_SOURCE_SHA BACKEND_IMAGE PORT CANARY_TRAFFIC_PERCENT
-            FRONTEND_IMAGE SOURCE_SHA CHANGE_ID
+            BACKEND_SOURCE_SHA BACKEND_IMAGE BACKEND_CERTIFICATION_RUN_ID
+            PORT CANARY_TRAFFIC_PERCENT FRONTEND_IMAGE SOURCE_SHA CHANGE_ID
           )
           for name in "${required[@]}"; do
             if [[ -z "${!name:-}" ]]; then
@@ -306,8 +412,17 @@ jobs:
           [[ "$DEPLOY_PATH" =~ ^/[A-Za-z0-9._/-]+$ ]]
           [[ "$PUBLIC_SERVER_NAME" =~ ^[A-Za-z0-9.-]+$ ]]
           [[ "$BACKEND_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
-          [[ "$BACKEND_IMAGE" =~ @sha256:[0-9a-f]{64}$ ]]
-          [[ "$FRONTEND_IMAGE" =~ @sha256:[0-9a-f]{64}$ ]]
+          [[ "$BACKEND_IMAGE" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
+          [[ "$BACKEND_CERTIFICATION_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$FRONTEND_IMAGE" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
+          case "$DEPLOYMENT_TARGET" in
+            staging-readonly) ;;
+            production-readonly)
+              [[ "$CANARY_TRAFFIC_PERCENT" =~ ^(0|1)$ ]]
+              [[ "$EXTERNAL_CANARY_ROUTING_VERIFIED" == "true" ]]
+              ;;
+            *) exit 1 ;;
+          esac
 
       - name: Package reviewed deployment authority
         shell: bash
@@ -328,6 +443,8 @@ jobs:
             printf 'SOURCE_SHA=%q\n' "$SOURCE_SHA"
             printf 'BACKEND_SOURCE_SHA=%q\n' "$BACKEND_SOURCE_SHA"
             printf 'BACKEND_IMAGE=%q\n' "$BACKEND_IMAGE"
+            printf 'BACKEND_CERTIFICATION_RUN_ID=%q\n' \
+              "$BACKEND_CERTIFICATION_RUN_ID"
             printf 'CHANGE_ID=%q\n' "$CHANGE_ID"
             printf 'DEPLOYMENT_TARGET=%q\n' "$DEPLOYMENT_TARGET"
             printf 'PUBLIC_SERVER_NAME=%q\n' "$PUBLIC_SERVER_NAME"
