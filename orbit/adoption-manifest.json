@@ -1,13 +1,111 @@
 {
-  "schemaVersion": "2.0.0",
+  "schemaVersion": "2.1.0",
   "repository": "appolon1908-hue/beyvra-frontend",
   "classification": "first-party-ui",
   "targetBranch": "codex/codestra-orbit-v2-beyvra-frontend",
   "adoptionMode": "full-shell",
   "domain": null,
   "domainStatus": "pending-registration",
+  "orbitAuthority": {
+    "repository": "appolon1908-hue/SDK-repository",
+    "sourcePullRequest": 75,
+    "protectedMainSha": "59994f618dda555264e45a5e49c05ec65325d035",
+    "packageVersion": "2.0.0",
+    "publishStatus": "blocked-pending-protected-post-merge-package-release",
+    "mutableRangesAllowed": false,
+    "requiredPackages": [
+      {
+        "name": "@corporate/design-tokens",
+        "version": "2.0.0",
+        "sourceSha": "59994f618dda555264e45a5e49c05ec65325d035",
+        "integrity": null,
+        "lockfileEntry": false,
+        "installAllowed": false
+      },
+      {
+        "name": "@corporate/ui",
+        "version": "2.0.0",
+        "sourceSha": "59994f618dda555264e45a5e49c05ec65325d035",
+        "integrity": null,
+        "lockfileEntry": false,
+        "installAllowed": false
+      },
+      {
+        "name": "@corporate/icons",
+        "version": "2.0.0",
+        "sourceSha": "59994f618dda555264e45a5e49c05ec65325d035",
+        "integrity": null,
+        "lockfileEntry": false,
+        "installAllowed": false
+      },
+      {
+        "name": "@corporate/brand-registry",
+        "version": "2.0.0",
+        "sourceSha": "59994f618dda555264e45a5e49c05ec65325d035",
+        "integrity": null,
+        "lockfileEntry": false,
+        "installAllowed": false
+      },
+      {
+        "name": "@corporate/content-sdk",
+        "version": "2.0.0",
+        "sourceSha": "59994f618dda555264e45a5e49c05ec65325d035",
+        "integrity": null,
+        "lockfileEntry": false,
+        "installAllowed": false
+      },
+      {
+        "name": "@corporate/auth-ui",
+        "version": "2.0.0",
+        "sourceSha": "59994f618dda555264e45a5e49c05ec65325d035",
+        "integrity": null,
+        "lockfileEntry": false,
+        "installAllowed": false
+      },
+      {
+        "name": "@corporate/eslint-config",
+        "version": "2.0.0",
+        "sourceSha": "59994f618dda555264e45a5e49c05ec65325d035",
+        "integrity": null,
+        "lockfileEntry": false,
+        "installAllowed": false
+      },
+      {
+        "name": "@corporate/stylelint-config",
+        "version": "2.0.0",
+        "sourceSha": "59994f618dda555264e45a5e49c05ec65325d035",
+        "integrity": null,
+        "lockfileEntry": false,
+        "installAllowed": false
+      },
+      {
+        "name": "@corporate/testing",
+        "version": "2.0.0",
+        "sourceSha": "59994f618dda555264e45a5e49c05ec65325d035",
+        "integrity": null,
+        "lockfileEntry": false,
+        "installAllowed": false
+      }
+    ],
+    "completionRule": "Every required package must have a protected published artifact, exact version, integrity value, and verified lockfile entry before adoption can be complete."
+  },
+  "securityBoundary": {
+    "apiOrigin": "same-origin",
+    "apiBasePath": "/api",
+    "webSocketOrigin": "same-origin",
+    "webSocketBasePath": "/ws",
+    "cookieSession": "secure-http-only-backend-cookie",
+    "credentialsMode": "include",
+    "browserAuthorizationTokenAllowed": false,
+    "csrfBootstrapEndpoint": "/api/v1/auth/oidc/csrf/",
+    "csrfRequiredForUnsafeMethods": true,
+    "identityRedirectsThroughBffOnly": true,
+    "complete": false
+  },
   "requirements": {
     "sharedPackages": true,
+    "immutablePackageCoordinates": true,
+    "lockfileIntegrityEvidence": true,
     "sharedHeader": true,
     "sharedFooter": true,
     "login": true,
@@ -18,15 +116,103 @@
     "protectedDeepLinks": true,
     "multiTabLogout": true,
     "browserTokenStorageProhibited": true,
+    "sameOriginApiBff": true,
+    "sameOriginWebSocketBff": true,
+    "credentialedCookieSession": true,
+    "csrfBootstrapForUnsafeRequests": true,
     "semanticColors": true,
     "routeManifest": true,
+    "exhaustiveRouteInventory": true,
+    "stateManifest": true,
+    "failureStateEvidence": true,
     "newPageGate": true,
-    "responsiveEvidence": true
+    "responsiveEvidence": true,
+    "accessibilityEvidence": true,
+    "rollbackEvidence": true
   },
-  "status": "branch-created",
+  "routeInventory": {
+    "sourceOfTruth": [
+      "client-portal/src/App.tsx",
+      "all nested workspace route registries and conditional surfaces"
+    ],
+    "exhaustiveRequired": true,
+    "nestedWorkspaceSurfacesRequired": true,
+    "routeClasses": [
+      "marketing-and-public",
+      "trading",
+      "account",
+      "activity",
+      "operator",
+      "identity-callbacks-and-recovery",
+      "logout-and-session-expiry",
+      "kyc-and-onboarding",
+      "lender",
+      "administration",
+      "legal-and-content-review",
+      "redirects",
+      "wildcard-and-failure"
+    ],
+    "complete": false,
+    "evidence": []
+  },
+  "stateManifest": {
+    "requiredStates": [
+      "loading",
+      "empty",
+      "timeout",
+      "offline",
+      "expired-session",
+      "provider-unavailable",
+      "stale-data",
+      "partial-data",
+      "mutation-failure",
+      "unknown-outcome",
+      "unauthorized",
+      "forbidden",
+      "not-found",
+      "maintenance"
+    ],
+    "complete": false,
+    "evidence": []
+  },
+  "validationEvidence": {
+    "securityBoundary": {
+      "required": true,
+      "complete": false,
+      "artifacts": []
+    },
+    "packageCoordinatesAndIntegrity": {
+      "required": true,
+      "complete": false,
+      "artifacts": []
+    },
+    "routeInventory": {
+      "required": true,
+      "complete": false,
+      "artifacts": []
+    },
+    "stateManifest": {
+      "required": true,
+      "complete": false,
+      "artifacts": []
+    },
+    "desktopMobileAccessibility": {
+      "required": true,
+      "complete": false,
+      "artifacts": []
+    },
+    "stagingAndRollback": {
+      "required": true,
+      "complete": false,
+      "artifacts": []
+    }
+  },
+  "status": "blocked-pending-implementation-and-evidence",
   "blockers": [
-    "Pin the immutable @corporate package artifacts after SDK-repository pull request 75 is protected-merged.",
+    "Publish protected Orbit v2.0.0 artifacts from SDK-repository protected main SHA 59994f618dda555264e45a5e49c05ec65325d035, then record each integrity value and verified client-portal lockfile entry.",
     "Register the canonical Beyvra application and account domains before configuring identity redirects or production routing.",
-    "Inventory every marketing, trading, account, activity, and operator route and replace local shell/auth copies before promotion."
+    "Produce an exhaustive route manifest from App.tsx and every nested workspace surface, then replace local shell and authentication copies.",
+    "Produce and test the required degraded and indeterminate state manifest across authentication, trading, account, operator, and public routes.",
+    "Provide same-origin /api and /ws, credentialed cookie, CSRF, responsive, accessibility, staging, and rollback evidence before marking adoption complete."
   ]
 }
