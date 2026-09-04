@@ -69,9 +69,10 @@ const Settings = () => {
     const newPass = passwordWatch("new_password");
 
     const handleNotificationToggle = (data: INotification) => {
+        if (!data.id) return;
+
         mutate({
-            data: { notification_id: data?.id, is_enabled: !data?.is_enabled },
-            token: cookies.access_token,
+            data: { notification_id: data.id, is_enabled: !data.is_enabled },
         });
     };
     const { errors: passwordErrors } = passwordState;
