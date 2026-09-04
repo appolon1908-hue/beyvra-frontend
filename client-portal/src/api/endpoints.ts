@@ -12,6 +12,7 @@ export const apiEndpoints = {
   },
   notifications: {
     list: "v1/notifications/notifications/",
+    emailPreferences: "v1/notifications/email-preferences/",
     toggle: "notification/toggle_notification/",
     inbox: "notification/inbox/",
     read: (eventId: string) => `notification/inbox/${eventId}/read/`,
