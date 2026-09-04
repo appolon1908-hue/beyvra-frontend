@@ -84,7 +84,21 @@ jobs:
 
           requested_source = str(intent.get("source_sha", ""))
           frontend_image = str(intent.get("frontend_image", ""))
-          digest = re.compile(r"^[a-z0-9][a-z0-9._/-]*@sha256:[0-9a-f]{64}$")
+          backend_source_sha = str(intent.get("backend_source_sha", ""))
+          backend_image = str(intent.get("backend_image", ""))
+          backend_certification_run_id = str(
+              intent.get("backend_certification_run_id", "")
+          )
+          digest = re.compile(
+              r"^[a-z0-9][a-z0-9._/-]*@sha256:[0-9a-f]{64}$"
+          )
+
+          if not re.fullmatch(r"[0-9a-f]{40}", backend_source_sha):
+              raise SystemExit("backend_source_sha must be exact")
+          if not digest.fullmatch(backend_image):
+              raise SystemExit("backend_image must be an immutable digest")
+          if not re.fullmatch(r"[0-9]+", backend_certification_run_id):
+              raise SystemExit("backend_certification_run_id must be numeric")
 
           if target == "staging-readonly":
               if requested_source != "CURRENT_MAIN":
@@ -100,7 +114,7 @@ jobs:
               if publish_image is not False or deploy is not True:
                   raise SystemExit("production intent must reuse and deploy the image")
               if not digest.fullmatch(frontend_image):
-                  raise SystemExit("production image must be an immutable digest")
+                  raise SystemExit("production image must be immutable")
               source_sha = requested_source
 
           values = {
@@ -109,6 +123,9 @@ jobs:
               "target": target,
               "publish_image": str(publish_image).lower(),
               "frontend_image": frontend_image,
+              "backend_source_sha": backend_source_sha,
+              "backend_image": backend_image,
+              "backend_certification_run_id": backend_certification_run_id,
               "deploy": str(deploy).lower(),
               "change_id": change_id,
           }
@@ -127,6 +144,9 @@ jobs:
           TARGET: ${{ steps.intent.outputs.target }}
           PUBLISH_IMAGE: ${{ steps.intent.outputs.publish_image }}
           FRONTEND_IMAGE: ${{ steps.intent.outputs.frontend_image }}
+          BACKEND_SOURCE_SHA: ${{ steps.intent.outputs.backend_source_sha }}
+          BACKEND_IMAGE: ${{ steps.intent.outputs.backend_image }}
+          BACKEND_CERTIFICATION_RUN_ID: ${{ steps.intent.outputs.backend_certification_run_id }}
           DEPLOY: ${{ steps.intent.outputs.deploy }}
           CHANGE_ID: ${{ steps.intent.outputs.change_id }}
         shell: bash
@@ -153,6 +173,9 @@ jobs:
             -f "inputs[target]=$TARGET" \
             -f "inputs[publish_image]=$PUBLISH_IMAGE" \
             -f "inputs[frontend_image]=$FRONTEND_IMAGE" \
+            -f "inputs[backend_source_sha]=$BACKEND_SOURCE_SHA" \
+            -f "inputs[backend_image]=$BACKEND_IMAGE" \
+            -f "inputs[backend_certification_run_id]=$BACKEND_CERTIFICATION_RUN_ID" \
             -f "inputs[deploy]=$DEPLOY" \
             -f "inputs[change_id]=$CHANGE_ID"
 
@@ -160,6 +183,10 @@ jobs:
             --arg dispatcher_sha "$GREEN_MAIN_SHA" \
             --arg source_sha "$SOURCE_SHA" \
             --arg target "$TARGET" \
+            --arg frontend_image "$FRONTEND_IMAGE" \
+            --arg backend_source_sha "$BACKEND_SOURCE_SHA" \
+            --arg backend_image "$BACKEND_IMAGE" \
+            --arg backend_certification_run_id "$BACKEND_CERTIFICATION_RUN_ID" \
             --arg change_id "$CHANGE_ID" \
             --arg dispatched_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             '{
@@ -167,6 +194,10 @@ jobs:
               dispatcher_sha: $dispatcher_sha,
               source_sha: $source_sha,
               target: $target,
+              frontend_image: $frontend_image,
+              backend_source_sha: $backend_source_sha,
+              backend_image: $backend_image,
+              backend_certification_run_id: $backend_certification_run_id,
               change_id: $change_id,
               dispatched_at: $dispatched_at,
               deployment_read_only: true,
