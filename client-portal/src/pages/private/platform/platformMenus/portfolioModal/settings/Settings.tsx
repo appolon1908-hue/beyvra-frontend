@@ -19,6 +19,7 @@ import TradingMenu from '../../trading/TradingMenu';
 import EmailVerify from './EmailVerify';
 import PhoneVerify from './PhoneVerify';
 import useNotificationList from 'api/notification/useNotificationList';
+import EmailPreferencesPanel from '../../notifications/EmailPreferencesPanel';
 
 const Settings = () => {
     const [cookies] = useCookies(["access_token"]);
@@ -69,9 +70,10 @@ const Settings = () => {
     const newPass = passwordWatch("new_password");
 
     const handleNotificationToggle = (data: INotification) => {
+        if (!data.id) return;
+
         mutate({
-            data: { notification_id: data?.id, is_enabled: !data?.is_enabled },
-            token: cookies.access_token,
+            data: { notification_id: data.id, is_enabled: !data.is_enabled },
         });
     };
     const { errors: passwordErrors } = passwordState;
@@ -199,7 +201,9 @@ const Settings = () => {
                             infoText={notificationData?.name === "Push Notifications" ? "Why should I receive them?" : ""}
                         />
                     ))}
-
+                </div>
+                <div className="notificationsMenuSection" style={{ paddingLeft: 16, paddingRight: 16 }}>
+                    <EmailPreferencesPanel />
                 </div>
             </DropDownOptions>
             <DropDownOptions
