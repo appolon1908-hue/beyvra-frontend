@@ -1,0 +1,19 @@
+name: Orbit Adoption Gate
+
+on:
+  pull_request:
+    paths:
+      - "orbit/**"
+      - ".github/workflows/orbit-adoption.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  orbit-adoption:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate fail-closed Orbit adoption manifest
+        run: node orbit/validate-adoption-manifest.mjs
