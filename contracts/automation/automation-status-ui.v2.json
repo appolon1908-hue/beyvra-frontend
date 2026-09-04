@@ -1,0 +1,93 @@
+{
+  "schema_version": "2.1",
+  "source_only": true,
+  "runtime_routes_added": false,
+  "backend_only": true,
+  "same_origin_bff_required": true,
+  "browser_token_storage_allowed": false,
+  "backend_dependency": {
+    "repository": "appolon1908-hue/beyvra-backend",
+    "pull_request": 89,
+    "candidate_sha": "b46a276ed1cd8c74c240f4bec9cf10307739d24f",
+    "state": "pending_protected_merge"
+  },
+  "direct_browser_n8n_access": false,
+  "direct_browser_middleware_access": false,
+  "machine_credentials_in_frontend": false,
+  "allowed_intents": [
+    "onboarding_assistance",
+    "compliance_reminder",
+    "support_escalation",
+    "report_request",
+    "alert_acknowledgement",
+    "notification_preferences",
+    "cancel_before_submission"
+  ],
+  "prohibited_intents": [
+    "trade",
+    "order",
+    "wallet",
+    "ledger",
+    "payment",
+    "deposit",
+    "withdrawal",
+    "transfer",
+    "custody",
+    "chain",
+    "broker",
+    "provider",
+    "demo_order"
+  ],
+  "operation_states": [
+    "accepted",
+    "queued",
+    "running",
+    "waiting_approval",
+    "submitted",
+    "unknown",
+    "reconciling",
+    "reconciled_success",
+    "reconciled_failure",
+    "rejected",
+    "cancelled"
+  ],
+  "success_state": "reconciled_success",
+  "safe_projection_fields": [
+    "operation_id",
+    "operation_type",
+    "status",
+    "created_at",
+    "updated_at",
+    "summary",
+    "retryable",
+    "correlation_id",
+    "next_action"
+  ],
+  "forbidden_projection_fields": [
+    "access_token",
+    "refresh_token",
+    "id_token",
+    "client_secret",
+    "provider_secret",
+    "machine_token",
+    "raw_execution",
+    "raw_webhook",
+    "stack_trace",
+    "lease_token",
+    "internal_route"
+  ],
+  "realtime": {
+    "subscribe_only": true,
+    "snapshot_first": true,
+    "duplicates_ignored": true,
+    "stale_events_ignored": true,
+    "sequence_gap_pauses_projection": true,
+    "authoritative_snapshot_recovery_required": true,
+    "reconnect_creates_request": false
+  },
+  "release": {
+    "production_deployed": false,
+    "live_apply_authorized": false,
+    "source_merge_authorizes_deployment": false
+  }
+}
