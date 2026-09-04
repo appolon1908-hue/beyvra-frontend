@@ -7,6 +7,7 @@ interface ToggleProps {
   label?: string;
   subtext?: string;
   onChange?: (checked: boolean) => void;
+  checked?: boolean;
   defaultChecked?: boolean;
   disabled?: boolean;
   infoText?: string;
@@ -17,6 +18,7 @@ const Toggle: React.FunctionComponent<ToggleProps> = ({
   label,
   subtext,
   onChange,
+  checked,
   defaultChecked = false,
   disabled = false,
   infoText,
@@ -32,7 +34,8 @@ const Toggle: React.FunctionComponent<ToggleProps> = ({
           {subtext ? <p className="toggleSubtext">{subtext}</p> : null}
         </div>
         <Switch
-          defaultChecked={defaultChecked}
+          checked={checked}
+          defaultChecked={checked === undefined ? defaultChecked : undefined}
           disabled={disabled}
           onChange={onChange}
         />

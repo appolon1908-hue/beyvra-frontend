@@ -1,9 +1,11 @@
-import { INotification } from "@interfaces";
+import type { INotification } from "@interfaces";
 import { useAppDispatch, useAppSelector } from "@store/hooks";
 import { updateNotificationList } from "@store/slices/notification";
+import { toast } from "react-toastify";
+
 import useNotificationToggle from "api/notification/useToggleNotification";
 import Toggle from "../../../../../components/toggle/Toggle";
-import { useCookies } from "react-cookie";
+import { logInternalError, toUserSafeErrorText } from "errors/userSafeError";
 
 import EmailPreferencesPanel from "./EmailPreferencesPanel";
 import "./notificationsMenu.scss";
@@ -14,22 +16,37 @@ const NotificationsMenu: React.FunctionComponent<
   NotificationsMenuProps
 > = () => {
   const dispatch = useAppDispatch();
-  const [cookies] = useCookies(["access_token"]);
   const { notificationList } = useAppSelector((state) => state.notification);
   const { mutate, isPending } = useNotificationToggle({
     onSuccess: (data) => {
-      dispatch(updateNotificationList(data));
+      const current = notificationList.find(
+        (notification) => notification.id === data.notification_id,
+      );
+
+      if (!current) return;
+
+      dispatch(
+        updateNotificationList({
+          ...current,
+          id: data.notification_id,
+          is_enabled: data.is_enabled,
+        }),
+      );
     },
-    onError: (_error) => {},
+    onError: (error) => {
+      logInternalError(error, { endpoint: "notifications.toggle" });
+      toast.error(toUserSafeErrorText(error));
+    },
   });
 
   const handleNotificationToggle = (
     data: INotification,
     isEnabled: boolean,
   ) => {
+    if (!data.id) return;
+
     mutate({
-      data: { notification_id: data?.id, is_enabled: isEnabled },
-      token: cookies.access_token,
+      data: { notification_id: data.id, is_enabled: isEnabled },
     });
   };
 
@@ -39,18 +56,18 @@ const NotificationsMenu: React.FunctionComponent<
         <p className="notificationsSectionTitle">
           Select the notifications you want to receive
         </p>
-        {notificationList.map((notificationData: INotification) => (
+        {notificationList.map((notificationData) => (
           <Toggle
             key={notificationData.id}
-            label={notificationData?.name}
+            label={notificationData.name}
             onChange={(checked) =>
               handleNotificationToggle(notificationData, checked)
             }
-            subtext={notificationData?.description}
-            defaultChecked={notificationData?.is_enabled}
+            subtext={notificationData.description}
+            checked={notificationData.is_enabled}
             disabled={isPending}
             infoText={
-              notificationData?.name === "Push Notifications"
+              notificationData.name === "Push Notifications"
                 ? "Why should I receive them?"
                 : ""
             }
