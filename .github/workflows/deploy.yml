@@ -1,5 +1,7 @@
 name: Publish and deploy immutable Beyvra frontend
 
+# Production promotion must reuse a staging-certified digest.
+
 on:
   workflow_dispatch:
     inputs:
