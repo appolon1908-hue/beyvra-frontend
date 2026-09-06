@@ -19,17 +19,6 @@ export const complianceChannels = (userId: string) => [
   `compliance.restriction.updated.v1.${userId}`,
 ];
 
-const tokenUserId = (token: string): string | undefined => {
-  try {
-    const segment = token.split(".")[1];
-    if (!segment) return undefined;
-    const normalized=segment.replace(/-/g, "+").replace(/_/g, "/");
-    const payload = JSON.parse(window.atob(normalized+"=".repeat((4-normalized.length%4)%4))) as Record<string, unknown>;
-    const value = payload.user_id ?? payload.sub;
-    return typeof value === "string" || typeof value === "number" ? String(value) : undefined;
-  } catch { return undefined; }
-};
-
 export const complianceDisplayState = (profile: ComplianceProfile): "Verification required" | "Verification pending" | "Manual review" | "Restricted" | "Approved" | "Expired" => {
   if (profile.kyc_state === "EXPIRED" || profile.kyc_state === "REQUIRES_UPDATE") return "Expired";
   if (profile.account_state === "RESTRICTED" || profile.account_state === "SUSPENDED" || profile.account_state === "CLOSED" || profile.kyc_state === "REJECTED" || profile.aml_state === "BLOCKED" || profile.sanctions_state === "CONFIRMED_MATCH") return "Restricted";
@@ -41,11 +30,10 @@ export const complianceDisplayState = (profile: ComplianceProfile): "Verificatio
 
 export function useComplianceProfile(token?: string) { return useQuery({ queryKey:["compliance-profile"], queryFn:()=>authenticatedRequest<ComplianceProfile>(apiEndpoints.compliance.profile,token!), enabled:Boolean(token), staleTime:15_000 }); }
 export function useComplianceRequirements(token?: string) { return useQuery({ queryKey:["compliance-requirements"], queryFn:()=>authenticatedRequest<{results:ComplianceRequirement[]}>(apiEndpoints.compliance.requirements,token!), enabled:Boolean(token), staleTime:15_000 }); }
-export function useComplianceRealtime(token?: string) {
+export function useComplianceRealtime(token?: string, userId?: string) {
   const queryClient = useQueryClient();
   useEffect(() => {
     if (!token) return;
-    const userId = tokenUserId(token);
     if (!userId) return;
     const realtime = getUnifiedRealtimeClient(token, async () => (await webSocketTicketFetcher(token)).ws_ticket);
     const refresh = async () => {
@@ -56,5 +44,5 @@ export function useComplianceRealtime(token?: string) {
     };
     const unsubscribes = complianceChannels(userId).map((channel) => realtime.subscribe(channel, () => { void refresh(); }, async () => { await refresh(); }));
     return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
-  }, [queryClient, token]);
+  }, [queryClient, token, userId]);
 }

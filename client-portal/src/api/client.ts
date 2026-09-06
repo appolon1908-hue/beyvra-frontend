@@ -1,5 +1,6 @@
 import { getApiUrl } from "utils/env";
 import { ApiError } from "api/errors";
+import { getBffCsrfToken, isBffSessionMarker, isUnsafeMethod } from "security/bffSession";
 export { ApiError } from "api/errors";
 
 export type AuthenticatedRequestOptions = RequestInit & {
@@ -19,6 +20,7 @@ export async function authenticatedRequest<T>(
   const abortFromCaller = () => controller.abort();
   callerSignal?.addEventListener("abort", abortFromCaller, { once: true });
   try {
+    const csrfToken = isUnsafeMethod(requestInit.method) ? await getBffCsrfToken() : undefined;
     const response = await fetch(getApiUrl(endpoint), {
       ...requestInit,
       credentials: "include",
@@ -26,7 +28,8 @@ export async function authenticatedRequest<T>(
       headers: {
         Accept: "application/json",
         ...(requestInit.body ? { "Content-Type": "application/json" } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(token && !isBffSessionMarker(token) ? { Authorization: `Bearer ${token}` } : {}),
+        ...(csrfToken ? { "X-CSRFToken": csrfToken } : {}),
         "X-Request-ID": requestId,
         ...requestInit.headers,
       },

@@ -1,0 +1,235 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build immutable frontend image
+        run: |
+          docker build \
+            -f client-portal/Dockerfile.prod \
+            --build-arg VCS_REF=${{ github.sha }} \
+            --build-arg BUILD_VERSION=${{ github.sha }} \
+            --build-arg BUILD_DATE=1970-01-01T00:00:00Z \
+            -t beyvra-frontend-review:${{ github.sha }} \
+            client-portal
+
+      - name: Exercise unprivileged read-only runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          image_digest='ghcr.io/example/beyvra-frontend@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          container="$(
+            docker run -d --rm \
+              --read-only \
+              --cap-drop=ALL \
+              --security-opt=no-new-privileges \
+              --tmpfs /tmp:rw,noexec,nosuid,nodev,uid=101,gid=101,mode=1777 \
+              -e VITE_PUBLIC_SITE_URL=https://localhost \
+              -e PUBLIC_SERVER_NAME=localhost \
+              -e BACKEND_UPSTREAM=127.0.0.1:19000 \
+              -e BEYVRA_SOURCE_SHA=${{ github.sha }} \
+              -e BEYVRA_IMAGE_DIGEST="$image_digest" \
+              -e BEYVRA_RELEASE_ID=ci-${{ github.run_id }} \
+              -e BEYVRA_BUILD_TIMESTAMP=1970-01-01T00:00:00Z \
+              -p 127.0.0.1:18081:8080 \
+              beyvra-frontend-review:${{ github.sha }}
+          )"
+          trap 'docker stop "$container" >/dev/null 2>&1 || true' EXIT
+
+          for _ in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18081/healthz >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          test "$(curl --fail --silent http://127.0.0.1:18081/healthz)" = "ok"
+
+          curl --fail --silent \
+            http://127.0.0.1:18081/__runtime-config.json \
+            > /tmp/runtime-config.json
+          jq -e '
+            .VITE_API_BASE_URL == "/api" and
+            .VITE_SOCKET_BASE_URL == "AUTO" and
+            .VITE_DEPLOYMENT_READ_ONLY == "true" and
+            .VITE_REALTIME_V2_ENABLED == "true" and
+            .VITE_REALTIME_V2_V1_FALLBACK_ENABLED == "false"
+          ' /tmp/runtime-config.json >/dev/null
+
+          curl --fail --silent \
+            http://127.0.0.1:18081/__release.json \
+            > /tmp/release.json
+          jq -e \
+            --arg sha "${{ github.sha }}" \
+            --arg image "$image_digest" '
+              .source_sha == $sha and
+              .image_digest == $image and
+              .deployment_read_only == true and
+              .legacy_realtime_fallback_enabled == false
+            ' /tmp/release.json >/dev/null
+
+          curl --fail --silent --dump-header /tmp/headers \
+            --output /dev/null http://127.0.0.1:18081/
+          grep -Eiq '^content-security-policy:.*frame-ancestors .none.' /tmp/headers
+          grep -Eiq '^x-content-type-options:[[:space:]]*nosniff' /tmp/headers
+          grep -Eiq '^strict-transport-security:' /tmp/headers
+
+          test "$(
+            docker image inspect \
+              --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' \
+              beyvra-frontend-review:${{ github.sha }}
+          )" = "${{ github.sha }}"
+          test "$(
+            docker image inspect \
+              --format '{{.Config.User}}' \
+              beyvra-frontend-review:${{ github.sha }}
+          )" = "101"
+          docker exec "$container" sh -ec '
+            test "$(id -u)" = 101
+            ! touch /usr/share/nginx/html/.write-test
+          '
+
+      - name: Scan frontend image
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: beyvra-frontend-review:${{ github.sha }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+  validate:
+    needs: container
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: client-portal/package-lock.json
+
+      - name: Install exact dependencies
+        working-directory: client-portal
+        run: npm ci
+
+      - name: Build, lint, and test application
+        working-directory: client-portal
+        run: |
+          npm run build
+          npm run lint
+          npm run test:errors
+          npm run test:realtime
+          npm run test:chart
+          npx vitest run src/security/deploymentMode.test.ts
+
+      - name: Verify frontend-to-backend contract ownership
+        working-directory: client-portal
+        run: node scripts/check-api-contract.mjs --source-only
+
+      - name: Enforce dependency audit policy
+        working-directory: client-portal
+        run: npm run audit:gate
+
+      - name: Validate singular deployment authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          sh -n client-portal/entrypoint.sh
+          bash -n operations/deploy_immutable_frontend.sh
+          python -m py_compile operations/verify_frontend_release.py
+          test ! -e client-portal/deploy.sh
+          test ! -e client-portal/docker-compose.prod.yaml
+          test ! -e client-portal/docker-compose.yaml
+
+          digest='ghcr.io/example/frontend@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          env \
+            FRONTEND_IMAGE="$digest" \
+            SOURCE_SHA=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \
+            CHANGE_ID=ci-validation \
+            PUBLIC_SERVER_NAME=beyvra.example \
+            BACKEND_UPSTREAM=backend-nginx:8080 \
+            BACKEND_NETWORK=beyvra-backend \
+            PORT=18081 \
+            docker compose -f docker-compose.yaml config \
+            > /tmp/beyvra-frontend-compose.yml
+
+          if grep -Eq '(^|[[:space:]])build:' /tmp/beyvra-frontend-compose.yml; then
+            echo "Production Compose must never build on the server." >&2
+            exit 1
+          fi
+          images="$(
+            env \
+              FRONTEND_IMAGE="$digest" \
+              SOURCE_SHA=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa \
+              CHANGE_ID=ci-validation \
+              PUBLIC_SERVER_NAME=beyvra.example \
+              BACKEND_UPSTREAM=backend-nginx:8080 \
+              BACKEND_NETWORK=beyvra-backend \
+              PORT=18081 \
+              docker compose -f docker-compose.yaml config --images
+          )"
+          if grep -Ev '@sha256:[0-9a-f]{64}$' <<<"$images" >/dev/null; then
+            printf 'Non-immutable production image:\n%s\n' "$images" >&2
+            exit 1
+          fi
+
+  exact-head-base-ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request'
+    env:
+      EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Verify exact tuple at start
+        run: |
+          observed=$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}")
+          observed_base=$(jq -r .base.sha <<<"$observed")
+          test "$(jq -r .head.sha <<<"$observed")" = "$EXPECTED_HEAD_SHA"
+          test "$observed_base" = "$EXPECTED_BASE_SHA"
+          printf 'EXPECTED_HEAD_SHA=%s\nEXPECTED_BASE_SHA=%s\nOBSERVED_HEAD_SHA=%s\nOBSERVED_BASE_SHA=%s\n' "$EXPECTED_HEAD_SHA" "$EXPECTED_BASE_SHA" "$(jq -r .head.sha <<<"$observed")" "$observed_base"
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.EXPECTED_HEAD_SHA }}
+          fetch-depth: 0
+
+      - name: Verify exact tuple and ancestry at end
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD_SHA"
+          git fetch origin "$EXPECTED_BASE_SHA"
+          git merge-base --is-ancestor "$EXPECTED_BASE_SHA" "$EXPECTED_HEAD_SHA"
+          observed=$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}")
+          observed_base=$(jq -r .base.sha <<<"$observed")
+          test "$(jq -r .head.sha <<<"$observed")" = "$EXPECTED_HEAD_SHA"
+          test "$observed_base" = "$EXPECTED_BASE_SHA"

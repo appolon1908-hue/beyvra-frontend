@@ -1,0 +1,157 @@
+name: Frontend certification authority CI
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/deploy.yml"
+      - ".github/workflows/release-intent-dispatch.yml"
+      - ".github/workflows/certify-deployment.yml"
+      - ".github/workflows/promote-production-readonly.yml"
+      - ".github/workflows/certification-ci.yml"
+      - "operations/inspect_deployment_run.sh"
+      - "operations/verify_backend_certification.sh"
+      - "operations/run_deployment_certification.sh"
+      - "operations/rehearse_frontend_rollback.sh"
+      - "operations/verify_frontend_release.py"
+      - "operations/validate_promotion_evidence.py"
+      - "docs/SIGNED-PRODUCTION-READONLY-PROMOTION.md"
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  certification-static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Validate scripts, workflows, and pinned signing authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n operations/inspect_deployment_run.sh
+          bash -n operations/verify_backend_certification.sh
+          bash -n operations/run_deployment_certification.sh
+          bash -n operations/rehearse_frontend_rollback.sh
+          python -m py_compile \
+            operations/verify_frontend_release.py \
+            operations/validate_promotion_evidence.py
+
+          ruby -e '
+            require "yaml"
+            YAML.load_file(".github/workflows/deploy.yml")
+            YAML.load_file(".github/workflows/release-intent-dispatch.yml")
+            YAML.load_file(".github/workflows/certify-deployment.yml")
+            YAML.load_file(".github/workflows/promote-production-readonly.yml")
+            YAML.load_file(".github/workflows/certification-ci.yml")
+          '
+
+          attest_sha=508db95dd578ae2727ebd6217d5ba78e4fbda05d
+          test "$(grep -Fc "actions/attest@$attest_sha" \
+            .github/workflows/deploy.yml)" -eq 1
+          test "$(grep -Fc "actions/attest@$attest_sha" \
+            .github/workflows/certify-deployment.yml)" -eq 2
+          grep -Fq 'artifact-metadata: write' .github/workflows/deploy.yml
+          grep -Fq 'artifact-metadata: write' \
+            .github/workflows/certify-deployment.yml
+          grep -Fq 'backend_certification_run_id' \
+            .github/workflows/deploy.yml
+          grep -Fq 'backend_certification_run_id' \
+            .github/workflows/release-intent-dispatch.yml
+          grep -Fq 'publish_image]=false' \
+            .github/workflows/promote-production-readonly.yml
+          grep -Fq 'CANARY_TRAFFIC_PERCENT" =~ ^(0|1)$' \
+            .github/workflows/promote-production-readonly.yml
+          grep -Fq 'DEPLOYMENT_TARGET: production-readonly' \
+            .github/workflows/promote-production-readonly.yml
+          test ! -e .release/intent.json
+
+      - name: Exercise promotion evidence parser
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          value = {
+              "schema_version": 1,
+              "source_sha": "a" * 40,
+              "frontend_image": (
+                  "ghcr.io/appolon1908-hue/beyvra-frontend@sha256:"
+                  + "b" * 64
+              ),
+              "backend_source_sha": "c" * 40,
+              "backend_image": (
+                  "ghcr.io/appolon1908-hue/beyvra-backend@sha256:"
+                  + "d" * 64
+              ),
+              "backend_certification_run_id": "123456789",
+              "target": "staging-readonly",
+              "certification_result": "PASS",
+              "rollback_rehearsal": "PASS",
+              "paired_backend_certification": "PASS",
+              "signed_provenance_verified": True,
+              "deployment_read_only": True,
+              "live_trading_authorized": False,
+              "real_money_authorized": False,
+              "payments_authorized": False,
+              "withdrawals_authorized": False,
+              "transactional_email_authorized": False,
+              "external_execution_authorized": False,
+              "legacy_realtime_fallback_enabled": False,
+          }
+          Path("/tmp/frontend-promotion.json").write_text(
+              json.dumps(value) + "\n"
+          )
+          PY
+          python operations/validate_promotion_evidence.py \
+            /tmp/frontend-promotion.json
+
+      - name: Reject unsafe promotion evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          value = {
+              "schema_version": 1,
+              "source_sha": "a" * 40,
+              "frontend_image": (
+                  "ghcr.io/appolon1908-hue/beyvra-frontend@sha256:"
+                  + "b" * 64
+              ),
+              "backend_source_sha": "c" * 40,
+              "backend_image": (
+                  "ghcr.io/appolon1908-hue/beyvra-backend@sha256:"
+                  + "d" * 64
+              ),
+              "backend_certification_run_id": "123456789",
+              "target": "staging-readonly",
+              "certification_result": "PASS",
+              "rollback_rehearsal": "PASS",
+              "paired_backend_certification": "PASS",
+              "signed_provenance_verified": True,
+              "deployment_read_only": True,
+              "live_trading_authorized": True,
+              "real_money_authorized": False,
+              "payments_authorized": False,
+              "withdrawals_authorized": False,
+              "transactional_email_authorized": False,
+              "external_execution_authorized": False,
+              "legacy_realtime_fallback_enabled": False,
+          }
+          Path("/tmp/frontend-promotion-unsafe.json").write_text(
+              json.dumps(value) + "\n"
+          )
+          PY
+          if python operations/validate_promotion_evidence.py \
+            /tmp/frontend-promotion-unsafe.json; then
+            echo "Unsafe promotion evidence was accepted." >&2
+            exit 1
+          fi

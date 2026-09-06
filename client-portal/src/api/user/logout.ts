@@ -1,10 +1,8 @@
 import { beyvraAuthApi } from "api/generated/beyvra";
+import { clearBffCsrfToken } from "security/bffSession";
 
-export async function revokeSession(
-  accessToken?: string,
-  refreshToken?: string,
-): Promise<void> {
-  if (!accessToken || !refreshToken) return;
-
-  await beyvraAuthApi.logout(accessToken, refreshToken);
+export async function revokeSession(): Promise<string> {
+  const result = await beyvraAuthApi.logout();
+  clearBffCsrfToken();
+  return result.logoutUrl;
 }
