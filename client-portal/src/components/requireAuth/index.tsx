@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 
@@ -89,6 +89,14 @@ const RequireAuth = () => {
     navigate("/session-expired", { replace: true, state: { from: location } });
   };
 
+  // The refresh-retry effect below only re-runs when `bootstrap` changes, so it must
+  // read expireSession through a ref that's always current — otherwise its failure
+  // handler keeps the `location` captured at login and redirects with a stale `from`.
+  const expireSessionRef = useRef(expireSession);
+  useEffect(() => {
+    expireSessionRef.current = expireSession;
+  });
+
   const handleKeepLogin = async () => {
     try {
       await beyvraAuthApi.refreshSession();
@@ -135,7 +143,7 @@ const RequireAuth = () => {
   useEffect(() => {
     if (bootstrap !== "USER_READY") return;
     const refresh = () => {
-      beyvraAuthApi.refreshSession().catch(expireSession);
+      beyvraAuthApi.refreshSession().catch(() => expireSessionRef.current());
     };
     const intervalId = window.setInterval(refresh, 10 * 60 * 1000);
     return () => window.clearInterval(intervalId);
