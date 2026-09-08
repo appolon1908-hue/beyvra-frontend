@@ -40,7 +40,7 @@ on:
         required: true
         type: string
       deploy:
-        description: Deploy after producing the release manifest
+        description: Legacy deploy switch; must remain false (infrastructure is runtime authority)
         required: true
         default: false
         type: boolean
@@ -106,6 +106,7 @@ jobs:
           [[ "$BACKEND_IMAGE" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
           [[ "$BACKEND_CERTIFICATION_RUN_ID" =~ ^[0-9]+$ ]]
           [[ "$CHANGE_ID_INPUT" =~ ^[A-Za-z0-9._-]+$ ]]
+          test "$DEPLOY_REQUESTED" = "false"
           git fetch origin main
           git cat-file -e "${SOURCE_SHA}^{commit}"
           git merge-base --is-ancestor "$SOURCE_SHA" origin/main
@@ -138,13 +139,11 @@ jobs:
           case "$TARGET" in
             staging-readonly)
               test "$PUBLISH_IMAGE" = "true"
-              test "$DEPLOY_REQUESTED" = "true"
               test -z "$PROVIDED_FRONTEND_IMAGE"
               test "$SOURCE_SHA" = "$(git rev-parse origin/main)"
               ;;
             production-readonly)
               test "$PUBLISH_IMAGE" = "false"
-              test "$DEPLOY_REQUESTED" = "true"
               [[ "$PROVIDED_FRONTEND_IMAGE" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
               ;;
             *)
@@ -359,7 +358,10 @@ jobs:
     needs:
       - eligibility
       - resolve
-    if: inputs.deploy
+    # RUNTIME_MUTATION_DISABLED=true
+    # Runtime mutation is exclusively owned by Infustruction-repo. Retain this
+    # historical job as reviewable rollback context, but make it unreachable.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 35
     environment:
