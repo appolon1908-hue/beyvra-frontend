@@ -67,6 +67,14 @@ jobs:
             .github/workflows/promote-production-readonly.yml
           grep -Fq 'DEPLOYMENT_TARGET: production-readonly' \
             .github/workflows/promote-production-readonly.yml
+          grep -Fq 'if: ${{ false }}' \
+            .github/workflows/release-intent-dispatch.yml
+          grep -Fq 'if: ${{ false }}' \
+            .github/workflows/promote-production-readonly.yml
+          grep -Fq 'if: ${{ false }}' \
+            .github/workflows/certify-deployment.yml
+          test "$(grep -Fc 'inputs[deploy]=true' \
+            .github/workflows/promote-production-readonly.yml)" -eq 0
           test ! -e .release/intent.json
 
       - name: Exercise promotion evidence parser

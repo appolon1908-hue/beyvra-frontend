@@ -304,6 +304,7 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/deploy.yml" \
             --source-ref refs/heads/main \
+            --bundle-from-oci \
             --format json \
             > frontend-attestation-verification.json
           jq -e 'type == "array" and length > 0' \
