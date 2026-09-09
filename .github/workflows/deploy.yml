@@ -64,6 +64,8 @@ permissions:
 
 jobs:
   eligibility:
+    # RUNTIME_MUTATION_DISABLED=true: this non-deployment authority is plan-only.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     outputs:
@@ -174,8 +176,9 @@ jobs:
           retention-days: 90
 
   publish:
+    # RUNTIME_MUTATION_DISABLED=true: image publication requires separate release authority.
     needs: eligibility
-    if: inputs.publish_image
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     outputs:
@@ -247,13 +250,11 @@ jobs:
           printf 'frontend_image=%s\n' "$frontend_image" >>"$GITHUB_OUTPUT"
 
   resolve:
+    # RUNTIME_MUTATION_DISABLED=true: candidate resolution remains inert until separately authorized.
     needs:
       - eligibility
       - publish
-    if: >-
-      always() &&
-      needs.eligibility.result == 'success' &&
-      (inputs.publish_image == false || needs.publish.result == 'success')
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
