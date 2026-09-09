@@ -40,14 +40,19 @@ jobs:
             operations/verify_frontend_release.py \
             operations/validate_promotion_evidence.py
 
-          ruby -e '
-            require "yaml"
-            YAML.load_file(".github/workflows/deploy.yml")
-            YAML.load_file(".github/workflows/release-intent-dispatch.yml")
-            YAML.load_file(".github/workflows/certify-deployment.yml")
-            YAML.load_file(".github/workflows/promote-production-readonly.yml")
-            YAML.load_file(".github/workflows/certification-ci.yml")
-          '
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          for path in (
+              ".github/workflows/deploy.yml",
+              ".github/workflows/release-intent-dispatch.yml",
+              ".github/workflows/certify-deployment.yml",
+              ".github/workflows/promote-production-readonly.yml",
+              ".github/workflows/certification-ci.yml",
+          ):
+              yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+          PY
 
           attest_sha=508db95dd578ae2727ebd6217d5ba78e4fbda05d
           test "$(grep -Fc "actions/attest@$attest_sha" \
