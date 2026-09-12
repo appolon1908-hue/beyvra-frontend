@@ -7,7 +7,16 @@ import { DemoConfiguration } from "api/demo/types";
 export type WorkspaceBootstrap = {
   state: "guest.ready" | "user.ready";
   tenant: { id: string };
-  account: { id: string; kind: "DEMO"; demoOnly: true };
+  account: {
+    id: string;
+    account_id: string;
+    execution_mode: "PAPER" | "LIVE";
+    base_currency: string;
+    status: "PENDING" | "ACTIVE" | "RESTRICTED" | "SUSPENDED" | "CLOSED";
+    trading_enabled: boolean;
+    funding_enabled: boolean;
+    withdrawals_enabled: boolean;
+  };
   realtime: { demo_order_channel: string; demo_execution_channel: string };
   wallet: { currency: "Virtual USD"; available: string; reserved: string; total: string };
   notifications: { unreadCount: number };

@@ -1,19 +1,11 @@
 /*
- * Generated-client foundation for the versioned Codestra Demo contract.
+ * Compatibility client foundation during the PAPER/LIVE contract migration.
  * Keep operation paths in this module; regenerate from
- * contracts/openapi/codestra-demo-v1.yaml when the contract changes.
+ * contracts/openapi/beyvra-v1.yaml when the contract changes.
  */
 import { getApiUrl } from "utils/env";
 import { ApiError } from "api/errors";
 import { getBffCsrfToken, isBffSessionMarker, isUnsafeMethod } from "security/bffSession";
-
-export type DemoWallet = {
-  available: string;
-  reserved: string;
-  currency?: string;
-};
-
-export type DemoConfig = Record<string, unknown>;
 
 export type ApiFailure = {
   detail?: string;
@@ -68,10 +60,6 @@ export async function codestraRequest<T>(path: string, options: RequestOptions =
     window.clearTimeout(timeout);
   }
 }
-
-export const codestraDemoApi = {
-  config: (token: string) => codestraRequest<DemoConfig>("v1/demo/config", { token }),
-};
 
 export type RealtimeV2Token = { token: string; channel?: string; expires_in: number; gateway?: string };
 
@@ -131,7 +119,6 @@ export const codestraAuthApi = {
   verifyPhone: <T>(token: string, body: unknown) => codestraRequest<T>("v1/auth/verify_phone/", { method: "POST", token, body: JSON.stringify(body) }),
   mfaQr: <T>(token: string) => codestraRequest<T>("v1/auth/generate_mfa_code/", { token }),
   verifyMfa: <T>(body: unknown, token?: string) => codestraRequest<T>("v1/auth/verify_mfa_code/", { method: "POST", token, body: JSON.stringify(body) }),
-  guestDemo: <T>(idempotencyKey?: string) => codestraRequest<T>("v1/demo/sessions", { method: "POST", idempotencyKey, body: "{}" }),
   registerDemo: <T>(body: unknown) => codestraRequest<T>("v1/auth/register", { method: "POST", body: JSON.stringify(body) }),
   verifyRegistration: <T>(body: unknown) => codestraRequest<T>("v1/auth/email-verification/verify", { method: "POST", body: JSON.stringify(body) }),
   providers: <T>() => codestraRequest<T>("v1/auth/providers"),
