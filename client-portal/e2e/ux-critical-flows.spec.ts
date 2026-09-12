@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { openGuestPlatform } from "./support/session";
+import { openPaperPlatform } from "./support/session";
 
 const forbidden = /requestId|correlationId|traceback|stack trace|integrityerror|operationalerror|\/api\/v\d|localhost|financial-service|postgres|redis|nats|docker/i;
 
@@ -31,7 +31,7 @@ test.describe("authenticated critical UX", () => {
   for (const viewport of [{ width: 375, height: 812 }, { width: 768, height: 1024 }, { width: 1024, height: 768 }, { width: 1440, height: 900 }]) {
     test(`dashboard is safe and responsive at ${viewport.width}px`, async ({ page }) => {
       await page.setViewportSize(viewport);
-      await openGuestPlatform(page);
+      await openPaperPlatform(page);
       await expect(page.getByText("Virtual funds only")).toBeVisible();
       await expect(page.locator("body")).not.toContainText(forbidden);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
@@ -43,7 +43,7 @@ test.describe("authenticated critical UX", () => {
   }
 
   test("profile, settings, trades, help, market and chart states are reachable", async ({ page }) => {
-    await openGuestPlatform(page);
+    await openPaperPlatform(page);
     await expect(page.locator(".chart-surface canvas").first()).toBeVisible();
     await page.getByRole("button", { name: "Market", exact: true }).click();
     await expect(page.locator("body")).not.toContainText(forbidden);

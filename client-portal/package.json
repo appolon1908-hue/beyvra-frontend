@@ -23,8 +23,8 @@
     "test:realtime": "vitest run src/realtime/UnifiedRealtimeClient.test.ts",
     "test": "npm run typecheck && npm run build:prod",
     "test:contract": "node scripts/check-api-contract.mjs",
-    "test:e2e": "playwright test"
-    ,"test:chart": "vitest run src/pages/private/platform/chart/chartEngine.test.ts src/pages/private/platform/chart/workspaceIntegration.test.ts src/pages/private/platform/chart/performance.test.ts src/pages/private/platform/chart/indicators/indicators.test.ts src/pages/private/platform/chart/drawings/drawings.test.ts src/pages/private/platform/chart/trades/tradeMarkers.test.ts src/pages/private/platform/chart/events/newsCalendar.test.ts"
+    "test:e2e": "playwright test",
+    "test:chart": "vitest run src/pages/private/platform/chart/chartEngine.test.ts src/pages/private/platform/chart/workspaceIntegration.test.ts src/pages/private/platform/chart/performance.test.ts src/pages/private/platform/chart/indicators/indicators.test.ts src/pages/private/platform/chart/drawings/drawings.test.ts src/pages/private/platform/chart/trades/tradeMarkers.test.ts src/pages/private/platform/chart/events/newsCalendar.test.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
@@ -90,6 +90,7 @@
     "tailwindcss": "^3.4.9",
     "typescript": "^5.2.2",
     "vite": "^8.2.0",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "ws": "8.21.1"
   }
 }

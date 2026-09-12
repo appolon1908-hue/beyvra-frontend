@@ -1,7 +1,6 @@
 export * from "./codestraDemo";
 export {
   codestraRequest as beyvraRequest,
-  codestraDemoApi as beyvraDemoApi,
   codestraRealtimeV2Api as beyvraRealtimeV2Api,
   codestraUserApi as beyvraUserApi,
   codestraWalletApi as beyvraWalletApi,

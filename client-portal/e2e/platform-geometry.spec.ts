@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { openGuestPlatform } from "./support/session";
+import { openPaperPlatform } from "./support/session";
 
 type Box = { x: number; y: number; width: number; height: number };
 
@@ -30,7 +30,7 @@ test.describe("authoritative platform geometry", () => {
   ]) {
     test(`${viewport.width}x${viewport.height} desktop frame`, async ({ page }) => {
       await page.setViewportSize(viewport);
-      await openGuestPlatform(page);
+      await openPaperPlatform(page);
       const chartWidth = viewport.width - viewport.rail - viewport.ticket;
       await expectBox(page.locator(".platformWrapper"), { x: 0, y: 0, width: viewport.width, height: viewport.height });
       await expectBox(page.locator(".sidebar"), { x: 0, y: 0, width: viewport.rail, height: viewport.height });
@@ -48,7 +48,7 @@ test.describe("authoritative platform geometry", () => {
   ]) {
     test(`${viewport.width}x${viewport.height} responsive frame`, async ({ page }) => {
       await page.setViewportSize(viewport);
-      await openGuestPlatform(page);
+      await openPaperPlatform(page);
       await expect(page.locator(".chart-container")).toBeVisible();
       await expectNoDocumentOverflow(page);
     });

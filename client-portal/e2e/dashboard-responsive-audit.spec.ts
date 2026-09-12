@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { openGuestPlatform } from "./support/session";
+import { openPaperPlatform } from "./support/session";
 
 async function noOverflow(page: Page) {
   const dimensions = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, content: document.documentElement.scrollWidth }));
@@ -11,7 +11,7 @@ test.describe("authenticated dashboard responsive audit", () => {
   for (const viewport of [{ width: 1440, height: 900 }, { width: 768, height: 1024 }, { width: 390, height: 844 }, { width: 360, height: 800 }]) {
     test(`platform remains usable at ${viewport.width}x${viewport.height}`, async ({ page }) => {
       await page.setViewportSize(viewport);
-      await openGuestPlatform(page);
+      await openPaperPlatform(page);
       await noOverflow(page);
       await expect(page.locator(".chart-container")).toBeVisible();
       await expect(page.getByText("Virtual funds only")).toBeVisible();

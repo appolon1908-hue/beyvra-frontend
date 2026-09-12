@@ -182,7 +182,7 @@ def validate_documentation(scripts: set[str]) -> None:
             "node scripts/check-api-contract.mjs --source-only",
             "API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contract",
             "E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e",
-            "POST /api/v1/demo/sessions",
+            "E2E_STORAGE_STATE",
             "Deploying this portal never enables live trading.",
         ),
         "client-portal README",
@@ -333,9 +333,9 @@ def validate_contract_and_browser() -> None:
     require(
         setup,
         (
-            'context.post("/api/v1/demo/sessions"',
-            "E2E_SKIP_GUEST_BOOTSTRAP",
-            "Guest session bootstrap failed",
+            'context.get("/api/v1/workspace/bootstrap"',
+            "E2E_PUBLIC_ONLY",
+            "Authenticated PAPER bootstrap failed",
         ),
         "Playwright global setup",
     )

@@ -1,33 +1,24 @@
 import { request, type FullConfig } from "@playwright/test";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { stat } from "node:fs/promises";
 
 export default async function globalSetup(config: FullConfig) {
+  if (process.env.E2E_PUBLIC_ONLY === "true") return;
+  const storageState = process.env.E2E_STORAGE_STATE;
+  if (!storageState) throw new Error("E2E_STORAGE_STATE must reference an authenticated PAPER test session captured through normal sign-in");
+  const metadata = await stat(storageState);
+  if (!metadata.isFile() || (metadata.mode & 0o077) !== 0) {
+    throw new Error("Authenticated E2E session state must be a private regular file (0600 or 0400)");
+  }
   const baseURL = config.projects[0]?.use.baseURL ?? process.env.E2E_BASE_URL ?? "http://127.0.0.1:8080";
-  const context = await request.newContext({ baseURL, timeout: 10_000 });
+  const context = await request.newContext({ baseURL, storageState, timeout: 10_000 });
   try {
-    const storagePath = path.resolve("test-results/storage/guest.json");
-    await fs.mkdir(path.dirname(storagePath), { recursive: true });
-    if (process.env.E2E_SKIP_GUEST_BOOTSTRAP === "true") {
-      await context.storageState({ path: storagePath });
-      return;
+    const response = await context.get("/api/v1/workspace/bootstrap");
+    if (!response.ok()) throw new Error(`Authenticated PAPER bootstrap failed (${response.status()})`);
+    const payload = await response.json();
+    if (payload.state !== "user.ready" || payload.account?.execution_mode !== "PAPER" ||
+        payload.account.funding_enabled !== false || payload.account.withdrawals_enabled !== false) {
+      throw new Error("E2E requires a normally authenticated PAPER account with financial effects disabled");
     }
-    const response = await context.post("/api/v1/demo/sessions", {
-      headers: { "Idempotency-Key": `playwright-global-${Date.now()}` },
-      data: {},
-    });
-    if (!response.ok()) {
-      throw new Error(`Guest session bootstrap failed (${response.status()}) at ${baseURL}`);
-    }
-    const payload = await response.json() as { access?: string };
-    if (!payload.access) throw new Error("Guest session response did not contain an access credential");
-    const origin = new URL(baseURL).origin;
-    await fs.writeFile(storagePath, JSON.stringify({ cookies: [
-      { name: "access_token", value: payload.access, domain: new URL(origin).hostname, path: "/", expires: -1, httpOnly: false, secure: origin.startsWith("https:"), sameSite: "Strict" },
-      { name: "codestra_guest_session", value: payload.access, domain: new URL(origin).hostname, path: "/", expires: -1, httpOnly: false, secure: origin.startsWith("https:"), sameSite: "Strict" },
-    ], origins: [] }));
-  } catch (error) {
-    throw new Error(`Playwright auth setup failed for ${baseURL}: ${error instanceof Error ? error.message : String(error)}`);
   } finally {
     await context.dispose();
   }

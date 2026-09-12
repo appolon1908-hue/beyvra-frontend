@@ -1,69 +1,114 @@
+import { stat } from "node:fs/promises";
+import { request } from "@playwright/test";
 import WebSocket from "ws";
 
-const base = process.env.LOAD_BASE_URL || "https://staging.beyvra.com";
-const count = Number(process.env.LOAD_CONNECTIONS || 1);
-const durationMs = Number(process.env.LOAD_DURATION_MS || 5000);
-const timeoutMs = Number(process.env.LOAD_TIMEOUT_MS || 15000);
-const requestedSubscriptions = Math.max(1, Number(process.env.LOAD_SUBSCRIPTIONS || 3));
-const availableChannels = [
-  "market.status", "notification", "demo.order", "demo.execution", "demo.position",
-  "compat.market-data", "compat.news", "compat.account", "compat.platform",
-  "market.compat.crypto", "market.compat.stocks",
-];
-const channels = availableChannels.slice(0, requestedSubscriptions);
-const started = Date.now();
-const metrics = { requested: count, subscriptions: channels.length, connected: 0, failed: 0, acknowledged: 0, duplicateAcks: 0, errors: 0, ticketFailures: 0, errorMessages: {}, connectMs: [], ackMs: [] };
-
-const sessionCount = Math.max(1, Number(process.env.LOAD_SESSION_COUNT || 1));
-const accesses = await Promise.all(Array.from({ length: sessionCount }, async (_, index) => {
-  const post = await fetch(`${base}/api/v1/demo/sessions`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "idempotency-key": `load-${Date.now()}-${index}` },
-    body: "{}",
-  });
-  if (!post.ok) throw new Error(`guest session failed: ${post.status}`);
-  return (await post.json()).access;
-}));
-
-async function ticket(index) {
-  const access = accesses[index % accesses.length];
-  const response = await fetch(`${base}/api/user/websocket_ticket/`, { headers: { authorization: `Bearer ${access}` } });
-  if (!response.ok) { metrics.ticketFailures++; throw new Error(`ticket failed: ${response.status}`); }
-  return (await response.json()).ws_ticket;
+function integer(name, fallback, maximum) {
+  const value = Number(process.env[name] ?? fallback);
+  if (!Number.isSafeInteger(value) || value < 1 || value > maximum) throw new Error(`Invalid ${name}`);
+  return value;
 }
 
+const target = process.env.LOAD_BASE_URL;
+const storageState = process.env.LOAD_STORAGE_STATE;
+if (!target || !storageState) throw new Error("LOAD_BASE_URL and private LOAD_STORAGE_STATE are required");
+const base = new URL(target);
+if (!["http:", "https:"].includes(base.protocol) || base.username || base.password || base.pathname !== "/" || base.search || base.hash) {
+  throw new Error("LOAD_BASE_URL must be an HTTP(S) origin without credentials");
+}
+const metadata = await stat(storageState);
+if (!metadata.isFile() || (metadata.mode & 0o077) !== 0) throw new Error("LOAD_STORAGE_STATE must be a private regular file");
+const count = integer("LOAD_CONNECTIONS", 1, 1000);
+const durationMs = integer("LOAD_DURATION_MS", 5000, 300000);
+const timeoutMs = integer("LOAD_TIMEOUT_MS", 15000, 60000);
+const channels = JSON.parse(process.env.LOAD_CHANNELS ?? '["system.status"]');
+if (!Array.isArray(channels) || channels.length < 1 || channels.length > 13 ||
+    channels.some((channel) => typeof channel !== "string" || !channel || channel.length > 200) ||
+    new Set(channels).size !== channels.length) throw new Error("LOAD_CHANNELS must contain 1–13 distinct channel names");
+const api = await request.newContext({ baseURL: base.origin, storageState, timeout: timeoutMs });
 const sockets = [];
-await Promise.all(Array.from({ length: count }, async () => {
-  let wsTicket;
-  try { wsTicket = await ticket(Math.floor(Math.random() * accesses.length)); } catch (error) {
-    metrics.failed++;
-    const key = String(error?.message || "ticket failure"); metrics.errorMessages[key] = (metrics.errorMessages[key] || 0) + 1;
-    return;
+let shuttingDown = false;
+const started = Date.now();
+const metrics = { requested: count, subscriptions: channels.length, connected: 0, failed: 0, acknowledged: 0, errors: 0, tokenFailures: 0, connectMs: [], ackMs: [] };
+
+try {
+  const workspace = await api.get("/api/v1/workspace/bootstrap");
+  if (workspace.status() !== 200) throw new Error("Authenticated workspace is unavailable");
+  const { state, account } = await workspace.json();
+  if (state !== "user.ready" || account?.execution_mode !== "PAPER" || account.funding_enabled !== false || account.withdrawals_enabled !== false) {
+    throw new Error("Load fixture requires a normally authenticated PAPER account");
   }
-  await new Promise((resolve) => {
-    const openedAt = Date.now();
-    const socket = new WebSocket(`${base.replace(/^http/, "ws")}/ws/v1/?ws_ticket=${encodeURIComponent(wsTicket)}`);
-    sockets.push(socket);
-    let settled = false;
-    const finish = () => { if (!settled) { settled = true; clearTimeout(timer); resolve(); } };
-    const timer = setTimeout(() => { metrics.failed++; socket.terminate(); finish(); }, timeoutMs);
-    socket.on("open", () => {
-      metrics.connected++; metrics.connectMs.push(Date.now() - openedAt);
-      socket.send(JSON.stringify({ action: "subscribe", request_id: crypto.randomUUID(), channels }));
+  const csrf = await api.get("/api/v1/auth/oidc/csrf/");
+  if (csrf.status() !== 200) throw new Error("CSRF bootstrap failed");
+  const { csrfToken } = await csrf.json();
+  if (typeof csrfToken !== "string" || !csrfToken) throw new Error("CSRF bootstrap returned no token");
+  const headers = { "X-CSRFToken": csrfToken, Origin: base.origin, Referer: `${base.origin}/platform` };
+  // Exercise the existing V2 authorization API. B17 migrates token acquisition
+  // to /api/v1/realtime/session; no guest sessions or V1 sockets are created.
+  for (const channel of channels) {
+    const authorized = await api.post("/api/v1/realtime/v2/subscription-token", { headers, data: { channel } });
+    if (authorized.status() !== 200) throw new Error("Channel authorization failed");
+  }
+  const socketURL = new URL("/ws/v2/", base);
+  socketURL.protocol = base.protocol === "https:" ? "wss:" : "ws:";
+  await Promise.all(Array.from({ length: count }, async () => {
+    let token;
+    try {
+      const issued = await api.post("/api/v1/realtime/v2/connection-token", { headers, data: {} });
+      if (issued.status() !== 200) throw new Error("Connection token unavailable");
+      token = (await issued.json()).token;
+      if (typeof token !== "string" || !token) throw new Error("Connection token missing");
+    } catch {
+      metrics.tokenFailures++; metrics.failed++;
+      return;
+    }
+    await new Promise((resolve) => {
+      const openedAt = Date.now();
+      const socket = new WebSocket(socketURL);
+      sockets.push(socket);
+      let finished = false;
+      let connected = false;
+      const pending = new Set(channels.map((_, index) => index + 2));
+      const finish = (failed) => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timer);
+        if (failed) { metrics.failed++; socket.terminate(); }
+        resolve();
+      };
+      const timer = setTimeout(() => finish(true), timeoutMs);
+      socket.on("open", () => socket.send(JSON.stringify({ id: 1, connect: { token } })));
+      socket.on("message", (raw) => {
+        for (const line of raw.toString().split("\n").filter(Boolean)) {
+          let reply;
+          try { reply = JSON.parse(line); } catch { metrics.errors++; finish(true); return; }
+          if (!reply || typeof reply !== "object" || Array.isArray(reply)) { metrics.errors++; finish(true); return; }
+          if (!Object.keys(reply).length) { socket.send("{}"); continue; }
+          if (reply.error) { metrics.errors++; finish(true); return; }
+          if (reply.id === 1 && reply.connect && !connected) {
+            connected = true; metrics.connected++; metrics.connectMs.push(Date.now() - openedAt);
+            channels.forEach((channel, index) => socket.send(JSON.stringify({ id: index + 2, subscribe: { channel, recover: true } })));
+          } else if (connected && pending.has(reply.id) && reply.subscribe) {
+            pending.delete(reply.id); metrics.acknowledged++;
+            if (!pending.size) { metrics.ackMs.push(Date.now() - openedAt); finish(false); }
+          }
+        }
+      });
+      socket.on("error", () => { metrics.errors++; finish(true); });
+      socket.on("close", () => {
+        if (!finished) finish(true);
+        else if (!shuttingDown && connected && !pending.size) metrics.errors++;
+      });
     });
-    socket.on("message", (raw) => {
-      let message; try { message = JSON.parse(raw.toString()); } catch { metrics.errors++; return; }
-      if (message.type === "subscription.ack") {
-        metrics.acknowledged++; if ((message.added || []).length !== channels.length) metrics.duplicateAcks++;
-        metrics.ackMs.push(Date.now() - openedAt); finish();
-      }
-      if (message.type === "error" || message.type === "subscription.error") metrics.errors++;
-    });
-    socket.on("error", (error) => { metrics.errors++; const key = String(error?.message || "unknown"); metrics.errorMessages[key] = (metrics.errorMessages[key] || 0) + 1; });
-    socket.on("close", () => { if (!settled) metrics.failed++; finish(); });
-  });
-}));
-await new Promise((resolve) => setTimeout(resolve, durationMs));
-sockets.forEach((socket) => socket.close());
-const percentile = (values, p) => { const sorted = [...values].sort((a, b) => a - b); return sorted.length ? sorted[Math.min(sorted.length - 1, Math.ceil(sorted.length * p) - 1)] : null; };
-console.log(JSON.stringify({ ...metrics, elapsedMs: Date.now() - started, connectP50Ms: percentile(metrics.connectMs, .5), connectP95Ms: percentile(metrics.connectMs, .95), connectP99Ms: percentile(metrics.connectMs, .99), ackP95Ms: percentile(metrics.ackMs, .95) }));
+  }));
+  await new Promise((resolve) => setTimeout(resolve, durationMs));
+} finally {
+  shuttingDown = true;
+  sockets.forEach((socket) => socket.terminate());
+  await api.dispose();
+}
+const percentile = (values, p) => {
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted.length ? sorted[Math.min(sorted.length - 1, Math.ceil(sorted.length * p) - 1)] : null;
+};
+process.stdout.write(JSON.stringify({ ...metrics, elapsedMs: Date.now() - started, connectP95Ms: percentile(metrics.connectMs, .95), ackP95Ms: percentile(metrics.ackMs, .95) }) + "\n");
+if (metrics.failed || metrics.errors || metrics.connected !== count || metrics.acknowledged !== count * channels.length) process.exitCode = 1;

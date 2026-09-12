@@ -1,6 +1,5 @@
 export type PlatformFeatureFlags = {
-  demoTrading: boolean;
-  guestDemo: boolean;
+  paperTrading: boolean;
   liveTrading: boolean;
   deposits: boolean;
   withdrawals: boolean;
@@ -22,8 +21,7 @@ export type PlatformFeatureFlags = {
 
 /** Safe staging defaults. The server config endpoint is authoritative when available. */
 export const stagingPlatformFeatures: PlatformFeatureFlags = {
-  demoTrading: true,
-  guestDemo: true,
+  paperTrading: true,
   liveTrading: false,
   deposits: false,
   withdrawals: false,

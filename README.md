@@ -125,10 +125,10 @@ API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contra
 Playwright requires a running integrated staging origin and does not start either application:
 
 ```bash
-E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e
+E2E_STORAGE_STATE=/private/paper-session.json E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e
 ```
 
-Authenticated browser acceptance requires `POST /api/v1/demo/sessions`. `E2E_SKIP_GUEST_BOOTSTRAP=true` is allowed only for an explicitly unauthenticated test subset.
+Authenticated browser acceptance requires `E2E_STORAGE_STATE` pointing to a private (0600 or 0400) Playwright session file captured through normal sign-in for a dedicated PAPER account. The setup verifies account mode and financial restrictions and never creates guest credentials. `E2E_PUBLIC_ONLY=true` runs only the public identity project; it does not certify authenticated behavior.
 
 ## Container architecture
 

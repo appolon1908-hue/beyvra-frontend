@@ -9,3 +9,6 @@
 /Dockerfile.prod
 /docker-compose.yaml
 /docker-compose.prod.yaml
+/test-results
+/playwright-report
+/e2e/.auth

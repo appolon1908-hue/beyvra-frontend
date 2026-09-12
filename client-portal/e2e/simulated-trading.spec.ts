@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test";
-import { guestAccess } from "./support/session";
+import { paperSession } from "./support/session";
 
-test("canonical simulation preview, idempotent order, settlement, and real-mode denial", async ({ request, context, baseURL }) => {
+test("canonical simulation preview, idempotent order, settlement, and real-mode denial", async ({ context, baseURL }) => {
   const origin = baseURL ?? "http://127.0.0.1:8080";
-  const access = await guestAccess(context, baseURL);
-  const simulation = { Authorization: `Bearer ${access}`, "Content-Type": "application/json", "X-Beyvra-Simulation-Mode": "true" };
+  const { api: request, headers: auth } = await paperSession(context, baseURL);
+  const simulation = { ...auth, "Content-Type": "application/json", "X-Beyvra-Simulation-Mode": "true" };
   const order = { instrument: "BTC-USD", side: "BUY", order_type: "MARKET", quantity: "0.001" };
 
   const preview = await request.post(`${origin}/api/v1/trading/orders/preview`, { headers: simulation, data: order });
@@ -18,7 +18,11 @@ test("canonical simulation preview, idempotent order, settlement, and real-mode 
   const candidate = await created.json();
   expect(candidate).toMatchObject({ instrument: "BTC-USD", side: "BUY", simulation: true });
   const duplicate = await request.post(`${origin}/api/v1/trading/orders`, { headers, data: order });
+  expect(duplicate.status()).toBe(201);
   expect((await duplicate.json()).id).toBe(candidate.id);
+  const conflict = await request.post(`${origin}/api/v1/trading/orders`, { headers, data: { ...order, quantity: "0.002" } });
+  expect(conflict.status()).toBe(409);
+  expect(await conflict.json()).toMatchObject({ error: { code: "IDEMPOTENCY_CONFLICT" } });
 
   await expect.poll(async () => {
     const orders = await request.get(`${origin}/api/v1/trading/orders`, { headers: simulation });
@@ -35,7 +39,7 @@ test("canonical simulation preview, idempotent order, settlement, and real-mode 
   expect((await accounts.json()).results[0]).toMatchObject({ simulation: true, currency: "USD" });
 
   const realModeAttempt = await request.post(`${origin}/api/v1/trading/orders`, {
-    headers: { Authorization: `Bearer ${access}`, "Content-Type": "application/json", "Idempotency-Key": `real-${Date.now()}` },
+    headers: { ...auth, "Content-Type": "application/json", "Idempotency-Key": `real-${Date.now()}` },
     data: order,
   });
   expect(realModeAttempt.status()).toBe(503);

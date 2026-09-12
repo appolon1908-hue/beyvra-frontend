@@ -26,9 +26,6 @@ export const apiEndpoints = {
     snapshot: "v1/market/quotes",
     candles: "v1/market/candles",
   },
-  demo: {
-    config: "v1/demo/config",
-  },
   simulationTrading: {
     preview: "v1/trading/orders/preview",
     orders: "v1/trading/orders",
@@ -49,7 +46,7 @@ export const apiEndpoints = {
     calendar: "v1/economic-calendar",
   },
   // These capabilities are intentionally not advertised until a matching
-  // backend contract exists. Demo configuration is served by demo.config.
+  // backend contract exists. Workspace configuration comes from bootstrap.
   realtime: {},
   integrations: {
     tenantContext: "v1/tenant/context",
