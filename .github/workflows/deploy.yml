@@ -40,7 +40,7 @@ on:
         required: true
         type: string
       deploy:
-        description: Deploy after producing the release manifest
+        description: Legacy deploy switch; must remain false (infrastructure is runtime authority)
         required: true
         default: false
         type: boolean
@@ -90,7 +90,7 @@ jobs:
       NGINX_BASE_IMAGE: "docker.io/nginxinc/nginx-unprivileged:1.29-alpine@sha256:0c79d56aee561a1d81c63f00eee5fb5fe29279560cdc55e91425133104c7fbe6"
     steps:
       - name: Require workflow and source authority from protected main
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
           fetch-depth: 0
@@ -106,6 +106,7 @@ jobs:
           [[ "$BACKEND_IMAGE" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
           [[ "$BACKEND_CERTIFICATION_RUN_ID" =~ ^[0-9]+$ ]]
           [[ "$CHANGE_ID_INPUT" =~ ^[A-Za-z0-9._-]+$ ]]
+          test "$DEPLOY_REQUESTED" = "false"
           git fetch origin main
           git cat-file -e "${SOURCE_SHA}^{commit}"
           git merge-base --is-ancestor "$SOURCE_SHA" origin/main
@@ -138,13 +139,11 @@ jobs:
           case "$TARGET" in
             staging-readonly)
               test "$PUBLISH_IMAGE" = "true"
-              test "$DEPLOY_REQUESTED" = "true"
               test -z "$PROVIDED_FRONTEND_IMAGE"
               test "$SOURCE_SHA" = "$(git rev-parse origin/main)"
               ;;
             production-readonly)
               test "$PUBLISH_IMAGE" = "false"
-              test "$DEPLOY_REQUESTED" = "true"
               [[ "$PROVIDED_FRONTEND_IMAGE" =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
               ;;
             *)
@@ -167,7 +166,7 @@ jobs:
           BACKEND_CERTIFICATION_EVIDENCE_DIR: evidence/backend-certification
         run: operations/verify_backend_certification.sh
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: beyvra-frontend-backend-authority-${{ inputs.source_sha }}
           path: evidence/backend-certification
@@ -183,14 +182,14 @@ jobs:
       frontend_image: ${{ steps.refs.outputs.frontend_image }}
       built_at: ${{ steps.metadata.outputs.built_at }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.eligibility.outputs.source_sha }}
           fetch-depth: 0
 
-      - uses: docker/setup-buildx-action@v4
+      - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4
 
-      - uses: docker/login-action@v4
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -208,7 +207,7 @@ jobs:
 
       - id: image
         name: Build and publish frontend
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
         with:
           context: ./client-portal
           file: ./client-portal/Dockerfile.prod
@@ -263,12 +262,12 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       PUBLISH_IMAGE: ${{ inputs.publish_image }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.eligibility.outputs.source_sha }}
           fetch-depth: 0
 
-      - uses: docker/login-action@v4
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -305,6 +304,7 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/deploy.yml" \
             --source-ref refs/heads/main \
+            --bundle-from-oci \
             --format json \
             > frontend-attestation-verification.json
           jq -e 'type == "array" and length > 0' \
@@ -345,7 +345,7 @@ jobs:
             }' > release-manifest.json
           sha256sum release-manifest.json > release-manifest.json.sha256
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: beyvra-frontend-release-${{ needs.eligibility.outputs.source_sha }}
           path: |
@@ -359,7 +359,10 @@ jobs:
     needs:
       - eligibility
       - resolve
-    if: inputs.deploy
+    # RUNTIME_MUTATION_DISABLED=true
+    # Runtime mutation is exclusively owned by Infustruction-repo. Retain this
+    # historical job as reviewable rollback context, but make it unreachable.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 35
     environment:
@@ -387,7 +390,7 @@ jobs:
       CHANGE_ID: ${{ inputs.change_id }}
       DEPLOYMENT_TARGET: ${{ inputs.target }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.eligibility.outputs.source_sha }}
           fetch-depth: 0
@@ -514,7 +517,7 @@ jobs:
             evidence/ || true
           rm -f evidence/workflow.env evidence/*/workflow.env
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: always()
         with:
           name: beyvra-frontend-deployment-${{ inputs.target }}-${{ inputs.change_id }}

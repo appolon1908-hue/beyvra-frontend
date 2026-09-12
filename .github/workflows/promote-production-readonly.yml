@@ -33,6 +33,9 @@ permissions:
 
 jobs:
   inspect:
+    # RUNTIME_MUTATION_DISABLED=true
+    # Legacy promotion is disabled in favor of the protected portfolio controller.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     outputs:
@@ -183,6 +186,8 @@ jobs:
         run: operations/verify_backend_certification.sh
 
   authorize:
+    # RUNTIME_MUTATION_DISABLED=true
+    if: ${{ false }}
     needs: inspect
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -200,6 +205,8 @@ jobs:
           [[ "$EXTERNAL_CANARY_ROUTING_VERIFIED" == "true" ]]
 
   dispatch:
+    # RUNTIME_MUTATION_DISABLED=true
+    if: ${{ false }}
     needs:
       - inspect
       - authorize
@@ -235,7 +242,7 @@ jobs:
             -f "inputs[backend_source_sha]=$BACKEND_SOURCE_SHA" \
             -f "inputs[backend_image]=$BACKEND_IMAGE" \
             -f "inputs[backend_certification_run_id]=$BACKEND_CERTIFICATION_RUN_ID" \
-            -f "inputs[deploy]=true" \
+            -f "inputs[deploy]=false" \
             -f "inputs[change_id]=$PRODUCTION_CHANGE_ID"
 
           jq -n \

@@ -351,8 +351,8 @@ def validate_release_authority() -> None:
         ci,
         (
             "exact-head-base-ci:",
-            "gitleaks/gitleaks-action@v2",
-            "aquasecurity/trivy-action@0.35.0",
+            "gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7",
+            "aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1",
             "npm run audit:gate",
             "test ! -e client-portal/deploy.sh",
             "docker compose -f docker-compose.yaml config --images",
