@@ -56,3 +56,4 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
+client-portal/e2e/.auth/

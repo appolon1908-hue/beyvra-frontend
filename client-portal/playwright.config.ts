@@ -11,7 +11,14 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
-    storageState: "test-results/storage/guest.json",
   },
+  projects: [
+    { name: "public", testMatch: "public-identity.spec.ts" },
+    ...(process.env.E2E_PUBLIC_ONLY === "true" ? [] : [{
+      name: "authenticated-paper",
+      testIgnore: "public-identity.spec.ts",
+      use: { storageState: process.env.E2E_STORAGE_STATE },
+    }]),
+  ],
   reporter: [["list"], ["html", { open: "never" }]],
 });

@@ -62,13 +62,13 @@ API_SCHEMA_URL=https://YOUR_APPROVED_STAGING_API/api/schema/ npm run test:contra
 
 The checker reads the real `src/api/endpoints.ts` definitions plus direct request literals, refuses empty or unexpectedly small discovery, and compares those paths with the backend schema.
 
-Playwright requires a running frontend at `E2E_BASE_URL`, a same-origin `/api` route to a non-production backend, and `POST /api/v1/demo/sessions` for guest-session bootstrap:
+Playwright requires a running frontend at `E2E_BASE_URL`, a same-origin `/api` route to the integrated test backend, and `E2E_STORAGE_STATE` pointing to a private (0600 or 0400) Playwright session file captured through normal sign-in for a dedicated PAPER account:
 
 ```bash
-E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e
+E2E_STORAGE_STATE=/private/paper-session.json E2E_BASE_URL=https://YOUR_APPROVED_STAGING_DOMAIN npm run test:e2e
 ```
 
-`E2E_SKIP_GUEST_BOOTSTRAP=true` is valid only for a deliberately unauthenticated test subset. It must not be used as evidence for authenticated, portfolio, order, or session behavior.
+`E2E_PUBLIC_ONLY=true` selects only the public identity project. The normal suite refuses missing, expired, guest, LIVE, or financially enabled session fixtures. This public-only subset does not certify authenticated, portfolio, order, or session behavior. Request helpers use the session cookies and normal BFF CSRF bootstrap; they do not extract bearer tokens.
 
 The contract, realtime, chart, browser, accessibility, localization, safe-error, brand, and dependency gates must pass on the exact release commit with their stated prerequisites. A local build or source-only parser pass is not production evidence.
 
